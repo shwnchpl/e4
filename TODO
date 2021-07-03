@@ -1,0 +1,18 @@
+Repo Maintenance
+----------------
+
+- Add license text to all source files.
+- Update README.rst to actually explain this project.
+
+
+Build
+-----
+
+- Add an amalgamated source target using amal.rb.
+- Create a repl build that uses the amalgamated source target.
+
+
+Misc
+----
+
+- Sort out e4-debug.h and put things where they actually belong.
