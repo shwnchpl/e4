@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 
-#define RETURN_ ((void*)0xdeadbeef)
+#define RETURN_ ((void*)e4__return)
 
 struct e4__vm_state
 {
@@ -22,5 +22,6 @@ void e4__execute(struct e4__vm_state *state, void *next);
 void e4__execute_threaded(struct e4__vm_state *state, void *next);
 void e4__abort(struct e4__vm_state *state, void *next);
 void e4__skip(struct e4__vm_state *state, void *next);
+void e4__return(struct e4__vm_state *state, void *next);
 
 #endif /* E4_DEBUG_H_ */

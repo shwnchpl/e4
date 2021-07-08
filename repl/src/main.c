@@ -44,10 +44,8 @@ void print_anything(struct e4__vm_state *state, void *next)
 {
     printf("\nHello\n");
     printf("Payload: %s\n", *((char**)next));
-    state->ip = *--state->r;
-    printf("Returning to %p\n", state->ip);
 
-    return;
+    e4__return(state, next);
 }
 
 int main(void)
