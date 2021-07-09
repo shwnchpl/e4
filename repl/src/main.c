@@ -1,7 +1,7 @@
 #include "e4-debug.h"
 #include <stdio.h>
 
-static void print_anything(struct e4__vm_state *state, void *next);
+static void print_anything(struct e4__task *state, void *next);
 
 void *PRINT_HELLO[] =
 {
@@ -11,19 +11,19 @@ void *PRINT_HELLO[] =
 
 void *ABORT[] =
 {
-    e4__abort,
+    e4__builtin_abort,
 };
 
 void *SKIP[] =
 {
-    e4__skip,
+    e4__builtin_skip,
 };
 
 void *HELLO1[] =
 {
     e4__execute_threaded,
     PRINT_HELLO,
-    RETURN_
+    e4__builtin_return
 };
 
 void *HELLO2[] =
@@ -35,32 +35,32 @@ void *HELLO2[] =
     HELLO1,
     ABORT,
     HELLO1,
-    RETURN_
+    e4__builtin_return
 };
 
-void (***RETURN_STACK[32])(struct e4__vm_state *, void *) = {0,};
-
-void print_anything(struct e4__vm_state *state, void *next)
+void print_anything(struct e4__task *state, void *next)
 {
     printf("\nHello\n");
     printf("Payload: %s\n", *((char**)next));
 
-    e4__return(state, next);
+    e4__builtin_return(state, next);
 }
 
 int main(void)
 {
-    struct e4__vm_state state;
+    static unsigned char buffer[4096];
+
+    struct e4__task *task;
 
     printf("Trying print hello...\n");
 
-    state.ip = NULL;
-    state.r = RETURN_STACK;
-    state.r_base = RETURN_STACK;
+    task = e4__task_create(buffer, sizeof(buffer));
 
-    /* e4__execute_threaded(&state, &HELLO2[1]); */
-    e4__execute(&state, HELLO2);
-    /* e4__execute(&state, PRINT_HELLO); */
+    printf("Trying to execute... ...\n");
+
+    /* e4__execute_threaded(task, &HELLO2[1]); */
+    e4__execute(task, HELLO2);
+    /* e4__execute(task, PRINT_HELLO); */
 
     return 0;
 }
