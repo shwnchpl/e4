@@ -18,22 +18,19 @@ typedef void** e4__void;
 struct e4__task
 {
     /* User table. */
-    /* TODO: Improve the order of these. */
     e4__void here;
     e4__void pad;
-    e4__void sp;
     e4__void s0;
+    e4__void sp;
     e4__void tib;
     e4__void tib_oft;
     e4__void tib_sz;
+    e4__void r0;
     e4__void rp;
     e4__void ip;
 
-    /* FIXME: Hack. Remove me. Maybe? */
-    e4__void r0;
-
+    /* System variables. */
     unsigned long sz;
-
     struct e4__dict_header *dict;
 };
 

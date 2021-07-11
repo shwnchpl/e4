@@ -56,8 +56,6 @@ int main(void)
 
     task = e4__task_create(buffer, sizeof(buffer));
 
-    printf("Trying to execute... ...\n");
-
     /* e4__execute_threaded(task, &HELLO2[1]); */
     e4__execute(task, HELLO2);
     /* e4__execute(task, PRINT_HELLO); */

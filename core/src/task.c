@@ -4,6 +4,10 @@
 struct e4__task* e4__task_create(void *buffer, unsigned long size)
 {
     struct e4__task *task;
+    e4__void cursor = buffer;
+
+    /* Align size to pointer width. */
+    size = size / sizeof(e4__void) * sizeof(e4__void);
 
     if (size < e4__MIN_TASK_SZ)
         return NULL;
@@ -11,23 +15,62 @@ struct e4__task* e4__task_create(void *buffer, unsigned long size)
     /* TODO: Make this optional somehow? */
     memset(buffer, 0, size);
 
+    /* Allocate space as follows:
+        70%-sizeof(*task) of dictionary
+        5% pad
+        10% parameter stack
+        5% TIB.
+        10% return stack.
+
+       To start, none of these will be checked, and none of them may
+       ever be checked. Since the user specifies the size, they should
+       have a good idea of whether or not they'll encounter issues
+       without checking. If they think they will, they should do so
+       themselves.
+
+       This is all just tentative. Builtin checks may be added later.
+    */
+
     task = buffer;
     task->sz = size;
+    task->dict = NULL;
 
-    /* TODO: Set task pad and tid. */
-    task->pad = NULL;
-    task->tib = NULL;
+    /* struct e4__task is guaranteed to be aligned to at least
+       sizeof(e4__void) (since it contains fields that are
+       e4__void), so this is safe. */
 
-    /* TODO: Set the stack position. */
-    task->s0 = NULL;
-    task->sp = NULL;
+    task->here = cursor + sizeof(*task) / sizeof(e4__void);
+    task->pad = cursor + (70 * size) / (100 * sizeof(e4__void));
+    task->s0 = cursor + (85 * size) / (100 * sizeof(e4__void));
+    task->sp = task->s0;
+    task->tib = cursor + (85 * size) / (100 * sizeof(e4__void)) + 1;
+    task->r0 = cursor + (size - 1) / sizeof(e4__void);
+    task->rp = task->r0;
 
-    /* TODO: Set the return stack to its real position and make it grow down. */
-    task->r0 = (e4__void)buffer + (size/sizeof(e4__void)) - 64;
-    task->rp = (e4__void)buffer + (size/sizeof(e4__void)) - 64;
-
-    task->dict = NULL; /* TODO: Set dict position. */
-    task->here = NULL; /* TODO: Set dict position. */
+#if 0
+    printf("\nCREATED TASK:\n"
+        "\ttask = %p\n"
+        "\ttask->sz = %lu\n"
+        "\ttask->dict = %p\n"
+        "\ttask->here = %p\n"
+        "\ttask->pad = %p\n"
+        "\ttask->s0 = %p\n"
+        "\ttask->sp = %p\n"
+        "\ttask->tib = %p\n"
+        "\ttask->r0 = %p\n"
+        "\ttask->rp = %p\n\n",
+        task,
+        task->sz,
+        task->dict,
+        task->here,
+        task->pad,
+        task->s0,
+        task->sp,
+        task->tib,
+        task->r0,
+        task->rp
+    );
+#endif
 
     return task;
 }

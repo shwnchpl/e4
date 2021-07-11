@@ -9,18 +9,18 @@ void e4__builtin_abort(struct e4__task *state, void *next)
     };
 
     printf("ABORTING ALL EXECUTION...\n");
-    for (i = -1; &state->rp[i] >= state->r0; --i)
+    for (i = 1; &state->rp[i] <= state->r0; ++i)
         state->rp[i] = RETURN;
-    state->ip = e4__DEREF(--state->rp);
+    state->ip = e4__DEREF(++state->rp);
 }
 
 void e4__builtin_return(struct e4__task *state, void *next)
 {
-    state->ip = e4__DEREF(--state->rp);
+    state->ip = e4__DEREF(++state->rp);
     printf("Returning to %p\n", (void*)state->ip);
 }
 
 void e4__builtin_skip(struct e4__task *state, void *next)
 {
-    state->ip = e4__DEREF(--state->rp) + 1;
+    state->ip = e4__DEREF(++state->rp) + 1;
 }
