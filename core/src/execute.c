@@ -17,8 +17,7 @@ void e4__execute_threaded(struct e4__task *state, void *next)
 
     printf("In e4__execute_threaded...: %p\n", e4__execute_threaded);
 
-    while (depth)
-    {
+    while (depth) {
         printf("Branching (%d) to %p, return addr: %p\n",
             depth, e4__DEREF2(state->ip), e4__DEREF(state->ip) + 1);
         if (e4__DEREF2(state->ip) == (e4__void)e4__execute_threaded) {

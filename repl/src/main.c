@@ -1,5 +1,6 @@
 #include "e4-debug.h"
 #include <stdio.h>
+#include <string.h>
 
 static void print_anything(struct e4__task *state, void *next);
 
@@ -51,6 +52,7 @@ int main(void)
     static unsigned char buffer[4096];
 
     struct e4__task *task;
+    void *tmp;
 
     printf("Trying print hello...\n");
 
@@ -59,6 +61,26 @@ int main(void)
     /* e4__execute_threaded(task, &HELLO2[1]); */
     e4__execute(task, HELLO2);
     /* e4__execute(task, PRINT_HELLO); */
+
+    e4__task_load_builtins(task);
+
+    tmp = task->here;
+    task->here = e4__dict_entry(task->here, task->dict,
+            "test-func", 9, NULL, NULL, 0);
+    task->dict = tmp;
+
+    tmp = task->here;
+    task->here = e4__dict_entry(task->here, task->dict,
+            "test-func2", 10, NULL, NULL, 0);
+    task->dict = tmp;
+
+    tmp = task->here;
+    task->here = e4__dict_entry(task->here, task->dict,
+            "test-func3", 10, NULL, NULL, 0);
+    task->dict = tmp;
+
+    printf("%p : %p\n", task->here, e4__dict_lookup(task->dict, "test-func3",
+                strlen("test-func3"))->footer->data);
 
     return 0;
 }

@@ -3,8 +3,8 @@
 
 struct e4__task* e4__task_create(void *buffer, unsigned long size)
 {
-    struct e4__task *task;
-    e4__void cursor = buffer;
+    register struct e4__task *task;
+    register e4__void cursor = buffer;
 
     /* Align size to pointer width. */
     size = size / sizeof(e4__void) * sizeof(e4__void);
@@ -73,4 +73,16 @@ struct e4__task* e4__task_create(void *buffer, unsigned long size)
 #endif
 
     return task;
+}
+
+void e4__task_load_builtins(struct e4__task *task)
+{
+    struct e4__builtin *b = e4__BUILTIN_TABLE;
+
+    for (b = e4__BUILTIN_TABLE; b->name; ++b) {
+        register void *here = task->here;
+        task->here = e4__dict_entry(here, task->dict, b->name, b->nbytes,
+                    b->code, NULL, 0);
+        task->dict = here;
+    }
 }

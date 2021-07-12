@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 
+/* TODO: Consider renaming this to e4__cell. */
 typedef void** e4__void;
 
 #define e4__DEREF(p)    (*((e4__void*)(p)))
@@ -37,18 +38,29 @@ struct e4__task
 struct e4__dict_header
 {
     struct e4__dict_header *link;
+    struct e4__dict_footer *footer;
 
+    /* FIXME: Consider moving flags to the footer. */
     unsigned short flags;
     unsigned short nbytes;
-    unsigned char name[1];
+    char name[1];
 };
 
 struct e4__dict_footer
 {
     void *user;
     void *code;
-    unsigned char data[1];
+    e4__void data[1];
 };
+
+struct e4__builtin
+{
+    char *name;
+    unsigned short nbytes;
+    void (*code)(struct e4__task *, void *);
+};
+
+extern struct e4__builtin e4__BUILTIN_TABLE[];
 
 void e4__execute(struct e4__task *state, void *next);
 void e4__execute_threaded(struct e4__task *state, void *next);
@@ -56,6 +68,12 @@ void e4__builtin_abort(struct e4__task *state, void *next);
 void e4__builtin_return(struct e4__task *state, void *next);
 void e4__builtin_skip(struct e4__task *state, void *next);
 
+void* e4__dict_entry(void *here, struct e4__dict_header *prev, char *name,
+        unsigned short nbytes, void *code, void *user, unsigned short flags);
+struct e4__dict_header* e4__dict_lookup(struct e4__dict_header *dict,
+        char *name, unsigned short nbytes);
+
 struct e4__task* e4__task_create(void *buffer, unsigned long size);
+void e4__task_load_builtins(struct e4__task *task);
 
 #endif /* E4_DEBUG_H_ */
