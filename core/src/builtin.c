@@ -18,7 +18,7 @@ struct e4__builtin e4__BUILTIN_TABLE[] =
 };
 #undef _e4_BUILTIN_DECL
 
-void e4__builtin_abort(struct e4__task *state, void *next)
+void e4__builtin_abort(struct e4__task *task, void *next)
 {
     register int i;
     static const void *RETURN[] =
@@ -27,18 +27,18 @@ void e4__builtin_abort(struct e4__task *state, void *next)
     };
 
     printf("ABORTING ALL EXECUTION...\n");
-    for (i = 1; &state->rp[i] <= state->r0; ++i)
-        state->rp[i] = RETURN;
-    state->ip = e4__DEREF(++state->rp);
+    for (i = 1; &task->rp[i] <= task->r0; ++i)
+        task->rp[i] = RETURN;
+    task->ip = e4__DEREF(++task->rp);
 }
 
-void e4__builtin_return(struct e4__task *state, void *next)
+void e4__builtin_return(struct e4__task *task, void *next)
 {
-    state->ip = e4__DEREF(++state->rp);
-    printf("Returning to %p\n", (void*)state->ip);
+    task->ip = e4__DEREF(++task->rp);
+    printf("Returning to %p\n", (void*)task->ip);
 }
 
-void e4__builtin_skip(struct e4__task *state, void *next)
+void e4__builtin_skip(struct e4__task *task, void *next)
 {
-    state->ip = e4__DEREF(++state->rp) + 1;
+    task->ip = e4__DEREF(++task->rp) + 1;
 }

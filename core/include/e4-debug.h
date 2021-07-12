@@ -62,11 +62,11 @@ struct e4__builtin
 
 extern struct e4__builtin e4__BUILTIN_TABLE[];
 
-void e4__execute(struct e4__task *state, void *next);
-void e4__execute_threaded(struct e4__task *state, void *next);
-void e4__builtin_abort(struct e4__task *state, void *next);
-void e4__builtin_return(struct e4__task *state, void *next);
-void e4__builtin_skip(struct e4__task *state, void *next);
+void e4__execute(struct e4__task *task, void *next);
+void e4__execute_threaded(struct e4__task *task, void *next);
+void e4__builtin_abort(struct e4__task *task, void *next);
+void e4__builtin_return(struct e4__task *task, void *next);
+void e4__builtin_skip(struct e4__task *task, void *next);
 
 void* e4__dict_entry(void *here, struct e4__dict_header *prev, char *name,
         unsigned short nbytes, void *code, void *user, unsigned short flags);

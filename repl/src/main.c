@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 
-static void print_anything(struct e4__task *state, void *next);
+static void print_anything(struct e4__task *task, void *next);
 
 void *PRINT_HELLO[] =
 {
@@ -39,12 +39,12 @@ void *HELLO2[] =
     e4__builtin_return
 };
 
-void print_anything(struct e4__task *state, void *next)
+void print_anything(struct e4__task *task, void *next)
 {
     printf("\nHello\n");
     printf("Payload: %s\n", *((char**)next));
 
-    e4__builtin_return(state, next);
+    e4__builtin_return(task, next);
 }
 
 int main(void)
