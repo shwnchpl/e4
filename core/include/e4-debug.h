@@ -76,4 +76,12 @@ struct e4__dict_header* e4__dict_lookup(struct e4__dict_header *dict,
 struct e4__task* e4__task_create(void *buffer, unsigned long size);
 void e4__task_load_builtins(struct e4__task *task);
 
+void e4__stack_push(struct e4__task *task, void *v);
+e4__cell e4__stack_pop(struct e4__task *task);
+e4__cell e4__stack_peek(struct e4__task *task);
+unsigned long e4__stack_depth(struct e4__task *task);
+void e4__stack_rpush(struct e4__task *task, void *v);
+e4__cell e4__stack_rpop(struct e4__task *task);
+e4__cell e4__stack_rpeek(struct e4__task *task);
+
 #endif /* E4_DEBUG_H_ */

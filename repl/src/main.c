@@ -82,5 +82,58 @@ int main(void)
     printf("%p : %p\n", task->here, e4__dict_lookup(task->dict, "test-func3",
                 strlen("test-func3"))->footer->data);
 
+    do {
+        e4__cell cells[6];
+        unsigned long depth0, depth1;
+
+        printf("Stack and return stack:\n");
+
+        e4__stack_push(task, 2);
+        e4__stack_push(task, 4);
+        e4__stack_push(task, 8);
+        e4__stack_push(task, 16);
+        e4__stack_push(task, 32);
+
+        depth0 = e4__stack_depth(task);
+        cells[0] = e4__stack_peek(task);
+        cells[1] = e4__stack_pop(task);
+        cells[2] = e4__stack_pop(task);
+        cells[3] = e4__stack_pop(task);
+        cells[4] = e4__stack_pop(task);
+        cells[5] = e4__stack_pop(task);
+        depth1 = e4__stack_depth(task);
+
+        printf("(start-depth: %lu) (peek: %p) %p %p %p %p %p (end-depth: %lu)\n",
+            depth0,
+            cells[0],
+            cells[1],
+            cells[2],
+            cells[3],
+            cells[4],
+            cells[5],
+            depth1);
+
+        e4__stack_rpush(task, 3);
+        e4__stack_rpush(task, 5);
+        e4__stack_rpush(task, 9);
+        e4__stack_rpush(task, 17);
+        e4__stack_rpush(task, 33);
+
+        cells[0] = e4__stack_rpeek(task);
+        cells[1] = e4__stack_rpop(task);
+        cells[2] = e4__stack_rpop(task);
+        cells[3] = e4__stack_rpop(task);
+        cells[4] = e4__stack_rpop(task);
+        cells[5] = e4__stack_rpop(task);
+
+        printf("(peek: %p) %p %p %p %p %p\n",
+            cells[0],
+            cells[1],
+            cells[2],
+            cells[3],
+            cells[4],
+            cells[5]);
+    } while (0);
+
     return 0;
 }
