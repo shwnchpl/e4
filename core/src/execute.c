@@ -20,12 +20,12 @@ void e4__execute_threaded(struct e4__task *state, void *next)
     while (depth) {
         printf("Branching (%d) to %p, return addr: %p\n",
             depth, e4__DEREF2(state->ip), e4__DEREF(state->ip) + 1);
-        if (e4__DEREF2(state->ip) == (e4__void)e4__execute_threaded) {
+        if (e4__DEREF2(state->ip) == (e4__cell)e4__execute_threaded) {
             depth += 1;
             e4__DEREF(state->rp--) = state->ip + 1;
             state->ip = e4__DEREF(state->ip) + 1;
         }
-        else if (e4__DEREF(state->ip) == (e4__void)e4__builtin_return) {
+        else if (e4__DEREF(state->ip) == (e4__cell)e4__builtin_return) {
             depth -= 1;
             state->ip = e4__DEREF(++state->rp);
             printf("Inline returning to %p\n", state->ip);

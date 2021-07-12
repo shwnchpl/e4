@@ -8,10 +8,10 @@
 #include <stdio.h>
 
 /* TODO: Consider renaming this to e4__cell. */
-typedef void** e4__void;
+typedef void** e4__cell;
 
-#define e4__DEREF(p)    (*((e4__void*)(p)))
-#define e4__DEREF2(p)   (**((e4__void**)(p)))
+#define e4__DEREF(p)    (*((e4__cell*)(p)))
+#define e4__DEREF2(p)   (**((e4__cell**)(p)))
 
 /* TODO: Determine if this is sensible. */
 #define e4__MIN_TASK_SZ (2048)
@@ -19,16 +19,16 @@ typedef void** e4__void;
 struct e4__task
 {
     /* User table. */
-    e4__void here;
-    e4__void pad;
-    e4__void s0;
-    e4__void sp;
-    e4__void tib;
-    e4__void tib_oft;
-    e4__void tib_sz;
-    e4__void r0;
-    e4__void rp;
-    e4__void ip;
+    e4__cell here;
+    e4__cell pad;
+    e4__cell s0;
+    e4__cell sp;
+    e4__cell tib;
+    e4__cell tib_oft;
+    e4__cell tib_sz;
+    e4__cell r0;
+    e4__cell rp;
+    e4__cell ip;
 
     /* System variables. */
     unsigned long sz;
@@ -50,7 +50,7 @@ struct e4__dict_footer
 {
     void *user;
     void *code;
-    e4__void data[1];
+    e4__cell data[1];
 };
 
 struct e4__builtin

@@ -4,10 +4,10 @@
 struct e4__task* e4__task_create(void *buffer, unsigned long size)
 {
     register struct e4__task *task;
-    register e4__void cursor = buffer;
+    register e4__cell cursor = buffer;
 
     /* Align size to pointer width. */
-    size = size / sizeof(e4__void) * sizeof(e4__void);
+    size = size / sizeof(e4__cell) * sizeof(e4__cell);
 
     if (size < e4__MIN_TASK_SZ)
         return NULL;
@@ -36,15 +36,15 @@ struct e4__task* e4__task_create(void *buffer, unsigned long size)
     task->dict = NULL;
 
     /* struct e4__task is guaranteed to be aligned to at least
-       sizeof(e4__void) (since it contains fields that are
-       e4__void), so this is safe. */
+       sizeof(e4__cell) (since it contains fields that are
+       e4__cell), so this is safe. */
 
-    task->here = cursor + sizeof(*task) / sizeof(e4__void);
-    task->pad = cursor + (70 * size) / (100 * sizeof(e4__void));
-    task->s0 = cursor + (85 * size) / (100 * sizeof(e4__void));
+    task->here = cursor + sizeof(*task) / sizeof(e4__cell);
+    task->pad = cursor + (70 * size) / (100 * sizeof(e4__cell));
+    task->s0 = cursor + (85 * size) / (100 * sizeof(e4__cell));
     task->sp = task->s0;
-    task->tib = cursor + (85 * size) / (100 * sizeof(e4__void)) + 1;
-    task->r0 = cursor + (size - 1) / sizeof(e4__void);
+    task->tib = cursor + (85 * size) / (100 * sizeof(e4__cell)) + 1;
+    task->r0 = cursor + (size - 1) / sizeof(e4__cell);
     task->rp = task->r0;
 
 #if 0
