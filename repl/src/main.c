@@ -1,4 +1,4 @@
-#include "e4-debug.h"
+#include "e4.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -52,7 +52,6 @@ int main(void)
     static unsigned char buffer[4096];
 
     struct e4__task *task;
-    void *tmp;
 
     printf("Trying print hello...\n");
 
@@ -64,6 +63,7 @@ int main(void)
 
     e4__task_load_builtins(task);
 
+    /* TODO: Replace this test code.
     tmp = task->here;
     task->here = e4__dict_entry(task->here, task->dict,
             "test-func", 9, NULL, NULL, 0);
@@ -81,6 +81,7 @@ int main(void)
 
     printf("%p : %p\n", task->here, e4__dict_lookup(task->dict, "test-func3",
                 strlen("test-func3"))->footer->data);
+    */
 
     do {
         e4__cell cells[6];
@@ -88,11 +89,11 @@ int main(void)
 
         printf("Stack and return stack:\n");
 
-        e4__stack_push(task, 2);
-        e4__stack_push(task, 4);
-        e4__stack_push(task, 8);
-        e4__stack_push(task, 16);
-        e4__stack_push(task, 32);
+        e4__stack_push(task, (void*)2);
+        e4__stack_push(task, (void*)4);
+        e4__stack_push(task, (void*)8);
+        e4__stack_push(task, (void*)16);
+        e4__stack_push(task, (void*)32);
 
         depth0 = e4__stack_depth(task);
         cells[0] = e4__stack_peek(task);
@@ -113,11 +114,11 @@ int main(void)
             cells[5],
             depth1);
 
-        e4__stack_rpush(task, 3);
-        e4__stack_rpush(task, 5);
-        e4__stack_rpush(task, 9);
-        e4__stack_rpush(task, 17);
-        e4__stack_rpush(task, 33);
+        e4__stack_rpush(task, (void*)3);
+        e4__stack_rpush(task, (void*)5);
+        e4__stack_rpush(task, (void*)9);
+        e4__stack_rpush(task, (void*)17);
+        e4__stack_rpush(task, (void*)33);
 
         cells[0] = e4__stack_rpeek(task);
         cells[1] = e4__stack_rpop(task);

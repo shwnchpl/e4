@@ -1,4 +1,7 @@
 #include "e4-debug.h"
+#include "e4.h"
+#include "e4-builtin.h"
+#include "e4-task.h"
 
 #define _e4_BUILTIN_DECL(name, func)    {name, sizeof(name) - 1, func}
 /* TODO: Consider putting builtin footers into some other memory that

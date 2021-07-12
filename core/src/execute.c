@@ -1,4 +1,6 @@
 #include "e4-debug.h"
+#include "e4.h"
+#include "e4-task.h"
 
 void e4__execute(struct e4__task *task, void *next)
 {

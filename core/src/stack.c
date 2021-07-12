@@ -1,4 +1,6 @@
 #include "e4-debug.h"
+#include "e4.h"
+#include "e4-task.h"
 
 /* FIXME: For performance reasons, they aren't actually used internally
    where we have access to the fields of struct task. Is this the right

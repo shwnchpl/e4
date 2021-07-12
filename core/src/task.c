@@ -1,4 +1,8 @@
 #include "e4-debug.h"
+#include "e4.h"
+#include "e4-builtin.h"
+#include "e4-task.h"
+
 #include <string.h>
 
 struct e4__task* e4__task_create(void *buffer, unsigned long size)
@@ -9,12 +13,14 @@ struct e4__task* e4__task_create(void *buffer, unsigned long size)
     /* Align size to pointer width. */
     size = size / sizeof(e4__cell) * sizeof(e4__cell);
 
-    if (size < e4__MIN_TASK_SZ)
+    if (size < e4__TASK_MIN_SZ)
         return NULL;
 
     /* TODO: Make this optional somehow? */
     memset(buffer, 0, size);
 
+    /* FIXME: Add text output buffer fields and space. This will be
+       needed by io.c, whenever that module is finally created. */
     /* Allocate space as follows:
         70%-sizeof(*task) of dictionary
         5% pad

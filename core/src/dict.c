@@ -1,5 +1,10 @@
 #include "e4-debug.h"
+#include "e4.h"
 #include <string.h>
+
+/* TODO: Create some kind of friendly user facing C API that
+   can actually create a dictionary entry in the right place and update
+   here, etc. */
 
 void* e4__dict_entry(void *here, struct e4__dict_header *prev, char *name,
         unsigned short nbytes, void *code, void *user, unsigned short flags)
