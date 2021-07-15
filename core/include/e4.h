@@ -28,9 +28,24 @@ struct e4__dict_footer
     e4__cell data[1];
 };
 
+/* FIXME: The current API is unstable. As it stands, if you're
+   going to implement one of these, you need to implement them
+   all. In the future, this may change. */
+struct e4__io
+{
+    void *user;
+    int (*key)(void *user, char *buf);
+    int (*accept)(void *user, char *buf, unsigned long n);
+    int (*type)(void *user, const char *buf, unsigned long n);
+};
+
 /* e4 constants */
+#define e4__E_OK            (0)
+#define e4__E_UNSUPPORTED   (-21)
+#define e4__E_FAILURE       (-256)
+
 /* TODO: Determine if this is sensible. */
-#define e4__TASK_MIN_SZ (2048)
+#define e4__TASK_MIN_SZ     (2048)
 
 /* e4 macros */
 #define e4__DEREF(p)    (*((e4__cell*)(p)))
@@ -64,5 +79,11 @@ void e4__execute_threaded(struct e4__task *task, void *next);
 /* task.c functions */
 struct e4__task* e4__task_create(void *buffer, unsigned long size);
 void e4__task_load_builtins(struct e4__task *task);
+void e4__task_io_init(struct e4__task *task, struct e4__io *io);
+
+/* io.c functions */
+int e4__io_key(struct e4__task *task, void *buf);
+int e4__io_accept(struct e4__task *task, char *buf, unsigned long n);
+int e4__io_type(struct e4__task *task, const char *buf, unsigned long n);
 
 #endif /* E4_H_ */

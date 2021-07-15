@@ -2,6 +2,12 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "e4-debug.h"
+
+/* FIXME: This is cool, but it doesn't actually work. longjmp down
+   the stackframe is undefined behavior since longjmp out blows the
+   stack. */
+
 static void print_anything(struct e4__task *task, void *next);
 
 void *PRINT_HELLO[] =
@@ -135,6 +141,9 @@ int main(void)
             cells[4],
             cells[5]);
     } while (0);
+
+    printf("Attempting to call key without defining it returns: %d\n",
+            e4__io_key(task, NULL));
 
     return 0;
 }

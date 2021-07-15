@@ -22,6 +22,7 @@ struct e4__task
     /* System variables. */
     unsigned long sz;
     struct e4__dict_header *dict;
+    struct e4__io io;
 };
 
 #endif /* E4_TASK_H_ */
