@@ -53,6 +53,7 @@ struct e4__io
 
 /* builtin.c functions */
 void e4__builtin_abort(struct e4__task *task, void *next);
+void e4__builtin_lit(struct e4__task *task, void *next);
 void e4__builtin_return(struct e4__task *task, void *next);
 void e4__builtin_skip(struct e4__task *task, void *next);
 

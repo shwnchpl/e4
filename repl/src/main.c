@@ -45,6 +45,19 @@ void *HELLO2[] =
     e4__builtin_return
 };
 
+void *LIT[] =
+{
+    e4__builtin_lit,
+};
+
+void *PUSH_NUM[] =
+{
+    e4__execute_threaded,
+    LIT,
+    12345,
+    e4__builtin_return
+};
+
 void print_anything(struct e4__task *task, void *next)
 {
     printf("\nHello\n");
@@ -171,6 +184,9 @@ int main(void)
         len = *word++;
         printf("Got (%d): %.*s\n", len, len, word);
     } while (0);
+
+    e4__execute(task, PUSH_NUM);
+    printf("STACK TOP: %lu\n", e4__stack_pop(task));
 
     return 0;
 }

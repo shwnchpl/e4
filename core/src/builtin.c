@@ -35,6 +35,12 @@ void e4__builtin_abort(struct e4__task *task, void *next)
     task->ip = e4__DEREF(++task->rp);
 }
 
+void e4__builtin_lit(struct e4__task *task, void *next)
+{
+    *task->sp-- = e4__DEREF2(++task->rp);
+    task->ip = e4__DEREF(task->rp) + 1;
+}
+
 void e4__builtin_return(struct e4__task *task, void *next)
 {
     task->ip = e4__DEREF(++task->rp);
