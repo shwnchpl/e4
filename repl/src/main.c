@@ -4,58 +4,39 @@
 
 #include "e4-debug.h"
 
-/* FIXME: This is cool, but it doesn't actually work. longjmp down
-   the stackframe is undefined behavior since longjmp out blows the
-   stack. */
-
 static void print_anything(struct e4__task *task, void *next);
 
-void *PRINT_HELLO[] =
+const void *PRINT_HELLO[] =
 {
     print_anything,
     (void*)"What's up?"
 };
 
-void *ABORT[] =
-{
-    e4__builtin_abort,
-};
-
-void *SKIP[] =
-{
-    e4__builtin_skip,
-};
-
-void *HELLO1[] =
+const void *HELLO1[] =
 {
     e4__execute_threaded,
     PRINT_HELLO,
-    e4__builtin_return
+    e4__builtin_RET
 };
 
-void *HELLO2[] =
+const void *HELLO2[] =
 {
     e4__execute_threaded,
     HELLO1,
-    SKIP,
+    &e4__BUILTIN_SKIP.code,
     HELLO1,
     HELLO1,
-    ABORT,
+    &e4__BUILTIN_ABORT.code,
     HELLO1,
-    e4__builtin_return
+    e4__builtin_RET
 };
 
-void *LIT[] =
-{
-    e4__builtin_lit,
-};
-
-void *PUSH_NUM[] =
+const void *PUSH_NUM[] =
 {
     e4__execute_threaded,
-    LIT,
-    12345,
-    e4__builtin_return
+    &e4__BUILTIN_LIT.code,
+    (void*)0x12345,
+    e4__builtin_RET
 };
 
 void print_anything(struct e4__task *task, void *next)
@@ -63,7 +44,7 @@ void print_anything(struct e4__task *task, void *next)
     printf("\nHello\n");
     printf("Payload: %s\n", *((char**)next));
 
-    e4__builtin_return(task, next);
+    e4__builtin_RET(task, next);
 }
 
 int main(void)
@@ -83,23 +64,27 @@ int main(void)
     e4__task_load_builtins(task);
 
     /* TODO: Replace this test code.
-    tmp = task->here;
-    task->here = e4__dict_entry(task->here, task->dict,
-            "test-func", 9, NULL, NULL, 0);
-    task->dict = tmp;
+    do {
+        void *tmp;
 
-    tmp = task->here;
-    task->here = e4__dict_entry(task->here, task->dict,
-            "test-func2", 10, NULL, NULL, 0);
-    task->dict = tmp;
+        tmp = task->here;
+        task->here = e4__dict_entry(task->here, task->dict,
+                "test-func", 9, NULL, NULL, 0);
+        task->dict = tmp;
 
-    tmp = task->here;
-    task->here = e4__dict_entry(task->here, task->dict,
-            "test-func3", 10, NULL, NULL, 0);
-    task->dict = tmp;
+        tmp = task->here;
+        task->here = e4__dict_entry(task->here, task->dict,
+                "test-func2", 10, NULL, NULL, 0);
+        task->dict = tmp;
 
-    printf("%p : %p\n", task->here, e4__dict_lookup(task->dict, "test-func3",
-                strlen("test-func3"))->footer->data);
+        tmp = task->here;
+        task->here = e4__dict_entry(task->here, task->dict,
+                "test-func3", 10, NULL, NULL, 0);
+        task->dict = tmp;
+
+        printf("%p : %p\n", task->here, e4__dict_lookup(task->dict, "test-func3",
+                    strlen("test-func3"))->footer->data);
+    } while (0);
     */
 
     do {
@@ -186,7 +171,7 @@ int main(void)
     } while (0);
 
     e4__execute(task, PUSH_NUM);
-    printf("STACK TOP: %lu\n", e4__stack_pop(task));
+    printf("STACK TOP: %p\n", e4__stack_pop(task));
 
     return 0;
 }

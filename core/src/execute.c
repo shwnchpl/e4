@@ -27,7 +27,7 @@ void e4__execute_threaded(struct e4__task *task, void *next)
             e4__DEREF(task->rp--) = task->ip + 1;
             task->ip = e4__DEREF(task->ip) + 1;
         }
-        else if (e4__DEREF(task->ip) == (e4__cell)e4__builtin_return) {
+        else if (e4__DEREF(task->ip) == (e4__cell)e4__builtin_RET) {
             depth -= 1;
             task->ip = e4__DEREF(++task->rp);
             printf("Inline returning to %p\n", task->ip);

@@ -5,7 +5,6 @@
 /* TODO: Create some kind of friendly user facing C API that
    can actually create a dictionary entry in the right place and update
    here, etc. */
-
 void* e4__dict_entry(void *here, struct e4__dict_header *prev, char *name,
         unsigned short nbytes, void *code, void *user, unsigned short flags)
 {
@@ -23,6 +22,11 @@ void* e4__dict_entry(void *here, struct e4__dict_header *prev, char *name,
     /* FIXME: Clean this up. */
     if (sz % sizeof(void*))
         sz += (sizeof(void*) - (sz % sizeof(void*)));
+
+    /* FIXME: This is a disgusting hack, only for proof of concept
+       purposes. Write a new function. */
+    if (flags & e4__F_BUILTIN)
+        return (char*)here + sz;
 
     header->footer = (struct e4__dict_footer*)((char*)here + sz);
     header->footer->user = user;

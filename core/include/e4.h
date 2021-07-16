@@ -44,6 +44,8 @@ struct e4__io
 #define e4__E_UNSUPPORTED   (-21)
 #define e4__E_FAILURE       (-256)
 
+#define e4__F_BUILTIN       (0x08)
+
 /* TODO: Determine if this is sensible. */
 #define e4__TASK_MIN_SZ     (2048)
 
@@ -51,11 +53,19 @@ struct e4__io
 #define e4__DEREF(p)    (*((e4__cell*)(p)))
 #define e4__DEREF2(p)   (**((e4__cell**)(p)))
 
+/* builtin declarations */
+/* FIXME: Clean this up and/or avoid having to declare each
+   builtin individually in multiple places. */
+extern const struct e4__dict_footer e4__BUILTIN_ABORT;
+extern const struct e4__dict_footer e4__BUILTIN_LIT;
+extern const struct e4__dict_footer e4__BUILTIN_RET;
+extern const struct e4__dict_footer e4__BUILTIN_SKIP;
+
 /* builtin.c functions */
-void e4__builtin_abort(struct e4__task *task, void *next);
-void e4__builtin_lit(struct e4__task *task, void *next);
-void e4__builtin_return(struct e4__task *task, void *next);
-void e4__builtin_skip(struct e4__task *task, void *next);
+void e4__builtin_ABORT(struct e4__task *task, void *next);
+void e4__builtin_LIT(struct e4__task *task, void *next);
+void e4__builtin_RET(struct e4__task *task, void *next);
+void e4__builtin_SKIP(struct e4__task *task, void *next);
 
 /* dict.c functions */
 /* FIXME: Should either of these be public at all? */

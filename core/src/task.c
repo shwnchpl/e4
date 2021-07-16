@@ -83,12 +83,13 @@ struct e4__task* e4__task_create(void *buffer, unsigned long size)
 
 void e4__task_load_builtins(struct e4__task *task)
 {
-    struct e4__builtin *b = e4__BUILTIN_TABLE;
+    const struct e4__builtin *b = e4__BUILTIN_TABLE;
 
     for (b = e4__BUILTIN_TABLE; b->name; ++b) {
         register void *here = task->here;
         task->here = e4__dict_entry(here, task->dict, b->name, b->nbytes,
-                    b->code, NULL, 0);
+                    NULL, NULL, e4__F_BUILTIN);
         task->dict = here;
+        task->dict->footer = (struct e4__dict_footer*)b->footer;
     }
 }
