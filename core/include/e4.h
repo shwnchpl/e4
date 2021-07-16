@@ -76,14 +76,17 @@ e4__cell e4__stack_rpeek(struct e4__task *task);
 void e4__execute(struct e4__task *task, void *next);
 void e4__execute_threaded(struct e4__task *task, void *next);
 
-/* task.c functions */
-struct e4__task* e4__task_create(void *buffer, unsigned long size);
-void e4__task_load_builtins(struct e4__task *task);
-void e4__task_io_init(struct e4__task *task, struct e4__io *io);
-
 /* io.c functions */
 int e4__io_key(struct e4__task *task, void *buf);
 int e4__io_accept(struct e4__task *task, char *buf, unsigned long n);
 int e4__io_type(struct e4__task *task, const char *buf, unsigned long n);
+
+/* mem.c functions */
+char* e4__mem_word(struct e4__task *task, char delim, const char *buf);
+
+/* task.c functions */
+struct e4__task* e4__task_create(void *buffer, unsigned long size);
+void e4__task_load_builtins(struct e4__task *task);
+void e4__task_io_init(struct e4__task *task, struct e4__io *io);
 
 #endif /* E4_H_ */

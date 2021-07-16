@@ -145,5 +145,32 @@ int main(void)
     printf("Attempting to call key without defining it returns: %d\n",
             e4__io_key(task, NULL));
 
+    do {
+        char len;
+        char *word;
+
+        printf("\nParsing some words now.\n\n");
+
+        word = e4__mem_word(task, ' ', "   foo bar bas");
+        len = *word++;
+        printf("Got (%d): %.*s\n", len, len, word);
+
+        word = e4__mem_word(task, ',', "   foo, bar,, bas");
+        len = *word++;
+        printf("Got (%d): %.*s\n", len, len, word);
+
+        word = e4__mem_word(task, ' ', "         ");
+        len = *word++;
+        printf("Got (%d): %.*s\n", len, len, word);
+
+        word = e4__mem_word(task, ' ', "  foo\nbar");
+        len = *word++;
+        printf("Got (%d): %.*s\n", len, len, word);
+
+        word = e4__mem_word(task, ' ', "  foo.bar");
+        len = *word++;
+        printf("Got (%d): %.*s\n", len, len, word);
+    } while (0);
+
     return 0;
 }
