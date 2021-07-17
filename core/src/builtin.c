@@ -11,7 +11,7 @@
     _e4__BUILTIN_PROC(SKIP)
 
 #define _e4__BUILTIN_PROC(p)    \
-    const struct e4__dict_footer e4__BUILTIN_##p = {NULL, e4__builtin_##p,};
+    const struct e4__dict_footer e4__BUILTIN_##p = {e4__builtin_##p, NULL};
 
 _e4__BUILTIN_DELC();
 

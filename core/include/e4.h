@@ -23,8 +23,8 @@ struct e4__dict_header
 
 struct e4__dict_footer
 {
-    void *user;
     void *code;
+    void *user;
     e4__cell data[1];
 };
 

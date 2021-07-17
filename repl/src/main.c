@@ -4,7 +4,7 @@
 
 #include "e4-debug.h"
 
-static void print_anything(struct e4__task *task, void *next);
+static void print_anything(struct e4__task *task, void *user);
 
 const void *PRINT_HELLO[] =
 {
@@ -15,6 +15,7 @@ const void *PRINT_HELLO[] =
 const void *HELLO1[] =
 {
     e4__execute_threaded,
+    NULL,
     PRINT_HELLO,
     e4__builtin_RET
 };
@@ -22,11 +23,12 @@ const void *HELLO1[] =
 const void *HELLO2[] =
 {
     e4__execute_threaded,
+    NULL,
     HELLO1,
-    &e4__BUILTIN_SKIP.code,
+    &e4__BUILTIN_SKIP,
     HELLO1,
     HELLO1,
-    &e4__BUILTIN_ABORT.code,
+    &e4__BUILTIN_ABORT,
     HELLO1,
     e4__builtin_RET
 };
@@ -34,17 +36,18 @@ const void *HELLO2[] =
 const void *PUSH_NUM[] =
 {
     e4__execute_threaded,
-    &e4__BUILTIN_LIT.code,
+    NULL,
+    &e4__BUILTIN_LIT,
     (void*)0x12345,
     e4__builtin_RET
 };
 
-void print_anything(struct e4__task *task, void *next)
+void print_anything(struct e4__task *task, void *user)
 {
     printf("\nHello\n");
-    printf("Payload: %s\n", *((char**)next));
+    printf("Payload: %s\n", *((char**)user));
 
-    e4__builtin_RET(task, next);
+    e4__builtin_RET(task, NULL);
 }
 
 int main(void)
@@ -91,7 +94,7 @@ int main(void)
         e4__cell cells[6];
         unsigned long depth0, depth1;
 
-        printf("Stack and return stack:\n");
+        printf("\nStack and return stack:\n");
 
         e4__stack_push(task, (void*)2);
         e4__stack_push(task, (void*)4);
