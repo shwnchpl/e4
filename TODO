@@ -1,18 +1,64 @@
+General TODO
+============
+
 Repo Maintenance
 ----------------
-
 - Add license text to all source files.
 - Update README.rst to actually explain this project.
 
-
 Build
 -----
-
 - Add an amalgamated source target using amal.rb.
 - Create a repl build that uses the amalgamated source target.
 
 
-Misc
-----
+Version 0.1
+===========
 
-- Sort out e4-debug.h and put things where they actually belong.
+Parsing/Text Execution
+----------------------
+- Implement WORD (builtin)
+- Implement NUMBER> (builtin/C API)
+- Implement LOOKUP (builtin; should be case insensitive)
+- Make existing LOOKUP C API case insensitive?
+- Implement EXECUTE (builtin).
+- Implement EVALUATE (builtin/C API) (including figuring out how this
+  interacts with TIB and appropriately setting SOURCE-IO).
+
+General Builtins
+----------------
+- Implement basic static manipulation words like DUP, DROP, TUCK, etc.
+- Implement compiletime BRANCH0, BRANCH, etc.
+- Implement different code handlers _constant, _variable, _thunk, and
+  _uservar.
+- Add mechanism for builtin constants (such as BL, etc.).
+
+Kernel
+------
+- Implement exceptions using the return stack.
+- Figure out stack underflow checking for builtins etc.
+- Implement QUIT using setjmp/longjmp.
+
+Compilation
+-----------
+- Implement simple : compilation.
+- Implement VARIABLE and CONSTANT.
+- Implement DOES>.
+
+Testing
+-------
+- Create test harness and add tests for every builtin word as
+  prescribed by the standard.
+
+REPL
+----
+- Create actual simple REPL using readline or some other utility.
+
+
+Version 0.2
+===========
+
+Compilation
+-----------
+- Add conditional structure words like IF, THEN, BEGIN, WHILE, LOOP,
+  DO, etc.
