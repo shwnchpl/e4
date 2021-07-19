@@ -22,11 +22,13 @@ struct e4__task* e4__task_create(void *buffer, unsigned long size)
     /* FIXME: Add text output buffer fields and space. This will be
        needed by io.c, whenever that module is finally created. */
     /* Allocate space as follows:
-        70%-sizeof(*task) of dictionary
+        65%-sizeof(*task) of dictionary
         5% pad
         10% parameter stack
-        5% TIB.
-        10% return stack.
+        5% TIB
+        10% return stack
+        5% TOB
+        5% string scratch buffer
 
        To start, none of these will be checked, and none of them may
        ever be checked. Since the user specifies the size, they should
@@ -46,12 +48,16 @@ struct e4__task* e4__task_create(void *buffer, unsigned long size)
        e4__cell), so this is safe. */
 
     task->here = cursor + sizeof(*task) / sizeof(e4__cell);
-    task->pad = cursor + (70 * size) / (100 * sizeof(e4__cell));
-    task->s0 = cursor + (85 * size) / (100 * sizeof(e4__cell));
+    task->pad = cursor + (65 * size) / (100 * sizeof(e4__cell));
+    task->s0 = cursor + (75 * size) / (100 * sizeof(e4__cell));
     task->sp = task->s0;
-    task->tib = cursor + (85 * size) / (100 * sizeof(e4__cell)) + 1;
-    task->r0 = cursor + (size - 1) / sizeof(e4__cell);
+    task->tib = cursor + (80 * size) / (100 * sizeof(e4__cell)) + 1;
+    task->io_src.buffer = task->tib;
+    task->r0 = cursor + (90 * size) / (100 * sizeof(e4__cell)) + 1;
     task->rp = task->r0;
+    task->pob = cursor + (95 * size) / (100 * sizeof(e4__cell)) + 1;
+    task->sq = cursor + (size - 1) / sizeof(e4__cell);
+    task->base = (e4__cell)10;
 
 #if 0
     printf("\nCREATED TASK:\n"
@@ -90,6 +96,6 @@ void e4__task_load_builtins(struct e4__task *task)
         task->here = e4__dict_entry(here, task->dict, b->name, b->nbytes,
                     NULL, NULL, e4__F_BUILTIN);
         task->dict = here;
-        task->dict->footer = (struct e4__dict_footer*)b->footer;
+        task->dict->xt = (struct e4__execute_token*)b->xt;
     }
 }

@@ -10,7 +10,7 @@ struct e4__builtin
 {
     char *name;
     unsigned short nbytes;
-    const struct e4__dict_footer *footer;
+    const struct e4__execute_token *xt;
 };
 
 extern const struct e4__builtin e4__BUILTIN_TABLE[];

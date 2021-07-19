@@ -1,7 +1,8 @@
 e4
 ==
 
-An embedded Forth.
+An embedded Forth. Once version 1.0 is reached, e4 will be a Forth-2012
+System providing the Core Extensions word set.
 
 About
 -----

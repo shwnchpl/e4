@@ -8,10 +8,11 @@
     _e4__BUILTIN_PROC(ABORT)    \
     _e4__BUILTIN_PROC(LIT)      \
     _e4__BUILTIN_PROC(RET)      \
-    _e4__BUILTIN_PROC(SKIP)
+    _e4__BUILTIN_PROC(SKIP)     \
+    _e4__BUILTIN_PROC(WORD)
 
 #define _e4__BUILTIN_PROC(p)    \
-    const struct e4__dict_footer e4__BUILTIN_##p = {e4__builtin_##p, NULL};
+    const struct e4__execute_token e4__BUILTIN_##p = {e4__builtin_##p, NULL};
 
 _e4__BUILTIN_DELC();
 
@@ -34,7 +35,7 @@ const struct e4__builtin e4__BUILTIN_TABLE[] =
    compiled or have their code components live in the user dictionary. */
 /* FIXME: Don't expose abort. We need quit instead? */
 
-void e4__builtin_ABORT(struct e4__task *task, void *next)
+void e4__builtin_ABORT(struct e4__task *task, void *user)
 {
     register int i;
     static const void *RETURN[] =
@@ -48,19 +49,24 @@ void e4__builtin_ABORT(struct e4__task *task, void *next)
     task->ip = e4__DEREF(++task->rp);
 }
 
-void e4__builtin_LIT(struct e4__task *task, void *next)
+void e4__builtin_LIT(struct e4__task *task, void *user)
 {
     *task->sp-- = e4__DEREF2(++task->rp);
     task->ip = e4__DEREF(task->rp) + 1;
 }
 
-void e4__builtin_RET(struct e4__task *task, void *next)
+void e4__builtin_RET(struct e4__task *task, void *user)
 {
     task->ip = e4__DEREF(++task->rp);
     printf("Returning to %p\n", (void*)task->ip);
 }
 
-void e4__builtin_SKIP(struct e4__task *task, void *next)
+void e4__builtin_SKIP(struct e4__task *task, void *user)
 {
     task->ip = e4__DEREF(++task->rp) + 1;
+}
+
+void e4__builtin_WORD(struct e4__task *task, void *user)
+{
+    /* FIXME: Stub. */
 }

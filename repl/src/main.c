@@ -85,8 +85,9 @@ int main(void)
                 "test-func3", 10, NULL, NULL, 0);
         task->dict = tmp;
 
-        printf("%p : %p\n", task->here, e4__dict_lookup(task->dict, "test-func3",
-                    strlen("test-func3"))->footer->data);
+        printf("%p : %p\n", task->here,
+                e4__dict_lookup(task->dict, "test-func3",
+                    strlen("test-func3"))->xt->data);
     } while (0);
     */
 
@@ -111,7 +112,8 @@ int main(void)
         cells[5] = e4__stack_pop(task);
         depth1 = e4__stack_depth(task);
 
-        printf("(start-depth: %lu) (peek: %p) %p %p %p %p %p (end-depth: %lu)\n",
+        printf("(start-depth: %lu) (peek: %p) %p %p %p %p %p "
+            "(end-depth: %lu)\n",
             depth0,
             cells[0],
             cells[1],

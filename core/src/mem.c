@@ -5,7 +5,7 @@
 char* e4__mem_word(struct e4__task *task, char delim, const char *buf)
 {
     register const char *start;
-    register char *p = (char*)task->pad;
+    register char *p = (char*)task->pob;
 
     while (*buf == delim)
         ++buf;

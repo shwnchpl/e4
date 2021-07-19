@@ -28,11 +28,11 @@ void* e4__dict_entry(void *here, struct e4__dict_header *prev, char *name,
     if (flags & e4__F_BUILTIN)
         return (char*)here + sz;
 
-    header->footer = (struct e4__dict_footer*)((char*)here + sz);
-    header->footer->user = user;
-    header->footer->code = code;
+    header->xt = (struct e4__execute_token*)((char*)here + sz);
+    header->xt->user = user;
+    header->xt->code = code;
 
-    return here + sz + sizeof(*header->footer) - sizeof(header->footer->data);
+    return here + sz + sizeof(*header->xt) - sizeof(header->xt->data);
 }
 
 struct e4__dict_header* e4__dict_lookup(struct e4__dict_header *dict,

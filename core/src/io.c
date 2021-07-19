@@ -2,31 +2,31 @@
 #include "e4.h"
 #include "e4-task.h"
 
-void e4__task_io_init(struct e4__task *task, struct e4__io *io)
+void e4__task_io_init(struct e4__task *task, struct e4__io_func *io_func)
 {
-    task->io = *io;
+    task->io_func = *io_func;
 }
 
 int e4__io_key(struct e4__task *task, void *buf)
 {
-    if (!task->io.key)
+    if (!task->io_func.key)
         return e4__E_UNSUPPORTED;
 
-    return task->io.key(task->io.user, buf);
+    return task->io_func.key(task->io_func.user, buf);
 }
 
 int e4__io_accept(struct e4__task *task, char *buf, unsigned long n)
 {
-    if (!task->io.accept)
+    if (!task->io_func.accept)
         return e4__E_UNSUPPORTED;
 
-    return task->io.accept(task->io.user, buf, n);
+    return task->io_func.accept(task->io_func.user, buf, n);
 }
 
 int e4__io_type(struct e4__task *task, const char *buf, unsigned long n)
 {
-    if (!task->io.type)
+    if (!task->io_func.type)
         return e4__E_UNSUPPORTED;
 
-    return task->io.type(task->io.user, buf, n);
+    return task->io_func.type(task->io_func.user, buf, n);
 }

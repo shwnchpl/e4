@@ -11,6 +11,12 @@ Build
 - Add an amalgamated source target using amal.rb.
 - Create a repl build that uses the amalgamated source target.
 
+Documentation
+-------------
+- Document all implementation-defined behavior as per Forth 2012 4.1.1.
+- Document all ambiguous condition handling as per Forth 2012 4.1.2.
+- Provide other system documentation as per by Forth 2012 4.1.3.
+
 
 Version 0.1
 ===========
@@ -62,3 +68,4 @@ Compilation
 -----------
 - Add conditional structure words like IF, THEN, BEGIN, WHILE, LOOP,
   DO, etc.
+- Figure out how to implement RECURSE.
