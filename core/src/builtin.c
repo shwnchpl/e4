@@ -68,5 +68,26 @@ void e4__builtin_SKIP(struct e4__task *task, void *user)
 
 void e4__builtin_WORD(struct e4__task *task, void *user)
 {
-    /* FIXME: Stub. */
+    register char delim;
+    register char *word;
+
+    /* FIXME: Should task struct fields just be used here rather than
+       the C stack API? */
+    if (e4__stack_depth(task) < 1) {
+        /* FIXME: Underflow. */
+    }
+
+    /* FIXME: Check for empty parse area. In reality, e4__mem_word
+       should probably take some kind of length. */
+    /* FIXME: Verify that WORD should update >IN. */
+    /* FIXME: Make this work with leading delimiters. This will
+       probably require a total refactor of e4__mem_word. */
+
+    delim = (long int)e4__stack_pop(task);
+    word = e4__mem_word(task, delim,
+            (const char*)task->io_src.buffer + (unsigned long)task->io_src.in);
+    task->io_src.in = (e4__cell)((const char*)task->io_src.in + *word + 1);
+    e4__stack_push(task, word);
+
+    e4__builtin_RET(task, NULL);
 }

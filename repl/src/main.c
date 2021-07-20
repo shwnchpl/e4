@@ -4,6 +4,11 @@
 
 #include "e4-debug.h"
 
+/* FIXME: Remove this. Uncomment for internal tests. */
+#if 0
+#include "../../core/src/e4-task.h"
+#endif
+
 static void print_anything(struct e4__task *task, void *user);
 
 const void *PRINT_HELLO[] =
@@ -177,6 +182,37 @@ int main(void)
 
     e4__execute(task, PUSH_NUM);
     printf("STACK TOP: %p\n", e4__stack_pop(task));
+
+    /*
+    do {
+        static const void *RUN_WORD[] = {
+            e4__execute_threaded,
+            NULL,
+            &e4__BUILTIN_LIT,
+            (void*)' ',
+            &e4__BUILTIN_WORD,
+            e4__builtin_RET
+        };
+        static const char *foo = "foo bar bas\n";
+        e4__cell old_buffer = task->io_src.buffer;
+        e4__cell old_in = task->io_src.in;
+        const char *res;
+        char len;
+
+        task->io_src.buffer = (e4__cell)foo;
+
+        do {
+            e4__execute(task, RUN_WORD);
+
+            res = (const char*)e4__stack_pop(task);
+            len = *res++;
+            printf("\nExecuting WORD, got (%d): %.*s\n", len, len, res);
+        } while (len);
+
+        task->io_src.buffer = old_buffer;
+        task->io_src.in = old_in;
+    } while (0);
+    */
 
     return 0;
 }

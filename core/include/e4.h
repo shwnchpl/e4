@@ -63,6 +63,7 @@ extern const struct e4__execute_token e4__BUILTIN_ABORT;
 extern const struct e4__execute_token e4__BUILTIN_LIT;
 extern const struct e4__execute_token e4__BUILTIN_RET;
 extern const struct e4__execute_token e4__BUILTIN_SKIP;
+extern const struct e4__execute_token e4__BUILTIN_WORD;
 
 /* builtin.c functions */
 void e4__builtin_ABORT(struct e4__task *task, void *user);
