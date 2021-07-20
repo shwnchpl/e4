@@ -24,12 +24,12 @@ Version 0.1
 Parsing/Text Execution
 ----------------------
 - [DONE] Implement WORD (builtin)
+- [DONE] Make existing LOOKUP C API case insensitive?
 - Fix e4__mem_word implementation to correctly advance >IN and also
   to pay attention to count. The API should probably take a mutable
   offset pointer as well as an overall max.
 - Implement NUMBER> (builtin/C API)
 - Implement LOOKUP (builtin; should be case insensitive)
-- Make existing LOOKUP C API case insensitive?
 - Implement EXECUTE (builtin).
 - Implement EVALUATE (builtin/C API) (including figuring out how this
   interacts with TIB and appropriately setting SOURCE-IO).

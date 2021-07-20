@@ -87,7 +87,7 @@ int main(void)
 
         tmp = task->here;
         task->here = e4__dict_entry(task->here, task->dict,
-                "test-func3", 10, NULL, NULL, 0);
+                "TEST-funC3", 10, NULL, NULL, 0);
         task->dict = tmp;
 
         printf("%p : %p\n", task->here,
@@ -213,6 +213,18 @@ int main(void)
         task->io_src.in = old_in;
     } while (0);
     */
+
+    printf("\nstrncasecmp(foobar, fooba, 5): %d\n",
+            e4__mem_strncasecmp("foobar", "fooba", 5));
+
+    printf("strncasecmp(foobar, fooba, 6): %d\n",
+            e4__mem_strncasecmp("foobar", "fooba", 6));
+
+    printf("strncasecmp(FOObaR, fooBa, 6): %d\n",
+            e4__mem_strncasecmp("FOObaR", "fooBa", 6));
+
+    printf("strncasecmp(FOOBAR, foobar, 90): %d\n",
+            e4__mem_strncasecmp("FOOBAR", "foobar", 90));
 
     return 0;
 }

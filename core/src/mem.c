@@ -1,6 +1,16 @@
 #include "e4.h"
 #include "e4-task.h"
 #include <string.h>
+#include <ctype.h>
+
+int e4__mem_strncasecmp(const char *left, const char *right, unsigned long n)
+{
+    while (n-- > 0 && tolower(*left++) == tolower(*right++))
+        if (!*left)
+            return 0;
+
+    return !++n ? 0 : tolower(*--left) - tolower(*--right);
+}
 
 char* e4__mem_word(struct e4__task *task, char delim, const char *buf)
 {

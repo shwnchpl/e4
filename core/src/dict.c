@@ -39,7 +39,8 @@ struct e4__dict_header* e4__dict_lookup(struct e4__dict_header *dict,
         char *name, unsigned short nbytes)
 {
     while (dict) {
-        if (nbytes == dict->nbytes && !memcmp(dict->name, name, nbytes))
+        if (nbytes == dict->nbytes &&
+                !e4__mem_strncasecmp(dict->name, name, nbytes))
             return dict;
         dict = dict->link;
     }

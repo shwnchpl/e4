@@ -98,6 +98,7 @@ int e4__io_accept(struct e4__task *task, char *buf, unsigned long n);
 int e4__io_type(struct e4__task *task, const char *buf, unsigned long n);
 
 /* mem.c functions */
+int e4__mem_strncasecmp(const char *left, const char *right, unsigned long n);
 char* e4__mem_word(struct e4__task *task, char delim, const char *buf);
 
 /* task.c functions */
