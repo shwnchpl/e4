@@ -1,6 +1,5 @@
 #include "e4-debug.h"
 #include "e4.h"
-#include "e4-builtin.h"
 #include "e4-task.h"
 
 #include <string.h>
@@ -41,7 +40,8 @@ struct e4__task* e4__task_create(void *buffer, unsigned long size)
 
     task = buffer;
     task->sz = size;
-    task->dict = NULL;
+    task->dict = (struct e4__dict_header *)
+            &e4__BUILTIN_HEADER[e4__BUILTIN_COUNT - 1];
 
     /* struct e4__task is guaranteed to be aligned to at least
        sizeof(e4__cell) (since it contains fields that are
@@ -85,17 +85,4 @@ struct e4__task* e4__task_create(void *buffer, unsigned long size)
 #endif
 
     return task;
-}
-
-void e4__task_load_builtins(struct e4__task *task)
-{
-    const struct e4__builtin *b = e4__BUILTIN_TABLE;
-
-    for (b = e4__BUILTIN_TABLE; b->name; ++b) {
-        register void *here = task->here;
-        task->here = e4__dict_entry(here, task->dict, b->name, b->nbytes,
-                    NULL, NULL, e4__F_BUILTIN);
-        task->dict = here;
-        task->dict->xt = (struct e4__execute_token*)b->xt;
-    }
 }

@@ -1,42 +1,78 @@
 #include "e4-debug.h"
 #include "e4.h"
-#include "e4-builtin.h"
 #include "e4-task.h"
 
 /* FIXME: Let this support "compile time" flags, etc. */
-#define _e4__BUILTIN_DELC()     \
+#define _e4__BUILTIN_DECL() \
+    _e4__BUILTIN_PROC_FIRST(RET)  \
     _e4__BUILTIN_PROC(ABORT)    \
-    _e4__BUILTIN_PROC(LIT)      \
-    _e4__BUILTIN_PROC(RET)      \
-    _e4__BUILTIN_PROC(SKIP)     \
+    _e4__BUILTIN_PROC(LIT)  \
+    _e4__BUILTIN_PROC(SKIP) \
     _e4__BUILTIN_PROC(WORD)
 
-#define _e4__BUILTIN_PROC(p)    \
-    const struct e4__execute_token e4__BUILTIN_##p = {e4__builtin_##p, NULL};
+/* Declare builtin functions. */
+#define _e4__BUILTIN_PROC_FIRST(w)  \
+    void e4__builtin_##w(struct e4__task *task, void *user);
+#define _e4__BUILTIN_PROC(w)    \
+    static void e4__builtin_##w(struct e4__task *task, void *user);
 
-_e4__BUILTIN_DELC();
+_e4__BUILTIN_DECL();
 
+#undef _e4__BUILTIN_PROC_FIRST
 #undef _e4__BUILTIN_PROC
-#define _e4__BUILTIN_PROC(p)    \
-    {#p, sizeof(#p), &e4__BUILTIN_##p},
 
-const struct e4__builtin e4__BUILTIN_TABLE[] =
+/* Define builtin header table. */
+#define _e4__BUILTIN_PROC_HEADER(w, link) \
+    {   \
+        link,   \
+        (struct e4__execute_token *)&e4__BUILTIN_XT[e4__B_##w],     \
+        e4__F_BUILTIN,  \
+        sizeof(#w) - 1, \
+        #w, \
+    },
+#define _e4__BUILTIN_PROC_FIRST(w)  \
+    _e4__BUILTIN_PROC_HEADER(w, NULL)
+#define _e4__BUILTIN_PROC(w)  \
+    _e4__BUILTIN_PROC_HEADER(w, \
+            (struct e4__dict_header *)&e4__BUILTIN_HEADER[e4__B_##w - 1])
+
+const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT] =
 {
-    _e4__BUILTIN_DELC()
-    {NULL},
+    _e4__BUILTIN_DECL()
 };
 
-#undef _e4_BUILTIN_PROC
-#undef _e4_BUILTIN_DECL
+#undef _e4__BUILTIN_PROC_HEADER
+#undef _e4__BUILTIN_PROC_FIRST
+#undef _e4__BUILTIN_PROC
+
+/* Define builtin execution token table. */
+#define _e4__BUILTIN_PROC_FIRST(w)  _e4__BUILTIN_PROC(w)
+#define _e4__BUILTIN_PROC(w)  \
+    {e4__builtin_##w, NULL},
+
+const struct e4__execute_token e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
+{
+    _e4__BUILTIN_DECL()
+};
+
+#undef _e4__BUILTIN_PROC
+#undef _e4__BUILTIN_DECL
 
 /* TODO: Add some sort of e4__builtin_thunk which basically just calls
    e4__execute on whatever is pointed to by the *user field. This could
    allow for builtins implemented in Forth that don't need to be
    compiled or have their code components live in the user dictionary. */
-/* FIXME: Don't expose abort. We need quit instead? */
+
+void e4__builtin_RET(struct e4__task *task, void *user)
+{
+    task->ip = e4__DEREF(++task->rp);
+    printf("Returning to %p\n", (void *)task->ip);
+}
 
 void e4__builtin_ABORT(struct e4__task *task, void *user)
 {
+    /* FIXME: Ensure the behavior of this function is correct. */
+
     register int i;
     static const void *RETURN[] =
     {
@@ -53,12 +89,6 @@ void e4__builtin_LIT(struct e4__task *task, void *user)
 {
     *task->sp-- = e4__DEREF2(++task->rp);
     task->ip = e4__DEREF(task->rp) + 1;
-}
-
-void e4__builtin_RET(struct e4__task *task, void *user)
-{
-    task->ip = e4__DEREF(++task->rp);
-    printf("Returning to %p\n", (void*)task->ip);
 }
 
 void e4__builtin_SKIP(struct e4__task *task, void *user)

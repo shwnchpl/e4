@@ -30,10 +30,10 @@ const void *HELLO2[] =
     e4__execute_threaded,
     NULL,
     HELLO1,
-    &e4__BUILTIN_SKIP,
+    &e4__BUILTIN_XT[e4__B_SKIP],
     HELLO1,
     HELLO1,
-    &e4__BUILTIN_ABORT,
+    &e4__BUILTIN_XT[e4__B_ABORT],
     HELLO1,
     e4__builtin_RET
 };
@@ -42,7 +42,7 @@ const void *PUSH_NUM[] =
 {
     e4__execute_threaded,
     NULL,
-    &e4__BUILTIN_LIT,
+    &e4__BUILTIN_XT[e4__B_LIT],
     (void*)0x12345,
     e4__builtin_RET
 };
@@ -69,8 +69,6 @@ int main(void)
     e4__execute(task, HELLO2);
     /* e4__execute(task, PRINT_HELLO); */
 
-    e4__task_load_builtins(task);
-
     /* TODO: Replace this test code.
     do {
         void *tmp;
@@ -93,6 +91,12 @@ int main(void)
         printf("%p : %p\n", task->here,
                 e4__dict_lookup(task->dict, "test-func3",
                     strlen("test-func3"))->xt->data);
+
+        printf("Looking up LIT (%p) : %p\n",
+                &e4__BUILTIN_XT[e4__B_LIT],
+                e4__dict_lookup(task->dict, "lit", strlen("lit"))->xt);
+        printf("Looking up FLOMBOM : %p\n",
+                e4__dict_lookup(task->dict, "flombom", strlen("flombom")));
     } while (0);
     */
 

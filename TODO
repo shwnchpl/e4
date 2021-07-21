@@ -10,6 +10,9 @@ Build
 -----
 - Add an amalgamated source target using amal.rb.
 - Create a repl build that uses the amalgamated source target.
+- Make it possible to disable core extensions for an even smaller build.
+- Attempt to set up an AVR build (or some other 8-16 bit target build)
+  to determine ROM size in that environment.
 
 Documentation
 -------------
@@ -28,6 +31,7 @@ Parsing/Text Execution
 - Fix e4__mem_word implementation to correctly advance >IN and also
   to pay attention to count. The API should probably take a mutable
   offset pointer as well as an overall max.
+- Determine if KEY should be writing to TIB.
 - Implement NUMBER> (builtin/C API)
 - Implement LOOKUP (builtin; should be case insensitive)
 - Implement EXECUTE (builtin).
@@ -38,12 +42,16 @@ General Builtins
 ----------------
 - Implement basic static manipulation words like DUP, DROP, TUCK, etc.
 - Implement compiletime BRANCH0, BRANCH, etc.
+- Implement FORGET. It should stop looking once it hits builtin words.
 - Implement different code handlers _constant, _variable, _thunk, and
   _uservar.
 - Add mechanism for builtin constants (such as BL, etc.).
 
 Kernel
 ------
+- [DONE] Move entire builtin dictionary into ROM.
+- Get rid of fields like POB and SQ and just use HERE instead to save
+  space. The dedicated static PAD space can stay.
 - Implement exceptions using the return stack.
 - Figure out stack underflow checking for builtins etc.
 - Implement QUIT using setjmp/longjmp.
@@ -72,3 +80,14 @@ Compilation
 - Add conditional structure words like IF, THEN, BEGIN, WHILE, LOOP,
   DO, etc.
 - Figure out how to implement RECURSE.
+
+General Builtins
+----------------
+- Implement S", S\", and C". These words should use transient memory
+  (possibly just HERE) during runtime, but during compile time they
+  should compile a string directly into the definition as appropriate.
+  This can be achieved by including some word STRING (similar to LIT)
+  in the thread that pushes the subsequent counted string onto the
+  stack as appropriate and advances the instruction pointer. The
+  string should be compiled directly into the definition *with* end
+  padding to align.

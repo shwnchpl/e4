@@ -18,7 +18,7 @@ struct e4__dict_header
     /* FIXME: Consider moving flags to the xt. */
     unsigned char flags;
     unsigned char nbytes;
-    char name[1];
+    char *name;
 };
 
 struct e4__execute_token
@@ -39,38 +39,39 @@ struct e4__io_func
     int (*type)(void *user, const char *buf, unsigned long n);
 };
 
-/* e4 constants */
+/* error constants */
 #define e4__E_OK            (0)
 #define e4__E_UNSUPPORTED   (-21)
 #define e4__E_FAILURE       (-256)
 
+/* flag constants */
 #define e4__F_BUILTIN       (0x08)
 
+/* builtin constants */
+#define e4__B_RET           (0)
+#define e4__B_ABORT         (1)
+#define e4__B_LIT           (2)
+#define e4__B_SKIP          (3)
+#define e4__B_WORD          (4)
+#define e4__BUILTIN_COUNT   (5)
+
+/* source ID constants */
 #define e4__SID_STR         (-1)
 #define e4__SID_UID         (0)
 
+/* task constants */
 /* TODO: Determine if this is sensible. */
-#define e4__TASK_MIN_SZ     (3072)
+#define e4__TASK_MIN_SZ     (2048)
 
 /* e4 macros */
 #define e4__DEREF(p)    (*((e4__cell*)(p)))
 #define e4__DEREF2(p)   (**((e4__cell**)(p)))
 
 /* builtin declarations */
-/* FIXME: Clean this up and/or avoid having to declare each
-   builtin individually in multiple places. */
-extern const struct e4__execute_token e4__BUILTIN_ABORT;
-extern const struct e4__execute_token e4__BUILTIN_LIT;
-extern const struct e4__execute_token e4__BUILTIN_RET;
-extern const struct e4__execute_token e4__BUILTIN_SKIP;
-extern const struct e4__execute_token e4__BUILTIN_WORD;
-
-/* builtin.c functions */
-void e4__builtin_ABORT(struct e4__task *task, void *user);
-void e4__builtin_LIT(struct e4__task *task, void *user);
+/* FIXME: Should the header table even be exposed here? */
+extern const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT];
+extern const struct e4__execute_token e4__BUILTIN_XT[e4__BUILTIN_COUNT];
 void e4__builtin_RET(struct e4__task *task, void *user);
-void e4__builtin_SKIP(struct e4__task *task, void *user);
-void e4__builtin_WORD(struct e4__task *task, void *user);
 
 /* dict.c functions */
 /* FIXME: Should either of these be public at all? */
@@ -103,7 +104,6 @@ char* e4__mem_word(struct e4__task *task, char delim, const char *buf);
 
 /* task.c functions */
 struct e4__task* e4__task_create(void *buffer, unsigned long size);
-void e4__task_load_builtins(struct e4__task *task);
 void e4__task_io_init(struct e4__task *task, struct e4__io_func *io);
 
 #endif /* E4_H_ */

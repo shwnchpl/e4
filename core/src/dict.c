@@ -14,19 +14,16 @@ void* e4__dict_entry(void *here, struct e4__dict_header *prev, char *name,
     header->link = prev;
     header->flags = flags;
     header->nbytes = nbytes;
-    memcpy(header->name, name, nbytes);
+    header->name = (char*)(&header[1]);
 
-    sz = sizeof(*header) - sizeof(header->name) + nbytes;
+    memcpy(&header[1], name, nbytes);
+
+    sz = sizeof(*header) + nbytes;
 
     /* Align size. */
     /* FIXME: Clean this up. */
-    if (sz % sizeof(void*))
-        sz += (sizeof(void*) - (sz % sizeof(void*)));
-
-    /* FIXME: This is a disgusting hack, only for proof of concept
-       purposes. Write a new function. */
-    if (flags & e4__F_BUILTIN)
-        return (char*)here + sz;
+    if (sz % sizeof(void *))
+        sz += (sizeof(void *) - (sz % sizeof(void *)));
 
     header->xt = (struct e4__execute_token*)((char*)here + sz);
     header->xt->user = user;
