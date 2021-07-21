@@ -11,12 +11,23 @@ struct e4__io_src
     e4__cell buffer;    /* input buffer */
     e4__cell sid;       /* input source id */
     e4__cell in;        /* >IN */
+    e4__cell length;    /* input buffer populated length */
     e4__cell sz;        /* input buffer size */
 };
 
 struct e4__task
 {
     /* FIXME: Reorder these, if necessary. */
+    /* FIXME: Ensure somewhere that a parse output buffer with 130
+       characters minimum is always maintained at the top of HERE.
+       This buffer is used by WORD, and per this implementation may
+       output strings as long as 255 characters. The current builtin
+       WORD implementation does NOT check that there is room at the
+       end of HERE when writing to this space.
+       This is the same buffer used for the counted string scratch
+       buffer (used by S" etc.), which must be at least 80
+       characters. Since HERE is being used, the dedicated buffers
+       in this struct can be removed. */
 
     /* User table. */
     e4__cell here;
@@ -30,10 +41,6 @@ struct e4__task
     e4__cell base; /* Initialize to 10. */
     e4__cell compiling;
     struct e4__io_src io_src;
-
-    /* Buffers */
-    e4__cell pob;   /* parse output buffer: 130 characters min */
-    e4__cell sq;    /* string scratch buffer 80 chars min */
 
     /* System variables. */
     unsigned long sz;

@@ -158,65 +158,58 @@ int main(void)
             e4__io_key(task, NULL));
 
     do {
-        char len;
-        char *word;
+        unsigned long len;
+        const char *word;
 
         printf("\nParsing some words now.\n\n");
 
-        word = e4__mem_word(task, ' ', "   foo bar bas");
-        len = *word++;
-        printf("Got (%d): %.*s\n", len, len, word);
-
-        word = e4__mem_word(task, ',', "   foo, bar,, bas");
-        len = *word++;
-        printf("Got (%d): %.*s\n", len, len, word);
-
-        word = e4__mem_word(task, ' ', "         ");
-        len = *word++;
-        printf("Got (%d): %.*s\n", len, len, word);
-
-        word = e4__mem_word(task, ' ', "  foo\nbar");
-        len = *word++;
-        printf("Got (%d): %.*s\n", len, len, word);
-
-        word = e4__mem_word(task, ' ', "  foo.bar");
-        len = *word++;
-        printf("Got (%d): %.*s\n", len, len, word);
+        #define _test_PARSE(s, d, f)   \
+            word = e4__mem_parse(s, d, strlen(s), f, &len); \
+            printf("Got (%lu): %.*s\n", len, (int)len, word);
+        _test_PARSE("   foo bar bas", ' ', e4__F_SKIP_LEADING);
+        _test_PARSE("   foo, bar,, bas", ',', e4__F_SKIP_LEADING);
+        _test_PARSE("         ", ' ', e4__F_SKIP_LEADING);
+        _test_PARSE("  foo\nbar", ' ', e4__F_SKIP_LEADING);
+        _test_PARSE("  foo.bar", ' ', e4__F_SKIP_LEADING);
+        _test_PARSE("  foo.bar", ' ', 0);
+        #undef _test_PARSE
     } while (0);
 
     e4__execute(task, PUSH_NUM);
     printf("STACK TOP: %p\n", e4__stack_pop(task));
 
-    /*
+/* FIXME: Remove this. Uncomment for WORD test. */
+#if 0
     do {
         static const void *RUN_WORD[] = {
             e4__execute_threaded,
             NULL,
-            &e4__BUILTIN_LIT,
+            &e4__BUILTIN_XT[e4__B_LIT],
             (void*)' ',
-            &e4__BUILTIN_WORD,
+            &e4__BUILTIN_XT[e4__B_WORD],
             e4__builtin_RET
         };
-        static const char *foo = "foo bar bas\n";
-        e4__cell old_buffer = task->io_src.buffer;
-        e4__cell old_in = task->io_src.in;
+        static const char *foo = "     foo   bar,,bas   \n";
+        struct e4__io_src old_io_src = task->io_src;
         const char *res;
         char len;
 
         task->io_src.buffer = (e4__cell)foo;
+        task->io_src.in = 0;
+        task->io_src.length = (e4__cell)strlen(foo);
 
         do {
             e4__execute(task, RUN_WORD);
 
             res = (const char*)e4__stack_pop(task);
             len = *res++;
-            printf("\nExecuting WORD, got (%d): %.*s\n", len, len, res);
-        } while (len);
+            printf("\nExecuted WORD (in: %p, len: %p), got (%d): %.*s\n",
+                    task->io_src.in, task->io_src.length, len, len, res);
+        } while (task->io_src.in < task->io_src.length);
 
-        task->io_src.buffer = old_buffer;
-        task->io_src.in = old_in;
+        task->io_src = old_io_src;
     } while (0);
-    */
+#endif
 
     printf("\nstrncasecmp(foobar, fooba, 5): %d\n",
             e4__mem_strncasecmp("foobar", "fooba", 5));

@@ -28,9 +28,8 @@ Parsing/Text Execution
 ----------------------
 - [DONE] Implement WORD (builtin)
 - [DONE] Make existing LOOKUP C API case insensitive?
-- Fix e4__mem_word implementation to correctly advance >IN and also
-  to pay attention to count. The API should probably take a mutable
-  offset pointer as well as an overall max.
+- [DONE] Fix WORD implementation to correctly advance >IN and also
+  to pay attention to count.
 - Determine if KEY should be writing to TIB.
 - Implement NUMBER> (builtin/C API)
 - Implement LOOKUP (builtin; should be case insensitive)
@@ -50,8 +49,8 @@ General Builtins
 Kernel
 ------
 - [DONE] Move entire builtin dictionary into ROM.
-- Get rid of fields like POB and SQ and just use HERE instead to save
-  space. The dedicated static PAD space can stay.
+- [DONE] Get rid of fields like POB and SQ and just use HERE instead
+  to save space. The dedicated static PAD space can stay.
 - Implement exceptions using the return stack.
 - Figure out stack underflow checking for builtins etc.
 - Implement QUIT using setjmp/longjmp.

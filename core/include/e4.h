@@ -45,6 +45,7 @@ struct e4__io_func
 #define e4__E_FAILURE       (-256)
 
 /* flag constants */
+#define e4__F_SKIP_LEADING  (0x01)
 #define e4__F_BUILTIN       (0x08)
 
 /* builtin constants */
@@ -100,7 +101,8 @@ int e4__io_type(struct e4__task *task, const char *buf, unsigned long n);
 
 /* mem.c functions */
 int e4__mem_strncasecmp(const char *left, const char *right, unsigned long n);
-char* e4__mem_word(struct e4__task *task, char delim, const char *buf);
+const char* e4__mem_parse(const char *buf, char delim, unsigned long size,
+        unsigned long flags, unsigned long *length);
 
 /* task.c functions */
 struct e4__task* e4__task_create(void *buffer, unsigned long size);

@@ -12,22 +12,22 @@ int e4__mem_strncasecmp(const char *left, const char *right, unsigned long n)
     return !++n ? 0 : tolower(*--left) - tolower(*--right);
 }
 
-char* e4__mem_word(struct e4__task *task, char delim, const char *buf)
+const char* e4__mem_parse(const char *buf, char delim, unsigned long size,
+        unsigned long flags, unsigned long *length)
 {
-    register const char *start;
-    register char *p = (char*)task->pob;
+    register const char* start;
 
-    while (*buf == delim)
-        ++buf;
+    if (flags & e4__F_SKIP_LEADING)
+        while (size && *buf == delim)
+            ++buf, --size;
+
     start = buf;
+    *length = 0;
 
-    /* FIXME: This may not play nice with \r\n style newlines.
-       I guess maybe this is implementation dependent. */
-    while (*buf != delim && buf - start < 256 && *buf && *buf != '\n')
-        ++buf;
+    /* FIXME: Consider wrapping the end on newline behavior around some
+       kind of flag. */
+    while (size && *buf != delim && *buf != '\n')
+        ++buf, --size, ++*length;
 
-    *p = (char)(buf - start);
-    memcpy(&p[1], start, *p);
-
-    return p;
+    return start;
 }

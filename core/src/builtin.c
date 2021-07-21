@@ -1,6 +1,7 @@
 #include "e4-debug.h"
 #include "e4.h"
 #include "e4-task.h"
+#include <string.h>
 
 /* FIXME: Let this support "compile time" flags, etc. */
 #define _e4__BUILTIN_DECL() \
@@ -99,7 +100,9 @@ void e4__builtin_SKIP(struct e4__task *task, void *user)
 void e4__builtin_WORD(struct e4__task *task, void *user)
 {
     register char delim;
-    register char *word;
+    register const char *word;
+    register char clamped_length;
+    unsigned long length;
 
     /* FIXME: Should task struct fields just be used here rather than
        the C stack API? */
@@ -107,17 +110,34 @@ void e4__builtin_WORD(struct e4__task *task, void *user)
         /* FIXME: Underflow. */
     }
 
-    /* FIXME: Check for empty parse area. In reality, e4__mem_word
-       should probably take some kind of length. */
-    /* FIXME: Verify that WORD should update >IN. */
-    /* FIXME: Make this work with leading delimiters. This will
-       probably require a total refactor of e4__mem_word. */
-
+    /* Parse word. */
     delim = (long int)e4__stack_pop(task);
-    word = e4__mem_word(task, delim,
-            (const char*)task->io_src.buffer + (unsigned long)task->io_src.in);
-    task->io_src.in = (e4__cell)((const char*)task->io_src.in + *word + 1);
-    e4__stack_push(task, word);
+    word = (const char *)task->io_src.buffer + (unsigned long)task->io_src.in;
+
+    if ((unsigned long)task->io_src.length > (unsigned long)task->io_src.in)
+        length = (unsigned long)task->io_src.length -
+                (unsigned long)task->io_src.in;
+    else
+        length = 0;
+
+    word = e4__mem_parse(word, delim, length, e4__F_SKIP_LEADING, &length);
+
+    /* XXX: Ambiguous condition. We take only the first 255 bytes of
+       a parsed string that is longer than this, but we advance >IN
+       to the actual end of the word (beyond the encountered delim),
+       as per the specified delim. */
+
+    /* Write word to HERE. */
+    /* FIXME: Check that there is space in HERE before writing
+       to it. */
+    clamped_length = length < 256 ? (unsigned char)length : 255;
+    *((unsigned char*)task->here) = clamped_length;
+    memcpy((unsigned char*)task->here + 1, word, clamped_length);
+
+    /* Update offset and push result. */
+    task->io_src.in = (e4__cell)(word + length + 1 -
+            (const char*)task->io_src.buffer);
+    e4__stack_push(task, task->here);
 
     e4__builtin_RET(task, NULL);
 }
