@@ -223,5 +223,38 @@ int main(void)
     printf("strncasecmp(FOOBAR, foobar, 90): %d\n",
             e4__mem_strncasecmp("FOOBAR", "foobar", 90));
 
+    do {
+        unsigned long long num = 0;
+        unsigned long parsed;
+
+        printf("\nNUMERIC PARSING\n");
+
+        #define _test_NUM_FLAGS \
+            e4__F_CHAR_LITERAL | e4__F_NEG_PREFIX | e4__F_BASE_PREFIX
+        #define _test_NUM(n, base, flags)   \
+            parsed = e4__mem_number(n, sizeof(n) - 1, base, flags, &num);   \
+            printf("Parsed \"%s\" (base: %d, digits: %lu): %lld\n", n,  \
+                    base, parsed, (long long)num)
+        _test_NUM("0xac", 10, _test_NUM_FLAGS);
+        _test_NUM("ac", 16, _test_NUM_FLAGS);
+        _test_NUM("ac", 5, _test_NUM_FLAGS);
+        _test_NUM("32ac", 5, _test_NUM_FLAGS);
+        _test_NUM("$ac", 5, _test_NUM_FLAGS);
+        _test_NUM("-$ac", 5, _test_NUM_FLAGS);
+        _test_NUM("%011011", 5, _test_NUM_FLAGS);
+        _test_NUM("0b011011", 5, _test_NUM_FLAGS);
+        _test_NUM("0o777xx", 5, _test_NUM_FLAGS);
+        _test_NUM("#777   ", 5, _test_NUM_FLAGS);
+        _test_NUM("'a'jieoag", 5, _test_NUM_FLAGS);
+        _test_NUM("zOo", 36, _test_NUM_FLAGS);
+        _test_NUM("zOo", 99, _test_NUM_FLAGS);
+        _test_NUM("000", 10, 0);
+        _test_NUM("-5", 10, 0);
+        _test_NUM("$5", 10, 0);
+        _test_NUM("'5'", 10, 0);
+        #undef _test_NUM
+        #undef _test_NUM_FLAGS
+    } while (0);
+
     return 0;
 }

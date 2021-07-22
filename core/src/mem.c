@@ -12,6 +12,73 @@ int e4__mem_strncasecmp(const char *left, const char *right, unsigned long n)
     return !++n ? 0 : tolower(*--left) - tolower(*--right);
 }
 
+unsigned long e4__mem_number(const char *buf, unsigned long length,
+        unsigned char base, unsigned long flags, unsigned long long *out)
+{
+    register char number;
+    register unsigned long identity = 1;
+    register unsigned long result = 0;
+    register const char *start = buf;
+
+    /* XXX: Ambiguous behavior. This implementation clamps to the
+       acceptable range. */
+    if (base < 2) base = 2;
+    if (base > 36) base = 36;
+
+    if (flags & e4__F_CHAR_LITERAL && length > 2 && buf[0] == '\'' &&
+            buf[2] == '\'') {
+        *out = buf[1];
+        return 3;
+    }
+
+    if (flags & e4__F_NEG_PREFIX && *buf == '-') {
+        identity = -1;
+        ++buf;
+    }
+
+    if (flags & e4__F_BASE_PREFIX)
+        switch (*buf++) {
+            case '0':
+                switch (*buf++) {
+                    case 'x': case 'X': base = 16; break;
+                    case 'o': case 'O': base = 8; break;
+                    case 'b': case 'B': base = 2; break;
+                    default: buf -= 2; break;
+                }
+                break;
+            case '$': base = 16; break;
+            case '#': base = 10; break;
+            case '%': base = 2; break;
+            default: --buf; break;
+        }
+
+    for (number = 0; buf - start < length; number = 1, ++buf) {
+        register unsigned long d;
+        register const char c = tolower(*buf);
+
+        if (isdigit(c))
+            d = c - '0';
+        else if (c >= 'a' && c <= 'z')
+            d = c - 'a' + 10;
+        else
+            break;
+
+        if (d >= base)
+            break;
+
+        result *= base;
+        result += d;
+    }
+
+    if (number) {
+        result *= identity;
+        *out = result;
+        return buf - start;
+    }
+
+    return 0;
+}
+
 const char* e4__mem_parse(const char *buf, char delim, unsigned long size,
         unsigned long flags, unsigned long *length)
 {
