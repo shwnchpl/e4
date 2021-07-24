@@ -3,7 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 
-int e4__mem_strncasecmp(const char *left, const char *right, unsigned long n)
+int e4__mem_strncasecmp(const char *left, const char *right, e4__usize n)
 {
     while (n-- > 0 && tolower(*left++) == tolower(*right++))
         if (!*left)
@@ -12,12 +12,12 @@ int e4__mem_strncasecmp(const char *left, const char *right, unsigned long n)
     return !++n ? 0 : tolower(*--left) - tolower(*--right);
 }
 
-unsigned long e4__mem_number(const char *buf, unsigned long length,
-        unsigned char base, unsigned long flags, unsigned long long *out)
+e4__usize e4__mem_number(const char *buf, e4__usize length, e4__u8 base,
+        e4__u8 flags, e4__usize *out)
 {
-    register char number;
-    register unsigned long identity = 1;
-    register unsigned long result = 0;
+    register e4__bool number;
+    register e4__bool negate;
+    register e4__usize result = 0;
     register const char *start = buf;
 
     /* XXX: Ambiguous behavior. This implementation clamps to the
@@ -32,7 +32,7 @@ unsigned long e4__mem_number(const char *buf, unsigned long length,
     }
 
     if (flags & e4__F_NEG_PREFIX && *buf == '-') {
-        identity = -1;
+        negate = 1;
         ++buf;
     }
 
@@ -53,7 +53,7 @@ unsigned long e4__mem_number(const char *buf, unsigned long length,
         }
 
     for (number = 0; buf - start < length; number = 1, ++buf) {
-        register unsigned long d;
+        register e4__usize d;
         register const char c = tolower(*buf);
 
         if (isdigit(c))
@@ -71,7 +71,8 @@ unsigned long e4__mem_number(const char *buf, unsigned long length,
     }
 
     if (number) {
-        result *= identity;
+        if (negate)
+            result = e4__USIZE_NEGATE(result);
         *out = result;
         return buf - start;
     }
@@ -79,8 +80,8 @@ unsigned long e4__mem_number(const char *buf, unsigned long length,
     return 0;
 }
 
-const char* e4__mem_parse(const char *buf, char delim, unsigned long size,
-        unsigned long flags, unsigned long *length)
+const char* e4__mem_parse(const char *buf, char delim, e4__usize size,
+        e4__usize flags, e4__usize *length)
 {
     register const char* start;
 

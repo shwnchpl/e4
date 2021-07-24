@@ -2,12 +2,12 @@
 
 /* C89 does not require that function pointers and void pointers be
    the same size. We do. */
-e4__ASSERT(sizeof(void*) == sizeof(void (*)(struct e4__task *, void *)));
+e4__ASSERT(sizeof(void *) == sizeof(void (*)(struct e4__task *, void *)));
 
 /* Similarly, C89 does not require that void* and void** be the same
    size. In practice, there is virtually no reason why they would
    ever not be, so we require that they are. */
-e4__ASSERT(sizeof(void*) == sizeof(e4__cell));
+e4__ASSERT(sizeof(void *) == sizeof(e4__cell));
 
 /* Finally, we require an integer type that is capable of holding
    any pointer value. This is the most likely assert to fire, because

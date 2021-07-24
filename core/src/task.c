@@ -4,7 +4,7 @@
 
 #include <string.h>
 
-struct e4__task* e4__task_create(void *buffer, unsigned long size)
+struct e4__task* e4__task_create(void *buffer, e4__usize size)
 {
     register struct e4__task *task;
     register e4__cell cursor = buffer;
@@ -53,8 +53,8 @@ struct e4__task* e4__task_create(void *buffer, unsigned long size)
     task->tib = cursor + (85 * size) / (100 * sizeof(e4__cell)) + 1;
     task->io_src.buffer = task->tib;
     /* FIXME: Store this size somewhere? Or recalculate it if needed? */
-    task->io_src.sz = (e4__cell)(((const char *)cursor + (90 * size ) / 100) -
-            (const char*)task->tib - 1);
+    task->io_src.sz = (e4__cell)(((e4__u8 *)cursor + (90 * size ) / 100) -
+            (e4__u8 *)task->tib - 1);
     task->r0 = cursor + size / sizeof(e4__cell) - 1;
     task->rp = task->r0;
     task->base = (e4__cell)10;

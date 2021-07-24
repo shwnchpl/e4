@@ -5,16 +5,16 @@
 /* TODO: Create some kind of friendly user facing C API that
    can actually create a dictionary entry in the right place and update
    here, etc. */
-void* e4__dict_entry(void *here, struct e4__dict_header *prev, char *name,
-        unsigned short nbytes, void *code, void *user, unsigned short flags)
+void* e4__dict_entry(void *here, struct e4__dict_header *prev,
+        const char *name, e4__u8 nbytes, void *code, void *user, e4__u8 flags)
 {
     register struct e4__dict_header *header = here;
-    register unsigned long sz;
+    register e4__usize sz;
 
     header->link = prev;
     header->flags = flags;
     header->nbytes = nbytes;
-    header->name = (char*)(&header[1]);
+    header->name = (const char *)(&header[1]);
 
     memcpy(&header[1], name, nbytes);
 
@@ -25,15 +25,16 @@ void* e4__dict_entry(void *here, struct e4__dict_header *prev, char *name,
     if (sz % sizeof(void *))
         sz += (sizeof(void *) - (sz % sizeof(void *)));
 
-    header->xt = (struct e4__execute_token*)((char*)here + sz);
+    header->xt = (struct e4__execute_token *)((e4__u8 *)here + sz);
     header->xt->user = user;
     header->xt->code = code;
 
-    return here + sz + sizeof(*header->xt) - sizeof(header->xt->data);
+    return (e4__u8 *)here + sz + sizeof(*header->xt) -
+            sizeof(header->xt->data);
 }
 
 struct e4__dict_header* e4__dict_lookup(struct e4__dict_header *dict,
-        char *name, unsigned short nbytes)
+        const char *name, e4__u8 nbytes)
 {
     while (dict) {
         if (nbytes == dict->nbytes &&

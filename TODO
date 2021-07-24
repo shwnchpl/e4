@@ -51,10 +51,10 @@ Kernel
 - [DONE] Move entire builtin dictionary into ROM.
 - [DONE] Get rid of fields like POB and SQ and just use HERE instead
   to save space. The dedicated static PAD space can stay.
-- Create custom integer types that are the same width as e4__cell and
-  use these where appropriate (as opposed to unsigned long etc.).
-- Consider creating custom integer types for u8 and u16 as well rather
-  than using char and short.
+- [DONE] Create custom integer types that are the same width as e4__cell
+  and use these where appropriate (as opposed to unsigned long etc.).
+- [DONE] Creating custom integer types for u8 and bool as well rather
+  than simply using char.
 - Implement exceptions using the return stack.
 - Figure out stack underflow checking for builtins etc.
 - Implement QUIT using setjmp/longjmp.
@@ -89,6 +89,17 @@ Kernel
 - Add support for double cell numbers (including arithmetic etc.).
 - Update words meant to support double width numbers that are currently
   implemented without any such support. This includes >NUMBER.
+- Add more two's complement utility macros as needed and use them where
+  appropriate
+
+General IO
+----------
+- Implement two's complement negative integer printing (only after
+  reviewing the requirements for the <# family of words used for
+  pictured numeric output). This should probably somehow check for
+  sign overflow on the most negative number and possibly report
+  that as some kind of error (with an exception or otherwise).
+- Implement pictured numeric output.
 
 General Builtins
 ----------------

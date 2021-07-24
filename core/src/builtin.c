@@ -95,11 +95,11 @@ void e4__builtin_ABORT(struct e4__task *task, void *user)
 
 void e4__builtin_GTNUMBER(struct e4__task *task, void *user)
 {
-    register unsigned long initial;
+    register e4__usize initial;
     register const char *buf;
-    register unsigned long length;
-    register unsigned long consumed;
-    unsigned long long result;
+    register e4__usize length;
+    register e4__usize consumed;
+    e4__usize result;
 
     /* FIXME: Should task struct fields just be used here rather than
        the C stack API? */
@@ -107,18 +107,17 @@ void e4__builtin_GTNUMBER(struct e4__task *task, void *user)
         /* FIXME: Underflow. */
     }
 
-    length = (unsigned long)e4__stack_pop(task);
-    buf = (const char*)e4__stack_pop(task);
+    length = (e4__usize)e4__stack_pop(task);
+    buf = (const char *)e4__stack_pop(task);
 
     /* FIXME: Correctly handle double cell integers! */
     e4__stack_pop(task);
 
-    initial = (unsigned long)e4__stack_pop(task);
-    initial *= (unsigned long)task->base;
+    initial = (e4__usize)e4__stack_pop(task);
+    initial *= (e4__usize)task->base;
 
     result = 0;
-    consumed = e4__mem_number(buf, length, (unsigned long)task->base, 0,
-            &result);
+    consumed = e4__mem_number(buf, length, (e4__usize)task->base, 0, &result);
     result += initial;
 
     e4__stack_push(task, (e4__cell)result);
@@ -147,8 +146,8 @@ void e4__builtin_WORD(struct e4__task *task, void *user)
 {
     register char delim;
     register const char *word;
-    register char clamped_length;
-    unsigned long length;
+    register e4__u8 clamped_length;
+    e4__usize length;
 
     /* FIXME: Should task struct fields just be used here rather than
        the C stack API? */
@@ -157,12 +156,11 @@ void e4__builtin_WORD(struct e4__task *task, void *user)
     }
 
     /* Parse word. */
-    delim = (long int)e4__stack_pop(task);
-    word = (const char *)task->io_src.buffer + (unsigned long)task->io_src.in;
+    delim = (e4__usize)e4__stack_pop(task);
+    word = (const char *)task->io_src.buffer + (e4__usize)task->io_src.in;
 
-    if ((unsigned long)task->io_src.length > (unsigned long)task->io_src.in)
-        length = (unsigned long)task->io_src.length -
-                (unsigned long)task->io_src.in;
+    if ((e4__usize)task->io_src.length > (e4__usize)task->io_src.in)
+        length = (e4__usize)task->io_src.length - (e4__usize)task->io_src.in;
     else
         length = 0;
 
@@ -176,13 +174,13 @@ void e4__builtin_WORD(struct e4__task *task, void *user)
     /* Write word to HERE. */
     /* FIXME: Check that there is space in HERE before writing
        to it. */
-    clamped_length = length < 256 ? (unsigned char)length : 255;
-    *((unsigned char*)task->here) = clamped_length;
-    memcpy((unsigned char*)task->here + 1, word, clamped_length);
+    clamped_length = length < 256 ? (e4__u8)length : 255;
+    *((e4__u8 *)task->here) = clamped_length;
+    memcpy((e4__u8 *)task->here + 1, word, clamped_length);
 
     /* Update offset and push result. */
     task->io_src.in = (e4__cell)(word + length + 1 -
-            (const char*)task->io_src.buffer);
+            (const char *)task->io_src.buffer);
     e4__stack_push(task, task->here);
 
     e4__builtin_RET(task, NULL);

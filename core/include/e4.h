@@ -82,9 +82,9 @@ struct e4__dict_header
     struct e4__execute_token *xt;
 
     /* FIXME: Consider moving flags to the xt. */
-    unsigned char flags;
-    unsigned char nbytes;
-    char *name;
+    e4__u8 flags;
+    e4__u8 nbytes;
+    const char *name;
 };
 
 struct e4__execute_token
@@ -101,8 +101,8 @@ struct e4__io_func
 {
     void *user;
     int (*key)(void *user, char *buf);
-    int (*accept)(void *user, char *buf, unsigned long n);
-    int (*type)(void *user, const char *buf, unsigned long n);
+    int (*accept)(void *user, char *buf, e4__usize n);
+    int (*type)(void *user, const char *buf, e4__usize n);
 };
 
 /* error constants */
@@ -139,8 +139,11 @@ struct e4__io_func
 #define e4__ASSERT_MSG1(c, m)   e4__ASSERT_MSG0(c, m)
 #define e4__ASSERT(c)           e4__ASSERT_MSG1(c, __LINE__)
 
-#define e4__DEREF(p)    (*((e4__cell*)(p)))
-#define e4__DEREF2(p)   (**((e4__cell**)(p)))
+#define e4__DEREF(p)    (*((e4__cell *)(p)))
+#define e4__DEREF2(p)   (**((e4__cell **)(p)))
+
+#define e4__USIZE_IS_NEGATIVE(u)    (u > ((e4__usize)-1 >> 1))
+#define e4__USIZE_NEGATE(u)         (((u) ^ (e4__usize)-1) + 1)
 
 /* builtin declarations */
 /* FIXME: Should the header table even be exposed here? */
@@ -150,16 +153,16 @@ void e4__builtin_RET(struct e4__task *task, void *user);
 
 /* dict.c functions */
 /* FIXME: Should either of these be public at all? */
-void* e4__dict_entry(void *here, struct e4__dict_header *prev, char *name,
-        unsigned short nbytes, void *code, void *user, unsigned short flags);
+void* e4__dict_entry(void *here, struct e4__dict_header *prev,
+        const char *name, e4__u8 nbytes, void *code, void *user, e4__u8 flags);
 struct e4__dict_header* e4__dict_lookup(struct e4__dict_header *dict,
-        char *name, unsigned short nbytes);
+        const char *name, e4__u8 nbytes);
 
 /* stack.c functions */
 void e4__stack_push(struct e4__task *task, void *v);
 e4__cell e4__stack_pop(struct e4__task *task);
 e4__cell e4__stack_peek(struct e4__task *task);
-unsigned long e4__stack_depth(struct e4__task *task);
+e4__usize e4__stack_depth(struct e4__task *task);
 void e4__stack_rpush(struct e4__task *task, void *v);
 e4__cell e4__stack_rpop(struct e4__task *task);
 e4__cell e4__stack_rpeek(struct e4__task *task);
@@ -170,18 +173,18 @@ void e4__execute_threaded(struct e4__task *task, void *user);
 
 /* io.c functions */
 int e4__io_key(struct e4__task *task, void *buf);
-int e4__io_accept(struct e4__task *task, char *buf, unsigned long n);
-int e4__io_type(struct e4__task *task, const char *buf, unsigned long n);
+int e4__io_accept(struct e4__task *task, char *buf, e4__usize n);
+int e4__io_type(struct e4__task *task, const char *buf, e4__usize n);
 
 /* mem.c functions */
-int e4__mem_strncasecmp(const char *left, const char *right, unsigned long n);
-unsigned long e4__mem_number(const char *buf, unsigned long size,
-        unsigned char base, unsigned long flags, unsigned long long *out);
-const char* e4__mem_parse(const char *buf, char delim, unsigned long size,
-        unsigned long flags, unsigned long *length);
+int e4__mem_strncasecmp(const char *left, const char *right, e4__usize n);
+e4__usize e4__mem_number(const char *buf, e4__usize size, e4__u8 base,
+        e4__u8 flags, e4__usize *out);
+const char* e4__mem_parse(const char *buf, char delim, e4__usize size,
+        e4__usize flags, e4__usize *length);
 
 /* task.c functions */
-struct e4__task* e4__task_create(void *buffer, unsigned long size);
+struct e4__task* e4__task_create(void *buffer, e4__usize size);
 void e4__task_io_init(struct e4__task *task, struct e4__io_func *io);
 
 #endif /* E4_H_ */

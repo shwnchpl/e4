@@ -43,7 +43,7 @@ struct e4__task
     struct e4__io_src io_src;
 
     /* System variables. */
-    unsigned long sz;
+    e4__usize sz;
     struct e4__dict_header *dict;
     struct e4__io_func io_func;
 };

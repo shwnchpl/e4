@@ -14,7 +14,7 @@ static void print_anything(struct e4__task *task, void *user);
 const void *PRINT_HELLO[] =
 {
     print_anything,
-    (void*)"What's up?"
+    (void *)"What's up?"
 };
 
 const void *HELLO1[] =
@@ -43,21 +43,21 @@ const void *PUSH_NUM[] =
     e4__execute_threaded,
     NULL,
     &e4__BUILTIN_XT[e4__B_LIT],
-    (void*)0x12345,
+    (void *)0x12345,
     e4__builtin_RET
 };
 
 void print_anything(struct e4__task *task, void *user)
 {
     printf("\nHello\n");
-    printf("Payload: %s\n", *((char**)user));
+    printf("Payload: %s\n", *((char **)user));
 
     e4__builtin_RET(task, NULL);
 }
 
 int main(void)
 {
-    static unsigned char buffer[4096];
+    static e4__u8 buffer[4096];
 
     struct e4__task *task;
 
@@ -102,15 +102,15 @@ int main(void)
 
     do {
         e4__cell cells[6];
-        unsigned long depth0, depth1;
+        e4__usize depth0, depth1;
 
         printf("\nStack and return stack:\n");
 
-        e4__stack_push(task, (void*)2);
-        e4__stack_push(task, (void*)4);
-        e4__stack_push(task, (void*)8);
-        e4__stack_push(task, (void*)16);
-        e4__stack_push(task, (void*)32);
+        e4__stack_push(task, (void *)2);
+        e4__stack_push(task, (void *)4);
+        e4__stack_push(task, (void *)8);
+        e4__stack_push(task, (void *)16);
+        e4__stack_push(task, (void *)32);
 
         depth0 = e4__stack_depth(task);
         cells[0] = e4__stack_peek(task);
@@ -132,11 +132,11 @@ int main(void)
             cells[5],
             depth1);
 
-        e4__stack_rpush(task, (void*)3);
-        e4__stack_rpush(task, (void*)5);
-        e4__stack_rpush(task, (void*)9);
-        e4__stack_rpush(task, (void*)17);
-        e4__stack_rpush(task, (void*)33);
+        e4__stack_rpush(task, (void *)3);
+        e4__stack_rpush(task, (void *)5);
+        e4__stack_rpush(task, (void *)9);
+        e4__stack_rpush(task, (void *)17);
+        e4__stack_rpush(task, (void *)33);
 
         cells[0] = e4__stack_rpeek(task);
         cells[1] = e4__stack_rpop(task);
@@ -158,7 +158,7 @@ int main(void)
             e4__io_key(task, NULL));
 
     do {
-        unsigned long len;
+        e4__usize len;
         const char *word;
 
         printf("\nParsing some words now.\n\n");
@@ -185,7 +185,7 @@ int main(void)
             e4__execute_threaded,
             NULL,
             &e4__BUILTIN_XT[e4__B_LIT],
-            (void*)' ',
+            (void *)' ',
             &e4__BUILTIN_XT[e4__B_WORD],
             e4__builtin_RET
         };
@@ -201,7 +201,7 @@ int main(void)
         do {
             e4__execute(task, RUN_WORD);
 
-            res = (const char*)e4__stack_pop(task);
+            res = (const char *)e4__stack_pop(task);
             len = *res++;
             printf("\nExecuted WORD (in: %p, len: %p), got (%d): %.*s\n",
                     task->io_src.in, task->io_src.length, len, len, res);
@@ -224,8 +224,8 @@ int main(void)
             e4__mem_strncasecmp("FOOBAR", "foobar", 90));
 
     do {
-        unsigned long long num = 0;
-        unsigned long parsed;
+        e4__usize num = 0;
+        e4__usize parsed;
 
         printf("\nNUMERIC PARSING\n");
 
@@ -233,8 +233,8 @@ int main(void)
             e4__F_CHAR_LITERAL | e4__F_NEG_PREFIX | e4__F_BASE_PREFIX
         #define _test_NUM(n, base, flags)   \
             parsed = e4__mem_number(n, sizeof(n) - 1, base, flags, &num);   \
-            printf("Parsed \"%s\" (base: %d, digits: %lu): %lld\n", n,  \
-                    base, parsed, (long long)num)
+            printf("Parsed \"%s\" (base: %d, digits: %lu): %ld\n", n,  \
+                    base, parsed, (long)num)
         _test_NUM("0xac", 10, _test_NUM_FLAGS);
         _test_NUM("ac", 16, _test_NUM_FLAGS);
         _test_NUM("ac", 5, _test_NUM_FLAGS);
@@ -265,18 +265,18 @@ int main(void)
                 long result;    \
                 const char *remaining;  \
                 int rcount; \
-                unsigned long old_base = (unsigned long)task->base; \
+                e4__usize old_base = (e4__usize)task->base; \
                                                         \
                 task->base = (e4__cell)b;   \
                 e4__stack_push(task, (e4__cell)n);  \
                 e4__stack_push(task, (e4__cell)0);  \
                 e4__stack_push(task, (e4__cell)s);  \
                 e4__stack_push(task, (e4__cell)(sizeof(s) - 1));    \
-                e4__execute(task, (void*)&e4__BUILTIN_XT[e4__B_GTNUMBER]);  \
-                rcount = (unsigned long)e4__stack_pop(task);    \
+                e4__execute(task, (void *)&e4__BUILTIN_XT[e4__B_GTNUMBER]);  \
+                rcount = (e4__usize)e4__stack_pop(task);    \
                 remaining = (const char *)e4__stack_pop(task);  \
                 e4__stack_pop(task);    \
-                result = (unsigned long)e4__stack_pop(task);    \
+                result = (e4__usize)e4__stack_pop(task);    \
                 printf("TRIED \"%s\". GOT %ld (%d remaining: \"%.*s\")\n",   \
                     s, result, rcount, rcount, remaining);  \
                 task->base = (e4__cell)old_base;    \
@@ -290,6 +290,10 @@ int main(void)
         #undef _test_GTNUMBER
     } while (0);
 #endif
+
+    printf("\n5 is positive, %ld is negative (%u)\n",
+            e4__USIZE_NEGATE((e4__usize)5),
+            e4__USIZE_IS_NEGATIVE((e4__usize)-5));
 
     return 0;
 }

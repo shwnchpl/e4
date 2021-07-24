@@ -24,7 +24,7 @@ e4__cell e4__stack_peek(struct e4__task *task)
     return e4__DEREF(task->sp + 1);
 }
 
-unsigned long e4__stack_depth(struct e4__task *task)
+e4__usize e4__stack_depth(struct e4__task *task)
 {
     return task->s0 - task->sp;
 }
