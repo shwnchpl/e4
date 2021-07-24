@@ -7,6 +7,10 @@ void e4__execute(struct e4__task *task, void *user)
     void **code = user;
     void (*entry)(struct e4__task *, void *) = *code;
 
+    /* FIXME: Typedef the type of entry somewhere so that it can be
+       used as part of the C API. Also, use this typedef'd version when
+       checking for compatibility in assert.c. */
+
     e4__DEREF(task->rp--) = task->ip + 1;
     entry(task, code + 1);
 }

@@ -1,12 +1,75 @@
 #ifndef E4_H_
 #define E4_H_
 
+#if defined(e4__LOAD_CONFIG)
+    /* To inject configuration into e4, provide the e4__UINT_DEFINED
+       preprocessor token using your build system and create a file
+       with the name "e4-config.h" containing the relevant
+       configuration. */
+    #include "e4-config.h"
+#endif
+
 /**************************************************
  *               e4 public C API
  *************************************************/
 
 /* e4 types */
 typedef void** e4__cell;
+
+/* Define the e4__uint type, an integral type that is the same width as
+   the e4__cell pointer type, if it has not been provided. */
+#if !defined(e4__UINT_DEFINED)
+    #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+        /* If C99 features are available, try to just use uintptr_t. */
+        #include <stdint.h>
+        typedef uintptr_t e4__uint;
+        #define e4__UINT_DEFINED
+    #else
+        /* Attempt to deduce the appropriate size for e4__uint based on
+           whatever information is available. */
+        #include <limits.h>
+
+        #if !defined(e4__WORDSIZE)
+            #if defined(__WORDSIZE)
+                #define e4__WORDSIZE __WORDSIZE
+            #elif defined(_WIN64)
+                #define e4__WORDSIZE 64
+            #elif defined(_WIN32)
+                #define e4__WORDSIZE 32
+            #endif
+        #endif
+
+        #if defined(e4__WORDSIZE)
+            #if UCHAR_MAX >> (e4__WORDSIZE - 1) == 1
+                typedef unsigned char e4__uint;
+                #define e4__UINT_DEFINED
+            #elif USHRT_MAX >> (e4__WORDSIZE - 1) == 1
+                typedef unsigned short e4__uint;
+                #define e4__UINT_DEFINED
+            #elif UINT_MAX >> (e4__WORDSIZE - 1) == 1
+                typedef unsigned int e4__uint;
+                #define e4__UINT_DEFINED
+            #elif ULONG_MAX >> (e4__WORDSIZE - 1) == 1
+                typedef unsigned long e4__uint;
+                #define e4__UINT_DEFINED
+            #elif defined(ULLONG_MAX) && ULLONG_MAX >> (e4__WORDSIZE - 1) == 1
+                typedef unsigned long long e4__uint;
+                #define e4__UINT_DEFINED
+            #endif
+        #endif
+
+        #if !defined(e4__UINT_DEFINED)
+            /* As a last ditch effort, attempt to just use size_t.
+               There's a relatively decent chance this will actually
+               work fine, but if it won't then the compile time
+               assertion in assert.c will prevent compilation. If that
+               does happen, there are still options (which are outlined
+               in assert.c). */
+            typedef size_t e4__uint;
+            #define e4__UINT_DEFINED
+        #endif
+    #endif
+#endif
 
 struct e4__task;
 
@@ -69,6 +132,10 @@ struct e4__io_func
 #define e4__TASK_MIN_SZ     (2048)
 
 /* e4 macros */
+#define e4__ASSERT_MSG0(c, m)   enum { e4__assert__ ## m = 1 / !!(c) }
+#define e4__ASSERT_MSG1(c, m)   e4__ASSERT_MSG0(c, m)
+#define e4__ASSERT(c)           e4__ASSERT_MSG1(c, __LINE__)
+
 #define e4__DEREF(p)    (*((e4__cell*)(p)))
 #define e4__DEREF2(p)   (**((e4__cell**)(p)))
 
