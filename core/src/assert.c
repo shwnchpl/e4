@@ -42,18 +42,18 @@ e4__ASSERT(sizeof(void*) == sizeof(e4__cell));
    simply provide the appropriate type definition yourself. If the
    preprocessor identifier e4__LOAD_CONFIG is defined, e4 will attempt
    to include a file named e4-config.h in all relevant locations. In
-   this header, an appropriate e4__uint type can be defined. If this is
-   done, the preprocessor identifier e4__UINT_DEFINED should also be
+   this header, an appropriate e4__usize type can be defined. If this is
+   done, the preprocessor identifier e4__USIZE_DEFINED should also be
    defined to indicate to e4 that it is no longer responsible for
-   providing the e4__uint type.
+   providing the e4__usize type.
 
    For example, assuming your system is 39 bit and your system headers
    provide some uint39_t type, then using your build system
    e4__LOAD_CONFIG should be defined and made available to e4 and
    e4-config.h should be made to contain the following:
 
-        typedef uint39_t e4__uint;
-        #define e4__UINT_DEFINED
+        typedef uint39_t e4__usize;
+        #define e4__USIZE_DEFINED
 
    If this is not possible on your system because there literally does
    not exist any integral type that is the same width as a pointer
@@ -62,4 +62,4 @@ e4__ASSERT(sizeof(void*) == sizeof(e4__cell));
    has been encountered, however if you believe you have found one,
    please don't hesitate to contact whoever is currently maintaining
    this code and instruct them to update this comment. */
-e4__ASSERT(sizeof(e4__cell) == sizeof(e4__uint));
+e4__ASSERT(sizeof(e4__cell) == sizeof(e4__usize));
