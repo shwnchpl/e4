@@ -30,12 +30,12 @@ Parsing/Text Execution
 - [DONE] Make existing LOOKUP C API case insensitive?
 - [DONE] Fix WORD implementation to correctly advance >IN and also
   to pay attention to count.
-- Determine if KEY should be writing to TIB.
-- Implement NUMBER> (builtin/C API)
-- Implement LOOKUP (builtin; should be case insensitive)
-- Implement EXECUTE (builtin).
+- [DONE] Implement >NUMBER (builtin/C API)
 - Implement EVALUATE (builtin/C API) (including figuring out how this
   interacts with TIB and appropriately setting SOURCE-IO).
+- Determine if KEY should be writing to TIB.
+- Implement LOOKUP (builtin; should be case insensitive)
+- Implement EXECUTE (builtin).
 
 General Builtins
 ----------------
@@ -51,6 +51,10 @@ Kernel
 - [DONE] Move entire builtin dictionary into ROM.
 - [DONE] Get rid of fields like POB and SQ and just use HERE instead
   to save space. The dedicated static PAD space can stay.
+- Create custom integer types that are the same width as e4__cell and
+  use these where appropriate (as opposed to unsigned long etc.).
+- Consider creating custom integer types for u8 and u16 as well rather
+  than using char and short.
 - Implement exceptions using the return stack.
 - Figure out stack underflow checking for builtins etc.
 - Implement QUIT using setjmp/longjmp.
@@ -79,6 +83,12 @@ Compilation
 - Add conditional structure words like IF, THEN, BEGIN, WHILE, LOOP,
   DO, etc.
 - Figure out how to implement RECURSE.
+
+Kernel
+-----
+- Add support for double cell numbers (including arithmetic etc.).
+- Update words meant to support double width numbers that are currently
+  implemented without any such support. This includes >NUMBER.
 
 General Builtins
 ----------------

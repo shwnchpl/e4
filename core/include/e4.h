@@ -54,10 +54,11 @@ struct e4__io_func
 /* builtin constants */
 #define e4__B_RET           (0)
 #define e4__B_ABORT         (1)
-#define e4__B_LIT           (2)
-#define e4__B_SKIP          (3)
-#define e4__B_WORD          (4)
-#define e4__BUILTIN_COUNT   (5)
+#define e4__B_GTNUMBER      (2)
+#define e4__B_LIT           (3)
+#define e4__B_SKIP          (4)
+#define e4__B_WORD          (5)
+#define e4__BUILTIN_COUNT   (6)
 
 /* source ID constants */
 #define e4__SID_STR         (-1)

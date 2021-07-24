@@ -7,48 +7,53 @@
 #define _e4__BUILTIN_DECL() \
     _e4__BUILTIN_PROC_FIRST(RET)  \
     _e4__BUILTIN_PROC(ABORT)    \
+    _e4__BUILTIN_PROC_NAMED(GTNUMBER, ">NUMBER")    \
     _e4__BUILTIN_PROC(LIT)  \
     _e4__BUILTIN_PROC(SKIP) \
     _e4__BUILTIN_PROC(WORD)
 
+#define _e4__BUILTIN_PROC(s)    \
+    _e4__BUILTIN_PROC_NAMED(s, #s)
+
 /* Declare builtin functions. */
 #define _e4__BUILTIN_PROC_FIRST(w)  \
     void e4__builtin_##w(struct e4__task *task, void *user);
-#define _e4__BUILTIN_PROC(w)    \
+#define _e4__BUILTIN_PROC_NAMED(w, n)   \
     static void e4__builtin_##w(struct e4__task *task, void *user);
 
 _e4__BUILTIN_DECL();
 
+#undef _e4__BUILTIN_PROC_NAMED
 #undef _e4__BUILTIN_PROC_FIRST
-#undef _e4__BUILTIN_PROC
 
 /* Define builtin header table. */
-#define _e4__BUILTIN_PROC_HEADER(w, link) \
+#define _e4__BUILTIN_PROC_HEADER(w, link, n)    \
     {   \
         link,   \
         (struct e4__execute_token *)&e4__BUILTIN_XT[e4__B_##w],     \
         e4__F_BUILTIN,  \
-        sizeof(#w) - 1, \
-        #w, \
+        sizeof(n) - 1, \
+        n, \
     },
 #define _e4__BUILTIN_PROC_FIRST(w)  \
-    _e4__BUILTIN_PROC_HEADER(w, NULL)
-#define _e4__BUILTIN_PROC(w)  \
+    _e4__BUILTIN_PROC_HEADER(w, NULL, #w)
+#define _e4__BUILTIN_PROC_NAMED(w, n)   \
     _e4__BUILTIN_PROC_HEADER(w, \
-            (struct e4__dict_header *)&e4__BUILTIN_HEADER[e4__B_##w - 1])
+            (struct e4__dict_header *)&e4__BUILTIN_HEADER[e4__B_##w - 1],   \
+            n)
 
 const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT] =
 {
     _e4__BUILTIN_DECL()
 };
 
-#undef _e4__BUILTIN_PROC_HEADER
+#undef _e4__BUILTIN_PROC_NAMED
 #undef _e4__BUILTIN_PROC_FIRST
-#undef _e4__BUILTIN_PROC
+#undef _e4__BUILTIN_PROC_HEADER
 
 /* Define builtin execution token table. */
 #define _e4__BUILTIN_PROC_FIRST(w)  _e4__BUILTIN_PROC(w)
-#define _e4__BUILTIN_PROC(w)  \
+#define _e4__BUILTIN_PROC_NAMED(w, n)   \
     {e4__builtin_##w, NULL},
 
 const struct e4__execute_token e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
@@ -56,6 +61,8 @@ const struct e4__execute_token e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
     _e4__BUILTIN_DECL()
 };
 
+#undef _e4__BUILTIN_PROC_NAMED
+#undef _e4__BUILTIN_PROC_FIRST
 #undef _e4__BUILTIN_PROC
 #undef _e4__BUILTIN_DECL
 
@@ -84,6 +91,45 @@ void e4__builtin_ABORT(struct e4__task *task, void *user)
     for (i = 1; &task->rp[i] <= task->r0; ++i)
         task->rp[i] = RETURN;
     task->ip = e4__DEREF(++task->rp);
+}
+
+void e4__builtin_GTNUMBER(struct e4__task *task, void *user)
+{
+    register unsigned long initial;
+    register const char *buf;
+    register unsigned long length;
+    register unsigned long consumed;
+    unsigned long long result;
+
+    /* FIXME: Should task struct fields just be used here rather than
+       the C stack API? */
+    if (e4__stack_depth(task) < 4) {
+        /* FIXME: Underflow. */
+    }
+
+    length = (unsigned long)e4__stack_pop(task);
+    buf = (const char*)e4__stack_pop(task);
+
+    /* FIXME: Correctly handle double cell integers! */
+    e4__stack_pop(task);
+
+    initial = (unsigned long)e4__stack_pop(task);
+    initial *= (unsigned long)task->base;
+
+    result = 0;
+    consumed = e4__mem_number(buf, length, (unsigned long)task->base, 0,
+            &result);
+    result += initial;
+
+    e4__stack_push(task, (e4__cell)result);
+
+    /* FIXME: Actually handle double cell integers. */
+    e4__stack_push(task, (e4__cell)0);
+
+    e4__stack_push(task, (e4__cell)(buf + consumed));
+    e4__stack_push(task, (e4__cell)(length - consumed));
+
+    e4__builtin_RET(task, NULL);
 }
 
 void e4__builtin_LIT(struct e4__task *task, void *user)
