@@ -71,6 +71,9 @@ typedef void** e4__cell;
     #endif
 #endif
 
+typedef unsigned char e4__bool;
+typedef unsigned char e4__u8;
+
 struct e4__task;
 
 struct e4__dict_header
