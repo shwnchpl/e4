@@ -40,6 +40,7 @@ Parsing/Text Execution
 General Builtins
 ----------------
 - Implement basic static manipulation words like DUP, DROP, TUCK, etc.
+- Implement simple IO builtins ., U., and EMIT.
 - Implement compiletime BRANCH0, BRANCH, etc.
 - Implement FORGET. It should stop looking once it hits builtin words.
 - Implement different code handlers _constant, _variable, _thunk, and
@@ -55,9 +56,14 @@ Kernel
   and use these where appropriate (as opposed to unsigned long etc.).
 - [DONE] Creating custom integer types for u8 and bool as well rather
   than simply using char.
+- [DONE] Implement numeric signed division.
 - Implement exceptions using the return stack.
 - Figure out stack underflow checking for builtins etc.
 - Implement QUIT using setjmp/longjmp.
+
+General IO
+----------
+- [DONE] Implement two's complement integer formatting.
 
 Compilation
 -----------
@@ -90,15 +96,11 @@ Kernel
 - Update words meant to support double width numbers that are currently
   implemented without any such support. This includes >NUMBER.
 - Add more two's complement utility macros as needed and use them where
-  appropriate
+  appropriate.
+- Implement signed modulo and other single width math operators.
 
 General IO
 ----------
-- Implement two's complement negative integer printing (only after
-  reviewing the requirements for the <# family of words used for
-  pictured numeric output). This should probably somehow check for
-  sign overflow on the most negative number and possibly report
-  that as some kind of error (with an exception or otherwise).
 - Implement pictured numeric output.
 
 General Builtins
@@ -111,3 +113,4 @@ General Builtins
   stack as appropriate and advances the instruction pointer. The
   string should be compiled directly into the definition *with* end
   padding to align.
+- Implement signed and unsigned single width arithmetic builtins.

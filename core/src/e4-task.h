@@ -17,18 +17,29 @@ struct e4__io_src
 
 struct e4__task
 {
-    /* FIXME: Reorder these, if necessary. */
     /* FIXME: Ensure somewhere that a parse output buffer with 130
        characters minimum is always maintained at the top of HERE.
-       This buffer is used by WORD, and per this implementation may
+       130 = 64 * 2 + 2 and the pictured numeric output buffer is
+       required to be at least n * 2 + 2 bytes long, where n is the
+       number of bits in a cell, and the largest this value is ever
+       likely to be is 64.
+       This buffer is used by WORD, which requires a buffer of at
+       least 33 characters that *may* be the same as the buffer used
+       for pictured numeric output. Per this implementation, WORD may
        output strings as long as 255 characters. The current builtin
        WORD implementation does NOT check that there is room at the
        end of HERE when writing to this space.
-       This is the same buffer used for the counted string scratch
-       buffer (used by S" etc.), which must be at least 80
-       characters. Since HERE is being used, the dedicated buffers
-       in this struct can be removed. */
 
+       Since here is being used, no dedicated buffers are provided
+       for this purposes outlined above. */
+    /* FIXME: Add a dedicated counted string scratch buffer (to be
+       used by S", S\", and C"), which must be able to store strings
+       at least 80 characters long *AND* must allow strings returned
+       to be valid for at least one consecutive call. For instance,
+       `S" bar" S" foo" type type` should output "foobar" not
+       "foofoo." */
+
+    /* FIXME: Reorder these, if necessary. */
     /* User table. */
     e4__cell here;
     e4__cell pad; /* 84 characters minimum */

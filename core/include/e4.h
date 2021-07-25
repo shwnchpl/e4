@@ -114,10 +114,13 @@ struct e4__io_func
 
 /* flag constants */
 #define e4__F_SKIP_LEADING  (0x01)
+
 #define e4__F_NEG_PREFIX    (0x01)
 #define e4__F_BASE_PREFIX   (0x02)
 #define e4__F_CHAR_LITERAL  (0x04)
 #define e4__F_BUILTIN       (0x08)
+
+#define e4__F_SIGNED        (0x01)
 
 /* builtin constants */
 #define e4__B_RET           (0)
@@ -184,6 +187,11 @@ e4__usize e4__mem_number(const char *buf, e4__usize size, e4__u8 base,
         e4__u8 flags, e4__usize *out);
 const char* e4__mem_parse(const char *buf, char delim, e4__usize size,
         e4__usize flags, e4__usize *length);
+
+/* num.c functions */
+e4__usize e4__num_digit(e4__usize u, e4__u8 base, char *d);
+char* e4__num_format(e4__usize n, e4__u8 base, e4__u8 flags, char *buf,
+        e4__usize sz);
 
 /* task.c functions */
 struct e4__task* e4__task_create(void *buffer, e4__usize size);

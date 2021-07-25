@@ -291,6 +291,26 @@ int main(void)
     } while (0);
 #endif
 
+    do {
+        char buf[30];
+        char *res;
+
+        printf("\nTesting numeric formatting:\n");
+
+        #define _test_FMTDIGIT(n, b, f) \
+            res = e4__num_format(n, b, f, buf, sizeof(buf));    \
+            printf("For %d (%u) base %u flags %x got: %.*s\n", \
+                n, n, b, f, (int)(&buf[32] - res), res)
+        _test_FMTDIGIT(531, 10, 0);
+        _test_FMTDIGIT(0xf3, 16, 0);
+        _test_FMTDIGIT(-0xf3, 16, 0);
+        _test_FMTDIGIT(-0xf3, 16, e4__F_SIGNED);
+        _test_FMTDIGIT(46655, 36, e4__F_SIGNED);
+        _test_FMTDIGIT(-50, 2, e4__F_SIGNED);
+        _test_FMTDIGIT(0, 2, e4__F_SIGNED);
+        #undef _test_FMTDIGIT
+    } while (0);
+
     printf("\n5 is positive, %ld is negative (%u)\n",
             e4__USIZE_NEGATE((e4__usize)5),
             e4__USIZE_IS_NEGATIVE((e4__usize)-5));
