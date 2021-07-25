@@ -315,5 +315,11 @@ int main(void)
             e4__USIZE_NEGATE((e4__usize)5),
             e4__USIZE_IS_NEGATIVE((e4__usize)-5));
 
+    printf("\n-10/3 = %ld, 10/-3 = %ld -10/-3 = %ld, 10/3 = %ld\n",
+            e4__num_sdiv((e4__usize)-10, (e4__usize)3),
+            e4__num_sdiv((e4__usize)10, (e4__usize)-3),
+            e4__num_sdiv((e4__usize)-10, (e4__usize)-3),
+            e4__num_sdiv((e4__usize)10, (e4__usize)3));
+
     return 0;
 }

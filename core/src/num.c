@@ -30,3 +30,25 @@ char* e4__num_format(e4__usize n, e4__u8 base, e4__u8 flags, char *buf,
 
     return buf;
 }
+
+e4__usize e4__num_sdiv(e4__usize n, e4__usize d)
+{
+    register e4__bool negate = 0;
+
+    if (e4__USIZE_IS_NEGATIVE(n)) {
+        n = e4__USIZE_NEGATE(n);
+        negate = !negate;
+    }
+
+    if (e4__USIZE_IS_NEGATIVE(d)) {
+        d = e4__USIZE_NEGATE(d);
+        negate = !negate;
+    }
+
+    n = n / d;
+
+    if (negate)
+        n = e4__USIZE_NEGATE(n);
+
+    return n;
+}

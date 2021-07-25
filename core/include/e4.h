@@ -192,6 +192,7 @@ const char* e4__mem_parse(const char *buf, char delim, e4__usize size,
 e4__usize e4__num_digit(e4__usize u, e4__u8 base, char *d);
 char* e4__num_format(e4__usize n, e4__u8 base, e4__u8 flags, char *buf,
         e4__usize sz);
+e4__usize e4__num_sdiv(e4__usize n, e4__usize d);
 
 /* task.c functions */
 struct e4__task* e4__task_create(void *buffer, e4__usize size);
