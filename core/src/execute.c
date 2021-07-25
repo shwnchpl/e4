@@ -5,7 +5,7 @@
 void e4__execute(struct e4__task *task, void *user)
 {
     void **code = user;
-    void (*entry)(struct e4__task *, void *) = *code;
+    e4__code_ptr entry = *code;
 
     /* FIXME: Typedef the type of entry somewhere so that it can be
        used as part of the C API. Also, use this typedef'd version when

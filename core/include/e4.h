@@ -76,6 +76,8 @@ typedef unsigned char e4__u8;
 
 struct e4__task;
 
+typedef void (*e4__code_ptr)(struct e4__task *, void *);
+
 struct e4__dict_header
 {
     struct e4__dict_header *link;
@@ -89,7 +91,7 @@ struct e4__dict_header
 
 struct e4__execute_token
 {
-    void *code;
+    e4__code_ptr code;
     void *user;
     e4__cell data[1];
 };
