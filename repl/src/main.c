@@ -339,20 +339,24 @@ int main(void)
                     e4__stack_clear(task);  \
                     printf("\n");   \
                 } while (0)
-        #define _test_STACK_WORD(w) \
+        #define _test_STACK_WORD(w, W) \
             do {    \
                 _test_PUSH3();  \
                 e4__stack_##w(task);    \
                 printf("Pushed 1 2 3. After %s, stack dump: ", #w); \
                 _test_DUMP_STACK(); \
+                _test_PUSH3();  \
+                e4__execute(task, (void *)&e4__BUILTIN_XT[e4__B_##W]);  \
+                printf("And again with %s. Stack dump: ", #W);  \
+                _test_DUMP_STACK(); \
             } while (0)
-        _test_STACK_WORD(clear);
-        _test_STACK_WORD(drop);
-        _test_STACK_WORD(dup);
-        _test_STACK_WORD(over);
-        _test_STACK_WORD(rot);
-        _test_STACK_WORD(swap);
-        _test_STACK_WORD(tuck);
+        _test_STACK_WORD(clear, CLEAR);
+        _test_STACK_WORD(drop, DROP);
+        _test_STACK_WORD(dup, DUP);
+        _test_STACK_WORD(over, OVER);
+        _test_STACK_WORD(rot, ROT);
+        _test_STACK_WORD(swap, SWAP);
+        _test_STACK_WORD(tuck, TUCK);
 
         _test_PUSH3();
         e4__stack_push(task, (e4__cell)4);
@@ -360,6 +364,13 @@ int main(void)
         e4__stack_push(task, (e4__cell)4);
         printf("Pushed 1 2 3 4 5 4. After roll, stack dump: ");
         e4__stack_roll(task);
+        _test_DUMP_STACK();
+        _test_PUSH3();
+        e4__stack_push(task, (e4__cell)4);
+        e4__stack_push(task, (e4__cell)5);
+        e4__stack_push(task, (e4__cell)4);
+        e4__execute(task, (void *)&e4__BUILTIN_XT[e4__B_ROLL]);
+        printf("And again with ROLL. Stack dump: ");
         _test_DUMP_STACK();
         #undef _test_STACK_WORD
         #undef _test_DUMP_STACK

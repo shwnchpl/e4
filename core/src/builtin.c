@@ -7,9 +7,18 @@
 #define _e4__BUILTIN_DECL() \
     _e4__BUILTIN_PROC_FIRST(RET)  \
     _e4__BUILTIN_PROC(ABORT)    \
+    _e4__BUILTIN_PROC(CLEAR)    \
+    _e4__BUILTIN_PROC(DEPTH)    \
+    _e4__BUILTIN_PROC(DROP) \
+    _e4__BUILTIN_PROC(DUP)  \
     _e4__BUILTIN_PROC_NAMED(GTNUMBER, ">NUMBER")    \
     _e4__BUILTIN_PROC(LIT)  \
+    _e4__BUILTIN_PROC(OVER) \
+    _e4__BUILTIN_PROC(ROT)  \
+    _e4__BUILTIN_PROC(ROLL) \
     _e4__BUILTIN_PROC(SKIP) \
+    _e4__BUILTIN_PROC(SWAP) \
+    _e4__BUILTIN_PROC(TUCK) \
     _e4__BUILTIN_PROC(WORD)
 
 #define _e4__BUILTIN_PROC(s)    \
@@ -93,6 +102,30 @@ void e4__builtin_ABORT(struct e4__task *task, void *user)
     task->ip = e4__DEREF(++task->rp);
 }
 
+void e4__builtin_CLEAR(struct e4__task *task, void *user)
+{
+    e4__stack_clear(task);
+    e4__builtin_RET(task, NULL);
+}
+
+void e4__builtin_DEPTH(struct e4__task *task, void *user)
+{
+    e4__stack_push(task, (e4__cell)e4__stack_depth(task));
+    e4__builtin_RET(task, NULL);
+}
+
+void e4__builtin_DROP(struct e4__task *task, void *user)
+{
+    e4__stack_drop(task);
+    e4__builtin_RET(task, NULL);
+}
+
+void e4__builtin_DUP(struct e4__task *task, void *user)
+{
+    e4__stack_dup(task);
+    e4__builtin_RET(task, NULL);
+}
+
 void e4__builtin_GTNUMBER(struct e4__task *task, void *user)
 {
     register e4__usize initial;
@@ -137,9 +170,39 @@ void e4__builtin_LIT(struct e4__task *task, void *user)
     task->ip = e4__DEREF(task->rp) + 1;
 }
 
+void e4__builtin_OVER(struct e4__task *task, void *user)
+{
+    e4__stack_over(task);
+    e4__builtin_RET(task, NULL);
+}
+
+void e4__builtin_ROT(struct e4__task *task, void *user)
+{
+    e4__stack_rot(task);
+    e4__builtin_RET(task, NULL);
+}
+
+void e4__builtin_ROLL(struct e4__task *task, void *user)
+{
+    e4__stack_roll(task);
+    e4__builtin_RET(task, NULL);
+}
+
 void e4__builtin_SKIP(struct e4__task *task, void *user)
 {
     task->ip = e4__DEREF(++task->rp) + 1;
+}
+
+void e4__builtin_SWAP(struct e4__task *task, void *user)
+{
+    e4__stack_swap(task);
+    e4__builtin_RET(task, NULL);
+}
+
+void e4__builtin_TUCK(struct e4__task *task, void *user)
+{
+    e4__stack_tuck(task);
+    e4__builtin_RET(task, NULL);
 }
 
 void e4__builtin_WORD(struct e4__task *task, void *user)

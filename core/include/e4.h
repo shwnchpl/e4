@@ -123,13 +123,23 @@ struct e4__io_func
 #define e4__F_SIGNED        (0x01)
 
 /* builtin constants */
+/* FIXME: Consider using an enum here. */
 #define e4__B_RET           (0)
 #define e4__B_ABORT         (1)
-#define e4__B_GTNUMBER      (2)
-#define e4__B_LIT           (3)
-#define e4__B_SKIP          (4)
-#define e4__B_WORD          (5)
-#define e4__BUILTIN_COUNT   (6)
+#define e4__B_CLEAR         (2)
+#define e4__B_DEPTH         (3)
+#define e4__B_DROP          (4)
+#define e4__B_DUP           (5)
+#define e4__B_GTNUMBER      (6)
+#define e4__B_LIT           (7)
+#define e4__B_OVER          (8)
+#define e4__B_ROT           (9)
+#define e4__B_ROLL          (10)
+#define e4__B_SKIP          (11)
+#define e4__B_SWAP          (12)
+#define e4__B_TUCK          (13)
+#define e4__B_WORD          (14)
+#define e4__BUILTIN_COUNT   (15)
 
 /* source ID constants */
 #define e4__SID_STR         (-1)
