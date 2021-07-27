@@ -41,6 +41,8 @@ General Builtins
 ----------------
 - [DONE] Implement basic static manipulation words CLEAR, DEPTH, DROP,
   DUP, OVER, ROT, ROLL, SWAP, and TUCK.
+- Implement HERE and ALLOT.
+- Implement @ and !.
 - Implement simple IO builtins ., U., and EMIT.
 - Implement compiletime BRANCH0, BRANCH, etc.
 - Implement FORGET. It should stop looking once it hits builtin words.

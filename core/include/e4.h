@@ -147,7 +147,7 @@ struct e4__io_func
 
 /* task constants */
 /* TODO: Determine if this is sensible. */
-#define e4__TASK_MIN_SZ     (2048)
+#define e4__TASK_MIN_SZ     (1024)
 
 /* e4 macros */
 #define e4__ASSERT_MSG0(c, m)   enum { e4__assert__ ## m = 1 / !!(c) }
