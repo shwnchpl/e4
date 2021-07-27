@@ -164,15 +164,21 @@ struct e4__dict_header* e4__dict_lookup(struct e4__dict_header *dict,
         const char *name, e4__u8 nbytes);
 
 /* stack.c functions */
+void e4__stack_clear(struct e4__task *task);
 e4__usize e4__stack_depth(struct e4__task *task);
+void e4__stack_drop(struct e4__task *task);
 void e4__stack_dup(struct e4__task *task);
+void e4__stack_over(struct e4__task *task);
 e4__cell e4__stack_peek(struct e4__task *task);
 e4__cell e4__stack_pop(struct e4__task *task);
 void e4__stack_push(struct e4__task *task, void *v);
+void e4__stack_rot(struct e4__task *task);
 e4__cell e4__stack_rpeek(struct e4__task *task);
 e4__cell e4__stack_rpop(struct e4__task *task);
+void e4__stack_roll(struct e4__task *task);
 void e4__stack_rpush(struct e4__task *task, void *v);
 void e4__stack_swap(struct e4__task *task);
+void e4__stack_tuck(struct e4__task *task);
 
 /* execute.c functions */
 void e4__execute(struct e4__task *task, void *user);

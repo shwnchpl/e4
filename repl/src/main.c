@@ -321,5 +321,51 @@ int main(void)
             e4__num_sdiv((e4__usize)-10, (e4__usize)-3),
             e4__num_sdiv((e4__usize)10, (e4__usize)3));
 
+#if 0 /* FIXME: Remove this code. */
+    do {
+        printf("\nTesting stack manipulation builtin utils:\n");
+        #define _test_PUSH3()   \
+            do {    \
+                e4__stack_push(task, (e4__cell)1);  \
+                e4__stack_push(task, (e4__cell)2);  \
+                e4__stack_push(task, (e4__cell)3);  \
+            } while (0)
+        #define _test_DUMP_STACK()  \
+                do {    \
+                    e4__cell s = task->s0; \
+                    printf("(%lu) ", e4__stack_depth(task));    \
+                    while (task->sp < s)  \
+                        printf("%lu ", (e4__usize)e4__DEREF(s--));   \
+                    e4__stack_clear(task);  \
+                    printf("\n");   \
+                } while (0)
+        #define _test_STACK_WORD(w) \
+            do {    \
+                _test_PUSH3();  \
+                e4__stack_##w(task);    \
+                printf("Pushed 1 2 3. After %s, stack dump: ", #w); \
+                _test_DUMP_STACK(); \
+            } while (0)
+        _test_STACK_WORD(clear);
+        _test_STACK_WORD(drop);
+        _test_STACK_WORD(dup);
+        _test_STACK_WORD(over);
+        _test_STACK_WORD(rot);
+        _test_STACK_WORD(swap);
+        _test_STACK_WORD(tuck);
+
+        _test_PUSH3();
+        e4__stack_push(task, (e4__cell)4);
+        e4__stack_push(task, (e4__cell)5);
+        e4__stack_push(task, (e4__cell)4);
+        printf("Pushed 1 2 3 4 5 4. After roll, stack dump: ");
+        e4__stack_roll(task);
+        _test_DUMP_STACK();
+        #undef _test_STACK_WORD
+        #undef _test_DUMP_STACK
+        #undef _test_PUSH3
+    } while (0);
+#endif
+
     return 0;
 }
