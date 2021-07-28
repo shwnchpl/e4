@@ -83,7 +83,9 @@ const struct e4__execute_token e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
 void e4__builtin_RET(struct e4__task *task, void *user)
 {
     task->ip = e4__DEREF(++task->rp);
+#if 0 /*FIXME: Remove this debug code completely. */
     printf("Returning to %p\n", (void *)task->ip);
+#endif
 }
 
 void e4__builtin_ABORT(struct e4__task *task, void *user)
@@ -242,8 +244,7 @@ void e4__builtin_WORD(struct e4__task *task, void *user)
     memcpy((e4__u8 *)task->here + 1, word, clamped_length);
 
     /* Update offset and push result. */
-    task->io_src.in = (e4__cell)(word + length + 1 -
-            (const char *)task->io_src.buffer);
+    task->io_src.in = word + length + 1 - (const char *)task->io_src.buffer;
     e4__stack_push(task, task->here);
 
     e4__builtin_RET(task, NULL);

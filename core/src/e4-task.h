@@ -2,6 +2,7 @@
 #define E4_TASK_H_
 
 /* e4 task structure and internal API definitions */
+/* FIXME: Should this file just be e4-internal.h? */
 
 #include "e4.h"
 
@@ -9,10 +10,10 @@
 struct e4__io_src
 {
     e4__cell buffer;    /* input buffer */
-    e4__cell sid;       /* input source id */
-    e4__cell in;        /* >IN */
-    e4__cell length;    /* input buffer populated length */
-    e4__cell sz;        /* input buffer size */
+    e4__usize sid;      /* input source id */
+    e4__usize in;       /* >IN */
+    e4__usize length;   /* input buffer populated length */
+    e4__usize sz;       /* input buffer size */
 };
 
 struct e4__task
@@ -49,8 +50,9 @@ struct e4__task
     e4__cell r0;
     e4__cell rp;
     e4__cell ip;
-    e4__cell base; /* Initialize to 10. */
-    e4__cell compiling;
+    /* FIXME: Can these somehow be made to be flags? */
+    e4__usize base; /* Initialize to 10. */
+    e4__usize compiling;
     struct e4__io_src io_src;
 
     /* System variables. */

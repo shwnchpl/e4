@@ -34,7 +34,7 @@ Parsing/Text Execution
 - Implement EVALUATE (builtin/C API) (including figuring out how this
   interacts with TIB and appropriately setting SOURCE-IO).
 - Determine if KEY should be writing to TIB.
-- Implement LOOKUP (builtin; should be case insensitive)
+- Implement ' (LOOKUP builtin; should be case insensitive)
 - Implement EXECUTE (builtin).
 
 General Builtins
@@ -60,7 +60,15 @@ Kernel
 - [DONE] Creating custom integer types for u8 and bool as well rather
   than simply using char.
 - [DONE] Implement numeric signed division.
-- Implement exceptions using the return stack.
+- Implement exceptions using the return stack, a field in the task
+  struct, and some kind of e4__exception_raise and e4__exception_peek,
+  and e4__exception_catch functions. These will need to be checked in
+  evaluate and execute functions, and also after any time a builtin
+  has been called directly. Alternatively, *actually* implement
+  exceptions with setjmp and longjmp and implement e4__exception_raise
+  and e4__exception_catch. It should be easy enough to roll this
+  implementation into the setjmp/longjmp quit implementation, so it's
+  probably just the way to go.
 - Figure out stack underflow checking for builtins etc.
 - Implement QUIT using setjmp/longjmp.
 
@@ -101,6 +109,7 @@ Kernel
 - Add more two's complement utility macros as needed and use them where
   appropriate.
 - Implement signed modulo and other single width math operators.
+- Implement user table access code handlers.
 
 General IO
 ----------
@@ -117,3 +126,4 @@ General Builtins
   string should be compiled directly into the definition *with* end
   padding to align.
 - Implement signed and unsigned single width arithmetic builtins.
+- Implement user table builtins.

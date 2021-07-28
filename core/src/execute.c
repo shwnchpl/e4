@@ -7,10 +7,6 @@ void e4__execute(struct e4__task *task, void *user)
     void **code = user;
     e4__code_ptr entry = *code;
 
-    /* FIXME: Typedef the type of entry somewhere so that it can be
-       used as part of the C API. Also, use this typedef'd version when
-       checking for compatibility in assert.c. */
-
     e4__DEREF(task->rp--) = task->ip + 1;
     entry(task, code + 1);
 }
@@ -30,8 +26,7 @@ void e4__execute_threaded(struct e4__task *task, void *user)
             depth += 1;
             e4__DEREF(task->rp--) = task->ip + 1;
             task->ip = e4__DEREF(task->ip) + 2;
-        }
-        else if (e4__DEREF(task->ip) == (e4__cell)e4__builtin_RET) {
+        } else if (e4__DEREF(task->ip) == (e4__cell)e4__builtin_RET) {
             depth -= 1;
             task->ip = e4__DEREF(++task->rp);
             printf("Inline returning to %p\n", task->ip);

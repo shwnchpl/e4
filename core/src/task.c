@@ -53,11 +53,11 @@ struct e4__task* e4__task_create(void *buffer, e4__usize size)
     task->tib = cursor + (85 * size) / (100 * sizeof(e4__cell)) + 1;
     task->io_src.buffer = task->tib;
     /* FIXME: Store this size somewhere? Or recalculate it if needed? */
-    task->io_src.sz = (e4__cell)(((e4__u8 *)cursor + (90 * size ) / 100) -
+    task->io_src.sz = (((e4__u8 *)cursor + (90 * size ) / 100) -
             (e4__u8 *)task->tib - 1);
     task->r0 = cursor + size / sizeof(e4__cell) - 1;
     task->rp = task->r0;
-    task->base = (e4__cell)10;
+    task->base = 10;
 
 #if 0 /* FIXME: Remove/alter this debug code. */
     printf("\nCREATED TASK:\n"

@@ -1,4 +1,7 @@
 #include "e4.h"
+#include "e4-task.h"
+
+#include <stdlib.h>
 
 /* C89 does not require that function pointers and void pointers be
    the same size. We do. */
@@ -63,3 +66,9 @@ e4__ASSERT(sizeof(void *) == sizeof(e4__cell));
    please don't hesitate to contact whoever is currently maintaining
    this code and instruct them to update this comment. */
 e4__ASSERT(sizeof(e4__cell) == sizeof(e4__usize));
+
+/* The hack used to access user table variables requires that fields in
+   the task struct are aligned at e4__cell width. */
+/* FIXME: Add asserts for all fields accessed this way once field
+   offset IDs are defined. */
+e4__ASSERT(&((struct e4__task *)NULL)->pad == &((e4__cell *)NULL)[1]);
