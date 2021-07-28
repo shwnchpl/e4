@@ -192,6 +192,10 @@ void e4__stack_rpush(struct e4__task *task, void *v);
 void e4__stack_swap(struct e4__task *task);
 void e4__stack_tuck(struct e4__task *task);
 
+/* evaluate.c functions */
+e4__usize e4__evaluate(struct e4__task *task, const char *buf, e4__usize sz,
+        e4__u8 mode);
+
 /* exception.c functions */
 e4__usize e4__exception_catch(struct e4__task *task, void *user);
 void e4__exception_throw(struct e4__task *task, e4__usize e);

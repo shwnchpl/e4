@@ -60,6 +60,7 @@ Kernel
 - [DONE] Creating custom integer types for u8 and bool as well rather
   than simply using char.
 - [DONE] Implement numeric signed division.
+- [DONE] Implement preliminary evaluate utility function.
 - [DONE] Implement exceptions using setjmp/longjmp.
 - Implement exceptions using the return stack, a field in the task
   struct, and some kind of e4__exception_raise and e4__exception_peek,

@@ -378,5 +378,37 @@ int main(void)
     } while (0);
 #endif
 
+#if 0 /* FIXME: Remove this debug code. */
+    do {
+        printf("\nTESTING EVALUATE:\n");
+        #define _test_DUMP_STACK()  \
+                do {    \
+                    e4__cell s = task->s0; \
+                    printf("(%lu) ", e4__stack_depth(task));    \
+                    while (task->sp < s)  \
+                        printf("%ld ", (e4__usize)e4__DEREF(s--));   \
+                    e4__stack_clear(task);  \
+                    printf("\n");   \
+                } while (0)
+        #define _test_EVALUATE(s)   \
+            do {    \
+                e4__usize res = e4__evaluate(task, s, -1, 0);   \
+                printf("Evaluated: \"" s "\" RES: (%ld) STACK: ", res); \
+                _test_DUMP_STACK(); \
+            } while (0)
+        _test_EVALUATE("1 2 3 clear");
+        _test_EVALUATE("1 2 3 drop");
+        _test_EVALUATE("1 2 3 dup");
+        _test_EVALUATE("1 2 3 over");
+        _test_EVALUATE("1 2 3 rot");
+        _test_EVALUATE("1 2 3 swap");
+        _test_EVALUATE("1 2 3 tuck");
+        _test_EVALUATE("1 2 3 4 5 4 roll");
+        _test_EVALUATE("1 2 3 4 5 4 rll");
+        #undef _test_EVALUATE
+        #undef _test_DUMP_STACK
+    } while (0);
+#endif
+
     return 0;
 }
