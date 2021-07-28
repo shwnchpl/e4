@@ -109,7 +109,9 @@ struct e4__io_func
 
 /* error constants */
 #define e4__E_OK            (0)
+#define e4__E_UNDEFWORD     (-13)
 #define e4__E_UNSUPPORTED   (-21)
+#define e4__E_QUIT          (-56)
 #define e4__E_FAILURE       (-256)
 
 /* flag constants */
@@ -189,6 +191,10 @@ void e4__stack_roll(struct e4__task *task);
 void e4__stack_rpush(struct e4__task *task, void *v);
 void e4__stack_swap(struct e4__task *task);
 void e4__stack_tuck(struct e4__task *task);
+
+/* exception.c functions */
+e4__usize e4__exception_catch(struct e4__task *task, void *user);
+void e4__exception_throw(struct e4__task *task, e4__usize e);
 
 /* execute.c functions */
 void e4__execute(struct e4__task *task, void *user);

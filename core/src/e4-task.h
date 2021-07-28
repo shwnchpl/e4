@@ -6,6 +6,8 @@
 
 #include "e4.h"
 
+#include <setjmp.h>
+
 /* FIXME: Move to an e4-io.h header file? */
 struct e4__io_src
 {
@@ -14,6 +16,12 @@ struct e4__io_src
     e4__usize in;       /* >IN */
     e4__usize length;   /* input buffer populated length */
     e4__usize sz;       /* input buffer size */
+};
+
+/* FIXME: Move to some exception header file? */
+struct e4__exception_ctx
+{
+    jmp_buf ctx;
 };
 
 struct e4__task
@@ -59,6 +67,9 @@ struct e4__task
     e4__usize sz;
     struct e4__dict_header *dict;
     struct e4__io_func io_func;
+    e4__bool exception_valid;
+    e4__usize exception_code;
+    struct e4__exception_ctx exception;
 };
 
 #endif /* E4_TASK_H_ */
