@@ -6,10 +6,10 @@
 int e4__mem_strncasecmp(const char *left, const char *right, e4__usize n)
 {
     while (n-- > 0 && tolower(*left++) == tolower(*right++))
-        if (!*left)
+        if (!left[-1])
             return 0;
 
-    return !++n ? 0 : tolower(*--left) - tolower(*--right);
+    return !++n ? 0 : tolower(left[-1]) - tolower(right[-1]);
 }
 
 e4__usize e4__mem_number(const char *buf, e4__usize length, e4__u8 base,
