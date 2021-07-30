@@ -50,6 +50,7 @@ General Builtins
 - Implement different code handlers _constant, _variable, _thunk, and
   _uservar.
 - Add mechanism for builtin constants (such as BL, etc.).
+- Add appropriate asserts to all existing builtins.
 
 Kernel
 ------
