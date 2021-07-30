@@ -5,6 +5,7 @@ Repo Maintenance
 ----------------
 - Add license text to all source files.
 - Update README.rst to actually explain this project.
+- Add C++ include guards to all headers.
 
 Build
 -----
@@ -86,9 +87,20 @@ Compilation
 
 Testing
 -------
-- Create test harness and add tests for every builtin word as
-  prescribed by the standard.
+- [DONE] Create a test harness.
+- Finalize test harness organization.
+- Migrate digit formatting tests.
+- Migrate basic two's complement tests.
+- Migrate two's complement signed division tests.
+- Migrate numeric parsing tests.
+- Migrate NUMBER> builtin tests.
+- Migrate builtin word parsing tests.
+- Migrate stack API tests.
+- Migrate builtin WORD tests.
+- Migrate dict entry creation tests (API also needed for exceptions
+  tests).
 - Add exception tests.
+- Add tests for every builtin word as prescribed by the standard.
 
 REPL
 ----
