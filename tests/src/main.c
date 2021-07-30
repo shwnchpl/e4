@@ -32,6 +32,7 @@ int main(void)
 
     /* Call into actual tests functions. */
     e4t__test_builtin();
+    e4t__test_execute();
     e4t__test_kernel();
 
     fprintf(stderr, "Tests complete! (%lu of %lu passed; %lu failed)\n",

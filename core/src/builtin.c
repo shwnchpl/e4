@@ -1,4 +1,3 @@
-#include "e4-debug.h"
 #include "e4.h"
 #include "e4-task.h"
 #include <string.h>
@@ -84,22 +83,17 @@ const struct e4__execute_token e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
 void e4__builtin_RET(struct e4__task *task, void *user)
 {
     task->ip = e4__DEREF(++task->rp);
-#if 0 /*FIXME: Remove this debug code completely. */
-    printf("Returning to %p\n", (void *)task->ip);
-#endif
 }
 
 void e4__builtin_ABORT(struct e4__task *task, void *user)
 {
     /* FIXME: Ensure the behavior of this function is correct. */
-
     register int i;
     static const void *RETURN[] =
     {
         e4__builtin_RET
     };
 
-    printf("ABORTING ALL EXECUTION...\n");
     for (i = 1; &task->rp[i] <= task->r0; ++i)
         task->rp[i] = RETURN;
     task->ip = e4__DEREF(++task->rp);

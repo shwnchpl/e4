@@ -1,4 +1,3 @@
-#include "e4-debug.h"
 #include "e4.h"
 #include <string.h>
 

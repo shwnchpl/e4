@@ -32,6 +32,9 @@ Parsing/Text Execution
 - [DONE] Fix WORD implementation to correctly advance >IN and also
   to pay attention to count.
 - [DONE] Implement >NUMBER (builtin/C API)
+- Reverse num_parse API to match mem_parse word parsing API (ie,
+  return parsed number and provide digits parsed through some
+  output parameter).
 - Implement EVALUATE (builtin/C API) (including figuring out how this
   interacts with TIB and appropriately setting SOURCE-IO).
 - Determine if KEY should be writing to TIB.
@@ -89,18 +92,18 @@ Compilation
 Testing
 -------
 - [DONE] Create a test harness.
-- Finalize test harness organization.
-- Migrate digit formatting tests.
-- Migrate basic two's complement tests.
-- Migrate two's complement signed division tests.
-- Migrate numeric parsing tests.
+- [DONE] Finalize test harness organization.
+- [DONE] Migrate digit formatting tests.
+- [DONE] Migrate basic two's complement tests.
+- [DONE] Migrate two's complement signed division tests.
+- [DONE] Migrate numeric parsing tests.
+- [DONE] Migrate builtin word parsing tests.
+- [DONE] Migrate stack API tests.
 - Migrate NUMBER> builtin tests.
-- Migrate builtin word parsing tests.
-- Migrate stack API tests.
 - Migrate builtin WORD tests.
 - Migrate dict entry creation tests (API also needed for exceptions
   tests).
-- Add exception tests.
+- Add exception tests (see uncommitted diff).
 - Add tests for every builtin word as prescribed by the standard.
 
 REPL

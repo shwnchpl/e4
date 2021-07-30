@@ -99,8 +99,8 @@ struct e4__execute_token {
    all. In the future, this may change. */
 struct e4__io_func {
     void *user;
-    e4__usize (*key)(void *user, char *buf);
     e4__usize (*accept)(void *user, char *buf, e4__usize n);
+    e4__usize (*key)(void *user, char *buf);
     e4__usize (*type)(void *user, const char *buf, e4__usize n);
 };
 
@@ -205,8 +205,8 @@ void e4__execute(struct e4__task *task, void *user);
 void e4__execute_threaded(struct e4__task *task, void *user);
 
 /* io.c functions */
-e4__usize e4__io_key(struct e4__task *task, void *buf);
 e4__usize e4__io_accept(struct e4__task *task, char *buf, e4__usize n);
+e4__usize e4__io_key(struct e4__task *task, void *buf);
 e4__usize e4__io_type(struct e4__task *task, const char *buf, e4__usize n);
 
 /* mem.c functions */

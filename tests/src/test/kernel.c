@@ -1,5 +1,6 @@
 #include "e4.h"
 #include "../e4t.h" /* FIXME: Add this to an include path? */
+#include <string.h>
 
 static void e4t__test_kernel_evaluate(void)
 {
@@ -10,6 +11,23 @@ static void e4t__test_kernel_evaluate(void)
     e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 4 5 4 rll .s clear", -1, 0),
             e4__E_UNDEFWORD);
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "");
+}
+
+static void e4t__test_kernel_io(void)
+{
+    struct e4__task *task = e4t__transient_task();
+    struct e4__io_func io_func = {0,};
+
+    /* FIXME: Add more IO tests. */
+
+    /* Clear all test related IO handlers. */
+    e4__task_io_init(task, &io_func);
+
+    /* Test that IO functions return the appropriate exception code
+       when no handler is available. */
+    e4t__ASSERT_EQ(e4__io_key(task, NULL), e4__E_UNSUPPORTED);
+    e4t__ASSERT_EQ(e4__io_accept(task, NULL, 0), e4__E_UNSUPPORTED);
+    e4t__ASSERT_EQ(e4__io_type(task, NULL, 0), e4__E_UNSUPPORTED);
 }
 
 static void e4t__test_kernel_numformat(void)
@@ -104,10 +122,73 @@ static void e4t__test_kernel_math(void)
     e4t__ASSERT_EQ(e4__num_sdiv((e4__usize)10, (e4__usize)3), 3);
 }
 
+static void e4t__test_kernel_stack(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    e4__stack_push(task, (void *)2);
+    e4__stack_push(task, (void *)4);
+    e4__stack_push(task, (void *)8);
+    e4__stack_push(task, (void *)16);
+    e4__stack_push(task, (void *)32);
+
+    e4t__ASSERT_EQ(e4__stack_depth(task), 5);
+    e4t__ASSERT_EQ((e4__usize)e4__stack_peek(task), 32);
+    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 32);
+    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 16);
+    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 8);
+    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 4);
+    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 2);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
+
+    e4__stack_rpush(task, (void *)3);
+    e4__stack_rpush(task, (void *)5);
+    e4__stack_rpush(task, (void *)9);
+    e4__stack_rpush(task, (void *)17);
+    e4__stack_rpush(task, (void *)33);
+
+    e4t__ASSERT_EQ((e4__usize)e4__stack_rpeek(task), 33);
+    e4t__ASSERT_EQ((e4__usize)e4__stack_rpop(task), 33);
+    e4t__ASSERT_EQ((e4__usize)e4__stack_rpop(task), 17);
+    e4t__ASSERT_EQ((e4__usize)e4__stack_rpop(task), 9);
+    e4t__ASSERT_EQ((e4__usize)e4__stack_rpop(task), 5);
+    e4t__ASSERT_EQ((e4__usize)e4__stack_rpop(task), 3);
+}
+
+static void e4t__test_kernel_wordparse(void)
+{
+    const char *word;
+    e4__usize len;
+
+    #define _p(s, d, f) e4__mem_parse(s, d, strlen(s), f, &len)
+    word = _p("   foo bar bas", ' ', e4__F_SKIP_LEADING);
+    e4t__ASSERT(!e4__mem_strncasecmp(word, "foo", len));
+
+    word = _p("   foo, bar,, bas", ',', e4__F_SKIP_LEADING);
+    e4t__ASSERT(!e4__mem_strncasecmp(word, "   foo", len));
+
+    word = _p("         ", ' ', e4__F_SKIP_LEADING);
+    e4t__ASSERT_EQ(len, 0);
+
+    word = _p("  foo\nbar", ' ', e4__F_SKIP_LEADING);
+    e4t__ASSERT(!e4__mem_strncasecmp(word, "foo", len));
+
+    word = _p("  foo.bar", ' ', e4__F_SKIP_LEADING);
+    e4t__ASSERT(!e4__mem_strncasecmp(word, "foo.bar", len));
+
+    word = _p("  foo.bar", ' ', 0);
+    e4t__ASSERT_EQ(len, 0);
+
+    #undef _p
+}
+
 void e4t__test_kernel(void)
 {
     e4t__test_kernel_evaluate();
+    e4t__test_kernel_io();
     e4t__test_kernel_math();
     e4t__test_kernel_numformat();
     e4t__test_kernel_numparse();
+    e4t__test_kernel_stack();
+    e4t__test_kernel_wordparse();
 }

@@ -56,6 +56,7 @@ void e4t__term_selftest(void);
 
 /* test/ declarations */
 void e4t__test_builtin(void);
+void e4t__test_execute(void);
 void e4t__test_kernel(void);
 
 #endif /* e4t_H_ */

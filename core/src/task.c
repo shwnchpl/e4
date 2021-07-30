@@ -1,4 +1,3 @@
-#include "e4-debug.h"
 #include "e4.h"
 #include "e4-task.h"
 
@@ -58,33 +57,6 @@ struct e4__task* e4__task_create(void *buffer, e4__usize size)
     task->r0 = cursor + size / sizeof(e4__cell) - 1;
     task->rp = task->r0;
     task->base = 10;
-
-#if 0 /* FIXME: Remove/alter this debug code. */
-    printf("\nCREATED TASK:\n"
-        "\ttask = %p\n"
-        "\ttask->sz = %lu\n"
-        "\ttask->dict = %p\n"
-        "\ttask->here = %p\n"
-        "\ttask->pad = %p\n"
-        "\ttask->s0 = %p\n"
-        "\ttask->sp = %p\n"
-        "\ttask->tib = %p\n"
-        "\ttask->io_src.sz = %p\n"
-        "\ttask->r0 = %p\n"
-        "\ttask->rp = %p\n\n",
-        task,
-        task->sz,
-        task->dict,
-        task->here,
-        task->pad,
-        task->s0,
-        task->sp,
-        task->tib,
-        task->io_src.sz,
-        task->r0,
-        task->rp
-    );
-#endif
 
     return task;
 }
