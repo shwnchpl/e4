@@ -217,39 +217,6 @@ int main(void)
     } while (0);
 #endif
 
-    do {
-        e4__usize num = 0;
-        e4__usize parsed;
-
-        printf("\nNUMERIC PARSING\n");
-
-        #define _test_NUM_FLAGS \
-            e4__F_CHAR_LITERAL | e4__F_NEG_PREFIX | e4__F_BASE_PREFIX
-        #define _test_NUM(n, base, flags)   \
-            parsed = e4__mem_number(n, sizeof(n) - 1, base, flags, &num);   \
-            printf("Parsed \"%s\" (base: %d, digits: %lu): %ld\n", n,  \
-                    base, parsed, (long)num)
-        _test_NUM("0xac", 10, _test_NUM_FLAGS);
-        _test_NUM("ac", 16, _test_NUM_FLAGS);
-        _test_NUM("ac", 5, _test_NUM_FLAGS);
-        _test_NUM("32ac", 5, _test_NUM_FLAGS);
-        _test_NUM("$ac", 5, _test_NUM_FLAGS);
-        _test_NUM("-$ac", 5, _test_NUM_FLAGS);
-        _test_NUM("%011011", 5, _test_NUM_FLAGS);
-        _test_NUM("0b011011", 5, _test_NUM_FLAGS);
-        _test_NUM("0o777xx", 5, _test_NUM_FLAGS);
-        _test_NUM("#777   ", 5, _test_NUM_FLAGS);
-        _test_NUM("'a'jieoag", 5, _test_NUM_FLAGS);
-        _test_NUM("zOo", 36, _test_NUM_FLAGS);
-        _test_NUM("zOo", 99, _test_NUM_FLAGS);
-        _test_NUM("000", 10, 0);
-        _test_NUM("-5", 10, 0);
-        _test_NUM("$5", 10, 0);
-        _test_NUM("'5'", 10, 0);
-        #undef _test_NUM
-        #undef _test_NUM_FLAGS
-    } while (0);
-
 #if 0 /* FIXME: Removed/update this test. */
     do {
         printf("\nTesting >NUMBER builtin:\n");
@@ -284,36 +251,6 @@ int main(void)
         #undef _test_GTNUMBER
     } while (0);
 #endif
-
-    do {
-        char buf[30];
-        char *res;
-
-        printf("\nTesting numeric formatting:\n");
-
-        #define _test_FMTDIGIT(n, b, f) \
-            res = e4__num_format(n, b, f, buf, sizeof(buf));    \
-            printf("For %d (%u) base %u flags %x got: %.*s\n", \
-                n, n, b, f, (int)(&buf[32] - res), res)
-        _test_FMTDIGIT(531, 10, 0);
-        _test_FMTDIGIT(0xf3, 16, 0);
-        _test_FMTDIGIT(-0xf3, 16, 0);
-        _test_FMTDIGIT(-0xf3, 16, e4__F_SIGNED);
-        _test_FMTDIGIT(46655, 36, e4__F_SIGNED);
-        _test_FMTDIGIT(-50, 2, e4__F_SIGNED);
-        _test_FMTDIGIT(0, 2, e4__F_SIGNED);
-        #undef _test_FMTDIGIT
-    } while (0);
-
-    printf("\n5 is positive, %ld is negative (%u)\n",
-            e4__USIZE_NEGATE((e4__usize)5),
-            e4__USIZE_IS_NEGATIVE((e4__usize)-5));
-
-    printf("\n-10/3 = %ld, 10/-3 = %ld -10/-3 = %ld, 10/3 = %ld\n",
-            e4__num_sdiv((e4__usize)-10, (e4__usize)3),
-            e4__num_sdiv((e4__usize)10, (e4__usize)-3),
-            e4__num_sdiv((e4__usize)-10, (e4__usize)-3),
-            e4__num_sdiv((e4__usize)10, (e4__usize)3));
 
     return 0;
 }
