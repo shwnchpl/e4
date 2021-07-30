@@ -78,8 +78,7 @@ struct e4__task;
 
 typedef void (*e4__code_ptr)(struct e4__task *, void *);
 
-struct e4__dict_header
-{
+struct e4__dict_header {
     struct e4__dict_header *link;
     struct e4__execute_token *xt;
 
@@ -89,8 +88,7 @@ struct e4__dict_header
     const char *name;
 };
 
-struct e4__execute_token
-{
+struct e4__execute_token {
     e4__code_ptr code;
     void *user;
     e4__cell data[1];
@@ -99,12 +97,11 @@ struct e4__execute_token
 /* FIXME: The current API is unstable. As it stands, if you're
    going to implement one of these, you need to implement them
    all. In the future, this may change. */
-struct e4__io_func
-{
+struct e4__io_func {
     void *user;
-    int (*key)(void *user, char *buf);
-    int (*accept)(void *user, char *buf, e4__usize n);
-    int (*type)(void *user, const char *buf, e4__usize n);
+    e4__usize (*key)(void *user, char *buf);
+    e4__usize (*accept)(void *user, char *buf, e4__usize n);
+    e4__usize (*type)(void *user, const char *buf, e4__usize n);
 };
 
 /* error constants */
@@ -126,22 +123,24 @@ struct e4__io_func
 
 /* builtin constants */
 /* FIXME: Consider using an enum here. */
-#define e4__B_RET           (0)
-#define e4__B_ABORT         (1)
-#define e4__B_CLEAR         (2)
-#define e4__B_DEPTH         (3)
-#define e4__B_DROP          (4)
-#define e4__B_DUP           (5)
-#define e4__B_GTNUMBER      (6)
-#define e4__B_LIT           (7)
-#define e4__B_OVER          (8)
-#define e4__B_ROT           (9)
-#define e4__B_ROLL          (10)
-#define e4__B_SKIP          (11)
-#define e4__B_SWAP          (12)
-#define e4__B_TUCK          (13)
-#define e4__B_WORD          (14)
-#define e4__BUILTIN_COUNT   (15)
+enum e4__builtin_id {
+    e4__B_RET = 0,
+    e4__B_ABORT,
+    e4__B_CLEAR,
+    e4__B_DEPTH,
+    e4__B_DROP,
+    e4__B_DUP,
+    e4__B_GTNUMBER,
+    e4__B_LIT,
+    e4__B_OVER,
+    e4__B_ROT,
+    e4__B_ROLL,
+    e4__B_SKIP,
+    e4__B_SWAP,
+    e4__B_TUCK,
+    e4__B_WORD,
+    e4__BUILTIN_COUNT
+};
 
 /* source ID constants */
 #define e4__SID_STR         (-1)
@@ -205,9 +204,9 @@ void e4__execute(struct e4__task *task, void *user);
 void e4__execute_threaded(struct e4__task *task, void *user);
 
 /* io.c functions */
-int e4__io_key(struct e4__task *task, void *buf);
-int e4__io_accept(struct e4__task *task, char *buf, e4__usize n);
-int e4__io_type(struct e4__task *task, const char *buf, e4__usize n);
+e4__usize e4__io_key(struct e4__task *task, void *buf);
+e4__usize e4__io_accept(struct e4__task *task, char *buf, e4__usize n);
+e4__usize e4__io_type(struct e4__task *task, const char *buf, e4__usize n);
 
 /* mem.c functions */
 int e4__mem_strncasecmp(const char *left, const char *right, e4__usize n);

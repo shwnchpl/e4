@@ -154,7 +154,7 @@ int main(void)
             cells[5]);
     } while (0);
 
-    printf("Attempting to call key without defining it returns: %d\n",
+    printf("Attempting to call key without defining it returns: %lu\n",
             e4__io_key(task, NULL));
 
     do {

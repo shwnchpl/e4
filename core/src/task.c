@@ -88,3 +88,8 @@ struct e4__task* e4__task_create(void *buffer, e4__usize size)
 
     return task;
 }
+
+void e4__task_io_init(struct e4__task *task, struct e4__io_func *io_func)
+{
+    task->io_func = *io_func;
+}
