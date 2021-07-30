@@ -4,9 +4,7 @@
 #include "e4.h"
 #include <stdio.h>
 
-extern unsigned long e4t__assert_attemptcount;
-extern unsigned long e4t__assert_failcount;
-
+/* e4t test assert macro definitions */
 #define e4t__ASSERT(e)  \
     do {    \
         ++e4t__assert_attemptcount; \
@@ -44,5 +42,16 @@ extern unsigned long e4t__assert_failcount;
             ++e4t__assert_failcount;    \
         }   \
     } while (0)
+
+/* main.c declarations */
+extern unsigned long e4t__assert_attemptcount;
+extern unsigned long e4t__assert_failcount;
+struct e4__task* e4t__transient_task(void);
+
+/* term.c declarations */
+void e4t__term_io_init(struct e4__task *task);
+const char* e4t__term_obuf_consume(void);
+const char* e4t__term_obuf_peek(void);
+void e4t__term_selftest(void);
 
 #endif /* e4t_H_ */

@@ -5,6 +5,19 @@
 unsigned long e4t__assert_attemptcount = 0;
 unsigned long e4t__assert_failcount = 0;
 
+/* Returns a temporary task struct. Valid only until this function
+   is next called. */
+struct e4__task* e4t__transient_task(void)
+{
+    static char buffer[4096];
+    struct e4__task *task;
+
+    task = e4__task_create(buffer, sizeof(buffer));
+    e4t__term_io_init(task);
+
+    return task;
+}
+
 int main(void)
 {
     /* Test asserts themselves. Sanity check. */
@@ -13,6 +26,9 @@ int main(void)
     e4t__ASSERT_MATCH("Dade Murphy", "Dade Murphy");
     e4t__ASSERT_MATCH("d-link", "D-LINK");
     e4t__ASSERT(e4__mem_strncasecmp("El Psy Kongroo", "El Psy Kongaly", -1));
+
+    /* Test e4t utilities. */
+    e4t__term_selftest();
 
     /* Call into actual tests functions. */
 
