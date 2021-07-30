@@ -14,6 +14,7 @@
     _e4__BUILTIN_PROC_NAMED(GTNUMBER, ">NUMBER")    \
     _e4__BUILTIN_PROC(LIT)  \
     _e4__BUILTIN_PROC(OVER) \
+    _e4__BUILTIN_PROC_NAMED(PRINTSTACK, ".S")   \
     _e4__BUILTIN_PROC(ROT)  \
     _e4__BUILTIN_PROC(ROLL) \
     _e4__BUILTIN_PROC(SKIP) \
@@ -175,6 +176,46 @@ void e4__builtin_LIT(struct e4__task *task, void *user)
 void e4__builtin_OVER(struct e4__task *task, void *user)
 {
     e4__stack_over(task);
+    e4__builtin_RET(task, NULL);
+}
+
+ /* XXX: From the Programming-Tools word set. */
+void e4__builtin_PRINTSTACK(struct e4__task *task, void *user)
+{
+    register e4__cell s = task->s0;
+    register e4__usize n = e4__stack_depth(task);
+    register e4__usize io_res;
+    register char *num;
+    register char *buf = (char *)task->here;
+    register e4__usize len;
+
+    /* FIXME: Once pictured numeric output has been implemented, use
+       that instead of these hacks, which may not quite be safe. */
+
+    num = e4__num_format(n, task->base, e4__F_SIGNED, &buf[1], 130);
+    len = &buf[131] - num;
+    len += 2;
+    *--num = '<';
+    num[len - 1] = '>';
+
+    if ((io_res = e4__io_type(task, num, len))) {
+        e4__exception_throw(task, io_res);
+        return;
+    }
+
+    while (task->sp < s) {
+        n = (e4__usize)e4__DEREF(s--);
+        num = e4__num_format(n, task->base, e4__F_SIGNED, &buf[1], 130);
+        len = &buf[131] - num;
+        len += 1;
+        *--num = ' ';
+
+        if ((io_res = e4__io_type(task, num, len))) {
+            e4__exception_throw(task, io_res);
+            return;
+        }
+    }
+
     e4__builtin_RET(task, NULL);
 }
 

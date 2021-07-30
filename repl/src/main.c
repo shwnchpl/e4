@@ -55,6 +55,12 @@ void print_anything(struct e4__task *task, void *user)
     e4__builtin_RET(task, NULL);
 }
 
+e4__usize printf_type(void *user, const char *buf, e4__usize n)
+{
+    printf("%.*s", (int)n, buf);
+    return e4__E_OK;
+}
+
 int main(void)
 {
     static e4__u8 buffer[4096];
@@ -409,6 +415,37 @@ int main(void)
         #undef _test_DUMP_STACK
     } while (0);
 #endif
+
+    do {
+        struct e4__io_func io_func = {
+            NULL,
+            NULL,
+            NULL,
+            printf_type,
+        };
+        e4__task_io_init(task, &io_func);
+
+        #define _test_EVALUATE(s)   \
+            do {    \
+                e4__usize res;  \
+                printf("\"" s "\"\n    ");    \
+                res = e4__evaluate(task, s, -1, 0); \
+                printf("\n    RES: %ld\n", res); \
+            } while (0)
+
+        printf("\nTESTING EVALUATION:\n");
+        _test_EVALUATE("1 -2 3 .s clear");
+        _test_EVALUATE("1 2 3 clear .s clear");
+        _test_EVALUATE("1 2 3 drop .s clear");
+        _test_EVALUATE("1 2 3 dup .s clear");
+        _test_EVALUATE("1 2 3 over .s clear");
+        _test_EVALUATE("1 2 3 rot .s clear");
+        _test_EVALUATE("1 2 3 swap .s clear");
+        _test_EVALUATE("1 2 3 tuck .s clear");
+        _test_EVALUATE("1 2 3 4 5 4 roll .s clear");
+        _test_EVALUATE("1 2 3 4 5 4 rll .s clear");
+        #undef _test_EVALUATE
+    } while (0);
 
     return 0;
 }
