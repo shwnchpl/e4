@@ -1,5 +1,5 @@
-#ifndef E4_TASK_H_
-#define E4_TASK_H_
+#ifndef e4_TASK_H_
+#define e4_TASK_H_
 
 /* e4 task structure and internal API definitions */
 /* FIXME: Should this file just be e4-internal.h? */
@@ -72,4 +72,4 @@ struct e4__task
     struct e4__exception_ctx exception;
 };
 
-#endif /* E4_TASK_H_ */
+#endif /* e4_TASK_H_ */

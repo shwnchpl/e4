@@ -1,5 +1,5 @@
-#ifndef E4_DEBUG_H_
-#define E4_DEBUG_H_
+#ifndef e4_DEBUG_H_
+#define e4_DEBUG_H_
 
 /* FIXME: Everything in this file is a hack. None of it is where it
    belongs. This only exists for very preliminary debug/proof of
@@ -8,4 +8,4 @@
 #include "e4.h"
 #include <stdio.h>
 
-#endif /* E4_DEBUG_H_ */
+#endif /* e4_DEBUG_H_ */

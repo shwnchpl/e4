@@ -1,5 +1,5 @@
-#ifndef E4_H_
-#define E4_H_
+#ifndef e4_H_
+#define e4_H_
 
 #if defined(e4__LOAD_CONFIG)
     /* To inject configuration into e4, provide the e4__USIZE_DEFINED
@@ -226,4 +226,4 @@ e4__usize e4__num_sdiv(e4__usize n, e4__usize d);
 struct e4__task* e4__task_create(void *buffer, e4__usize size);
 void e4__task_io_init(struct e4__task *task, struct e4__io_func *io);
 
-#endif /* E4_H_ */
+#endif /* e4_H_ */
