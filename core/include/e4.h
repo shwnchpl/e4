@@ -125,6 +125,12 @@ struct e4__io_func {
 #define e4__BF_TRUE         ((e4__usize)-1)
 #define e4__BF_FALSE        ((e4__usize)0)
 
+/* uservar offsets */
+/* FIXME: Add more user variable offsets. */
+#define e4__UV_HERE         (0)
+#define e4__UV_PAD          (1)
+#define e4__UV_BASE         (8)
+
 /* builtin constants */
 enum e4__builtin_id {
     e4__B_RET = 0,
@@ -229,5 +235,6 @@ e4__usize e4__num_sdiv(e4__usize n, e4__usize d);
 /* task.c functions */
 struct e4__task* e4__task_create(void *buffer, e4__usize size);
 void e4__task_io_init(struct e4__task *task, struct e4__io_func *io);
+e4__cell e4__task_uservar(struct e4__task *task, e4__usize size);
 
 #endif /* e4_H_ */

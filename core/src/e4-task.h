@@ -59,12 +59,13 @@ struct e4__task
     e4__cell rp;
     e4__cell ip;
     /* FIXME: Can these somehow be made to be flags? */
-    e4__usize base; /* Initialize to 10. */
+    e4__cell base_ptr;
     e4__usize compiling;
     struct e4__io_src io_src;
 
     /* System variables. */
     e4__usize sz;
+    e4__usize base; /* Initialize to 10. */
     struct e4__dict_header *dict;
     struct e4__io_func io_func;
     e4__bool exception_valid;

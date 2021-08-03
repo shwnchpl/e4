@@ -51,6 +51,7 @@ struct e4__task* e4__task_create(void *buffer, e4__usize size)
     task->sp = task->s0;
     task->tib = cursor + (85 * size) / (100 * sizeof(e4__cell)) + 1;
     task->io_src.buffer = task->tib;
+    task->base_ptr = (e4__cell)&task->base;
     /* FIXME: Store this size somewhere? Or recalculate it if needed? */
     task->io_src.sz = (((e4__u8 *)cursor + (90 * size ) / 100) -
             (e4__u8 *)task->tib - 1);
@@ -64,4 +65,11 @@ struct e4__task* e4__task_create(void *buffer, e4__usize size)
 void e4__task_io_init(struct e4__task *task, struct e4__io_func *io_func)
 {
     task->io_func = *io_func;
+}
+
+e4__cell e4__task_uservar(struct e4__task *task, e4__usize offset)
+{
+    /* XXX: This function is unsafe. Do not call it with
+       an inappropriate offset. */
+    return ((e4__cell *)task)[offset];
 }

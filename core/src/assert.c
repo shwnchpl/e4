@@ -71,4 +71,8 @@ e4__ASSERT(sizeof(e4__cell) == sizeof(e4__usize));
    the task struct are aligned at e4__cell width. */
 /* FIXME: Add asserts for all fields accessed this way once field
    offset IDs are defined. */
-e4__ASSERT(&((struct e4__task *)NULL)->pad == &((e4__cell *)NULL)[1]);
+e4__ASSERT(&((struct e4__task *)NULL)->here ==
+        &((e4__cell *)NULL)[e4__UV_HERE]);
+e4__ASSERT(&((struct e4__task *)NULL)->pad == &((e4__cell *)NULL)[e4__UV_PAD]);
+e4__ASSERT(&((struct e4__task *)NULL)->base_ptr ==
+        &((e4__cell *)NULL)[e4__UV_BASE]);
