@@ -2,6 +2,42 @@
 #include "../e4t.h" /* FIXME: Add this to an include path? */
 #include <string.h>
 
+static void e4t__test_kernel_dict(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    #define _d(s, c)    e4__dict_entry(task, s, sizeof(s) - 1, 0, c, NULL)
+    #define _l(s)       e4__dict_lookup(task, s, sizeof(s) - 1)
+    #define _f(s)       e4__dict_forget(task, s, sizeof(s) - 1)
+
+    _d("first-entry", (void *)0xabcde);
+    e4t__ASSERT(_l("first-entry"));
+    e4t__ASSERT_EQ((e4__usize)_l("first-entry")->xt->code, 0xabcde);
+
+    _d("second-entry", (void *)0x12345);
+    e4t__ASSERT(_l("second-entry"));
+    e4t__ASSERT_EQ((e4__usize)_l("second-entry")->xt->code, 0x12345);
+
+    e4t__ASSERT(_l("first-entry"));
+    e4t__ASSERT_EQ((e4__usize)_l("first-entry")->xt->code, 0xabcde);
+    e4t__ASSERT_EQ((e4__usize)_l("FIRST-entry")->xt->code, 0xabcde);
+
+    /* Can't forget a word that isn't present or a builtin. */
+    e4t__ASSERT_EQ((e4__usize)_l("not-present"), (e4__usize)NULL);
+    e4t__ASSERT_EQ(_f("not-present"), e4__E_INVFORGET);
+    e4t__ASSERT(_l("dup"));
+    e4t__ASSERT_EQ(_f("dup"), e4__E_INVFORGET);
+
+    /* FORGET forgets all words defined after a word. */
+    e4t__ASSERT_OK(_f("first-entry"));
+    e4t__ASSERT_EQ((e4__usize)_l("first-entry"), (e4__usize)NULL);
+    e4t__ASSERT_EQ((e4__usize)_l("second-entry"), (e4__usize)NULL);
+
+    #undef _f
+    #undef _l
+    #undef _d
+}
+
 static void e4t__test_kernel_evaluate(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -137,6 +173,7 @@ static void e4t__test_kernel_mem_dict(void)
             here += wrote;  \
         } while (0)
     #define _l(s)   e4__mem_dict_lookup(dict, s, sizeof(s) - 1)
+
     _d("first-entry", (void *)0xabcde);
     e4t__ASSERT_EQ((e4__usize)_l("first-entry"), (e4__usize)dict);
     e4t__ASSERT_EQ((e4__usize)_l("first-entry")->xt->code, 0xabcde);
@@ -151,6 +188,7 @@ static void e4t__test_kernel_mem_dict(void)
     e4t__ASSERT_EQ((e4__usize)_l("FIRST-entry")->xt->code, 0xabcde);
 
     e4t__ASSERT_EQ((e4__usize)_l("not-present"), (e4__usize)NULL);
+
     #undef _l
     #undef _d
 }
@@ -218,6 +256,7 @@ static void e4t__test_kernel_wordparse(void)
 void e4t__test_kernel(void)
 {
     /* FIXME: Add uservar tests. */
+    e4t__test_kernel_dict();
     e4t__test_kernel_evaluate();
     e4t__test_kernel_io();
     e4t__test_kernel_math();

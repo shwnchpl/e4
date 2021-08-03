@@ -107,6 +107,7 @@ struct e4__io_func {
 /* error constants */
 #define e4__E_OK            (0)
 #define e4__E_UNDEFWORD     (-13)
+#define e4__E_INVFORGET     (-15)
 #define e4__E_UNSUPPORTED   (-21)
 #define e4__E_QUIT          (-56)
 #define e4__E_FAILURE       (-256)
@@ -179,6 +180,12 @@ extern const struct e4__execute_token e4__BUILTIN_XT[e4__BUILTIN_COUNT];
 void e4__builtin_RET(struct e4__task *task, void *user);
 
 /* dict.c functions */
+void e4__dict_entry(struct e4__task *task, const char *name, e4__u8 nbytes,
+        e4__u8 flags, e4__code_ptr code, void *user);
+e4__usize e4__dict_forget(struct e4__task *task, const char *name,
+        e4__u8 nbytes);
+struct e4__dict_header* e4__dict_lookup(struct e4__task *task,
+        const char *name, e4__u8 nbytes);
 
 /* stack.c functions */
 void e4__stack_clear(struct e4__task *task);
