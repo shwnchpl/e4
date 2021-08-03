@@ -14,6 +14,7 @@
     _e4__BUILTIN_PROC(LIT)  \
     _e4__BUILTIN_PROC(OVER) \
     _e4__BUILTIN_PROC_NAMED(PRINTSTACK, ".S")   \
+    _e4__BUILTIN_PROC(REFILL)   \
     _e4__BUILTIN_PROC(ROT)  \
     _e4__BUILTIN_PROC(ROLL) \
     _e4__BUILTIN_PROC(SKIP) \
@@ -211,6 +212,34 @@ void e4__builtin_PRINTSTACK(struct e4__task *task, void *user)
     }
 
     e4__builtin_RET(task, NULL);
+}
+
+void e4__builtin_REFILL(struct e4__task *task, void *user)
+{
+    register e4__usize io_res;
+
+    /* Unless SOURCE-ID is user input device, just return false. */
+    if (task->io_src.sid) {
+        e4__stack_push(task, (e4__cell)e4__BF_FALSE);
+        return;
+    }
+
+    /* Attempt to read the entire buffer. */
+    task->io_src.length = task->io_src.sz;
+    io_res = e4__io_accept(task, (char *)task->io_src.buffer,
+            &task->io_src.length);
+    if (io_res) {
+        /* We've failed. Say the buffer is empty. */
+        task->io_src.length = 0;
+        e4__exception_throw(task, io_res);
+
+        /* If we happen to be here, exceptions aren't enabled, so we
+           we may as well return false. */
+        e4__stack_push(task, (e4__cell)e4__BF_FALSE);
+        return;
+    }
+
+    e4__stack_push(task, (e4__cell)e4__BF_TRUE);
 }
 
 void e4__builtin_ROT(struct e4__task *task, void *user)

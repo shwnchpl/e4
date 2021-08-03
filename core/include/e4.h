@@ -121,8 +121,11 @@ struct e4__io_func {
 
 #define e4__F_SIGNED        (0x01)
 
+/* boolean flags */
+#define e4__BF_TRUE         ((e4__usize)-1)
+#define e4__BF_FALSE        ((e4__usize)0)
+
 /* builtin constants */
-/* FIXME: Consider using an enum here. */
 enum e4__builtin_id {
     e4__B_RET = 0,
     e4__B_ABORT,
@@ -134,6 +137,7 @@ enum e4__builtin_id {
     e4__B_LIT,
     e4__B_OVER,
     e4__B_PRINTSTACK,
+    e4__B_REFILL,
     e4__B_ROT,
     e4__B_ROLL,
     e4__B_SKIP,

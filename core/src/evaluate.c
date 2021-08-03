@@ -47,6 +47,8 @@ e4__usize e4__evaluate(struct e4__task *task, const char *buf, e4__usize sz,
     task->io_src.buffer = (e4__cell)buf;
     task->io_src.in = 0;
     task->io_src.length = sz != (e4__usize)-1 ? sz : (e4__usize)strlen(buf);
+    task->io_src.sz = task->io_src.length;
+    task->io_src.sid = e4__SID_STR;
 
     while (task->io_src.in < task->io_src.length) {
         register struct e4__dict_header *header;

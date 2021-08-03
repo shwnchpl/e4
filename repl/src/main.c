@@ -2,11 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 
-/* FIXME: Remove this. Uncomment for internal tests. */
-#if 0
-#include "../../core/src/e4-task.h"
-#endif
-
 int main(void)
 {
     /* TODO: Replace this test code.
@@ -39,39 +34,6 @@ int main(void)
                 e4__dict_lookup(task->dict, "flombom", strlen("flombom")));
     } while (0);
     */
-
-/* FIXME: Remove this. Uncomment for WORD test. */
-#if 0
-    do {
-        static const void *RUN_WORD[] = {
-            e4__execute_threaded,
-            NULL,
-            &e4__BUILTIN_XT[e4__B_LIT],
-            (void *)' ',
-            &e4__BUILTIN_XT[e4__B_WORD],
-            e4__builtin_RET
-        };
-        static const char *foo = "     foo   bar,,bas   \n";
-        struct e4__io_src old_io_src = task->io_src;
-        const char *res;
-        char len;
-
-        task->io_src.buffer = (e4__cell)foo;
-        task->io_src.in = 0;
-        task->io_src.length = (e4__cell)strlen(foo);
-
-        do {
-            e4__execute(task, RUN_WORD);
-
-            res = (const char *)e4__stack_pop(task);
-            len = *res++;
-            printf("\nExecuted WORD (in: %p, len: %p), got (%d): %.*s\n",
-                    task->io_src.in, task->io_src.length, len, len, res);
-        } while (task->io_src.in < task->io_src.length);
-
-        task->io_src = old_io_src;
-    } while (0);
-#endif
 
 #if 0 /* FIXME: Removed/update this test. */
     do {

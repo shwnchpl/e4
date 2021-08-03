@@ -35,8 +35,6 @@ Parsing/Text Execution
 - Reverse num_parse API to match mem_parse word parsing API (ie,
   return parsed number and provide digits parsed through some
   output parameter).
-- Implement EVALUATE (builtin/C API) (including figuring out how this
-  interacts with TIB and appropriately setting SOURCE-IO).
 - Determine if KEY should be writing to TIB.
 - Implement ' (LOOKUP builtin; should be case insensitive)
 - Implement EXECUTE (builtin).
@@ -45,6 +43,7 @@ General Builtins
 ----------------
 - [DONE] Implement basic static manipulation words CLEAR, DEPTH, DROP,
   DUP, OVER, ROT, ROLL, SWAP, and TUCK.
+- [DONE] Implement REFILL.
 - Implement HERE and ALLOT.
 - Implement @ and !.
 - Implement simple IO builtins ., U., and EMIT.
@@ -52,6 +51,7 @@ General Builtins
 - Implement FORGET. It should stop looking once it hits builtin words.
 - Implement different code handlers _constant, _variable, _thunk, and
   _uservar.
+- Implement EVALUATE (builtin)
 - Add mechanism for builtin constants (such as BL, etc.).
 - Add appropriate asserts to all existing builtins.
 
@@ -100,7 +100,7 @@ Testing
 - [DONE] Migrate builtin word parsing tests.
 - [DONE] Migrate stack API tests.
 - Migrate NUMBER> builtin tests.
-- Migrate builtin WORD tests.
+- [DONE] Migrate builtin WORD tests.
 - Migrate dict entry creation tests (API also needed for exceptions
   tests).
 - Add exception tests (see uncommitted diff).

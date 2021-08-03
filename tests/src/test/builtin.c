@@ -1,7 +1,52 @@
 #include "e4.h"
 #include "../e4t.h" /* FIXME: Add this to an include path? */
 
-/* Covers: CLEAR .S DROP DUP OVER ROT SWAP TUCK ROLL */
+/* Covers REFILL WORD */
+static void e4t__test_builtin_parseword(void)
+{
+    struct e4__task *task = e4t__transient_task();
+    char *res;
+    e4__u8 len;
+
+    e4t__term_ibuf_feed("first second third", -1);
+
+    e4__execute(task, (void *)&e4__BUILTIN_XT[e4__B_REFILL]);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), e4__BF_TRUE);
+
+    e4__stack_push(task, (e4__cell)' ');
+    e4__execute(task, (void *)&e4__BUILTIN_XT[e4__B_WORD]);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    res = (char *)e4__stack_pop(task);
+    len = *res++;
+    e4t__ASSERT_EQ(len, 5);
+    e4t__ASSERT(!e4__mem_strncasecmp(res, "first", len));
+
+    e4__stack_push(task, (e4__cell)' ');
+    e4__execute(task, (void *)&e4__BUILTIN_XT[e4__B_WORD]);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    res = (char *)e4__stack_pop(task);
+    len = *res++;
+    e4t__ASSERT_EQ(len, 6);
+    e4t__ASSERT(!e4__mem_strncasecmp(res, "second", len));
+
+    e4__stack_push(task, (e4__cell)' ');
+    e4__execute(task, (void *)&e4__BUILTIN_XT[e4__B_WORD]);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    res = (char *)e4__stack_pop(task);
+    len = *res++;
+    e4t__ASSERT_EQ(len, 5);
+    e4t__ASSERT(!e4__mem_strncasecmp(res, "third", len));
+
+    e4__stack_push(task, (e4__cell)' ');
+    e4__execute(task, (void *)&e4__BUILTIN_XT[e4__B_WORD]);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    res = (char *)e4__stack_pop(task);
+    len = *res++;
+    e4t__ASSERT_EQ(len, 0);
+}
+
+/* Covers CLEAR .S DROP DUP OVER ROT SWAP TUCK ROLL */
 static void e4t__test_builtin_stackmanip(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -36,5 +81,6 @@ static void e4t__test_builtin_stackmanip(void)
 
 void e4t__test_builtin(void)
 {
+    e4t__test_builtin_parseword();
     e4t__test_builtin_stackmanip();
 }
