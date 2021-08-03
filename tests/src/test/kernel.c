@@ -2,6 +2,37 @@
 #include "../e4t.h" /* FIXME: Add this to an include path? */
 #include <string.h>
 
+static void e4t__test_kernel_dict(void)
+{
+    char buf[4096] = {0,};
+    void *here = buf;
+    void *tmp;
+    struct e4__dict_header *dict = NULL;
+
+    #define _d(s, c)    \
+        do {    \
+            tmp = here; \
+            here = e4__dict_entry(here, dict, s, sizeof(s) - 1, c, NULL, 0);\
+            dict = tmp; \
+        } while (0)
+    #define _l(s)   e4__dict_lookup(dict, s, sizeof(s) - 1)
+    _d("first-entry", (void *)0xabcde);
+    e4t__ASSERT_EQ((e4__usize)_l("first-entry"), (e4__usize)dict);
+    e4t__ASSERT_EQ((e4__usize)_l("first-entry")->xt->code, 0xabcde);
+
+    _d("second-entry", (void *)0x12345);
+    e4t__ASSERT_EQ((e4__usize)_l("second-entry"), (e4__usize)dict);
+    e4t__ASSERT_EQ((e4__usize)_l("second-entry")->xt->code, 0x12345);
+
+    e4t__ASSERT(_l("first-entry"));
+    e4t__ASSERT_EQ((e4__usize)_l("first-entry")->xt->code, 0xabcde);
+    e4t__ASSERT_EQ((e4__usize)_l("FIRST-entry")->xt->code, 0xabcde);
+
+    e4t__ASSERT_EQ((e4__usize)_l("not-present"), (e4__usize)NULL);
+    #undef _l
+    #undef _d
+}
+
 static void e4t__test_kernel_evaluate(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -184,6 +215,8 @@ static void e4t__test_kernel_wordparse(void)
 
 void e4t__test_kernel(void)
 {
+    /* FIXME: Add uservar tests. */
+    e4t__test_kernel_dict();
     e4t__test_kernel_evaluate();
     e4t__test_kernel_io();
     e4t__test_kernel_math();
