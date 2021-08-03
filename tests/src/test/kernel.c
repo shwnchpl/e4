@@ -287,23 +287,23 @@ static void e4t__test_kernel_wordparse(void)
     const char *word;
     e4__usize len;
 
-    #define _p(s, d, f) e4__mem_parse(s, d, strlen(s), f, &len)
-    word = _p("   foo bar bas", ' ', e4__F_SKIP_LEADING);
+    #define _p(s, d, f) e4__mem_parse(s, d, strlen(s), f, &word)
+    len = _p("   foo bar bas", ' ', e4__F_SKIP_LEADING);
     e4t__ASSERT(!e4__mem_strncasecmp(word, "foo", len));
 
-    word = _p("   foo, bar,, bas", ',', e4__F_SKIP_LEADING);
+    len = _p("   foo, bar,, bas", ',', e4__F_SKIP_LEADING);
     e4t__ASSERT(!e4__mem_strncasecmp(word, "   foo", len));
 
-    word = _p("         ", ' ', e4__F_SKIP_LEADING);
+    len = _p("         ", ' ', e4__F_SKIP_LEADING);
     e4t__ASSERT_EQ(len, 0);
 
-    word = _p("  foo\nbar", ' ', e4__F_SKIP_LEADING);
+    len = _p("  foo\nbar", ' ', e4__F_SKIP_LEADING);
     e4t__ASSERT(!e4__mem_strncasecmp(word, "foo", len));
 
-    word = _p("  foo.bar", ' ', e4__F_SKIP_LEADING);
+    len = _p("  foo.bar", ' ', e4__F_SKIP_LEADING);
     e4t__ASSERT(!e4__mem_strncasecmp(word, "foo.bar", len));
 
-    word = _p("  foo.bar", ' ', 0);
+    len = _p("  foo.bar", ' ', 0);
     e4t__ASSERT_EQ(len, 0);
 
     #undef _p

@@ -274,9 +274,9 @@ void e4__builtin_TUCK(struct e4__task *task, void *user)
 void e4__builtin_WORD(struct e4__task *task, void *user)
 {
     register char delim;
-    register const char *word;
+    register e4__usize length;
     register e4__u8 clamped_length;
-    e4__usize length;
+    const char *word = NULL;
 
     /* FIXME: Should task struct fields just be used here rather than
        the C stack API? */
@@ -293,7 +293,7 @@ void e4__builtin_WORD(struct e4__task *task, void *user)
     else
         length = 0;
 
-    word = e4__mem_parse(word, delim, length, e4__F_SKIP_LEADING, &length);
+    length = e4__mem_parse(word, delim, length, e4__F_SKIP_LEADING, &word);
 
     /* XXX: Ambiguous condition. We take only the first 255 bytes of
        a parsed string that is longer than this, but we advance >IN

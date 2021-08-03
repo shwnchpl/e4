@@ -32,9 +32,7 @@ Parsing/Text Execution
 - [DONE] Fix WORD implementation to correctly advance >IN and also
   to pay attention to count.
 - [DONE] Implement >NUMBER (builtin/C API)
-- Reverse num_parse API to match mem_parse word parsing API (ie,
-  return parsed number and provide digits parsed through some
-  output parameter).
+- [DONE] Reverse mem_parse API to match mem_number API semantics.
 - Determine if KEY should be writing to TIB.
 - Implement ' (LOOKUP builtin; should be case insensitive)
 - Implement EXECUTE (builtin).

@@ -230,8 +230,8 @@ struct e4__dict_header* e4__mem_dict_lookup(struct e4__dict_header *dict,
 int e4__mem_strncasecmp(const char *left, const char *right, e4__usize n);
 e4__usize e4__mem_number(const char *buf, e4__usize size, e4__u8 base,
         e4__u8 flags, e4__usize *out);
-const char* e4__mem_parse(const char *buf, char delim, e4__usize size,
-        e4__usize flags, e4__usize *length);
+e4__usize e4__mem_parse(const char *buf, char delim, e4__usize size,
+        e4__usize flags, const char **length);
 
 /* num.c functions */
 e4__usize e4__num_digit(e4__usize u, e4__u8 base, char *d);
