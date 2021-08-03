@@ -38,6 +38,62 @@ static void e4t__test_kernel_dict(void)
     #undef _d
 }
 
+static void e4t__test_kernel_exceptions_da(struct e4__task *task, void *user);
+
+static void e4t__test_kernel_exceptions(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* Install test "drop abort" words. */
+    e4__dict_entry(task, "dropfail", 8, 0, e4t__test_kernel_exceptions_da,
+            (void *)e4__USIZE_NEGATE(e4__E_FAILURE));
+    e4__dict_entry(task, "dropquit", 8, 0, e4t__test_kernel_exceptions_da,
+            (void *)e4__USIZE_NEGATE(e4__E_QUIT));
+
+    /* Sanity check to make sure those words went in. */
+    e4t__ASSERT(e4__dict_lookup(task, "dropfail", 8));
+    e4t__ASSERT(e4__dict_lookup(task, "dropquit", 8));
+
+    /* Test that regular exceptions are caught and the stack is
+       restored correctly. */
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, "4 dropfail", -1, 0));
+    e4t__term_obuf_consume();
+    e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1, 0));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 2 3 4");
+
+    /* Test that QUIT exception actually percolates all the way up. */
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3", -1, 0));
+    e4t__ASSERT_EQ(e4__evaluate(task, "4 dropquit", -1, 0), e4__E_QUIT);
+    e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1, 0));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 2 3");
+}
+
+static void e4t__test_kernel_exceptions_da(struct e4__task *task, void *user)
+{
+    const e4__usize ex = (e4__usize)e4__DEREF(user);
+
+    if (!e4__USIZE_IS_NEGATIVE(ex)) {
+        /* Set up another exception handler and re-call this
+           function. */
+        struct e4__execute_token xt = {
+            e4t__test_kernel_exceptions_da,
+            (e4__cell)e4__USIZE_NEGATE(ex),
+        };
+        e4__exception_catch(task, &xt);
+        return;
+    }
+
+    e4__stack_drop(task);
+    e4__stack_drop(task);
+    e4__stack_drop(task);
+
+    e4__exception_throw(task, ex);
+
+    /* This should be unreachable. */
+    e4__builtin_RET(task, NULL);
+}
+
 static void e4t__test_kernel_evaluate(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -257,6 +313,7 @@ void e4t__test_kernel(void)
 {
     /* FIXME: Add uservar tests. */
     e4t__test_kernel_dict();
+    e4t__test_kernel_exceptions();
     e4t__test_kernel_evaluate();
     e4t__test_kernel_io();
     e4t__test_kernel_math();

@@ -67,17 +67,8 @@ Kernel
 - [DONE] Implement numeric signed division.
 - [DONE] Implement preliminary evaluate utility function.
 - [DONE] Implement exceptions using setjmp/longjmp.
-- Implement exceptions using the return stack, a field in the task
-  struct, and some kind of e4__exception_raise and e4__exception_peek,
-  and e4__exception_catch functions. These will need to be checked in
-  evaluate and execute functions, and also after any time a builtin
-  has been called directly. Alternatively, *actually* implement
-  exceptions with setjmp and longjmp and implement e4__exception_raise
-  and e4__exception_catch. It should be easy enough to roll this
-  implementation into the setjmp/longjmp quit implementation, so it's
-  probably just the way to go.
 - Figure out stack underflow checking for builtins etc.
-- Implement QUIT using setjmp/longjmp.
+- Implement QUIT using exceptions etc.
 
 General IO
 ----------
@@ -106,7 +97,7 @@ Testing
 - [DONE] Migrate >NUMBER builtin tests.
 - [DONE] Migrate builtin WORD tests.
 - [DONE] Migrate dict entry creation tests.
-- Add exception tests (see uncommitted diff).
+- [DONE] Add exception tests (see uncommitted diff).
 - Add tests for every builtin word as prescribed by the standard.
 
 REPL
