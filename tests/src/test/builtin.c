@@ -1,6 +1,86 @@
 #include "e4.h"
 #include "../e4t.h" /* FIXME: Add this to an include path? */
 
+/* Covers >NUMBER and BASE uservar */
+static void e4t__test_builtin_parsenum(void)
+{
+    struct e4__task *task = e4t__transient_task();
+    e4__cell base = e4__task_uservar(task, e4__UV_BASE);
+    e4__usize rcount;
+    const char *remaining;
+    e4__usize result;
+
+    /* FIXME: Add more to this test once double-cell numbers have been
+       implemented. */
+    e4t__ASSERT_EQ((e4__usize)e4__DEREF(base), 10);
+
+    #define _push(s, n) \
+        do {    \
+            e4__stack_push(task, (e4__cell)n);  \
+            e4__stack_push(task, (e4__cell)0);  \
+            e4__stack_push(task, (e4__cell)s);  \
+            e4__stack_push(task, (e4__cell)(sizeof(s) - 1));    \
+        } while (0)
+    #define _pop() \
+        do {    \
+            rcount = (e4__usize)e4__stack_pop(task);    \
+            remaining = (const char *)e4__stack_pop(task);  \
+            e4__stack_pop(task);    \
+            result = (e4__usize)e4__stack_pop(task);    \
+        } while (0)
+
+    _push("42", 0);
+    e4t__ASSERT_OK(e4__evaluate(task, ">NUMBER", -1, 0));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 4);
+    _pop();
+    e4t__ASSERT_EQ(result, 42);
+    e4t__ASSERT_EQ(rcount, 0);
+
+    _push("42 f", 0);
+    e4t__ASSERT_OK(e4__evaluate(task, ">NUMBER", -1, 0));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 4);
+    _pop();
+    e4t__ASSERT_EQ(result, 42);
+    e4t__ASSERT_EQ(rcount, 2);
+    e4t__ASSERT(!e4__mem_strncasecmp(remaining, " f", rcount));
+
+    _push("-10", 50);
+    e4t__ASSERT_OK(e4__evaluate(task, ">NUMBER", -1, 0));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 4);
+    _pop();
+    e4t__ASSERT_EQ(result, 500);
+    e4t__ASSERT_EQ(rcount, 3);
+    e4t__ASSERT(!e4__mem_strncasecmp(remaining, "-10", rcount));
+
+    e4__DEREF(base) = (e4__cell)16;
+    _push("ff-3", 0);
+    e4t__ASSERT_OK(e4__evaluate(task, ">NUMBER", -1, 0));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 4);
+    _pop();
+    e4t__ASSERT_EQ(result, 255);
+    e4t__ASSERT_EQ(rcount, 2);
+    e4t__ASSERT(!e4__mem_strncasecmp(remaining, "-3", rcount));
+    e4__DEREF(base) = (e4__cell)10;
+
+    _push("1000", 4);
+    e4t__ASSERT_OK(e4__evaluate(task, ">NUMBER", -1, 0));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 4);
+    _pop();
+    e4t__ASSERT_EQ(result, 1040);
+    e4t__ASSERT_EQ(rcount, 0);
+
+    _push("'a'", 0);
+    e4t__ASSERT_OK(e4__evaluate(task, ">NUMBER", -1, 0));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 4);
+    _pop();
+    e4t__ASSERT_EQ(result, 0);
+    e4t__ASSERT_EQ(rcount, 3);
+    e4t__ASSERT(!e4__mem_strncasecmp(remaining, "'a'", rcount));
+
+    #undef _pop
+    #undef _push
+}
+
 /* Covers REFILL WORD */
 static void e4t__test_builtin_parseword(void)
 {
@@ -81,6 +161,7 @@ static void e4t__test_builtin_stackmanip(void)
 
 void e4t__test_builtin(void)
 {
+    e4t__test_builtin_parsenum();
     e4t__test_builtin_parseword();
     e4t__test_builtin_stackmanip();
 }

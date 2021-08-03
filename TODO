@@ -99,7 +99,7 @@ Testing
 - [DONE] Migrate numeric parsing tests.
 - [DONE] Migrate builtin word parsing tests.
 - [DONE] Migrate stack API tests.
-- Migrate NUMBER> builtin tests.
+- [DONE] Migrate >NUMBER builtin tests.
 - [DONE] Migrate builtin WORD tests.
 - Migrate dict entry creation tests (API also needed for exceptions
   tests).
