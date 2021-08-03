@@ -67,7 +67,7 @@ e4__usize e4__evaluate(struct e4__task *task, const char *buf, e4__usize sz,
            rather than doing this? */
         word = (const char *)e4__stack_pop(task);
         len = (e4__u8)*word++;
-        header = e4__dict_lookup(task->dict, word, len);
+        header = e4__mem_dict_lookup(task->dict, word, len);
 
         if (header) {
             e4__execute(task, header->xt);

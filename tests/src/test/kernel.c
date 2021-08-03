@@ -2,38 +2,6 @@
 #include "../e4t.h" /* FIXME: Add this to an include path? */
 #include <string.h>
 
-static void e4t__test_kernel_dict(void)
-{
-    char buf[4096] = {0,};
-    void *here = buf;
-    e4__usize wrote;
-    struct e4__dict_header *dict = NULL;
-
-    #define _d(s, c)    \
-        do {    \
-            wrote = e4__dict_entry(here, dict, s, sizeof(s) - 1, 0, c, NULL);\
-            dict = here;    \
-            here += wrote;  \
-        } while (0)
-    #define _l(s)   e4__dict_lookup(dict, s, sizeof(s) - 1)
-    _d("first-entry", (void *)0xabcde);
-    e4t__ASSERT_EQ((e4__usize)_l("first-entry"), (e4__usize)dict);
-    e4t__ASSERT_EQ((e4__usize)_l("first-entry")->xt->code, 0xabcde);
-    e4t__ASSERT_EQ((e4__usize)here % sizeof(e4__cell), 0);
-
-    _d("second-entry", (void *)0x12345);
-    e4t__ASSERT_EQ((e4__usize)_l("second-entry"), (e4__usize)dict);
-    e4t__ASSERT_EQ((e4__usize)_l("second-entry")->xt->code, 0x12345);
-
-    e4t__ASSERT(_l("first-entry"));
-    e4t__ASSERT_EQ((e4__usize)_l("first-entry")->xt->code, 0xabcde);
-    e4t__ASSERT_EQ((e4__usize)_l("FIRST-entry")->xt->code, 0xabcde);
-
-    e4t__ASSERT_EQ((e4__usize)_l("not-present"), (e4__usize)NULL);
-    #undef _l
-    #undef _d
-}
-
 static void e4t__test_kernel_evaluate(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -154,6 +122,39 @@ static void e4t__test_kernel_math(void)
     e4t__ASSERT_EQ(e4__num_sdiv((e4__usize)10, (e4__usize)3), 3);
 }
 
+static void e4t__test_kernel_mem_dict(void)
+{
+    char buf[4096] = {0,};
+    void *here = buf;
+    e4__usize wrote;
+    struct e4__dict_header *dict = NULL;
+
+    #define _d(s, c)    \
+        do {    \
+            wrote = e4__mem_dict_entry(here, dict, s, sizeof(s) - 1, 0, c,  \
+                    NULL);  \
+            dict = here;    \
+            here += wrote;  \
+        } while (0)
+    #define _l(s)   e4__mem_dict_lookup(dict, s, sizeof(s) - 1)
+    _d("first-entry", (void *)0xabcde);
+    e4t__ASSERT_EQ((e4__usize)_l("first-entry"), (e4__usize)dict);
+    e4t__ASSERT_EQ((e4__usize)_l("first-entry")->xt->code, 0xabcde);
+    e4t__ASSERT_EQ((e4__usize)here % sizeof(e4__cell), 0);
+
+    _d("second-entry", (void *)0x12345);
+    e4t__ASSERT_EQ((e4__usize)_l("second-entry"), (e4__usize)dict);
+    e4t__ASSERT_EQ((e4__usize)_l("second-entry")->xt->code, 0x12345);
+
+    e4t__ASSERT(_l("first-entry"));
+    e4t__ASSERT_EQ((e4__usize)_l("first-entry")->xt->code, 0xabcde);
+    e4t__ASSERT_EQ((e4__usize)_l("FIRST-entry")->xt->code, 0xabcde);
+
+    e4t__ASSERT_EQ((e4__usize)_l("not-present"), (e4__usize)NULL);
+    #undef _l
+    #undef _d
+}
+
 static void e4t__test_kernel_stack(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -217,10 +218,10 @@ static void e4t__test_kernel_wordparse(void)
 void e4t__test_kernel(void)
 {
     /* FIXME: Add uservar tests. */
-    e4t__test_kernel_dict();
     e4t__test_kernel_evaluate();
     e4t__test_kernel_io();
     e4t__test_kernel_math();
+    e4t__test_kernel_mem_dict();
     e4t__test_kernel_numformat();
     e4t__test_kernel_numparse();
     e4t__test_kernel_stack();

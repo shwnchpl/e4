@@ -85,7 +85,7 @@ General IO
 
 Compilation
 -----------
-- Refactor dict API into mem_dict API.
+- [DONE] Refactor dict API into mem_dict API.
 - Add true dict API that allows creating a new dict entry by acting
   on the task struct and updating HERE and other fields appropriately.
 - Implement simple : compilation.
