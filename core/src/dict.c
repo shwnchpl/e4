@@ -3,10 +3,12 @@
 
 /* TODO: Create some kind of friendly user facing C API that
    can actually create a dictionary entry in the right place and update
-   here, etc. */
-void* e4__dict_entry(void *here, struct e4__dict_header *prev,
-        const char *name, e4__u8 nbytes, void *code, void *user, e4__u8 flags)
+   here, etc. Returns the number of cells of the dictionary entry. */
+e4__usize e4__dict_entry(void *here, struct e4__dict_header *prev,
+        const char *name, e4__u8 nbytes, e4__u8 flags, e4__code_ptr code,
+        void *user)
 {
+    /* FIXME: Allow passing -1 for strlen of name. */
     register struct e4__dict_header *header = here;
     register e4__usize sz;
 
@@ -28,8 +30,13 @@ void* e4__dict_entry(void *here, struct e4__dict_header *prev,
     header->xt->user = user;
     header->xt->code = code;
 
-    return (e4__u8 *)here + sz + sizeof(*header->xt) -
-            sizeof(header->xt->data);
+    sz += sizeof(*header->xt) - sizeof(header->xt->data);
+
+    /* XXX: Really this should be impossible. */
+    if (sz % sizeof(void *))
+        sz += (sizeof(void *) - (sz % sizeof(void *)));
+
+    return sz;
 }
 
 struct e4__dict_header* e4__dict_lookup(struct e4__dict_header *dict,

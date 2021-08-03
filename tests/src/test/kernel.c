@@ -6,19 +6,20 @@ static void e4t__test_kernel_dict(void)
 {
     char buf[4096] = {0,};
     void *here = buf;
-    void *tmp;
+    e4__usize wrote;
     struct e4__dict_header *dict = NULL;
 
     #define _d(s, c)    \
         do {    \
-            tmp = here; \
-            here = e4__dict_entry(here, dict, s, sizeof(s) - 1, c, NULL, 0);\
-            dict = tmp; \
+            wrote = e4__dict_entry(here, dict, s, sizeof(s) - 1, 0, c, NULL);\
+            dict = here;    \
+            here += wrote;  \
         } while (0)
     #define _l(s)   e4__dict_lookup(dict, s, sizeof(s) - 1)
     _d("first-entry", (void *)0xabcde);
     e4t__ASSERT_EQ((e4__usize)_l("first-entry"), (e4__usize)dict);
     e4t__ASSERT_EQ((e4__usize)_l("first-entry")->xt->code, 0xabcde);
+    e4t__ASSERT_EQ((e4__usize)here % sizeof(e4__cell), 0);
 
     _d("second-entry", (void *)0x12345);
     e4t__ASSERT_EQ((e4__usize)_l("second-entry"), (e4__usize)dict);

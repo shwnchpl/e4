@@ -180,8 +180,9 @@ void e4__builtin_RET(struct e4__task *task, void *user);
 
 /* dict.c functions */
 /* FIXME: Should either of these be public at all? */
-void* e4__dict_entry(void *here, struct e4__dict_header *prev,
-        const char *name, e4__u8 nbytes, void *code, void *user, e4__u8 flags);
+e4__usize e4__dict_entry(void *here, struct e4__dict_header *prev,
+        const char *name, e4__u8 nbytes, e4__u8 flags, e4__code_ptr code,
+        void *user);
 struct e4__dict_header* e4__dict_lookup(struct e4__dict_header *dict,
         const char *name, e4__u8 nbytes);
 
