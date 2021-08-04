@@ -1,5 +1,6 @@
 #include "e4.h"
 #include "../e4t.h" /* FIXME: Add this to an include path? */
+
 #include <string.h>
 
 static void e4t__test_kernel_dict(void)

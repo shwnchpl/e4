@@ -1,6 +1,7 @@
-#include <string.h>
 #include "e4.h"
 #include "e4-task.h"
+
+#include <string.h>
 
 e4__usize e4__io_accept(struct e4__task *task, char *buf, e4__usize *n)
 {

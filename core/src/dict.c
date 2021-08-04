@@ -1,5 +1,6 @@
 #include "e4.h"
 #include "e4-task.h"
+
 #include <string.h>
 
 void e4__dict_entry(struct e4__task *task, const char *name, e4__u8 nbytes,

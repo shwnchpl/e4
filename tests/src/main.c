@@ -1,6 +1,8 @@
 #include "e4.h"
 #include "e4t.h"
+
 #include <stdio.h>
+#include <stdlib.h>
 
 unsigned long e4t__assert_attemptcount = 0;
 unsigned long e4t__assert_failcount = 0;

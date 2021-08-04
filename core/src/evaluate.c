@@ -1,6 +1,7 @@
 #include "e4.h"
 #include "e4-task.h"
-#include "string.h"
+
+#include <string.h>
 
 struct e4__evaluate_thunk {
     e4__code_ptr code;

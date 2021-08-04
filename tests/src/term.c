@@ -1,5 +1,6 @@
 #include "e4.h"
 #include "e4t.h"
+
 #include <string.h>
 
 struct e4t__term_ibuf {
