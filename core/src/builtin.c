@@ -1,6 +1,7 @@
 #include "e4.h"
 #include "e4-task.h"
 
+#include <stdarg.h>
 #include <string.h>
 
 /* FIXME: Let this support "compile time" flags, etc. */
@@ -85,6 +86,37 @@ const struct e4__execute_token e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
    allow for builtins implemented in Forth that don't need to be
    compiled or have their code components live in the user dictionary. */
 
+/* task and id are mandatory, otherwise this function simply does
+   nothing. Executes the builtin corresponding to id on the
+   specified task after pushing any remaining arguments onto the
+   stack as cells. These arguments should be explicitly cast
+   to either e4__cell or e4__usize if they are not already one
+   of those types. */
+void e4__builtin_exec_(e4__u8 count, /* struct e4__task *task, */
+        /* enum e4__builtin_id id, */ ...)
+{
+    va_list ap;
+    register struct e4__task *task;
+    register enum e4__builtin_id id;
+
+    if (count < 2)
+        return;
+
+    va_start(ap, count);
+
+    task = va_arg(ap, struct e4__task *);
+    id = va_arg(ap, enum e4__builtin_id);
+    count -= 2;
+
+    while (count--)
+        e4__stack_push(task, va_arg(ap, e4__cell));
+
+    va_end(ap);
+
+    e4__stack_rpush(task, NULL);
+    e4__BUILTIN_XT[id].code(task, NULL);
+}
+
 void e4__builtin_RET(struct e4__task *task, void *user)
 {
     task->ip = e4__DEREF(++task->rp);
@@ -143,9 +175,7 @@ static void e4__builtin_FORGET(struct e4__task *task, void *user)
     register e4__u8 len;
     register e4__usize res;
 
-    e4__stack_rpush(task, NULL);
-    e4__stack_push(task, (e4__cell)' ');
-    e4__BUILTIN_XT[e4__B_WORD].code(task, NULL);
+    e4__builtin_exec(task, e4__B_WORD, (e4__usize)' ');
 
     word = (const char *)e4__stack_pop(task);
 

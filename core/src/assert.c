@@ -67,6 +67,18 @@ e4__ASSERT(sizeof(void *) == sizeof(e4__cell));
    this code and instruct them to update this comment. */
 e4__ASSERT(sizeof(e4__cell) == sizeof(e4__usize));
 
+/* Ensure the e4__NARGS macro works correctly across its target domain. */
+e4__ASSERT(e4__NARGS(1) == 1);
+e4__ASSERT(e4__NARGS(1, 2) == 2);
+e4__ASSERT(e4__NARGS(1, 2, 3) == 3);
+e4__ASSERT(e4__NARGS(1, 2, 3, 4) == 4);
+e4__ASSERT(e4__NARGS(1, 2, 3, 4, 5) == 5);
+e4__ASSERT(e4__NARGS(1, 2, 3, 4, 5, 6) == 6);
+e4__ASSERT(e4__NARGS(1, 2, 3, 4, 5, 6, 7) == 7);
+e4__ASSERT(e4__NARGS(1, 2, 3, 4, 5, 6, 7, 8) == 8);
+e4__ASSERT(e4__NARGS(1, 2, 3, 4, 5, 6, 7, 8, 9) == 9);
+e4__ASSERT(e4__NARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10) == 10);
+
 /* The hack used to access user table variables requires that fields in
    the task struct are aligned at e4__cell width. */
 /* FIXME: Add asserts for all fields accessed this way once field

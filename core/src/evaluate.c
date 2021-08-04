@@ -63,9 +63,7 @@ e4__usize e4__evaluate(struct e4__task *task, const char *buf, e4__usize sz,
 
         /* FIXME: Expose WORD in some way so that it isn't necessary
            to call it like this? */
-        e4__stack_rpush(task, NULL);
-        e4__stack_push(task, (e4__cell)' ');
-        e4__BUILTIN_XT[e4__B_WORD].code(task, NULL);
+        e4__builtin_exec(task, e4__B_WORD, (e4__usize)' ');
 
         /* FIXME: Execute builtin lookup here and catch the exception
            rather than doing this? */
@@ -121,8 +119,7 @@ void e4__evaluate_quit(struct e4__task *task)
            necessary. */
 
         /* FIXME: Create e4__io_refill function and use that. */
-        e4__stack_rpush(task, NULL);
-        e4__BUILTIN_XT[e4__B_REFILL].code(task, NULL);
+        e4__builtin_exec(task, e4__B_REFILL);
         e4__stack_pop(task);
 
         res = e4__evaluate(task, (const char *)task->io_src.buffer,
