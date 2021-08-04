@@ -12,6 +12,7 @@
     _e4__BUILTIN_PROC(DEPTH)    \
     _e4__BUILTIN_PROC(DROP) \
     _e4__BUILTIN_PROC(DUP)  \
+    _e4__BUILTIN_PROC(FORGET)   \
     _e4__BUILTIN_PROC_NAMED(GTNUMBER, ">NUMBER")    \
     _e4__BUILTIN_PROC(LIT)  \
     _e4__BUILTIN_PROC(OVER) \
@@ -132,6 +133,31 @@ static void e4__builtin_DROP(struct e4__task *task, void *user)
 static void e4__builtin_DUP(struct e4__task *task, void *user)
 {
     e4__stack_dup(task);
+    e4__builtin_RET(task, NULL);
+}
+
+ /* XXX: From the Programming-Tools Extensions word set. */
+static void e4__builtin_FORGET(struct e4__task *task, void *user)
+{
+    register const char *word;
+    register e4__u8 len;
+    register e4__usize res;
+
+    e4__stack_rpush(task, NULL);
+    e4__stack_push(task, (e4__cell)' ');
+    e4__BUILTIN_XT[e4__B_WORD].code(task, NULL);
+
+    word = (const char *)e4__stack_pop(task);
+
+    if (!(len = (e4__u8)*word++)) {
+        e4__exception_throw(task, e4__E_ZLNAME);
+        e4__builtin_RET(task, NULL);
+        return;
+    }
+
+    if ((res = e4__dict_forget(task, word, len)))
+        e4__exception_throw(task, res);
+
     e4__builtin_RET(task, NULL);
 }
 

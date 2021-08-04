@@ -44,12 +44,13 @@ General Builtins
 - [DONE] Implement basic static manipulation words CLEAR, DEPTH, DROP,
   DUP, OVER, ROT, ROLL, SWAP, and TUCK.
 - [DONE] Implement REFILL.
+- [DONE] Implement FORGET. It should stop looking once it hits builtin
+  words.
 - Implement CR.
 - Implement HERE and ALLOT.
 - Implement @ and !.
 - Implement simple IO builtins ., U., and EMIT.
 - Implement compiletime BRANCH0, BRANCH, etc.
-- Implement FORGET. It should stop looking once it hits builtin words.
 - Implement different code handlers _constant, _variable, _thunk, and
   _uservar.
 - Add mechanism for builtin constants (such as BL, etc.).
@@ -104,7 +105,7 @@ Testing
 
 REPL
 ----
-- Create actual simple REPL using readline or some other utility.
+- Create actual simple REPL using libedit or some other utility.
 
 
 Version 0.2

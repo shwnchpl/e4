@@ -1,6 +1,39 @@
 #include "e4.h"
 #include "../e4t.h" /* FIXME: Add this to an include path? */
 
+/* Covers FORGET and look-ahead idiom (which uses builtin WORD) */
+static void e4t__test_builtin_forget(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* Test that FORGET fails on zero length names. */
+    e4t__ASSERT_EQ(e4__evaluate(task, "forget", -1, 0), e4__E_ZLNAME);
+    e4t__ASSERT_EQ(e4__evaluate(task, "forget   ", -1, 0), e4__E_ZLNAME);
+
+    /* Test that FORGET fails on invalid words and builtins. */
+    e4t__ASSERT_EQ(e4__evaluate(task, "forget notaword", -1, 0),
+            e4__E_INVFORGET);
+    e4t__ASSERT_EQ(e4__evaluate(task, "forget dup", -1, 0), e4__E_INVFORGET);
+
+    e4__dict_entry(task, "foo", 3, 0, NULL, NULL);
+    e4__dict_entry(task, "bar", 3, 0, NULL, NULL);
+
+    e4t__ASSERT(e4__dict_lookup(task, "foo", 3));
+    e4t__ASSERT(e4__dict_lookup(task, "bar", 3));
+
+    /* Test actually forgetting a word. */
+    e4t__ASSERT_OK(e4__evaluate(task, "forget bar", -1, 0));
+    e4t__ASSERT_EQ((e4__usize)e4__dict_lookup(task, "bar", 3),
+            (e4__usize)NULL);
+
+    /* Test that contents of buffer after look-ahead are intact
+       and executed as appropriate. */
+    e4t__ASSERT_OK(e4__evaluate(task, "forget    foo 17 dup", -1, 0));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 17);
+    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 17);
+}
+
 /* Covers >NUMBER and BASE uservar */
 static void e4t__test_builtin_parsenum(void)
 {
@@ -165,6 +198,7 @@ static void e4t__test_builtin_stackmanip(void)
 
 void e4t__test_builtin(void)
 {
+    e4t__test_builtin_forget();
     e4t__test_builtin_parsenum();
     e4t__test_builtin_parseword();
     e4t__test_builtin_stackmanip();

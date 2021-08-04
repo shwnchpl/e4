@@ -108,6 +108,7 @@ struct e4__io_func {
 #define e4__E_OK            (0)
 #define e4__E_UNDEFWORD     (-13)
 #define e4__E_INVFORGET     (-15)
+#define e4__E_ZLNAME        (-16)
 #define e4__E_UNSUPPORTED   (-21)
 #define e4__E_QUIT          (-56)
 
@@ -144,6 +145,7 @@ enum e4__builtin_id {
     e4__B_DEPTH,
     e4__B_DROP,
     e4__B_DUP,
+    e4__B_FORGET,
     e4__B_GTNUMBER,
     e4__B_LIT,
     e4__B_OVER,
