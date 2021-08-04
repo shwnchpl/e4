@@ -67,6 +67,11 @@ void e4__task_io_init(struct e4__task *task, struct e4__io_func *io_func)
     task->io_func = *io_func;
 }
 
+void e4__task_io_get(struct e4__task *task, struct e4__io_func *io_func)
+{
+    *io_func = task->io_func;
+}
+
 e4__cell e4__task_uservar(struct e4__task *task, e4__usize offset)
 {
     /* XXX: This function is unsafe. Do not call it with
