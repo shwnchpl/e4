@@ -86,7 +86,7 @@ void e4__builtin_RET(struct e4__task *task, void *user)
     task->ip = e4__DEREF(++task->rp);
 }
 
-void e4__builtin_ABORT(struct e4__task *task, void *user)
+static void e4__builtin_ABORT(struct e4__task *task, void *user)
 {
     /* FIXME: Ensure the behavior of this function is correct. */
     register int i;
@@ -100,31 +100,31 @@ void e4__builtin_ABORT(struct e4__task *task, void *user)
     task->ip = e4__DEREF(++task->rp);
 }
 
-void e4__builtin_CLEAR(struct e4__task *task, void *user)
+static void e4__builtin_CLEAR(struct e4__task *task, void *user)
 {
     e4__stack_clear(task);
     e4__builtin_RET(task, NULL);
 }
 
-void e4__builtin_DEPTH(struct e4__task *task, void *user)
+static void e4__builtin_DEPTH(struct e4__task *task, void *user)
 {
     e4__stack_push(task, (e4__cell)e4__stack_depth(task));
     e4__builtin_RET(task, NULL);
 }
 
-void e4__builtin_DROP(struct e4__task *task, void *user)
+static void e4__builtin_DROP(struct e4__task *task, void *user)
 {
     e4__stack_drop(task);
     e4__builtin_RET(task, NULL);
 }
 
-void e4__builtin_DUP(struct e4__task *task, void *user)
+static void e4__builtin_DUP(struct e4__task *task, void *user)
 {
     e4__stack_dup(task);
     e4__builtin_RET(task, NULL);
 }
 
-void e4__builtin_GTNUMBER(struct e4__task *task, void *user)
+static void e4__builtin_GTNUMBER(struct e4__task *task, void *user)
 {
     register e4__usize initial;
     register const char *buf;
@@ -162,20 +162,20 @@ void e4__builtin_GTNUMBER(struct e4__task *task, void *user)
     e4__builtin_RET(task, NULL);
 }
 
-void e4__builtin_LIT(struct e4__task *task, void *user)
+static void e4__builtin_LIT(struct e4__task *task, void *user)
 {
     *task->sp-- = e4__DEREF2(++task->rp);
     task->ip = e4__DEREF(task->rp) + 1;
 }
 
-void e4__builtin_OVER(struct e4__task *task, void *user)
+static void e4__builtin_OVER(struct e4__task *task, void *user)
 {
     e4__stack_over(task);
     e4__builtin_RET(task, NULL);
 }
 
  /* XXX: From the Programming-Tools word set. */
-void e4__builtin_PRINTSTACK(struct e4__task *task, void *user)
+static void e4__builtin_PRINTSTACK(struct e4__task *task, void *user)
 {
     register e4__cell s = task->s0;
     register e4__usize n = e4__stack_depth(task);
@@ -195,6 +195,7 @@ void e4__builtin_PRINTSTACK(struct e4__task *task, void *user)
 
     if ((io_res = e4__io_type(task, num, len))) {
         e4__exception_throw(task, io_res);
+        e4__builtin_RET(task, NULL);
         return;
     }
 
@@ -207,6 +208,7 @@ void e4__builtin_PRINTSTACK(struct e4__task *task, void *user)
 
         if ((io_res = e4__io_type(task, num, len))) {
             e4__exception_throw(task, io_res);
+            e4__builtin_RET(task, NULL);
             return;
         }
     }
@@ -214,7 +216,7 @@ void e4__builtin_PRINTSTACK(struct e4__task *task, void *user)
     e4__builtin_RET(task, NULL);
 }
 
-void e4__builtin_REFILL(struct e4__task *task, void *user)
+static void e4__builtin_REFILL(struct e4__task *task, void *user)
 {
     register e4__usize io_res;
 
@@ -236,42 +238,43 @@ void e4__builtin_REFILL(struct e4__task *task, void *user)
         /* If we happen to be here, exceptions aren't enabled, so we
            we may as well return false. */
         e4__stack_push(task, (e4__cell)e4__BF_FALSE);
+        e4__builtin_RET(task, NULL);
         return;
     }
 
     e4__stack_push(task, (e4__cell)e4__BF_TRUE);
 }
 
-void e4__builtin_ROT(struct e4__task *task, void *user)
+static void e4__builtin_ROT(struct e4__task *task, void *user)
 {
     e4__stack_rot(task);
     e4__builtin_RET(task, NULL);
 }
 
-void e4__builtin_ROLL(struct e4__task *task, void *user)
+static void e4__builtin_ROLL(struct e4__task *task, void *user)
 {
     e4__stack_roll(task);
     e4__builtin_RET(task, NULL);
 }
 
-void e4__builtin_SKIP(struct e4__task *task, void *user)
+static void e4__builtin_SKIP(struct e4__task *task, void *user)
 {
     task->ip = e4__DEREF(++task->rp) + 1;
 }
 
-void e4__builtin_SWAP(struct e4__task *task, void *user)
+static void e4__builtin_SWAP(struct e4__task *task, void *user)
 {
     e4__stack_swap(task);
     e4__builtin_RET(task, NULL);
 }
 
-void e4__builtin_TUCK(struct e4__task *task, void *user)
+static void e4__builtin_TUCK(struct e4__task *task, void *user)
 {
     e4__stack_tuck(task);
     e4__builtin_RET(task, NULL);
 }
 
-void e4__builtin_WORD(struct e4__task *task, void *user)
+static void e4__builtin_WORD(struct e4__task *task, void *user)
 {
     register char delim;
     register e4__usize length;
