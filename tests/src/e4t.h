@@ -2,7 +2,9 @@
 #define e4t_H_
 
 #include "e4.h"
+
 #include <stdio.h>
+#include <stdlib.h>
 
 /* e4t test assert macro definitions */
 #define e4t__ASSERT(e)  \
@@ -12,6 +14,18 @@
             fprintf(stderr, "Assert failed! (" __FILE__ ":%u) - "   \
                     "\"" #e "\" evaluated to 0\n", __LINE__); \
             ++e4t__assert_failcount;    \
+        }   \
+    } while (0)
+
+#define e4t__ASSERT_CRITICAL(e) \
+    do {    \
+        ++e4t__assert_attemptcount; \
+        if (!(e)) {   \
+            fprintf(stderr, "Critical assert failed! (" __FILE__ ":%u) - "  \
+                    "\"" #e "\" evaluated to 0\nAborting test execution\n", \
+                    __LINE__); \
+            ++e4t__assert_failcount;    \
+            exit(EXIT_FAILURE); \
         }   \
     } while (0)
 

@@ -40,5 +40,5 @@ int main(void)
             e4t__assert_attemptcount, e4t__assert_failcount);
 
     /* Return success only if all tests passed. */
-    return !!e4t__assert_failcount;
+    return !e4t__assert_failcount ? EXIT_SUCCESS : EXIT_FAILURE;
 }
