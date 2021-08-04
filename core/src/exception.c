@@ -28,12 +28,16 @@ e4__usize e4__exception_catch(struct e4__task * task, void *user)
         if (!setjmp(task->exception.ctx)) {
             e4__execute(task, user);
         } else {
-            /* If the exception is e4__E_QUIT and we're not the last
-               handler, keep going. */
+            /* If the exception is e4__E_QUIT or e4__E_BYE and we're not
+               the last handler, keep going. */
             task->exception = old_ex;
 
-            if (task->exception_code == e4__E_QUIT)
-                e4__exception_throw(task, e4__E_QUIT);
+            /* FIXME: Should BYE be implemented with some flag
+               elsewhere so that QUIT is the only exception with this
+               behavior? */
+            if (task->exception_code == e4__E_QUIT ||
+                    task->exception_code == e4__E_BYE)
+                e4__exception_throw(task, task->exception_code);
 
             task->sp = saved_sp;
             task->rp = saved_rp;

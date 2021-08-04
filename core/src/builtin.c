@@ -7,6 +7,7 @@
 #define _e4__BUILTIN_DECL() \
     _e4__BUILTIN_PROC_FIRST(RET)  \
     _e4__BUILTIN_PROC(ABORT)    \
+    _e4__BUILTIN_PROC(BYE)  \
     _e4__BUILTIN_PROC(CLEAR)    \
     _e4__BUILTIN_PROC(DEPTH)    \
     _e4__BUILTIN_PROC(DROP) \
@@ -99,6 +100,14 @@ static void e4__builtin_ABORT(struct e4__task *task, void *user)
     for (i = 1; &task->rp[i] <= task->r0; ++i)
         task->rp[i] = RETURN;
     task->ip = e4__DEREF(++task->rp);
+}
+
+static void e4__builtin_BYE(struct e4__task *task, void *user)
+{
+    e4__exception_throw(task, e4__E_BYE);
+
+    /* If exceptions aren't enabled, just return. */
+    e4__builtin_RET(task, NULL);
 }
 
 static void e4__builtin_CLEAR(struct e4__task *task, void *user)

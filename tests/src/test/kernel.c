@@ -50,10 +50,13 @@ static void e4t__test_kernel_exceptions(void)
             (void *)e4__USIZE_NEGATE(e4__E_FAILURE));
     e4__dict_entry(task, "dropquit", 8, 0, e4t__test_kernel_exceptions_da,
             (void *)e4__USIZE_NEGATE(e4__E_QUIT));
+    e4__dict_entry(task, "dropbye", 7, 0, e4t__test_kernel_exceptions_da,
+            (void *)e4__USIZE_NEGATE(e4__E_BYE));
 
     /* Sanity check to make sure those words went in. */
     e4t__ASSERT(e4__dict_lookup(task, "dropfail", 8));
     e4t__ASSERT(e4__dict_lookup(task, "dropquit", 8));
+    e4t__ASSERT(e4__dict_lookup(task, "dropbye", 7));
 
     /* Test that regular exceptions are caught and the stack is
        restored correctly. */
@@ -66,6 +69,12 @@ static void e4t__test_kernel_exceptions(void)
     /* Test that QUIT exception actually percolates all the way up. */
     e4t__ASSERT_OK(e4__evaluate(task, "1 2 3", -1, 0));
     e4t__ASSERT_EQ(e4__evaluate(task, "4 dropquit", -1, 0), e4__E_QUIT);
+    e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1, 0));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 2 3");
+
+    /* Test that BYE exception actually percolates all the way up. */
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3", -1, 0));
+    e4t__ASSERT_EQ(e4__evaluate(task, "4 dropbye", -1, 0), e4__E_BYE);
     e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1, 0));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 2 3");
 }

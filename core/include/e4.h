@@ -104,13 +104,16 @@ struct e4__io_func {
     e4__usize (*type)(void *user, const char *buf, e4__usize n);
 };
 
-/* error constants */
+/* error constants - standard */
 #define e4__E_OK            (0)
 #define e4__E_UNDEFWORD     (-13)
 #define e4__E_INVFORGET     (-15)
 #define e4__E_UNSUPPORTED   (-21)
 #define e4__E_QUIT          (-56)
+
+/* error constants - system */
 #define e4__E_FAILURE       (-256)
+#define e4__E_BYE           (-257)
 
 /* flag constants */
 #define e4__F_SKIP_LEADING  (0x01)
@@ -136,6 +139,7 @@ struct e4__io_func {
 enum e4__builtin_id {
     e4__B_RET = 0,
     e4__B_ABORT,
+    e4__B_BYE,
     e4__B_CLEAR,
     e4__B_DEPTH,
     e4__B_DROP,
