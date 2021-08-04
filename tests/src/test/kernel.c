@@ -66,13 +66,15 @@ static void e4t__test_kernel_exceptions(void)
     e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1, 0));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 2 3 4");
 
-    /* Test that QUIT exception actually percolates all the way up. */
+    /* Test that QUIT exception actually percolates all the way up and
+       *doesn't* restore sp. */
     e4t__ASSERT_OK(e4__evaluate(task, "1 2 3", -1, 0));
     e4t__ASSERT_EQ(e4__evaluate(task, "4 dropquit", -1, 0), e4__E_QUIT);
     e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1, 0));
-    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 2 3");
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<1> 1");
 
-    /* Test that BYE exception actually percolates all the way up. */
+    /* Test that BYE exception actually percolates all the way up and
+       *does* restore sp. */
     e4t__ASSERT_OK(e4__evaluate(task, "1 2 3", -1, 0));
     e4t__ASSERT_EQ(e4__evaluate(task, "4 dropbye", -1, 0), e4__E_BYE);
     e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1, 0));
@@ -259,6 +261,81 @@ static void e4t__test_kernel_mem_dict(void)
     #undef _d
 }
 
+static e4__usize e4t__test_kernel_quit_accept(void *user, char *buf,
+        e4__usize *n);
+
+struct e4t__test_kernel_quit_data {
+    struct e4__task *task;
+    e4__usize step;
+};
+
+static void e4t__test_kernel_quit(void)
+{
+    struct e4__io_func old_iof;
+    struct e4__task *task = e4t__transient_task();
+    struct e4t__test_kernel_quit_data test_data = {
+        task,
+        0
+    };
+    struct e4__io_func iof = {
+        &test_data,
+        (void *)e4t__test_kernel_quit_accept,
+    };
+
+    /* Hack. Normally this kind of thing isn't safe unless you know
+       the old handlers will be using their user pointer the same as
+       you, or not at all. In this case, we know the previous TYPE
+       handler doesn't use the user pointer, so this is safe. */
+    e4__task_io_get(task, &old_iof);
+    iof.type = old_iof.type;
+
+    e4__task_io_init(task, &iof);
+    e4__evaluate_quit(task);
+}
+
+static e4__usize e4t__test_kernel_quit_accept(void *user, char *buf, e4__usize *n)
+{
+    struct e4t__test_kernel_quit_data *test_data = user;
+
+    #define _m(s)   \
+        do { \
+            memcpy(buf, s, sizeof(s) - 1);  \
+            *n = sizeof(s) - 1; \
+        } while (0)
+
+    switch (test_data->step++) {
+        case 0:
+            e4t__term_obuf_consume();
+            _m("1 2 3 4 .s clear");
+            break;
+        case 1:
+            e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 2 3 4  ok\n");
+            _m("1 2 3 4 .s clear quit");
+            break;
+        case 2:
+            e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 2 3 4\n");
+            e4__stack_push(test_data->task, (e4__cell)17);
+            _m("1 2 3 4 .s clear notarealword");
+            break;
+        case 3:
+            e4t__ASSERT_MATCH(e4t__term_obuf_consume(),
+                    "<5> 17 1 2 3 4  EXCEPTION: -13\n");
+            e4t__ASSERT_EQ(e4__stack_depth(test_data->task), 0);
+            _m("bye");
+            break;
+        default:
+            /* Should be unreachable. If we get here BYE has failed
+               to terminate execution and we are now set to run
+               forever. */
+            e4t__ASSERT_CRITICAL(0);
+            break;
+    }
+
+    #undef _m
+
+    return e4__E_OK;
+}
+
 static void e4t__test_kernel_stack(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -330,6 +407,7 @@ void e4t__test_kernel(void)
     e4t__test_kernel_mem_dict();
     e4t__test_kernel_numformat();
     e4t__test_kernel_numparse();
+    e4t__test_kernel_quit();
     e4t__test_kernel_stack();
     e4t__test_kernel_wordparse();
 }

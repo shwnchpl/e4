@@ -17,7 +17,9 @@ e4__usize e4__exception_catch(struct e4__task * task, void *user)
         if (!setjmp(task->exception.ctx))
             e4__execute(task, user);
         else {
-            task->sp = saved_sp;
+            /* FIXME: Document this odd system behavior somewhere. */
+            if (task->exception_code != e4__E_QUIT)
+                task->sp = saved_sp;
             task->rp = saved_rp;
             task->io_src = saved_io_src;
         }

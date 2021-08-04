@@ -33,6 +33,8 @@ Parsing/Text Execution
   to pay attention to count.
 - [DONE] Implement >NUMBER (builtin/C API)
 - [DONE] Reverse mem_parse API to match mem_number API semantics.
+- Create e4__io_refill function and use where appropriate rather than
+  calling builtin directly.
 - Determine if KEY should be writing to TIB.
 - Implement ' (LOOKUP builtin; should be case insensitive)
 - Implement EXECUTE (builtin).
@@ -42,6 +44,7 @@ General Builtins
 - [DONE] Implement basic static manipulation words CLEAR, DEPTH, DROP,
   DUP, OVER, ROT, ROLL, SWAP, and TUCK.
 - [DONE] Implement REFILL.
+- Implement CR.
 - Implement HERE and ALLOT.
 - Implement @ and !.
 - Implement simple IO builtins ., U., and EMIT.
@@ -49,7 +52,6 @@ General Builtins
 - Implement FORGET. It should stop looking once it hits builtin words.
 - Implement different code handlers _constant, _variable, _thunk, and
   _uservar.
-- Implement EVALUATE (builtin)
 - Add mechanism for builtin constants (such as BL, etc.).
 - Add appropriate asserts to all existing builtins.
 
@@ -65,8 +67,10 @@ Kernel
 - [DONE] Implement numeric signed division.
 - [DONE] Implement preliminary evaluate utility function.
 - [DONE] Implement exceptions using setjmp/longjmp.
+- [DONE] Implement QUIT using exceptions etc.
+- Cleanup evaluate_quit implementation by refactoring "mode" into flags
+  and using that rather than the TIB hack.
 - Figure out stack underflow checking for builtins etc.
-- Implement QUIT using exceptions etc.
 
 General IO
 ----------
@@ -136,6 +140,7 @@ General Builtins
   stack as appropriate and advances the instruction pointer. The
   string should be compiled directly into the definition *with* end
   padding to align.
+- Implement EVALUATE (builtin)
 - Implement signed and unsigned single width arithmetic builtins.
 - Implement user table builtins.
 - Consider implementing the Programming-Tools word set.

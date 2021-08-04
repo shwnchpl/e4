@@ -126,7 +126,7 @@ static void e4t__test_builtin_parseword(void)
     e4t__ASSERT_EQ(len, 0);
 }
 
-/* Covers CLEAR .S DROP DUP OVER ROT SWAP TUCK ROLL */
+/* Covers CLEAR .S DROP DUP OVER ROT SWAP TUCK ROLL QUIT */
 static void e4t__test_builtin_stackmanip(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -157,6 +157,10 @@ static void e4t__test_builtin_stackmanip(void)
 
     e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 4 5 4 roll .s clear", -1, 0));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<5> 1 3 4 5 2");
+
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 quit 4 5", -1, 0), e4__E_QUIT);
+    e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1, 0));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 2 3");
 }
 
 void e4t__test_builtin(void)

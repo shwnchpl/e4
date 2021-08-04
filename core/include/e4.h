@@ -148,6 +148,7 @@ enum e4__builtin_id {
     e4__B_LIT,
     e4__B_OVER,
     e4__B_PRINTSTACK,
+    e4__B_QUIT,
     e4__B_REFILL,
     e4__B_ROT,
     e4__B_ROLL,
@@ -211,6 +212,7 @@ void e4__stack_tuck(struct e4__task *task);
 /* evaluate.c functions */
 e4__usize e4__evaluate(struct e4__task *task, const char *buf, e4__usize sz,
         e4__u8 mode);
+void e4__evaluate_quit(struct e4__task *task);
 
 /* exception.c functions */
 e4__usize e4__exception_catch(struct e4__task *task, void *user);

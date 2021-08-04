@@ -45,11 +45,14 @@ e4__usize e4__evaluate(struct e4__task *task, const char *buf, e4__usize sz,
 
     old_io_src = task->io_src;
 
-    task->io_src.buffer = (e4__cell)buf;
-    task->io_src.in = 0;
-    task->io_src.length = sz != (e4__usize)-1 ? sz : (e4__usize)strlen(buf);
-    task->io_src.sz = task->io_src.length;
-    task->io_src.sid = e4__SID_STR;
+    /* FIXME: Hack. Use mode somehow instead? */
+    if ((e4__cell)buf != task->tib) {
+        task->io_src.buffer = (e4__cell)buf;
+        task->io_src.in = 0;
+        task->io_src.length = sz != (e4__usize)-1 ? sz : (e4__usize)strlen(buf);
+        task->io_src.sz = task->io_src.length;
+        task->io_src.sid = e4__SID_STR;
+    }
 
     while (task->io_src.in < task->io_src.length) {
         register struct e4__dict_header *header;
@@ -90,7 +93,68 @@ e4__usize e4__evaluate(struct e4__task *task, const char *buf, e4__usize sz,
     }
 
     /* Restore old IO src. */
+    /* FIXME: Is this *actually* always correct? */
     task->io_src = old_io_src;
 
     return 0;
+}
+
+void e4__evaluate_quit(struct e4__task *task)
+{
+    e4__bool running;
+
+    /* The behavior of this function depends on whether or not we're
+       already in some evaluate context. If we are, raise a quit
+       exception. If not, perform the QUIT behavior as prescribed
+       by the standard. */
+    e4__exception_throw(task, e4__E_QUIT);
+
+    /* Okay, we're still here. That means exceptions aren't currently
+       enabled and it's time to enter a QUIT loop. */
+    running = 1;
+    while (running) {
+        register e4__usize res;
+
+        task->rp = task->r0;
+
+        /* FIXME: Reset IO src to TIB etc. This shouldn't actually be
+           necessary. */
+
+        /* FIXME: Create e4__io_refill function and use that. */
+        e4__stack_rpush(task, NULL);
+        e4__BUILTIN_XT[e4__B_REFILL].code(task, NULL);
+        e4__stack_pop(task);
+
+        res = e4__evaluate(task, (const char *)task->io_src.buffer,
+                task->io_src.length, 0);
+        switch (res) {
+            case e4__E_OK:
+                /* FIXME: Use CR here instead for newline? */
+                e4__io_type(task, "  ok", 4);
+                /* fall through */
+            case e4__E_QUIT:
+                break;
+            case e4__E_BYE:
+                running = 0;
+                break;
+            default: {
+                /* FIXME: Improve this handling once better string
+                   formatting is available. */
+                register e4__usize len;
+                register char *buf = (char *)task->here;
+                register char *num;
+
+                /* XXX: An uncaught exception clears the stack. */
+                e4__stack_clear(task);
+
+                e4__io_type(task, "  EXCEPTION: ", -1);
+                num = e4__num_format(res, task->base, e4__F_SIGNED, buf, 130);
+                len = &buf[130] - num;
+                e4__io_type(task, num, len);
+             }
+        }
+
+        /* FIXME: User CR instead of this? */
+        e4__io_type(task, "\n", 1);
+    }
 }

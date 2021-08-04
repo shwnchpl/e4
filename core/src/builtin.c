@@ -16,6 +16,7 @@
     _e4__BUILTIN_PROC(LIT)  \
     _e4__BUILTIN_PROC(OVER) \
     _e4__BUILTIN_PROC_NAMED(PRINTSTACK, ".S")   \
+    _e4__BUILTIN_PROC(QUIT) \
     _e4__BUILTIN_PROC(REFILL)   \
     _e4__BUILTIN_PROC(ROT)  \
     _e4__BUILTIN_PROC(ROLL) \
@@ -223,6 +224,12 @@ static void e4__builtin_PRINTSTACK(struct e4__task *task, void *user)
         }
     }
 
+    e4__builtin_RET(task, NULL);
+}
+
+static void e4__builtin_QUIT(struct e4__task *task, void *user)
+{
+    e4__evaluate_quit(task);
     e4__builtin_RET(task, NULL);
 }
 
