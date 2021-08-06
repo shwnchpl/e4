@@ -118,18 +118,21 @@ struct e4__io_func {
 #define e4__E_FAILURE       (-256)
 #define e4__E_BYE           (-257)
 
-/* flag constants */
-#define e4__F_SKIP_LEADING  (0x01)
-
-#define e4__F_NEG_PREFIX    (0x01)
-#define e4__F_BASE_PREFIX   (0x02)
-#define e4__F_CHAR_LITERAL  (0x04)
-
+/* flag constants - dictionary entry */
 #define e4__F_IMMEDIATE     (0x01)
 #define e4__F_COMPONLY      (0x02)
 #define e4__F_BUILTIN       (0x08)
 
+/* flag constants - numeric parsing */
+#define e4__F_NEG_PREFIX    (0x01)
+#define e4__F_BASE_PREFIX   (0x02)
+#define e4__F_CHAR_LITERAL  (0x04)
+
+/* flag constants - numeric formatting */
 #define e4__F_SIGNED        (0x01)
+
+/* flag constants - word parsing */
+#define e4__F_SKIP_LEADING  (0x01)
 
 /* boolean flags */
 #define e4__BF_TRUE         ((e4__usize)-1)
