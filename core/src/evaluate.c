@@ -8,12 +8,40 @@ struct e4__evaluate_thunk {
     void *padding;
 };
 
-static e4__usize e4__evaluate_internal(struct e4__task *task);
+static void e4__evaluate_wrapper(struct e4__task *task, void *user);
 
-static void e4__evaluate_wrapper(struct e4__task *task, void *user)
+static void e4__evaluate_compile(struct e4__task *task, const char *word,
+        e4__u8 len)
 {
-    e4__evaluate_internal(task);
-    e4__execute_ret(task);
+    /* FIXME: Add compilation semantics. */
+}
+
+static void e4__evaluate_interpret(struct e4__task *task, const char *word,
+        e4__u8 len)
+{
+    register struct e4__dict_header *header;
+    register e4__usize pcount;
+    e4__usize num;
+
+    header = e4__mem_dict_lookup(task->dict, word, len);
+
+    if (header) {
+        if (header->flags & e4__F_COMPONLY)
+            e4__exception_throw(task, e4__E_COMPONLYWORD);
+        e4__execute(task, header->xt);
+        return;
+    }
+
+    /* Attempt to convert to a number and push it onto the stack. */
+    pcount = e4__mem_number(word, len, task->base,
+        e4__F_CHAR_LITERAL | e4__F_NEG_PREFIX | e4__F_BASE_PREFIX, &num);
+    /* FIXME: Should e4__mem_number return a e4__u8? */
+    if (pcount == (e4__usize)len) {
+        e4__stack_push(task, (e4__cell)num);
+        return;
+    }
+
+    e4__exception_throw(task, e4__E_UNDEFWORD);
 }
 
 static e4__usize e4__evaluate_internal(struct e4__task *task)
@@ -31,11 +59,8 @@ static e4__usize e4__evaluate_internal(struct e4__task *task)
     }
 
     while (task->io_src.in < task->io_src.length) {
-        register struct e4__dict_header *header;
         register const char *word;
         register e4__u8 len;
-        register e4__usize pcount;
-        e4__usize num;
 
         /* FIXME: Expose WORD in some way so that it isn't necessary
            to call it like this? */
@@ -49,30 +74,19 @@ static e4__usize e4__evaluate_internal(struct e4__task *task)
         if (!len)
             continue;
 
-        header = e4__mem_dict_lookup(task->dict, word, len);
-
-        if (header) {
-            if (header->flags & e4__F_COMPONLY)
-                e4__exception_throw(task, e4__E_COMPONLYWORD);
-            e4__execute(task, header->xt);
-            continue;
-        }
-
-        /* Attempt to convert to a number and push it onto the stack. */
-        pcount = e4__mem_number(word, len, task->base,
-            e4__F_CHAR_LITERAL | e4__F_NEG_PREFIX | e4__F_BASE_PREFIX, &num);
-        /* FIXME: Should e4__mem_number return a e4__u8? */
-        if (pcount == (e4__usize)len) {
-            e4__stack_push(task, (e4__cell)num);
-            continue;
-        }
-
-        /* FIXME: Raise some kind of exception; don't just fail
-           silently. */
-        e4__exception_throw(task, e4__E_UNDEFWORD);
+        if (task->compiling)
+            e4__evaluate_compile(task, word, len);
+        else
+            e4__evaluate_interpret(task, word, len);
     }
 
     return e4__E_OK;
+}
+
+static void e4__evaluate_wrapper(struct e4__task *task, void *user)
+{
+    e4__evaluate_internal(task);
+    e4__execute_ret(task);
 }
 
 e4__usize e4__evaluate(struct e4__task *task, const char *buf, e4__usize sz)
