@@ -103,7 +103,7 @@ static void e4t__test_kernel_exceptions_da(struct e4__task *task, void *user)
     e4__exception_throw(task, ex);
 
     /* This should be unreachable. */
-    e4__builtin_RET(task, NULL);
+    e4__execute_ret(task);
 }
 
 static void e4t__test_kernel_evaluate(void)

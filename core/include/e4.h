@@ -142,8 +142,7 @@ struct e4__io_func {
 
 /* builtin constants */
 enum e4__builtin_id {
-    e4__B_RET = 0,
-    e4__B_ABORT,
+    e4__B_ABORT = 0,
     e4__B_BYE,
     e4__B_CLEAR,
     e4__B_CR,
@@ -160,8 +159,9 @@ enum e4__builtin_id {
     e4__B_PRINTSTACK,
     e4__B_QUIT,
     e4__B_REFILL,
-    e4__B_ROT,
+    e4__B_RET,
     e4__B_ROLL,
+    e4__B_ROT,
     e4__B_SKIP,
     e4__B_SWAP,
     e4__B_TUCK,
@@ -204,7 +204,6 @@ enum e4__builtin_id {
 /* FIXME: Should the header table even be exposed here? */
 extern const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT];
 extern const struct e4__execute_token e4__BUILTIN_XT[e4__BUILTIN_COUNT];
-void e4__builtin_RET(struct e4__task *task, void *user);
 void e4__builtin_exec_(e4__u8 count, /* struct e4__task *task, */
         /* enum e4__builtin_id id, */ ...);
 
@@ -244,6 +243,7 @@ void e4__exception_throw(struct e4__task *task, e4__usize e);
 
 /* execute.c functions */
 void e4__execute(struct e4__task *task, void *user);
+void e4__execute_ret(struct e4__task *task);
 void e4__execute_threaded(struct e4__task *task, void *user);
 
 /* io.c functions */

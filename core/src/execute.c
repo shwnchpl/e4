@@ -10,6 +10,11 @@ void e4__execute(struct e4__task *task, void *user)
     entry(task, code + 1);
 }
 
+void e4__execute_ret(struct e4__task *task)
+{
+    task->ip = e4__DEREF(++task->rp);
+}
+
 void e4__execute_threaded(struct e4__task *task, void *user)
 {
     register int depth = 1;

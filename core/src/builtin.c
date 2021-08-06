@@ -11,7 +11,7 @@
         register const e4__usize _c = (e4__usize)(c);   \
         if (e4__stack_depth(t) < _c) { \
             e4__exception_throw(t, e4__E_STKUNDERFLOW);  \
-            e4__builtin_RET(t, NULL);   \
+            e4__execute_ret(task);  \
             return; \
         }   \
     } while (0)
@@ -20,8 +20,7 @@
 
 /* FIXME: Let this support "compile time" flags, etc. */
 #define _e4__BUILTIN_DECL() \
-    _e4__BUILTIN_PROC_FIRST(RET)  \
-    _e4__BUILTIN_PROC(ABORT)    \
+    _e4__BUILTIN_PROC_FIRST(ABORT)  \
     _e4__BUILTIN_PROC(BYE)  \
     _e4__BUILTIN_PROC(CLEAR)    \
     _e4__BUILTIN_PROC(CR)   \
@@ -38,8 +37,9 @@
     _e4__BUILTIN_PROC_N(PRINTSTACK, ".S")   \
     _e4__BUILTIN_PROC(QUIT) \
     _e4__BUILTIN_PROC(REFILL)   \
-    _e4__BUILTIN_PROC(ROT)  \
+    _e4__BUILTIN_PROC_F(RET, e4__F_COMPONLY)    \
     _e4__BUILTIN_PROC(ROLL) \
+    _e4__BUILTIN_PROC(ROT)  \
     _e4__BUILTIN_PROC(SKIP) \
     _e4__BUILTIN_PROC(SWAP) \
     _e4__BUILTIN_PROC(TUCK) \
@@ -56,8 +56,7 @@
     _e4__BUILTIN_PROC_NF(w, #w, f)
 
 /* Declare builtin functions. */
-#define _e4__BUILTIN_PROC_FIRST(w)  \
-    void e4__builtin_##w(struct e4__task *task, void *user);
+#define _e4__BUILTIN_PROC_FIRST(w)  _e4__BUILTIN_PROC(w)
 #define _e4__BUILTIN_PROC_NF(w, n, f)   \
     static void e4__builtin_##w(struct e4__task *task, void *user);
 
@@ -148,11 +147,6 @@ void e4__builtin_exec_(e4__u8 count, /* struct e4__task *task, */
 
 /* builtin implementations */
 
-void e4__builtin_RET(struct e4__task *task, void *user)
-{
-    task->ip = e4__DEREF(++task->rp);
-}
-
 static void e4__builtin_ABORT(struct e4__task *task, void *user)
 {
     /* FIXME: Implement this function correctly. */
@@ -172,13 +166,13 @@ static void e4__builtin_BYE(struct e4__task *task, void *user)
     e4__exception_throw(task, e4__E_BYE);
 
     /* If exceptions aren't enabled, just return. */
-    e4__builtin_RET(task, NULL);
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_CLEAR(struct e4__task *task, void *user)
 {
     e4__stack_clear(task);
-    e4__builtin_RET(task, NULL);
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_CR(struct e4__task *task, void *user)
@@ -189,27 +183,27 @@ static void e4__builtin_CR(struct e4__task *task, void *user)
     if ((io_res = e4__io_type(task, "\n", 1)))
         e4__exception_throw(task, io_res);
 
-    e4__builtin_RET(task, NULL);
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_DEPTH(struct e4__task *task, void *user)
 {
     e4__stack_push(task, (e4__cell)e4__stack_depth(task));
-    e4__builtin_RET(task, NULL);
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_DROP(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
     e4__stack_drop(task);
-    e4__builtin_RET(task, NULL);
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_DUP(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
     e4__stack_dup(task);
-    e4__builtin_RET(task, NULL);
+    e4__execute_ret(task);
 }
 
  /* XXX: From the Programming-Tools Extensions word set. */
@@ -225,14 +219,14 @@ static void e4__builtin_FORGET(struct e4__task *task, void *user)
 
     if (!(len = (e4__u8)*word++)) {
         e4__exception_throw(task, e4__E_ZLNAME);
-        e4__builtin_RET(task, NULL);
+        e4__execute_ret(task);
         return;
     }
 
     if ((res = e4__dict_forget(task, word, len)))
         e4__exception_throw(task, res);
 
-    e4__builtin_RET(task, NULL);
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_GTNUMBER(struct e4__task *task, void *user)
@@ -266,7 +260,7 @@ static void e4__builtin_GTNUMBER(struct e4__task *task, void *user)
     e4__stack_push(task, (e4__cell)(buf + consumed));
     e4__stack_push(task, (e4__cell)(length - consumed));
 
-    e4__builtin_RET(task, NULL);
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_LIT(struct e4__task *task, void *user)
@@ -290,7 +284,7 @@ static void e4__builtin_OVER(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
     e4__stack_over(task);
-    e4__builtin_RET(task, NULL);
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_PLUS(struct e4__task *task, void *user)
@@ -326,7 +320,7 @@ static void e4__builtin_PRINTN(struct e4__task *task, void *user)
     if ((io_res = e4__io_type(task, num, len)))
         e4__exception_throw(task, io_res);
 
-    e4__builtin_RET(task, NULL);
+    e4__execute_ret(task);
 }
 
  /* XXX: From the Programming-Tools word set. */
@@ -351,7 +345,7 @@ static void e4__builtin_PRINTSTACK(struct e4__task *task, void *user)
 
     if ((io_res = e4__io_type(task, num, len))) {
         e4__exception_throw(task, io_res);
-        e4__builtin_RET(task, NULL);
+        e4__execute_ret(task);
         return;
     }
 
@@ -363,18 +357,18 @@ static void e4__builtin_PRINTSTACK(struct e4__task *task, void *user)
 
         if ((io_res = e4__io_type(task, num, len))) {
             e4__exception_throw(task, io_res);
-            e4__builtin_RET(task, NULL);
+            e4__execute_ret(task);
             return;
         }
     }
 
-    e4__builtin_RET(task, NULL);
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_QUIT(struct e4__task *task, void *user)
 {
     e4__evaluate_quit(task);
-    e4__builtin_RET(task, NULL);
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_REFILL(struct e4__task *task, void *user)
@@ -399,18 +393,19 @@ static void e4__builtin_REFILL(struct e4__task *task, void *user)
         /* If we happen to be here, exceptions aren't enabled, so we
            we may as well return false. */
         e4__stack_push(task, (e4__cell)e4__BF_FALSE);
-        e4__builtin_RET(task, NULL);
+        e4__execute_ret(task);
         return;
     }
 
     e4__stack_push(task, (e4__cell)e4__BF_TRUE);
 }
 
-static void e4__builtin_ROT(struct e4__task *task, void *user)
+/* XXX: System word. Not part of any word set. */
+static void e4__builtin_RET(struct e4__task *task, void *user)
 {
-    _e4__BUILTIN_EXPECT_DEPTH(task, 3);
-    e4__stack_rot(task);
-    e4__builtin_RET(task, NULL);
+    /* XXX: This function doesn't actually do anything. It's address
+       is simply understood by the threaded interpreter to indicate
+       that a return should occur. */
 }
 
 static void e4__builtin_ROLL(struct e4__task *task, void *user)
@@ -418,7 +413,14 @@ static void e4__builtin_ROLL(struct e4__task *task, void *user)
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
     _e4__BUILTIN_EXPECT_DEPTH(task, (e4__usize)e4__stack_peek(task) + 1);
     e4__stack_roll(task);
-    e4__builtin_RET(task, NULL);
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_ROT(struct e4__task *task, void *user)
+{
+    _e4__BUILTIN_EXPECT_DEPTH(task, 3);
+    e4__stack_rot(task);
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_SKIP(struct e4__task *task, void *user)
@@ -430,14 +432,14 @@ static void e4__builtin_SWAP(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
     e4__stack_swap(task);
-    e4__builtin_RET(task, NULL);
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_TUCK(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
     e4__stack_tuck(task);
-    e4__builtin_RET(task, NULL);
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_WORD(struct e4__task *task, void *user)
@@ -476,7 +478,7 @@ static void e4__builtin_WORD(struct e4__task *task, void *user)
     task->io_src.in = word + length + 1 - (const char *)task->io_src.buffer;
     e4__stack_push(task, task->here);
 
-    e4__builtin_RET(task, NULL);
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_WORDS(struct e4__task *task, void *user)
