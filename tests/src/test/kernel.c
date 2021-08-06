@@ -129,6 +129,10 @@ static void e4t__test_kernel_evaluate(void)
             e4__E_UNDEFWORD);
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "");
     e4t__ASSERT_EQ(e4__stack_depth(task), 0);
+
+    /* Attempting to interpret a compile-only word throws
+       an exception. */
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 exit", -1, 0), e4__E_COMPONLYWORD);
 }
 
 static void e4t__test_kernel_io(void)

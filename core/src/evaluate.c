@@ -76,6 +76,8 @@ e4__usize e4__evaluate(struct e4__task *task, const char *buf, e4__usize sz,
         header = e4__mem_dict_lookup(task->dict, word, len);
 
         if (header) {
+            if (header->flags & e4__F_COMPONLY)
+                e4__exception_throw(task, e4__E_COMPONLYWORD);
             e4__execute(task, header->xt);
             continue;
         }

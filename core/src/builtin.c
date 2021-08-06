@@ -30,7 +30,7 @@
     _e4__BUILTIN_PROC_F(EXIT, e4__F_COMPONLY)   \
     _e4__BUILTIN_PROC(FORGET)   \
     _e4__BUILTIN_PROC_N(GTNUMBER, ">NUMBER")    \
-    _e4__BUILTIN_PROC(LIT)  \
+    _e4__BUILTIN_PROC_F(LIT, e4__F_COMPONLY)  \
     _e4__BUILTIN_PROC_N(MINUS, "-") \
     _e4__BUILTIN_PROC(OVER) \
     _e4__BUILTIN_PROC_N(PLUS, "+")  \
@@ -40,7 +40,7 @@
     _e4__BUILTIN_PROC(REFILL)   \
     _e4__BUILTIN_PROC(ROLL) \
     _e4__BUILTIN_PROC(ROT)  \
-    _e4__BUILTIN_PROC(SKIP) \
+    _e4__BUILTIN_PROC_F(SKIP, e4__F_COMPONLY) \
     _e4__BUILTIN_PROC(SWAP) \
     _e4__BUILTIN_PROC(TUCK) \
     _e4__BUILTIN_PROC(WORD) \
