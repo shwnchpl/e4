@@ -160,6 +160,23 @@ static void e4t__test_builtin_stackmanip(void)
 {
     struct e4__task *task = e4t__transient_task();
 
+    /* Test that underflows are expressed properly. */
+
+    e4t__ASSERT_EQ(e4__evaluate(task, "drop", -1, 0), e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, "dup", -1, 0), e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 over", -1, 0), e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 over", -1, 0), e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 rot", -1, 0), e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 swap", -1, 0), e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 tuck", -1, 0), e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 roll", -1, 0), e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 roll", -1, 0),
+            e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 4 roll", -1, 0),
+            e4__E_STKUNDERFLOW);
+
+    /* Test for behavioral correctness. */
+
     e4t__ASSERT_OK(e4__evaluate(task, "1 -2 3 .s clear", -1, 0));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 -2 3");
 

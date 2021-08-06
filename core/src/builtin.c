@@ -4,6 +4,20 @@
 #include <stdarg.h>
 #include <string.h>
 
+/* utility macros */
+
+#define _e4__BUILTIN_EXPECT_DEPTH(t, c) \
+    do {    \
+        register const e4__usize _c = (e4__usize)(c);   \
+        if (e4__stack_depth(t) < _c) { \
+            e4__exception_throw(t, e4__E_STKUNDERFLOW);  \
+            e4__builtin_RET(t, NULL);   \
+            return; \
+        }   \
+    } while (0)
+
+/* builtin dictionary definitions */
+
 /* FIXME: Let this support "compile time" flags, etc. */
 #define _e4__BUILTIN_DECL() \
     _e4__BUILTIN_PROC_FIRST(RET)  \
@@ -86,6 +100,8 @@ const struct e4__execute_token e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
    allow for builtins implemented in Forth that don't need to be
    compiled or have their code components live in the user dictionary. */
 
+/* builtin utilities */
+
 /* task and id are mandatory, otherwise this function simply does
    nothing. Executes the builtin corresponding to id on the
    specified task after pushing any remaining arguments onto the
@@ -117,6 +133,8 @@ void e4__builtin_exec_(e4__u8 count, /* struct e4__task *task, */
     e4__BUILTIN_XT[id].code(task, NULL);
 }
 
+/* builtin implementations */
+
 void e4__builtin_RET(struct e4__task *task, void *user)
 {
     task->ip = e4__DEREF(++task->rp);
@@ -124,7 +142,7 @@ void e4__builtin_RET(struct e4__task *task, void *user)
 
 static void e4__builtin_ABORT(struct e4__task *task, void *user)
 {
-    /* FIXME: Ensure the behavior of this function is correct. */
+    /* FIXME: Implement this function correctly. */
     register int i;
     static const void *RETURN[] =
     {
@@ -158,12 +176,14 @@ static void e4__builtin_DEPTH(struct e4__task *task, void *user)
 
 static void e4__builtin_DROP(struct e4__task *task, void *user)
 {
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
     e4__stack_drop(task);
     e4__builtin_RET(task, NULL);
 }
 
 static void e4__builtin_DUP(struct e4__task *task, void *user)
 {
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
     e4__stack_dup(task);
     e4__builtin_RET(task, NULL);
 }
@@ -199,11 +219,7 @@ static void e4__builtin_GTNUMBER(struct e4__task *task, void *user)
     register e4__usize consumed;
     e4__usize result;
 
-    /* FIXME: Should task struct fields just be used here rather than
-       the C stack API? */
-    if (e4__stack_depth(task) < 4) {
-        /* FIXME: Underflow. */
-    }
+    _e4__BUILTIN_EXPECT_DEPTH(task, 4);
 
     length = (e4__usize)e4__stack_pop(task);
     buf = (const char *)e4__stack_pop(task);
@@ -237,6 +253,7 @@ static void e4__builtin_LIT(struct e4__task *task, void *user)
 
 static void e4__builtin_OVER(struct e4__task *task, void *user)
 {
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
     e4__stack_over(task);
     e4__builtin_RET(task, NULL);
 }
@@ -320,12 +337,15 @@ static void e4__builtin_REFILL(struct e4__task *task, void *user)
 
 static void e4__builtin_ROT(struct e4__task *task, void *user)
 {
+    _e4__BUILTIN_EXPECT_DEPTH(task, 3);
     e4__stack_rot(task);
     e4__builtin_RET(task, NULL);
 }
 
 static void e4__builtin_ROLL(struct e4__task *task, void *user)
 {
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+    _e4__BUILTIN_EXPECT_DEPTH(task, (e4__usize)e4__stack_peek(task) + 1);
     e4__stack_roll(task);
     e4__builtin_RET(task, NULL);
 }
@@ -337,12 +357,14 @@ static void e4__builtin_SKIP(struct e4__task *task, void *user)
 
 static void e4__builtin_SWAP(struct e4__task *task, void *user)
 {
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
     e4__stack_swap(task);
     e4__builtin_RET(task, NULL);
 }
 
 static void e4__builtin_TUCK(struct e4__task *task, void *user)
 {
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
     e4__stack_tuck(task);
     e4__builtin_RET(task, NULL);
 }
@@ -354,11 +376,7 @@ static void e4__builtin_WORD(struct e4__task *task, void *user)
     register e4__u8 clamped_length;
     const char *word = NULL;
 
-    /* FIXME: Should task struct fields just be used here rather than
-       the C stack API? */
-    if (e4__stack_depth(task) < 1) {
-        /* FIXME: Underflow. */
-    }
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
 
     /* Parse word. */
     delim = (e4__usize)e4__stack_pop(task);

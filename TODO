@@ -47,14 +47,12 @@ General Builtins
 - [DONE] Implement FORGET. It should stop looking once it hits builtin
   words.
 - Implement CR.
+- [DONE] Add appropriate asserts to all existing builtins.
 - Implement HERE and ALLOT.
 - Implement @ and !.
 - Implement simple IO builtins ., U., and EMIT.
-- Implement compiletime BRANCH0, BRANCH, etc.
-- Implement different code handlers _constant, _variable, _thunk, and
-  _uservar.
+- Fix ABORT implementation.
 - Add mechanism for builtin constants (such as BL, etc.).
-- Add appropriate asserts to all existing builtins.
 
 Kernel
 ------
@@ -69,9 +67,12 @@ Kernel
 - [DONE] Implement preliminary evaluate utility function.
 - [DONE] Implement exceptions using setjmp/longjmp.
 - [DONE] Implement QUIT using exceptions etc.
+- [DONE] Figure out stack underflow checking for builtins etc.
 - Cleanup evaluate_quit implementation by refactoring "mode" into flags
   and using that rather than the TIB hack.
-- Figure out stack underflow checking for builtins etc.
+- Implement compiletime BRANCH0, BRANCH, etc.
+- Implement different code handlers _constant, _variable, _thunk, and
+  _uservar.
 
 General IO
 ----------

@@ -106,6 +106,7 @@ struct e4__io_func {
 
 /* error constants - standard */
 #define e4__E_OK            (0)
+#define e4__E_STKUNDERFLOW  (-4)
 #define e4__E_UNDEFWORD     (-13)
 #define e4__E_INVFORGET     (-15)
 #define e4__E_ZLNAME        (-16)
