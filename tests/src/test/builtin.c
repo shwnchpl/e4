@@ -34,6 +34,18 @@ static void e4t__test_builtin_forget(void)
     e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 17);
 }
 
+/* Covers CR */
+static void e4t__test_builtin_io(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    e4t__term_obuf_consume();
+    e4t__ASSERT_OK(e4__evaluate(task, "cr", -1, 0));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "\n");
+    e4t__ASSERT_OK(e4__evaluate(task, "cr cr", -1, 0));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "\n\n");
+}
+
 /* Covers >NUMBER and BASE uservar */
 static void e4t__test_builtin_parsenum(void)
 {
@@ -212,6 +224,7 @@ static void e4t__test_builtin_stackmanip(void)
 void e4t__test_builtin(void)
 {
     e4t__test_builtin_forget();
+    e4t__test_builtin_io();
     e4t__test_builtin_parsenum();
     e4t__test_builtin_parseword();
     e4t__test_builtin_stackmanip();

@@ -24,6 +24,7 @@
     _e4__BUILTIN_PROC(ABORT)    \
     _e4__BUILTIN_PROC(BYE)  \
     _e4__BUILTIN_PROC(CLEAR)    \
+    _e4__BUILTIN_PROC(CR)   \
     _e4__BUILTIN_PROC(DEPTH)    \
     _e4__BUILTIN_PROC(DROP) \
     _e4__BUILTIN_PROC(DUP)  \
@@ -165,6 +166,17 @@ static void e4__builtin_BYE(struct e4__task *task, void *user)
 static void e4__builtin_CLEAR(struct e4__task *task, void *user)
 {
     e4__stack_clear(task);
+    e4__builtin_RET(task, NULL);
+}
+
+static void e4__builtin_CR(struct e4__task *task, void *user)
+{
+    e4__usize io_res;
+
+    /* FIXME: Should this actually output \r\n? */
+    if ((io_res = e4__io_type(task, "\n", 1)))
+        e4__exception_throw(task, io_res);
+
     e4__builtin_RET(task, NULL);
 }
 

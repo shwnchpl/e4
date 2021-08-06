@@ -46,7 +46,7 @@ General Builtins
 - [DONE] Implement REFILL.
 - [DONE] Implement FORGET. It should stop looking once it hits builtin
   words.
-- Implement CR.
+- [DONE] Implement CR.
 - [DONE] Add appropriate asserts to all existing builtins.
 - Implement HERE and ALLOT.
 - Implement @ and !.
@@ -146,3 +146,6 @@ General Builtins
 - Implement signed and unsigned single width arithmetic builtins.
 - Implement user table builtins.
 - Consider implementing the Programming-Tools word set.
+- Determine whether CR should actually output \r\n. If it should,
+  ensure that \r\n is used instead of \n in all places where \n is
+  currently in use.

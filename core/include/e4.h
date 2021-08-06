@@ -143,6 +143,7 @@ enum e4__builtin_id {
     e4__B_ABORT,
     e4__B_BYE,
     e4__B_CLEAR,
+    e4__B_CR,
     e4__B_DEPTH,
     e4__B_DROP,
     e4__B_DUP,
