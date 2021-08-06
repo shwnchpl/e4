@@ -7,21 +7,21 @@ static void e4t__test_execute_meta(void)
     static const void *push_12345[] = {
         e4__execute_threaded,
         NULL,
-        &e4__BUILTIN_XT[e4__B_LIT],
+        &e4__BUILTIN_XT[e4__B_LITERAL],
         (void *)0x12345,
         &e4__BUILTIN_XT[e4__B_EXIT]
     };
     static const void *push_abcde[] = {
         e4__execute_threaded,
         NULL,
-        &e4__BUILTIN_XT[e4__B_LIT],
+        &e4__BUILTIN_XT[e4__B_LITERAL],
         (void *)0xabcde,
         &e4__BUILTIN_XT[e4__B_EXIT]
     };
     static const void *push_77777[] = {
         e4__execute_threaded,
         NULL,
-        &e4__BUILTIN_XT[e4__B_LIT],
+        &e4__BUILTIN_XT[e4__B_LITERAL],
         (void *)0x77777,
         &e4__BUILTIN_XT[e4__B_EXIT]
     };

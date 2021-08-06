@@ -31,7 +31,7 @@
     _e4__BUILTIN_PROC(DUP)  \
     _e4__BUILTIN_PROC_F(EXIT, e4__F_COMPONLY)   \
     _e4__BUILTIN_PROC(FORGET)   \
-    _e4__BUILTIN_PROC_F(LIT, e4__F_COMPONLY)  \
+    _e4__BUILTIN_PROC_F(LITERAL, e4__F_COMPONLY)    \
     _e4__BUILTIN_PROC_N(MINUS, "-") \
     _e4__BUILTIN_PROC(OVER) \
     _e4__BUILTIN_PROC_N(PLUS, "+")  \
@@ -303,8 +303,9 @@ static void e4__builtin_FORGET(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_LIT(struct e4__task *task, void *user)
+static void e4__builtin_LITERAL(struct e4__task *task, void *user)
 {
+    /* FIXME: Add compilation semantics for this word. */
     *task->sp-- = e4__DEREF2(++task->rp);
     task->ip = e4__DEREF(task->rp) + 1;
 }

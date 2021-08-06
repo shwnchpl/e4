@@ -157,7 +157,7 @@ enum e4__builtin_id {
     e4__B_DUP,
     e4__B_EXIT,
     e4__B_FORGET,
-    e4__B_LIT,
+    e4__B_LITERAL,
     e4__B_MINUS,
     e4__B_OVER,
     e4__B_PLUS,
