@@ -9,21 +9,21 @@ static void e4t__test_execute_meta(void)
         NULL,
         &e4__BUILTIN_XT[e4__B_LIT],
         (void *)0x12345,
-        e4__builtin_RET
+        &e4__BUILTIN_XT[e4__B_RET]
     };
     static const void *push_abcde[] = {
         e4__execute_threaded,
         NULL,
         &e4__BUILTIN_XT[e4__B_LIT],
         (void *)0xabcde,
-        e4__builtin_RET
+        &e4__BUILTIN_XT[e4__B_RET]
     };
     static const void *push_77777[] = {
         e4__execute_threaded,
         NULL,
         &e4__BUILTIN_XT[e4__B_LIT],
         (void *)0x77777,
-        e4__builtin_RET
+        &e4__BUILTIN_XT[e4__B_RET]
     };
     const void *push_seq[] = {
         e4__execute_threaded,
@@ -34,7 +34,7 @@ static void e4t__test_execute_meta(void)
         push_abcde,
         &e4__BUILTIN_XT[e4__B_ABORT],
         push_12345,
-        e4__builtin_RET
+        &e4__BUILTIN_XT[e4__B_RET]
     };
 
     struct e4__task *task = e4t__transient_task();

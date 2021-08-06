@@ -159,7 +159,7 @@ static void e4__builtin_ABORT(struct e4__task *task, void *user)
     register int i;
     static const void *RETURN[] =
     {
-        e4__builtin_RET
+        &e4__BUILTIN_XT[e4__B_RET]
     };
 
     for (i = 1; &task->rp[i] <= task->r0; ++i)
