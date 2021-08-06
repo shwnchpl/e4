@@ -285,6 +285,8 @@ static void e4__builtin_MINUS(struct e4__task *task, void *user)
     r = (e4__usize)e4__stack_pop(task);
     l = (e4__usize)e4__stack_pop(task);
     e4__stack_push(task, (e4__cell)(l - r));
+
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_OVER(struct e4__task *task, void *user)
@@ -303,6 +305,8 @@ static void e4__builtin_PLUS(struct e4__task *task, void *user)
     r = (e4__usize)e4__stack_pop(task);
     l = (e4__usize)e4__stack_pop(task);
     e4__stack_push(task, (e4__cell)(l + r));
+
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_PRINTN(struct e4__task *task, void *user)
@@ -405,6 +409,8 @@ static void e4__builtin_REFILL(struct e4__task *task, void *user)
     }
 
     e4__stack_push(task, (e4__cell)e4__BF_TRUE);
+
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_ROLL(struct e4__task *task, void *user)
@@ -495,4 +501,6 @@ static void e4__builtin_WORDS(struct e4__task *task, void *user)
         e4__io_type(task, " ", 1);
         e = e->link;
     }
+
+    e4__execute_ret(task);
 }

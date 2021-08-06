@@ -115,6 +115,7 @@ Testing
 - [DONE] Add exception tests (see uncommitted diff).
 - Add tests for every builtin word as prescribed by the standard.
 - Figure out some way to cover WORDS in tests.
+- Figure out some way to cover return stack corruption in tests.
 
 REPL
 ----
