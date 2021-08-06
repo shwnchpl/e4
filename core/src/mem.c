@@ -11,12 +11,14 @@ e4__usize e4__mem_dict_entry(void *here, struct e4__dict_header *prev,
     register struct e4__dict_header *header = here;
     register e4__usize sz;
 
+    /* Copy name before *ANYTHING* else. Since the word parsing
+       scratch area is HERE, we may be about to write over it. */
+    memmove(&header[1], name, nbytes);
+
     header->link = prev;
     header->flags = flags;
     header->nbytes = nbytes;
     header->name = (const char *)(&header[1]);
-
-    memcpy(&header[1], name, nbytes);
 
     sz = sizeof(*header) + nbytes;
 
