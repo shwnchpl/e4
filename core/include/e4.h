@@ -163,6 +163,7 @@ enum e4__builtin_id {
     e4__B_SWAP,
     e4__B_TUCK,
     e4__B_WORD,
+    e4__B_WORDS,
     e4__BUILTIN_COUNT
 };
 

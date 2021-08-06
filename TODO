@@ -50,6 +50,7 @@ General Builtins
 - [DONE] Implement + and -.
 - [DONE] Implement ..
 - [DONE] Add appropriate asserts to all existing builtins.
+- [DONE] Implement WORDS.
 - Implement HERE and ALLOT.
 - Implement @ and !.
 - Fix ABORT implementation.
@@ -105,6 +106,7 @@ Testing
 - [DONE] Migrate dict entry creation tests.
 - [DONE] Add exception tests (see uncommitted diff).
 - Add tests for every builtin word as prescribed by the standard.
+- Figure out some way to cover WORDS in tests.
 
 REPL
 ----

@@ -43,7 +43,8 @@
     _e4__BUILTIN_PROC(SKIP) \
     _e4__BUILTIN_PROC(SWAP) \
     _e4__BUILTIN_PROC(TUCK) \
-    _e4__BUILTIN_PROC(WORD)
+    _e4__BUILTIN_PROC(WORD) \
+    _e4__BUILTIN_PROC(WORDS)
 
 #define _e4__BUILTIN_PROC(s)    \
     _e4__BUILTIN_PROC_NAMED(s, #s)
@@ -468,4 +469,21 @@ static void e4__builtin_WORD(struct e4__task *task, void *user)
     e4__stack_push(task, task->here);
 
     e4__builtin_RET(task, NULL);
+}
+
+static void e4__builtin_WORDS(struct e4__task *task, void *user)
+{
+    struct e4__dict_header *e = task->dict;
+    e4__usize written = 0;
+
+    while (e) {
+        written += e->nbytes + 1;
+        if (written > 79) {
+            e4__io_type(task, "\n", 1);
+            written = e->nbytes + 1;
+        }
+        e4__io_type(task, e->name, e->nbytes);
+        e4__io_type(task, " ", 1);
+        e = e->link;
+    }
 }
