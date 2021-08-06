@@ -60,24 +60,24 @@ static void e4t__test_kernel_exceptions(void)
 
     /* Test that regular exceptions are caught and the stack is
        restored correctly. */
-    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3", -1, 0));
-    e4t__ASSERT_OK(e4__evaluate(task, "4 dropfail", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "4 dropfail", -1));
     e4t__term_obuf_consume();
-    e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 2 3 4 ");
 
     /* Test that QUIT exception actually percolates all the way up and
        *doesn't* restore sp. */
-    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3", -1, 0));
-    e4t__ASSERT_EQ(e4__evaluate(task, "4 dropquit", -1, 0), e4__E_QUIT);
-    e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "4 dropquit", -1), e4__E_QUIT);
+    e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<1> 1 ");
 
     /* Test that BYE exception actually percolates all the way up and
        *does* restore sp. */
-    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3", -1, 0));
-    e4t__ASSERT_EQ(e4__evaluate(task, "4 dropbye", -1, 0), e4__E_BYE);
-    e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "4 dropbye", -1), e4__E_BYE);
+    e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 2 3 ");
 }
 
@@ -115,24 +115,24 @@ static void e4t__test_kernel_evaluate(void)
     /* Empty strings or strings with only delimiters should be
        no-ops. */
     e4t__ASSERT_EQ(e4__stack_depth(task), 0);
-    e4t__ASSERT_EQ(e4__evaluate(task, "", -1, 0), e4__E_OK);
+    e4t__ASSERT_EQ(e4__evaluate(task, "", -1), e4__E_OK);
     e4t__ASSERT_EQ(e4__stack_depth(task), 0);
 
     e4t__ASSERT_EQ(e4__stack_depth(task), 0);
-    e4t__ASSERT_EQ(e4__evaluate(task, " ", -1, 0), e4__E_OK);
+    e4t__ASSERT_EQ(e4__evaluate(task, " ", -1), e4__E_OK);
     e4t__ASSERT_EQ(e4__stack_depth(task), 0);
 
     /* Undefined words should generate an exception and clear
        the stack. */
     e4__stack_clear(task);
-    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 4 5 rll", -1, 0),
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 4 5 rll", -1),
             e4__E_UNDEFWORD);
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "");
     e4t__ASSERT_EQ(e4__stack_depth(task), 0);
 
     /* Attempting to interpret a compile-only word throws
        an exception. */
-    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 exit", -1, 0), e4__E_COMPONLYWORD);
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 exit", -1), e4__E_COMPONLYWORD);
 }
 
 static void e4t__test_kernel_io(void)

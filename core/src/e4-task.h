@@ -65,6 +65,7 @@ struct e4__task
 
     /* System variables. */
     e4__usize sz;
+    e4__usize tib_sz;
     e4__usize base; /* Initialize to 10. */
     struct e4__dict_header *dict;
     struct e4__io_func io_func;

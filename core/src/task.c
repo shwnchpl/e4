@@ -6,7 +6,7 @@
 struct e4__task* e4__task_create(void *buffer, e4__usize size)
 {
     register struct e4__task *task;
-    register e4__cell cursor = buffer;
+    register const e4__cell c0 = buffer;
 
     /* Align size to pointer width. */
     size = size / sizeof(e4__cell) * sizeof(e4__cell);
@@ -14,7 +14,6 @@ struct e4__task* e4__task_create(void *buffer, e4__usize size)
     if (size < e4__TASK_MIN_SZ)
         return NULL;
 
-    /* TODO: Make this optional somehow? */
     memset(buffer, 0, size);
 
     /* FIXME: Verify that these fields are all a reasonable size (per
@@ -45,17 +44,17 @@ struct e4__task* e4__task_create(void *buffer, e4__usize size)
        sizeof(e4__cell) (since it contains fields that are
        e4__cell), so this is safe. */
 
-    task->here = cursor + sizeof(*task) / sizeof(e4__cell);
-    task->pad = cursor + (70 * size) / (100 * sizeof(e4__cell));
-    task->s0 = cursor + (85 * size) / (100 * sizeof(e4__cell));
+    task->here = c0 + sizeof(*task) / sizeof(e4__cell);
+    task->pad = c0 + (70 * size) / (100 * sizeof(e4__cell));
+    task->s0 = c0 + (85 * size) / (100 * sizeof(e4__cell));
     task->sp = task->s0;
-    task->tib = cursor + (85 * size) / (100 * sizeof(e4__cell)) + 1;
-    task->io_src.buffer = task->tib;
-    task->base_ptr = (e4__cell)&task->base;
-    /* FIXME: Store this size somewhere? Or recalculate it if needed? */
-    task->io_src.sz = (((e4__u8 *)cursor + (90 * size ) / 100) -
+    task->tib = c0 + (85 * size) / (100 * sizeof(e4__cell)) + 1;
+    task->tib_sz = (((e4__u8 *)c0 + (90 * size) / 100) -
             (e4__u8 *)task->tib - 1);
-    task->r0 = cursor + size / sizeof(e4__cell) - 1;
+    task->base_ptr = (e4__cell)&task->base;
+    task->io_src.buffer = task->tib;
+    task->io_src.sz = task->tib_sz;
+    task->r0 = c0 + size / sizeof(e4__cell) - 1;
     task->rp = task->r0;
     task->base = 10;
 

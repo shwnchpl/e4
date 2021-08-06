@@ -7,13 +7,13 @@ static void e4t__test_builtin_forget(void)
     struct e4__task *task = e4t__transient_task();
 
     /* Test that FORGET fails on zero length names. */
-    e4t__ASSERT_EQ(e4__evaluate(task, "forget", -1, 0), e4__E_ZLNAME);
-    e4t__ASSERT_EQ(e4__evaluate(task, "forget   ", -1, 0), e4__E_ZLNAME);
+    e4t__ASSERT_EQ(e4__evaluate(task, "forget", -1), e4__E_ZLNAME);
+    e4t__ASSERT_EQ(e4__evaluate(task, "forget   ", -1), e4__E_ZLNAME);
 
     /* Test that FORGET fails on invalid words and builtins. */
-    e4t__ASSERT_EQ(e4__evaluate(task, "forget notaword", -1, 0),
+    e4t__ASSERT_EQ(e4__evaluate(task, "forget notaword", -1),
             e4__E_INVFORGET);
-    e4t__ASSERT_EQ(e4__evaluate(task, "forget dup", -1, 0), e4__E_INVFORGET);
+    e4t__ASSERT_EQ(e4__evaluate(task, "forget dup", -1), e4__E_INVFORGET);
 
     e4__dict_entry(task, "foo", 3, 0, NULL, NULL);
     e4__dict_entry(task, "bar", 3, 0, NULL, NULL);
@@ -22,13 +22,13 @@ static void e4t__test_builtin_forget(void)
     e4t__ASSERT(e4__dict_lookup(task, "bar", 3));
 
     /* Test actually forgetting a word. */
-    e4t__ASSERT_OK(e4__evaluate(task, "forget bar", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, "forget bar", -1));
     e4t__ASSERT_EQ((e4__usize)e4__dict_lookup(task, "bar", 3),
             (e4__usize)NULL);
 
     /* Test that contents of buffer after look-ahead are intact
        and executed as appropriate. */
-    e4t__ASSERT_OK(e4__evaluate(task, "forget    foo 17 dup", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, "forget    foo 17 dup", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 2);
     e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 17);
     e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 17);
@@ -40,15 +40,15 @@ static void e4t__test_builtin_io(void)
     struct e4__task *task = e4t__transient_task();
 
     e4t__term_obuf_consume();
-    e4t__ASSERT_OK(e4__evaluate(task, "cr", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, "cr", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "\n");
-    e4t__ASSERT_OK(e4__evaluate(task, "cr cr", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, "cr cr", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "\n\n");
 
-    e4t__ASSERT_OK(e4__evaluate(task, "17 .", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, "17 .", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "17 ");
 
-    e4t__ASSERT_OK(e4__evaluate(task, "-17 .", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, "-17 .", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-17 ");
 }
 
@@ -57,7 +57,7 @@ static void e4t__test_builtin_math(void)
 {
     struct e4__task *task = e4t__transient_task();
 
-    #define _e(s)   e4__evaluate(task, s, sizeof(s) - 1, 0)
+    #define _e(s)   e4__evaluate(task, s, sizeof(s) - 1)
 
     e4t__ASSERT_EQ(_e("+"), e4__E_STKUNDERFLOW);
     e4t__ASSERT_EQ(_e("1 +"), e4__E_STKUNDERFLOW);
@@ -134,14 +134,14 @@ static void e4t__test_builtin_parsenum(void)
         } while (0)
 
     _push("42", 0);
-    e4t__ASSERT_OK(e4__evaluate(task, ">NUMBER", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, ">NUMBER", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 4);
     _pop();
     e4t__ASSERT_EQ(result, 42);
     e4t__ASSERT_EQ(rcount, 0);
 
     _push("42 f", 0);
-    e4t__ASSERT_OK(e4__evaluate(task, ">NUMBER", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, ">NUMBER", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 4);
     _pop();
     e4t__ASSERT_EQ(result, 42);
@@ -149,7 +149,7 @@ static void e4t__test_builtin_parsenum(void)
     e4t__ASSERT(!e4__mem_strncasecmp(remaining, " f", rcount));
 
     _push("-10", 50);
-    e4t__ASSERT_OK(e4__evaluate(task, ">NUMBER", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, ">NUMBER", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 4);
     _pop();
     e4t__ASSERT_EQ(result, 500);
@@ -158,7 +158,7 @@ static void e4t__test_builtin_parsenum(void)
 
     e4__DEREF(base) = (e4__cell)16;
     _push("ff-3", 0);
-    e4t__ASSERT_OK(e4__evaluate(task, ">NUMBER", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, ">NUMBER", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 4);
     _pop();
     e4t__ASSERT_EQ(result, 255);
@@ -167,14 +167,14 @@ static void e4t__test_builtin_parsenum(void)
     e4__DEREF(base) = (e4__cell)10;
 
     _push("1000", 4);
-    e4t__ASSERT_OK(e4__evaluate(task, ">NUMBER", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, ">NUMBER", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 4);
     _pop();
     e4t__ASSERT_EQ(result, 1040);
     e4t__ASSERT_EQ(rcount, 0);
 
     _push("'a'", 0);
-    e4t__ASSERT_OK(e4__evaluate(task, ">NUMBER", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, ">NUMBER", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 4);
     _pop();
     e4t__ASSERT_EQ(result, 0);
@@ -233,50 +233,48 @@ static void e4t__test_builtin_stackmanip(void)
 
     /* Test that underflows are expressed properly. */
 
-    e4t__ASSERT_EQ(e4__evaluate(task, "drop", -1, 0), e4__E_STKUNDERFLOW);
-    e4t__ASSERT_EQ(e4__evaluate(task, "dup", -1, 0), e4__E_STKUNDERFLOW);
-    e4t__ASSERT_EQ(e4__evaluate(task, "1 over", -1, 0), e4__E_STKUNDERFLOW);
-    e4t__ASSERT_EQ(e4__evaluate(task, "1 over", -1, 0), e4__E_STKUNDERFLOW);
-    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 rot", -1, 0), e4__E_STKUNDERFLOW);
-    e4t__ASSERT_EQ(e4__evaluate(task, "1 swap", -1, 0), e4__E_STKUNDERFLOW);
-    e4t__ASSERT_EQ(e4__evaluate(task, "1 tuck", -1, 0), e4__E_STKUNDERFLOW);
-    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 roll", -1, 0), e4__E_STKUNDERFLOW);
-    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 roll", -1, 0),
-            e4__E_STKUNDERFLOW);
-    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 4 roll", -1, 0),
-            e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, "drop", -1), e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, "dup", -1), e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 over", -1), e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 over", -1), e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 rot", -1), e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 swap", -1), e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 tuck", -1), e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 roll", -1), e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 roll", -1), e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 4 roll", -1), e4__E_STKUNDERFLOW);
 
     /* Test for behavioral correctness. */
 
-    e4t__ASSERT_OK(e4__evaluate(task, "1 -2 3 .s clear", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, "1 -2 3 .s clear", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 -2 3 ");
 
-    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 clear .s clear", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 clear .s clear", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<0> ");
 
-    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 drop .s clear", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 drop .s clear", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<2> 1 2 ");
 
-    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 dup .s clear", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 dup .s clear", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 2 3 3 ");
 
-    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 over .s clear", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 over .s clear", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 2 3 2 ");
 
-    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 rot .s clear", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 rot .s clear", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 2 3 1 ");
 
-    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 swap .s clear", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 swap .s clear", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 3 2 ");
 
-    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 tuck .s clear", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 tuck .s clear", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 3 2 3 ");
 
-    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 4 5 4 roll .s clear", -1, 0));
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 4 5 4 roll .s clear", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<5> 1 3 4 5 2 ");
 
-    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 quit 4 5", -1, 0), e4__E_QUIT);
-    e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1, 0));
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 quit 4 5", -1), e4__E_QUIT);
+    e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 2 3 ");
 }
 

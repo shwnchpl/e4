@@ -79,12 +79,12 @@ Kernel
   definition.
 - [DONE] Prevent builtins with the COMPONLY flag set from being
   interpreted.
-- Always use size or sz as name to indicate size in API paramters.
-- Cleanup evaluate_quit implementation by refactoring "mode" into flags
-  and using that rather than the TIB hack.
+- [DONE] Cleanup evaluate and evaluate_quit implementation, removing
+  unnecessary parameters.
 - Implement compiletime BRANCH0, BRANCH, etc.
 - Implement different code handlers _constant, _variable, _thunk, and
   _uservar.
+- Always use size or sz as name to indicate size in API parameters.
 
 General IO
 ----------

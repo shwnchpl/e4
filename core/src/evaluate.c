@@ -6,52 +6,28 @@
 struct e4__evaluate_thunk {
     e4__code_ptr code;
     void *padding;
-    const char *buf;
-    e4__usize sz;
-    e4__u8 mode;
 };
+
+static e4__usize e4__evaluate_internal(struct e4__task *task);
 
 static void e4__evaluate_wrapper(struct e4__task *task, void *user)
 {
-    struct e4__evaluate_thunk *thunk =
-            (struct e4__evaluate_thunk *)((e4__cell)user - 1);
-
-    e4__evaluate(task, thunk->buf, thunk->sz, thunk->mode);
-
-    /* Simply pop from the return stack. ip probably isn't valid
-       anyhow, but why risk it? */
-    e4__stack_rpop(task);
+    e4__evaluate_internal(task);
+    e4__execute_ret(task);
 }
 
-e4__usize e4__evaluate(struct e4__task *task, const char *buf, e4__usize sz,
-        e4__u8 mode)
+static e4__usize e4__evaluate_internal(struct e4__task *task)
 {
-    /* FIXME: Actually handle other modes. Figure out how this part
-       of the API should be structured. */
-    struct e4__io_src old_io_src;
 
     if (!task->exception_valid) {
         /* If there's nothing currently catching exceptions, catch and
            return them here. */
-        struct e4__evaluate_thunk thunk;
-
-        thunk.code = e4__evaluate_wrapper;
-        thunk.buf = buf;
-        thunk.sz = sz;
-        thunk.mode = mode;
+        struct e4__evaluate_thunk thunk = {
+            e4__evaluate_wrapper,
+            NULL
+        };
 
         return e4__exception_catch(task, (struct e4__execute_token *)&thunk);
-    }
-
-    old_io_src = task->io_src;
-
-    /* FIXME: Hack. Use mode somehow instead? */
-    if ((e4__cell)buf != task->tib) {
-        task->io_src.buffer = (e4__cell)buf;
-        task->io_src.in = 0;
-        task->io_src.length = sz != (e4__usize)-1 ? sz : (e4__usize)strlen(buf);
-        task->io_src.sz = task->io_src.length;
-        task->io_src.sid = e4__SID_STR;
     }
 
     while (task->io_src.in < task->io_src.length) {
@@ -96,11 +72,29 @@ e4__usize e4__evaluate(struct e4__task *task, const char *buf, e4__usize sz,
         e4__exception_throw(task, e4__E_UNDEFWORD);
     }
 
+    return e4__E_OK;
+}
+
+e4__usize e4__evaluate(struct e4__task *task, const char *buf, e4__usize sz)
+{
+    struct e4__io_src old_io_src;
+    e4__usize res;
+
+    old_io_src = task->io_src;
+
+    task->io_src.buffer = (e4__cell)buf;
+    task->io_src.in = 0;
+    task->io_src.length = sz != (e4__usize)-1 ? sz : (e4__usize)strlen(buf);
+    task->io_src.sz = task->io_src.length;
+    task->io_src.sid = e4__SID_STR;
+
+    res = e4__evaluate_internal(task);
+
     /* Restore old IO src. */
     /* FIXME: Is this *actually* always correct? */
     task->io_src = old_io_src;
 
-    return 0;
+    return res;
 }
 
 void e4__evaluate_quit(struct e4__task *task)
@@ -121,15 +115,20 @@ void e4__evaluate_quit(struct e4__task *task)
 
         task->rp = task->r0;
 
-        /* FIXME: Reset IO src to TIB etc. This shouldn't actually be
-           necessary. */
+        /* Reset IO src to TIB. */
+        /* XXX: This shouldn't actually be necessary under the current
+           implementation, but do it anyway just to be safe. */
+        task->io_src.buffer = task->tib;
+        task->io_src.sid = e4__SID_UID;
+        task->io_src.in = 0;
+        task->io_src.length = 0;
+        task->io_src.sz = task->tib_sz;
 
-        /* FIXME: Create e4__io_refill function and use that. */
+        /* FIXME: Create e4__io_refill function and use that? */
         e4__builtin_exec(task, e4__B_REFILL);
         e4__stack_pop(task);
 
-        res = e4__evaluate(task, (const char *)task->io_src.buffer,
-                task->io_src.length, 0);
+        res = e4__evaluate_internal(task);
         switch (res) {
             case e4__E_OK:
                 /* FIXME: Use CR here instead for newline? */
