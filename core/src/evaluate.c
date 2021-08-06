@@ -127,7 +127,7 @@ void e4__evaluate_quit(struct e4__task *task)
         switch (res) {
             case e4__E_OK:
                 /* FIXME: Use CR here instead for newline? */
-                e4__io_type(task, "  ok", 4);
+                e4__io_type(task, " ok\n", 4);
                 /* fall through */
             case e4__E_QUIT:
                 break;
@@ -144,14 +144,12 @@ void e4__evaluate_quit(struct e4__task *task)
                 /* XXX: An uncaught exception clears the stack. */
                 e4__stack_clear(task);
 
-                e4__io_type(task, "  EXCEPTION: ", -1);
+                e4__io_type(task, " EXCEPTION: ", 12);
                 num = e4__num_format(res, task->base, e4__F_SIGNED, buf, 130);
                 len = &buf[130] - num;
+                num[len++] = '\n';
                 e4__io_type(task, num, len);
              }
         }
-
-        /* FIXME: User CR instead of this? */
-        e4__io_type(task, "\n", 1);
     }
 }

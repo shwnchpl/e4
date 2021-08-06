@@ -273,9 +273,10 @@ static void e4__builtin_PRINTSTACK(struct e4__task *task, void *user)
 
     num = e4__num_format(n, task->base, e4__F_SIGNED, &buf[1], 130);
     len = &buf[131] - num;
-    len += 2;
+    len += 3;
     *--num = '<';
-    num[len - 1] = '>';
+    num[len - 2] = '>';
+    num[len - 1] = ' ';
 
     if ((io_res = e4__io_type(task, num, len))) {
         e4__exception_throw(task, io_res);
@@ -285,10 +286,9 @@ static void e4__builtin_PRINTSTACK(struct e4__task *task, void *user)
 
     while (task->sp < s) {
         n = (e4__usize)e4__DEREF(s--);
-        num = e4__num_format(n, task->base, e4__F_SIGNED, &buf[1], 130);
-        len = &buf[131] - num;
-        len += 1;
-        *--num = ' ';
+        num = e4__num_format(n, task->base, e4__F_SIGNED, buf, 130);
+        len = &buf[130] - num;
+        num[len++] = ' ';
 
         if ((io_res = e4__io_type(task, num, len))) {
             e4__exception_throw(task, io_res);

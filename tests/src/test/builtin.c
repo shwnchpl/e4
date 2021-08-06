@@ -178,35 +178,35 @@ static void e4t__test_builtin_stackmanip(void)
     /* Test for behavioral correctness. */
 
     e4t__ASSERT_OK(e4__evaluate(task, "1 -2 3 .s clear", -1, 0));
-    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 -2 3");
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 -2 3 ");
 
     e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 clear .s clear", -1, 0));
-    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<0>");
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<0> ");
 
     e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 drop .s clear", -1, 0));
-    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<2> 1 2");
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<2> 1 2 ");
 
     e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 dup .s clear", -1, 0));
-    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 2 3 3");
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 2 3 3 ");
 
     e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 over .s clear", -1, 0));
-    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 2 3 2");
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 2 3 2 ");
 
     e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 rot .s clear", -1, 0));
-    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 2 3 1");
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 2 3 1 ");
 
     e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 swap .s clear", -1, 0));
-    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 3 2");
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 3 2 ");
 
     e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 tuck .s clear", -1, 0));
-    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 3 2 3");
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 3 2 3 ");
 
     e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 4 5 4 roll .s clear", -1, 0));
-    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<5> 1 3 4 5 2");
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<5> 1 3 4 5 2 ");
 
     e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 quit 4 5", -1, 0), e4__E_QUIT);
     e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1, 0));
-    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 2 3");
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 2 3 ");
 }
 
 void e4t__test_builtin(void)

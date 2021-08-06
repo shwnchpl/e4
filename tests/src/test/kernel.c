@@ -64,21 +64,21 @@ static void e4t__test_kernel_exceptions(void)
     e4t__ASSERT_OK(e4__evaluate(task, "4 dropfail", -1, 0));
     e4t__term_obuf_consume();
     e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1, 0));
-    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 2 3 4");
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 2 3 4 ");
 
     /* Test that QUIT exception actually percolates all the way up and
        *doesn't* restore sp. */
     e4t__ASSERT_OK(e4__evaluate(task, "1 2 3", -1, 0));
     e4t__ASSERT_EQ(e4__evaluate(task, "4 dropquit", -1, 0), e4__E_QUIT);
     e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1, 0));
-    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<1> 1");
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<1> 1 ");
 
     /* Test that BYE exception actually percolates all the way up and
        *does* restore sp. */
     e4t__ASSERT_OK(e4__evaluate(task, "1 2 3", -1, 0));
     e4t__ASSERT_EQ(e4__evaluate(task, "4 dropbye", -1, 0), e4__E_BYE);
     e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1, 0));
-    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 2 3");
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 2 3 ");
 }
 
 static void e4t__test_kernel_exceptions_da(struct e4__task *task, void *user)
@@ -313,7 +313,7 @@ static e4__usize e4t__test_kernel_quit_accept(void *user, char *buf, e4__usize *
             _m("1 2 3 4 .s clear quit");
             break;
         case 2:
-            e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 2 3 4\n");
+            e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 2 3 4 ");
             e4__stack_push(test_data->task, (e4__cell)17);
             _m("1 2 3 4 .s clear notarealword");
             break;
