@@ -31,7 +31,9 @@
     _e4__BUILTIN_PROC(FORGET)   \
     _e4__BUILTIN_PROC_NAMED(GTNUMBER, ">NUMBER")    \
     _e4__BUILTIN_PROC(LIT)  \
+    _e4__BUILTIN_PROC_NAMED(MINUS, "-") \
     _e4__BUILTIN_PROC(OVER) \
+    _e4__BUILTIN_PROC_NAMED(PLUS, "+")  \
     _e4__BUILTIN_PROC_NAMED(PRINTN, ".")    \
     _e4__BUILTIN_PROC_NAMED(PRINTSTACK, ".S")   \
     _e4__BUILTIN_PROC(QUIT) \
@@ -264,11 +266,33 @@ static void e4__builtin_LIT(struct e4__task *task, void *user)
     task->ip = e4__DEREF(task->rp) + 1;
 }
 
+static void e4__builtin_MINUS(struct e4__task *task, void *user)
+{
+    e4__usize l, r;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    r = (e4__usize)e4__stack_pop(task);
+    l = (e4__usize)e4__stack_pop(task);
+    e4__stack_push(task, (e4__cell)(l - r));
+}
+
 static void e4__builtin_OVER(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
     e4__stack_over(task);
     e4__builtin_RET(task, NULL);
+}
+
+static void e4__builtin_PLUS(struct e4__task *task, void *user)
+{
+    e4__usize l, r;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    r = (e4__usize)e4__stack_pop(task);
+    l = (e4__usize)e4__stack_pop(task);
+    e4__stack_push(task, (e4__cell)(l + r));
 }
 
 static void e4__builtin_PRINTN(struct e4__task *task, void *user)

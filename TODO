@@ -47,6 +47,7 @@ General Builtins
 - [DONE] Implement FORGET. It should stop looking once it hits builtin
   words.
 - [DONE] Implement CR.
+- [DONE] Implement + and -.
 - [DONE] Implement ..
 - [DONE] Add appropriate asserts to all existing builtins.
 - Implement HERE and ALLOT.

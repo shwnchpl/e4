@@ -52,6 +52,59 @@ static void e4t__test_builtin_io(void)
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-17 ");
 }
 
+/* Covers + - . */
+static void e4t__test_builtin_math(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    #define _e(s)   e4__evaluate(task, s, sizeof(s) - 1, 0)
+
+    e4t__ASSERT_EQ(_e("+"), e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(_e("1 +"), e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(_e("-"), e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(_e("1 -"), e4__E_STKUNDERFLOW);
+
+    e4t__ASSERT_OK(_e("0  5 + ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "5 ");
+    e4t__ASSERT_OK(_e("5  0 + ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "5 ");
+    e4t__ASSERT_OK(_e("0 -5 + ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-5 ");
+    e4t__ASSERT_OK(_e("-5  0 + ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-5 ");
+    e4t__ASSERT_OK(_e("1  2 + ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "3 ");
+    e4t__ASSERT_OK(_e("1 -2 + ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-1 ");
+    e4t__ASSERT_OK(_e("-1  2 + ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "1 ");
+    e4t__ASSERT_OK(_e("-1 -2 + ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-3 ");
+    e4t__ASSERT_OK(_e("-1  1 + ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 ");
+
+    e4t__ASSERT_OK(_e("0  5 - . "));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-5 ");
+    e4t__ASSERT_OK(_e("5  0 - . "));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "5 ");
+    e4t__ASSERT_OK(_e("0 -5 - . "));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "5 ");
+    e4t__ASSERT_OK(_e("-5  0 - . "));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-5 ");
+    e4t__ASSERT_OK(_e("1  2 - . "));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-1 ");
+    e4t__ASSERT_OK(_e("1 -2 - . "));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "3 ");
+    e4t__ASSERT_OK(_e("-1  2 - . "));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-3 ");
+    e4t__ASSERT_OK(_e("-1 -2 - . "));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "1 ");
+    e4t__ASSERT_OK(_e("0  1 - . "));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-1 ");
+
+    #undef _e
+}
+
 /* Covers >NUMBER and BASE uservar */
 static void e4t__test_builtin_parsenum(void)
 {
@@ -231,6 +284,7 @@ void e4t__test_builtin(void)
 {
     e4t__test_builtin_forget();
     e4t__test_builtin_io();
+    e4t__test_builtin_math();
     e4t__test_builtin_parsenum();
     e4t__test_builtin_parseword();
     e4t__test_builtin_stackmanip();
