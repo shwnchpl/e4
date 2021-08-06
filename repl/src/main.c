@@ -1,9 +1,112 @@
 #include "e4.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <histedit.h>
 
-int main(void)
+struct repl_data {
+    EditLine *el;
+    History *hist;
+    HistEvent ev;
+};
+
+static char* repl_prompt(EditLine *el)
 {
+    return "";
+}
+
+#if 0 /* FIXME: Remove this code. It doesn't work well. */
+/* FIXME: This doesn't work right at all. For some reason, history
+   ends up being corrupted. Additionally, hitting enter in vi command
+   mode leaves the cursor in the wrong position. It's probably *much*
+   simpler to just allow newlines to be printed and deal with it. */
+static unsigned char repl_newline(EditLine *el, int ch)
+{
+    el_insertstr(el, " ");
+    fprintf(stdout, " ");
+    return CC_NEWLINE;
+}
+#endif
+
+static e4__usize repl_accept(void *user, char *buf, e4__usize *n)
+{
+    int d = 0;
+    struct repl_data *rd = user;
+    const char *ebuf = el_gets(rd->el, &d);
+    e4__usize num = d;
+
+    if (num > *n)
+        num = *n;
+
+    if (buf == NULL || num == 0) {
+        memcpy(buf, "quit", 4);
+        *n = 4;
+        el_push(rd->el, "bye\n");
+    } else {
+        memcpy(buf, ebuf, num);
+        *n = num;
+        history(rd->hist, &rd->ev, H_ENTER, ebuf);
+    }
+
+    return e4__E_OK;
+}
+
+static e4__usize repl_key(void *user, char *buf)
+{
+    struct repl_data *rd = user;
+    return el_getc(rd->el, buf) != -1 ? e4__E_OK : e4__E_FAILURE;
+}
+
+static e4__usize repl_type(void *user, const char *buf, e4__usize n)
+{
+    fprintf(stdout, "%.*s", (int)n, buf);
+    return e4__E_OK;
+}
+
+int main(int argc, char **argv)
+{
+    static char task_buffer[4096];
+    struct repl_data rd;
+    struct e4__task *task;
+    struct e4__io_func io_src = {
+        NULL,
+        repl_accept,
+        repl_key,
+        repl_type
+    };
+    EditLine *el = NULL;
+    History *hist;
+
+    hist = history_init();
+    history(hist, &rd.ev, H_SETSIZE, 100);
+
+    el = el_init(*argv, stdin, stdout, stderr);
+
+    el_set(el, EL_EDITOR, "vi");
+    el_set(el, EL_SIGNAL, 1);
+    el_set(el, EL_HIST, history, hist);
+    el_set(el, EL_PROMPT, repl_prompt);
+
+#if 0 /* FIXME: Remove this code. It doesn't work well. */
+    el_set(el, EL_ADDFN, "silent-nl", "process input line", repl_newline);
+    el_set(el, EL_BIND, "-a", "\n", "silent-nl", NULL);
+    el_set(el, EL_BIND, "\n", "silent-nl", NULL);
+#endif
+
+    el_source(el, NULL);
+
+    rd.el = el;
+    rd.hist = hist;
+
+    io_src.user = &rd;
+    task = e4__task_create(task_buffer, sizeof(task_buffer));
+    e4__task_io_init(task, &io_src);
+
+    e4__evaluate_quit(task);
+
+    history_end(hist);
+    el_end(el);
+
     return 0;
 }

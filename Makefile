@@ -29,7 +29,7 @@ TESTS_DEPS := $(TESTS_OBJS:.o=.d)
 # on the amalgamated core target.
 
 CFLAGS := -Wall -std=c89 -MMD -MP
-REPL_LDFLAGS := -L$(BUILD_DIR) -le4
+REPL_LDFLAGS := -L$(BUILD_DIR) -le4 -ledit
 TESTS_LDFLAGS := -L$(BUILD_DIR) -le4
 
 # Default "all" target.

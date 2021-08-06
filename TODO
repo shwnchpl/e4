@@ -110,7 +110,10 @@ Testing
 
 REPL
 ----
-- Create actual simple REPL using libedit or some other utility.
+- [DONE] Create actual simple REPL using libedit or some other utility.
+- Figure out having \n user input print a space rather than newline
+  while maintaining all other \n semantics using libedit (or otherwise
+  abandon this goal and delete the commented out code in repl/main.c).
 
 
 Version 0.2
