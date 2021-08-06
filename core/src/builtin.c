@@ -32,6 +32,7 @@
     _e4__BUILTIN_PROC_NAMED(GTNUMBER, ">NUMBER")    \
     _e4__BUILTIN_PROC(LIT)  \
     _e4__BUILTIN_PROC(OVER) \
+    _e4__BUILTIN_PROC_NAMED(PRINTN, ".")    \
     _e4__BUILTIN_PROC_NAMED(PRINTSTACK, ".S")   \
     _e4__BUILTIN_PROC(QUIT) \
     _e4__BUILTIN_PROC(REFILL)   \
@@ -267,6 +268,31 @@ static void e4__builtin_OVER(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
     e4__stack_over(task);
+    e4__builtin_RET(task, NULL);
+}
+
+static void e4__builtin_PRINTN(struct e4__task *task, void *user)
+{
+    /* FIXME: Once pictured numeric output has been implemented, use
+       that instead of this implementation. */
+    register e4__usize io_res;
+    register char *num;
+    register char *buf;
+    register e4__usize len;
+    register e4__usize n;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+
+    buf = (char *)task->here;
+    n = (e4__usize)e4__stack_pop(task);
+
+    num = e4__num_format(n, task->base, e4__F_SIGNED, buf, 130);
+    len = &buf[130] - num;
+    num[len++] = ' ';
+
+    if ((io_res = e4__io_type(task, num, len)))
+        e4__exception_throw(task, io_res);
+
     e4__builtin_RET(task, NULL);
 }
 

@@ -151,6 +151,7 @@ enum e4__builtin_id {
     e4__B_GTNUMBER,
     e4__B_LIT,
     e4__B_OVER,
+    e4__B_PRINTN,
     e4__B_PRINTSTACK,
     e4__B_QUIT,
     e4__B_REFILL,

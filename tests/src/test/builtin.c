@@ -34,7 +34,7 @@ static void e4t__test_builtin_forget(void)
     e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 17);
 }
 
-/* Covers CR */
+/* Covers CR . */
 static void e4t__test_builtin_io(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -44,6 +44,12 @@ static void e4t__test_builtin_io(void)
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "\n");
     e4t__ASSERT_OK(e4__evaluate(task, "cr cr", -1, 0));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "\n\n");
+
+    e4t__ASSERT_OK(e4__evaluate(task, "17 .", -1, 0));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "17 ");
+
+    e4t__ASSERT_OK(e4__evaluate(task, "-17 .", -1, 0));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-17 ");
 }
 
 /* Covers >NUMBER and BASE uservar */
