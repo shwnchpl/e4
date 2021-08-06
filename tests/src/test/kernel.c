@@ -110,11 +110,25 @@ static void e4t__test_kernel_evaluate(void)
 {
     struct e4__task *task = e4t__transient_task();
 
-    /* FIXME: Add more evaluate tests. */
+    /* FIXME: Add more explicit evaluate tests. */
 
-    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 4 5 4 rll .s clear", -1, 0),
+    /* Empty strings or strings with only delimiters should be
+       no-ops. */
+    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
+    e4t__ASSERT_EQ(e4__evaluate(task, "", -1, 0), e4__E_OK);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
+
+    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
+    e4t__ASSERT_EQ(e4__evaluate(task, " ", -1, 0), e4__E_OK);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
+
+    /* Undefined words should generate an exception and clear
+       the stack. */
+    e4__stack_clear(task);
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 4 5 rll", -1, 0),
             e4__E_UNDEFWORD);
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "");
+    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
 }
 
 static void e4t__test_kernel_io(void)
