@@ -27,7 +27,7 @@ void e4__execute_threaded(struct e4__task *task, void *user)
             e4__DEREF(task->rp--) = task->ip + 1;
             task->ip = e4__DEREF(task->ip) + 2;
         } else if (e4__DEREF2(task->ip) ==
-                (e4__cell)e4__BUILTIN_XT[e4__B_RET].code) {
+                (e4__cell)e4__BUILTIN_XT[e4__B_EXIT].code) {
             depth -= 1;
             task->ip = e4__DEREF(++task->rp);
         } else {

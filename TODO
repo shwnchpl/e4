@@ -74,7 +74,7 @@ Kernel
 - [DONE] Implement exceptions using setjmp/longjmp.
 - [DONE] Implement QUIT using exceptions etc.
 - [DONE] Figure out stack underflow checking for builtins etc.
-- Implement RET as a utility function and cleanup RET builtin
+- [DONE] Implement RET as a utility function and cleanup RET builtin
   definition.
 - Prevent builtins with the compiletime flag set from being executed at
   runtime. It may be easier to give words a compile time *and* runtime

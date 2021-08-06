@@ -27,6 +27,7 @@
     _e4__BUILTIN_PROC(DEPTH)    \
     _e4__BUILTIN_PROC(DROP) \
     _e4__BUILTIN_PROC(DUP)  \
+    _e4__BUILTIN_PROC_F(EXIT, e4__F_COMPONLY)   \
     _e4__BUILTIN_PROC(FORGET)   \
     _e4__BUILTIN_PROC_N(GTNUMBER, ">NUMBER")    \
     _e4__BUILTIN_PROC(LIT)  \
@@ -37,7 +38,6 @@
     _e4__BUILTIN_PROC_N(PRINTSTACK, ".S")   \
     _e4__BUILTIN_PROC(QUIT) \
     _e4__BUILTIN_PROC(REFILL)   \
-    _e4__BUILTIN_PROC_F(RET, e4__F_COMPONLY)    \
     _e4__BUILTIN_PROC(ROLL) \
     _e4__BUILTIN_PROC(ROT)  \
     _e4__BUILTIN_PROC(SKIP) \
@@ -153,7 +153,7 @@ static void e4__builtin_ABORT(struct e4__task *task, void *user)
     register int i;
     static const void *RETURN[] =
     {
-        &e4__BUILTIN_XT[e4__B_RET]
+        &e4__BUILTIN_XT[e4__B_EXIT]
     };
 
     for (i = 1; &task->rp[i] <= task->r0; ++i)
@@ -204,6 +204,13 @@ static void e4__builtin_DUP(struct e4__task *task, void *user)
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
     e4__stack_dup(task);
     e4__execute_ret(task);
+}
+
+static void e4__builtin_EXIT(struct e4__task *task, void *user)
+{
+    /* XXX: This function doesn't actually do anything. It's address
+       is simply understood by the threaded interpreter to indicate
+       that a return should occur. */
 }
 
  /* XXX: From the Programming-Tools Extensions word set. */
@@ -398,14 +405,6 @@ static void e4__builtin_REFILL(struct e4__task *task, void *user)
     }
 
     e4__stack_push(task, (e4__cell)e4__BF_TRUE);
-}
-
-/* XXX: System word. Not part of any word set. */
-static void e4__builtin_RET(struct e4__task *task, void *user)
-{
-    /* XXX: This function doesn't actually do anything. It's address
-       is simply understood by the threaded interpreter to indicate
-       that a return should occur. */
 }
 
 static void e4__builtin_ROLL(struct e4__task *task, void *user)
