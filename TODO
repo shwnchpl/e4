@@ -51,6 +51,9 @@ General Builtins
 - [DONE] Implement ..
 - [DONE] Add appropriate asserts to all existing builtins.
 - [DONE] Implement WORDS.
+- Add the ability to add flags to builtins defined with the macros in
+  core/builtin.c.
+- Add compile-time flags to appropriate builtins in core/builtin.c.
 - Implement HERE and ALLOT.
 - Implement @ and !.
 - Fix ABORT implementation.
@@ -71,6 +74,13 @@ Kernel
 - [DONE] Implement exceptions using setjmp/longjmp.
 - [DONE] Implement QUIT using exceptions etc.
 - [DONE] Figure out stack underflow checking for builtins etc.
+- Implement RET as a utility function and cleanup RET builtin
+  definition.
+- Prevent builtins with the compiletime flag set from being executed at
+  runtime. It may be easier to give words a compile time *and* runtime
+  flag. If they have the compile time flag, they run at compile time
+  and if they have the runtime flag they run at runtime. This will
+  allow for the implementation of so-called "smart words" like S" etc.
 - Cleanup evaluate_quit implementation by refactoring "mode" into flags
   and using that rather than the TIB hack.
 - Implement compiletime BRANCH0, BRANCH, etc.
