@@ -25,23 +25,23 @@
     _e4__BUILTIN_PROC(CLEAR)    \
     _e4__BUILTIN_PROC(CR)   \
     _e4__BUILTIN_PROC(DEPTH)    \
+    _e4__BUILTIN_PROC_N(DOT, ".")    \
+    _e4__BUILTIN_PROC_N(DOT_S, ".S")   \
     _e4__BUILTIN_PROC(DROP) \
     _e4__BUILTIN_PROC(DUP)  \
     _e4__BUILTIN_PROC_F(EXIT, e4__F_COMPONLY)   \
     _e4__BUILTIN_PROC(FORGET)   \
-    _e4__BUILTIN_PROC_N(GTNUMBER, ">NUMBER")    \
     _e4__BUILTIN_PROC_F(LIT, e4__F_COMPONLY)  \
     _e4__BUILTIN_PROC_N(MINUS, "-") \
     _e4__BUILTIN_PROC(OVER) \
     _e4__BUILTIN_PROC_N(PLUS, "+")  \
-    _e4__BUILTIN_PROC_N(PRINTN, ".")    \
-    _e4__BUILTIN_PROC_N(PRINTSTACK, ".S")   \
     _e4__BUILTIN_PROC(QUIT) \
     _e4__BUILTIN_PROC(REFILL)   \
     _e4__BUILTIN_PROC(ROLL) \
     _e4__BUILTIN_PROC(ROT)  \
     _e4__BUILTIN_PROC_F(SKIP, e4__F_COMPONLY) \
     _e4__BUILTIN_PROC(SWAP) \
+    _e4__BUILTIN_PROC_N(TO_NUMBER, ">NUMBER")   \
     _e4__BUILTIN_PROC(TUCK) \
     _e4__BUILTIN_PROC(WORD) \
     _e4__BUILTIN_PROC(WORDS)
@@ -192,6 +192,73 @@ static void e4__builtin_DEPTH(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_DOT(struct e4__task *task, void *user)
+{
+    /* FIXME: Once pictured numeric output has been implemented, use
+       that instead of this implementation. */
+    register e4__usize io_res;
+    register char *num;
+    register char *buf;
+    register e4__usize len;
+    register e4__usize n;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+
+    buf = (char *)task->here;
+    n = (e4__usize)e4__stack_pop(task);
+
+    num = e4__num_format(n, task->base, e4__F_SIGNED, buf, 130);
+    len = &buf[130] - num;
+    num[len++] = ' ';
+
+    if ((io_res = e4__io_type(task, num, len)))
+        e4__exception_throw(task, io_res);
+
+    e4__execute_ret(task);
+}
+
+ /* XXX: From the Programming-Tools word set. */
+static void e4__builtin_DOT_S(struct e4__task *task, void *user)
+{
+    register e4__cell s = task->s0;
+    register e4__usize n = e4__stack_depth(task);
+    register e4__usize io_res;
+    register char *num;
+    register char *buf = (char *)task->here;
+    register e4__usize len;
+
+    /* FIXME: Once pictured numeric output has been implemented, use
+       that instead of these hacks, which may not quite be safe. */
+
+    num = e4__num_format(n, task->base, e4__F_SIGNED, &buf[1], 130);
+    len = &buf[131] - num;
+    len += 3;
+    *--num = '<';
+    num[len - 2] = '>';
+    num[len - 1] = ' ';
+
+    if ((io_res = e4__io_type(task, num, len))) {
+        e4__exception_throw(task, io_res);
+        e4__execute_ret(task);
+        return;
+    }
+
+    while (task->sp < s) {
+        n = (e4__usize)e4__DEREF(s--);
+        num = e4__num_format(n, task->base, e4__F_SIGNED, buf, 130);
+        len = &buf[130] - num;
+        num[len++] = ' ';
+
+        if ((io_res = e4__io_type(task, num, len))) {
+            e4__exception_throw(task, io_res);
+            e4__execute_ret(task);
+            return;
+        }
+    }
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_DROP(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
@@ -236,40 +303,6 @@ static void e4__builtin_FORGET(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_GTNUMBER(struct e4__task *task, void *user)
-{
-    register e4__usize initial;
-    register const char *buf;
-    register e4__usize length;
-    register e4__usize consumed;
-    e4__usize result;
-
-    _e4__BUILTIN_EXPECT_DEPTH(task, 4);
-
-    length = (e4__usize)e4__stack_pop(task);
-    buf = (const char *)e4__stack_pop(task);
-
-    /* FIXME: Correctly handle double cell integers! */
-    e4__stack_pop(task);
-
-    initial = (e4__usize)e4__stack_pop(task);
-    initial *= (e4__usize)task->base;
-
-    result = 0;
-    consumed = e4__mem_number(buf, length, (e4__usize)task->base, 0, &result);
-    result += initial;
-
-    e4__stack_push(task, (e4__cell)result);
-
-    /* FIXME: Actually handle double cell integers. */
-    e4__stack_push(task, (e4__cell)0);
-
-    e4__stack_push(task, (e4__cell)(buf + consumed));
-    e4__stack_push(task, (e4__cell)(length - consumed));
-
-    e4__execute_ret(task);
-}
-
 static void e4__builtin_LIT(struct e4__task *task, void *user)
 {
     *task->sp-- = e4__DEREF2(++task->rp);
@@ -305,73 +338,6 @@ static void e4__builtin_PLUS(struct e4__task *task, void *user)
     r = (e4__usize)e4__stack_pop(task);
     l = (e4__usize)e4__stack_pop(task);
     e4__stack_push(task, (e4__cell)(l + r));
-
-    e4__execute_ret(task);
-}
-
-static void e4__builtin_PRINTN(struct e4__task *task, void *user)
-{
-    /* FIXME: Once pictured numeric output has been implemented, use
-       that instead of this implementation. */
-    register e4__usize io_res;
-    register char *num;
-    register char *buf;
-    register e4__usize len;
-    register e4__usize n;
-
-    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
-
-    buf = (char *)task->here;
-    n = (e4__usize)e4__stack_pop(task);
-
-    num = e4__num_format(n, task->base, e4__F_SIGNED, buf, 130);
-    len = &buf[130] - num;
-    num[len++] = ' ';
-
-    if ((io_res = e4__io_type(task, num, len)))
-        e4__exception_throw(task, io_res);
-
-    e4__execute_ret(task);
-}
-
- /* XXX: From the Programming-Tools word set. */
-static void e4__builtin_PRINTSTACK(struct e4__task *task, void *user)
-{
-    register e4__cell s = task->s0;
-    register e4__usize n = e4__stack_depth(task);
-    register e4__usize io_res;
-    register char *num;
-    register char *buf = (char *)task->here;
-    register e4__usize len;
-
-    /* FIXME: Once pictured numeric output has been implemented, use
-       that instead of these hacks, which may not quite be safe. */
-
-    num = e4__num_format(n, task->base, e4__F_SIGNED, &buf[1], 130);
-    len = &buf[131] - num;
-    len += 3;
-    *--num = '<';
-    num[len - 2] = '>';
-    num[len - 1] = ' ';
-
-    if ((io_res = e4__io_type(task, num, len))) {
-        e4__exception_throw(task, io_res);
-        e4__execute_ret(task);
-        return;
-    }
-
-    while (task->sp < s) {
-        n = (e4__usize)e4__DEREF(s--);
-        num = e4__num_format(n, task->base, e4__F_SIGNED, buf, 130);
-        len = &buf[130] - num;
-        num[len++] = ' ';
-
-        if ((io_res = e4__io_type(task, num, len))) {
-            e4__exception_throw(task, io_res);
-            e4__execute_ret(task);
-            return;
-        }
-    }
 
     e4__execute_ret(task);
 }
@@ -437,6 +403,40 @@ static void e4__builtin_SWAP(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
     e4__stack_swap(task);
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_TO_NUMBER(struct e4__task *task, void *user)
+{
+    register e4__usize initial;
+    register const char *buf;
+    register e4__usize length;
+    register e4__usize consumed;
+    e4__usize result;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 4);
+
+    length = (e4__usize)e4__stack_pop(task);
+    buf = (const char *)e4__stack_pop(task);
+
+    /* FIXME: Correctly handle double cell integers! */
+    e4__stack_pop(task);
+
+    initial = (e4__usize)e4__stack_pop(task);
+    initial *= (e4__usize)task->base;
+
+    result = 0;
+    consumed = e4__mem_number(buf, length, (e4__usize)task->base, 0, &result);
+    result += initial;
+
+    e4__stack_push(task, (e4__cell)result);
+
+    /* FIXME: Actually handle double cell integers. */
+    e4__stack_push(task, (e4__cell)0);
+
+    e4__stack_push(task, (e4__cell)(buf + consumed));
+    e4__stack_push(task, (e4__cell)(length - consumed));
+
     e4__execute_ret(task);
 }
 
