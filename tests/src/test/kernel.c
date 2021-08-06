@@ -339,6 +339,14 @@ static e4__usize e4t__test_kernel_quit_accept(void *user, char *buf, e4__usize *
             e4t__ASSERT_MATCH(e4t__term_obuf_consume(),
                     "<5> 17 1 2 3 4  EXCEPTION: -13\n");
             e4t__ASSERT_EQ(e4__stack_depth(test_data->task), 0);
+            _m(": foo");
+            break;
+        case 4:
+            e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "");
+            _m(";");
+            break;
+        case 5:
+            e4t__ASSERT_MATCH(e4t__term_obuf_consume(), " ok\n");
             _m("bye");
             break;
         default:

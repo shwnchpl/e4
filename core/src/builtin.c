@@ -23,6 +23,7 @@
     _e4__BUILTIN_PROC_FIRST(ABORT)  \
     _e4__BUILTIN_PROC(BYE)  \
     _e4__BUILTIN_PROC(CLEAR)    \
+    _e4__BUILTIN_PROC_N(COLON, ":") \
     _e4__BUILTIN_PROC(CR)   \
     _e4__BUILTIN_PROC(DEPTH)    \
     _e4__BUILTIN_PROC_N(DOT, ".")    \
@@ -39,6 +40,7 @@
     _e4__BUILTIN_PROC(REFILL)   \
     _e4__BUILTIN_PROC(ROLL) \
     _e4__BUILTIN_PROC(ROT)  \
+    _e4__BUILTIN_PROC_NF(SEMICOLON, ";", e4__F_IMMEDIATE | e4__F_COMPONLY)  \
     _e4__BUILTIN_PROC_F(SKIP, e4__F_COMPONLY) \
     _e4__BUILTIN_PROC(SWAP) \
     _e4__BUILTIN_PROC_N(TO_NUMBER, ">NUMBER")   \
@@ -172,6 +174,27 @@ static void e4__builtin_BYE(struct e4__task *task, void *user)
 static void e4__builtin_CLEAR(struct e4__task *task, void *user)
 {
     e4__stack_clear(task);
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_COLON(struct e4__task *task, void *user)
+{
+    register const char *word;
+    register e4__u8 len;
+
+    e4__builtin_exec(task, e4__B_WORD, (e4__usize)' ');
+
+    word = (const char *)e4__stack_pop(task);
+
+    if (!(len = (e4__u8)*word++)) {
+        e4__exception_throw(task, e4__E_ZLNAME);
+        e4__execute_ret(task);
+        return;
+    }
+
+    e4__dict_entry(task, word, len, 0, e4__execute_threaded, NULL);
+    task->compiling = 1;
+
     e4__execute_ret(task);
 }
 
@@ -392,6 +415,13 @@ static void e4__builtin_ROT(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 3);
     e4__stack_rot(task);
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_SEMICOLON(struct e4__task *task, void *user)
+{
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_EXIT]);
+    task->compiling = 0;
     e4__execute_ret(task);
 }
 

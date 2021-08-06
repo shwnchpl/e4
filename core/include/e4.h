@@ -149,6 +149,7 @@ enum e4__builtin_id {
     e4__B_ABORT = 0,
     e4__B_BYE,
     e4__B_CLEAR,
+    e4__B_COLON,
     e4__B_CR,
     e4__B_DEPTH,
     e4__B_DOT,
@@ -165,6 +166,7 @@ enum e4__builtin_id {
     e4__B_REFILL,
     e4__B_ROLL,
     e4__B_ROT,
+    e4__B_SEMICOLON,
     e4__B_SKIP,
     e4__B_SWAP,
     e4__B_TO_NUMBER,
@@ -210,6 +212,10 @@ extern const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT];
 extern const struct e4__execute_token e4__BUILTIN_XT[e4__BUILTIN_COUNT];
 void e4__builtin_exec_(e4__u8 count, /* struct e4__task *task, */
         /* enum e4__builtin_id id, */ ...);
+
+/* compile.c functions */
+void e4__compile_cell(struct e4__task *task, e4__cell cell);
+void e4__compile_literal(struct e4__task *task, e4__cell num);
 
 /* dict.c functions */
 void e4__dict_entry(struct e4__task *task, const char *name, e4__u8 nbytes,
@@ -273,6 +279,7 @@ char* e4__num_format(e4__usize n, e4__u8 base, e4__u8 flags, char *buf,
 e4__usize e4__num_sdiv(e4__usize n, e4__usize d);
 
 /* task.c functions */
+e4__bool e4__task_compiling(struct e4__task *task);
 struct e4__task* e4__task_create(void *buffer, e4__usize size);
 void e4__task_io_init(struct e4__task *task, struct e4__io_func *io);
 void e4__task_io_get(struct e4__task *task, struct e4__io_func *io);

@@ -3,6 +3,11 @@
 
 #include <string.h>
 
+e4__bool e4__task_compiling(struct e4__task *task)
+{
+    return task->compiling;
+}
+
 struct e4__task* e4__task_create(void *buffer, e4__usize size)
 {
     register struct e4__task *task;

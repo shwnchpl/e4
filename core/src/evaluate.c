@@ -13,7 +13,29 @@ static void e4__evaluate_wrapper(struct e4__task *task, void *user);
 static void e4__evaluate_compile(struct e4__task *task, const char *word,
         e4__u8 len)
 {
-    /* FIXME: Add compilation semantics. */
+    register struct e4__dict_header *header;
+    register e4__usize pcount;
+    e4__usize num;
+
+    header = e4__mem_dict_lookup(task->dict, word, len);
+
+    if (header) {
+        if (header->flags & e4__F_IMMEDIATE)
+            e4__execute(task, header->xt);
+        else
+            e4__compile_cell(task, (e4__cell)header->xt);
+        return;
+    }
+
+    /* Attempt to convert to a number and compile. */
+    pcount = e4__mem_number(word, len, task->base,
+        e4__F_CHAR_LITERAL | e4__F_NEG_PREFIX | e4__F_BASE_PREFIX, &num);
+    if (pcount == (e4__usize)len) {
+        e4__compile_literal(task, (e4__cell)num);
+        return;
+    }
+
+    e4__exception_throw(task, e4__E_UNDEFWORD);
 }
 
 static void e4__evaluate_interpret(struct e4__task *task, const char *word,
@@ -146,7 +168,8 @@ void e4__evaluate_quit(struct e4__task *task)
         switch (res) {
             case e4__E_OK:
                 /* FIXME: Use CR here instead for newline? */
-                e4__io_type(task, " ok\n", 4);
+                if (!task->compiling)
+                    e4__io_type(task, " ok\n", 4);
                 /* fall through */
             case e4__E_QUIT:
                 break;

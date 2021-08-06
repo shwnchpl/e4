@@ -81,7 +81,6 @@ Kernel
   interpreted.
 - [DONE] Cleanup evaluate and evaluate_quit implementation, removing
   unnecessary parameters.
-- Implement compiletime BRANCH0, BRANCH, etc.
 - Implement different code handlers _constant, _variable, _thunk, and
   _uservar.
 - Always use size or sz as name to indicate size in API parameters.
@@ -96,7 +95,7 @@ Compilation
 - [DONE] Add true dict API that allows creating a new dict entry by
   acting on the task struct and updating HERE and other fields
   appropriately.
-- Implement simple : compilation.
+- [DONE] Implement simple : compilation.
 - Implement VARIABLE and CONSTANT.
 - Implement DOES>.
 
@@ -131,8 +130,10 @@ Version 0.2
 
 Compilation
 -----------
+- Implement compiletime BRANCH0, BRANCH, AHEAD, etc.
 - Add conditional structure words like IF, THEN, BEGIN, WHILE, LOOP,
   DO, etc.
+- Add compile time semantics to LITERAL.
 - Figure out how to implement RECURSE.
 
 Kernel
