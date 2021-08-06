@@ -123,6 +123,9 @@ struct e4__io_func {
 #define e4__F_NEG_PREFIX    (0x01)
 #define e4__F_BASE_PREFIX   (0x02)
 #define e4__F_CHAR_LITERAL  (0x04)
+
+#define e4__F_IMMEDIATE     (0x01)
+#define e4__F_COMPONLY      (0x02)
 #define e4__F_BUILTIN       (0x08)
 
 #define e4__F_SIGNED        (0x01)

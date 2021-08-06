@@ -51,8 +51,8 @@ General Builtins
 - [DONE] Implement ..
 - [DONE] Add appropriate asserts to all existing builtins.
 - [DONE] Implement WORDS.
-- Add the ability to add flags to builtins defined with the macros in
-  core/builtin.c.
+- [DONE] Add the ability to add flags to builtins defined with the
+  macros in core/builtin.c.
 - Add compile-time flags to appropriate builtins in core/builtin.c.
 - Implement HERE and ALLOT.
 - Implement @ and !.

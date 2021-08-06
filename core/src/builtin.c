@@ -29,13 +29,13 @@
     _e4__BUILTIN_PROC(DROP) \
     _e4__BUILTIN_PROC(DUP)  \
     _e4__BUILTIN_PROC(FORGET)   \
-    _e4__BUILTIN_PROC_NAMED(GTNUMBER, ">NUMBER")    \
+    _e4__BUILTIN_PROC_N(GTNUMBER, ">NUMBER")    \
     _e4__BUILTIN_PROC(LIT)  \
-    _e4__BUILTIN_PROC_NAMED(MINUS, "-") \
+    _e4__BUILTIN_PROC_N(MINUS, "-") \
     _e4__BUILTIN_PROC(OVER) \
-    _e4__BUILTIN_PROC_NAMED(PLUS, "+")  \
-    _e4__BUILTIN_PROC_NAMED(PRINTN, ".")    \
-    _e4__BUILTIN_PROC_NAMED(PRINTSTACK, ".S")   \
+    _e4__BUILTIN_PROC_N(PLUS, "+")  \
+    _e4__BUILTIN_PROC_N(PRINTN, ".")    \
+    _e4__BUILTIN_PROC_N(PRINTSTACK, ".S")   \
     _e4__BUILTIN_PROC(QUIT) \
     _e4__BUILTIN_PROC(REFILL)   \
     _e4__BUILTIN_PROC(ROT)  \
@@ -46,48 +46,54 @@
     _e4__BUILTIN_PROC(WORD) \
     _e4__BUILTIN_PROC(WORDS)
 
-#define _e4__BUILTIN_PROC(s)    \
-    _e4__BUILTIN_PROC_NAMED(s, #s)
+#define _e4__BUILTIN_PROC(w)    \
+    _e4__BUILTIN_PROC_NF(w, #w, 0)
+
+#define _e4__BUILTIN_PROC_N(w, n)   \
+    _e4__BUILTIN_PROC_NF(w, n, 0)
+
+#define _e4__BUILTIN_PROC_F(w, f)   \
+    _e4__BUILTIN_PROC_NF(w, #w, f)
 
 /* Declare builtin functions. */
 #define _e4__BUILTIN_PROC_FIRST(w)  \
     void e4__builtin_##w(struct e4__task *task, void *user);
-#define _e4__BUILTIN_PROC_NAMED(w, n)   \
+#define _e4__BUILTIN_PROC_NF(w, n, f)   \
     static void e4__builtin_##w(struct e4__task *task, void *user);
 
 _e4__BUILTIN_DECL();
 
-#undef _e4__BUILTIN_PROC_NAMED
+#undef _e4__BUILTIN_PROC_NF
 #undef _e4__BUILTIN_PROC_FIRST
 
 /* Define builtin header table. */
-#define _e4__BUILTIN_PROC_HEADER(w, link, n)    \
+#define _e4__BUILTIN_PROC_HEADER(w, link, n, f) \
     {   \
         link,   \
         (struct e4__execute_token *)&e4__BUILTIN_XT[e4__B_##w],     \
-        e4__F_BUILTIN,  \
+        e4__F_BUILTIN | (f),    \
         sizeof(n) - 1, \
         n, \
     },
 #define _e4__BUILTIN_PROC_FIRST(w)  \
-    _e4__BUILTIN_PROC_HEADER(w, NULL, #w)
-#define _e4__BUILTIN_PROC_NAMED(w, n)   \
+    _e4__BUILTIN_PROC_HEADER(w, NULL, #w, 0)
+#define _e4__BUILTIN_PROC_NF(w, n, f)   \
     _e4__BUILTIN_PROC_HEADER(w, \
             (struct e4__dict_header *)&e4__BUILTIN_HEADER[e4__B_##w - 1],   \
-            n)
+            n, f)
 
 const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT] =
 {
     _e4__BUILTIN_DECL()
 };
 
-#undef _e4__BUILTIN_PROC_NAMED
+#undef _e4__BUILTIN_PROC_NF
 #undef _e4__BUILTIN_PROC_FIRST
 #undef _e4__BUILTIN_PROC_HEADER
 
 /* Define builtin execution token table. */
 #define _e4__BUILTIN_PROC_FIRST(w)  _e4__BUILTIN_PROC(w)
-#define _e4__BUILTIN_PROC_NAMED(w, n)   \
+#define _e4__BUILTIN_PROC_NF(w, n, f)   \
     {e4__builtin_##w, NULL},
 
 const struct e4__execute_token e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
@@ -95,8 +101,10 @@ const struct e4__execute_token e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
     _e4__BUILTIN_DECL()
 };
 
-#undef _e4__BUILTIN_PROC_NAMED
+#undef _e4__BUILTIN_PROC_NF
 #undef _e4__BUILTIN_PROC_FIRST
+#undef _e4__BUILTIN_PROC_F
+#undef _e4__BUILTIN_PROC_N
 #undef _e4__BUILTIN_PROC
 #undef _e4__BUILTIN_DECL
 
