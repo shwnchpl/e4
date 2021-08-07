@@ -173,6 +173,7 @@ enum e4__builtin_id {
     e4__B_PAD,
     e4__B_PLUS,
     e4__B_QUIT,
+    e4__B_QUESTION,
     e4__B_REFILL,
     e4__B_ROLL,
     e4__B_ROT,

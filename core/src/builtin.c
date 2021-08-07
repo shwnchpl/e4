@@ -45,6 +45,7 @@
     _e4__BUILTIN_USERVAR(PAD)   \
     _e4__BUILTIN_PROC_N(PLUS, "+")  \
     _e4__BUILTIN_PROC(QUIT) \
+    _e4__BUILTIN_PROC_N(QUESTION, "?")  \
     _e4__BUILTIN_PROC(REFILL)   \
     _e4__BUILTIN_PROC(ROLL) \
     _e4__BUILTIN_PROC(ROT)  \
@@ -197,6 +198,7 @@ static void e4__builtin_ALLOT(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+ /* XXX: From the Programming-Tools Extensions word set. */
 static void e4__builtin_BYE(struct e4__task *task, void *user)
 {
     e4__exception_throw(task, e4__E_BYE);
@@ -419,6 +421,14 @@ static void e4__builtin_PLUS(struct e4__task *task, void *user)
 static void e4__builtin_QUIT(struct e4__task *task, void *user)
 {
     e4__evaluate_quit(task);
+    e4__execute_ret(task);
+}
+
+/* XXX: From the Programming-Tools word set. */
+static void e4__builtin_QUESTION(struct e4__task *task, void *user)
+{
+    e4__builtin_exec(task, e4__B_FETCH);
+    e4__builtin_exec(task, e4__B_DOT);
     e4__execute_ret(task);
 }
 

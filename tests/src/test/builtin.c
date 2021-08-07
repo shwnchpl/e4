@@ -51,22 +51,39 @@ static void e4t__test_builtin_forget(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 17);
 }
 
-/* Covers CR . */
+/* Covers . ? CR BASE PAD */
 static void e4t__test_builtin_io(void)
 {
     struct e4__task *task = e4t__transient_task();
 
     e4t__term_obuf_consume();
+
+    /* Test that basic with . works . */
+    e4t__ASSERT_OK(e4__evaluate(task, "17 .", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "17 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "-17 .", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-17 ");
+
+    /* Test that . respects base. */
+    e4t__ASSERT_OK(e4__evaluate(task, "17 10 17 0x10 base ! . base ! .", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "11 17 ");
+
+    /* Test basic output with ?. */
+    e4t__ASSERT_OK(e4__evaluate(task, "123 pad ! pad ?", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "123 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "456 pad ! pad ?", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "456 ");
+
+    /* Test that ? respects base. */
+    e4t__ASSERT_OK(e4__evaluate(task,
+                "10 17 pad ! 0x10 base ! pad ? base ! pad ?", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "11 17 ");
+
+    /* Test that CR works correctly. */
     e4t__ASSERT_OK(e4__evaluate(task, "cr", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "\n");
     e4t__ASSERT_OK(e4__evaluate(task, "cr cr", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "\n\n");
-
-    e4t__ASSERT_OK(e4__evaluate(task, "17 .", -1));
-    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "17 ");
-
-    e4t__ASSERT_OK(e4__evaluate(task, "-17 .", -1));
-    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-17 ");
 }
 
 /* Covers + - . */
