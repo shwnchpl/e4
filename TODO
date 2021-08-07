@@ -57,11 +57,10 @@ General Builtins
   core/builtin.c.
 - [DONE] Implement @ and !.
 - [DONE] Implement HERE, CELLS, and ALLOT.
-- Add mechanism for builtin constants (such as BL, etc.).
-- Add mechanism for uservar definitions and refactor existing code
-  that *should* point to uservars (for instance, HERE).
-- Refactor HERE to be a uservar.
-- Add BASE and PAD builtins.
+- [DONE] Add mechanism for builtin constants (such as BL, etc.).
+- [DONE] Add mechanism for uservar definitions.
+- [DONE] Refactor HERE to be a uservar.
+- [DONE] Add BASE and PAD builtins.
 - Add CREATE, VARIABLE, CONSTANT, and , builtins.
 - Add VALUE and TO builtins. VALUE and CONSTANT should differ in that
   CONSTANT should have some flag preventing update with TO.
@@ -106,7 +105,6 @@ Compilation
 - [DONE] Check for stack balance at end of compilation. If stack is not
   in the same position as it was at the start of compilation, throw the
   appropriate exception and reject the definition.
-- Implement VARIABLE and CONSTANT.
 - Implement DOES>.
 
 Testing
@@ -178,7 +176,7 @@ Kernel
 - Add more two's complement utility macros as needed and use them where
   appropriate.
 - Implement signed modulo and other single width math operators.
-- Implement user table access code handlers.
+- Handle dictionary overflows and other overflows.
 
 General IO
 ----------
@@ -195,8 +193,6 @@ General Builtins
   string should be compiled directly into the definition *with* end
   padding to align.
 - Implement EVALUATE (builtin)
-- Implement signed and unsigned single width arithmetic builtins.
-- Implement user table builtins.
 - Consider implementing the Programming-Tools word set.
 - Determine whether CR should actually output \r\n. If it should,
   ensure that \r\n is used instead of \n in all places where \n is

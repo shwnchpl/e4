@@ -1,6 +1,24 @@
 #include "e4.h"
 #include "../e4t.h" /* FIXME: Add this to an include path? */
 
+/* Covers BL FALSE TRUE */
+static void e4t__test_builtin_constants(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    e4t__ASSERT_OK(e4__evaluate(task, "bl", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), ' ');
+
+    e4t__ASSERT_OK(e4__evaluate(task, "true", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "false", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+}
+
 /* Covers FORGET and look-ahead idiom (which uses builtin WORD) */
 static void e4t__test_builtin_forget(void)
 {
@@ -310,8 +328,27 @@ static void e4t__test_builtin_stackmanip(void)
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 2 3 ");
 }
 
+/* Covers BASE HERE PAD */
+static void e4t__test_builtin_uservars(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    e4t__ASSERT_OK(e4__evaluate(task, "base", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__task_uservar(task, e4__UV_BASE));
+
+    e4t__ASSERT_OK(e4__evaluate(task, "here", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__task_uservar(task, e4__UV_HERE));
+
+    e4t__ASSERT_OK(e4__evaluate(task, "pad", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__task_uservar(task, e4__UV_PAD));
+}
+
 void e4t__test_builtin(void)
 {
+    e4t__test_builtin_constants();
     e4t__test_builtin_forget();
     e4t__test_builtin_io();
     e4t__test_builtin_math();
@@ -319,4 +356,5 @@ void e4t__test_builtin(void)
     e4t__test_builtin_parsenum();
     e4t__test_builtin_parseword();
     e4t__test_builtin_stackmanip();
+    e4t__test_builtin_uservars();
 }

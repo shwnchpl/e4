@@ -21,7 +21,9 @@
 /* FIXME: Let this support "compile time" flags, etc. */
 #define _e4__BUILTIN_DECL() \
     _e4__BUILTIN_PROC_FIRST(ABORT)  \
-    _e4__BUILTIN_PROC_FIRST(ALLOT)  \
+    _e4__BUILTIN_PROC(ALLOT)    \
+    _e4__BUILTIN_USERVAR(BASE) \
+    _e4__BUILTIN_CONSTANT(BL, ' ')  \
     _e4__BUILTIN_PROC(BYE)  \
     _e4__BUILTIN_PROC(CELLS)    \
     _e4__BUILTIN_PROC(CLEAR)    \
@@ -33,12 +35,14 @@
     _e4__BUILTIN_PROC(DROP) \
     _e4__BUILTIN_PROC(DUP)  \
     _e4__BUILTIN_PROC_F(EXIT, e4__F_COMPONLY)   \
+    _e4__BUILTIN_CONSTANT(FALSE, e4__BF_FALSE)  \
     _e4__BUILTIN_PROC_N(FETCH, "@") \
     _e4__BUILTIN_PROC(FORGET)   \
-    _e4__BUILTIN_PROC(HERE) \
+    _e4__BUILTIN_USERVAR(HERE)  \
     _e4__BUILTIN_PROC_F(LITERAL, e4__F_COMPONLY)    \
     _e4__BUILTIN_PROC_N(MINUS, "-") \
     _e4__BUILTIN_PROC(OVER) \
+    _e4__BUILTIN_USERVAR(PAD)   \
     _e4__BUILTIN_PROC_N(PLUS, "+")  \
     _e4__BUILTIN_PROC(QUIT) \
     _e4__BUILTIN_PROC(REFILL)   \
@@ -49,6 +53,7 @@
     _e4__BUILTIN_PROC_N(STORE, "!") \
     _e4__BUILTIN_PROC(SWAP) \
     _e4__BUILTIN_PROC_N(TO_NUMBER, ">NUMBER")   \
+    _e4__BUILTIN_CONSTANT(TRUE, e4__BF_TRUE)    \
     _e4__BUILTIN_PROC(TUCK) \
     _e4__BUILTIN_PROC(WORD) \
     _e4__BUILTIN_PROC(WORDS)
@@ -67,8 +72,13 @@
 #define _e4__BUILTIN_PROC_NF(w, n, f)   \
     static void e4__builtin_##w(struct e4__task *task, void *user);
 
+#define _e4__BUILTIN_CONSTANT(w, c)
+#define _e4__BUILTIN_USERVAR(w)
+
 _e4__BUILTIN_DECL();
 
+#undef _e4__BUILTIN_USERVAR
+#undef _e4__BUILTIN_CONSTANT
 #undef _e4__BUILTIN_PROC_NF
 #undef _e4__BUILTIN_PROC_FIRST
 
@@ -87,12 +97,18 @@ _e4__BUILTIN_DECL();
     _e4__BUILTIN_PROC_HEADER(w, \
             (struct e4__dict_header *)&e4__BUILTIN_HEADER[e4__B_##w - 1],   \
             n, f)
+#define _e4__BUILTIN_CONSTANT(w, c) \
+    _e4__BUILTIN_PROC_F(w, e4__F_CONSTANT)
+#define _e4__BUILTIN_USERVAR(w) \
+    _e4__BUILTIN_PROC(w)
 
 const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT] =
 {
     _e4__BUILTIN_DECL()
 };
 
+#undef _e4__BUILTIN_USERVAR
+#undef _e4__BUILTIN_CONSTANT
 #undef _e4__BUILTIN_PROC_NF
 #undef _e4__BUILTIN_PROC_FIRST
 #undef _e4__BUILTIN_PROC_HEADER
@@ -101,13 +117,18 @@ const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT] =
 #define _e4__BUILTIN_PROC_FIRST(w)  _e4__BUILTIN_PROC(w)
 #define _e4__BUILTIN_PROC_NF(w, n, f)   \
     {e4__builtin_##w, NULL},
+#define _e4__BUILTIN_CONSTANT(w, c) \
+    {e4__execute_constant, NULL, { (e4__cell)((e4__usize)(c)), }},
+#define _e4__BUILTIN_USERVAR(w) \
+    {e4__execute_uservar, NULL, {(e4__cell)((e4__usize)(e4__UV_##w))}},
 
 const struct e4__execute_token e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
 {
     _e4__BUILTIN_DECL()
 };
 
-#undef _e4__BUILTIN_PROC_NF
+#undef _e4__BUILTIN_USERVAR
+#undef _e4__BUILTIN_CONSTANT
 #undef _e4__BUILTIN_PROC_FIRST
 #undef _e4__BUILTIN_PROC_F
 #undef _e4__BUILTIN_PROC_N
@@ -352,13 +373,6 @@ static void e4__builtin_FORGET(struct e4__task *task, void *user)
     if ((res = e4__dict_forget(task, word, len)))
         e4__exception_throw(task, res);
 
-    e4__execute_ret(task);
-}
-
-/* FIXME: Implement this as a user variable. */
-static void e4__builtin_HERE(struct e4__task *task, void *user)
-{
-    e4__stack_push(task, task->here);
     e4__execute_ret(task);
 }
 

@@ -122,6 +122,7 @@ struct e4__io_func {
 /* flag constants - dictionary entry */
 #define e4__F_IMMEDIATE     (0x01)
 #define e4__F_COMPONLY      (0x02)
+#define e4__F_CONSTANT      (0x04)
 #define e4__F_BUILTIN       (0x08)
 
 /* flag constants - numeric parsing */
@@ -149,6 +150,8 @@ struct e4__io_func {
 enum e4__builtin_id {
     e4__B_ABORT = 0,
     e4__B_ALLOT,
+    e4__B_BASE,
+    e4__B_BL,
     e4__B_BYE,
     e4__B_CELLS,
     e4__B_CLEAR,
@@ -160,12 +163,14 @@ enum e4__builtin_id {
     e4__B_DROP,
     e4__B_DUP,
     e4__B_EXIT,
+    e4__B_FALSE,
     e4__B_FETCH,
     e4__B_FORGET,
     e4__B_HERE,
     e4__B_LITERAL,
     e4__B_MINUS,
     e4__B_OVER,
+    e4__B_PAD,
     e4__B_PLUS,
     e4__B_QUIT,
     e4__B_REFILL,
@@ -176,6 +181,7 @@ enum e4__builtin_id {
     e4__B_STORE,
     e4__B_SWAP,
     e4__B_TO_NUMBER,
+    e4__B_TRUE,
     e4__B_TUCK,
     e4__B_WORD,
     e4__B_WORDS,
