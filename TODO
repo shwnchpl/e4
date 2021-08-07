@@ -57,11 +57,16 @@ General Builtins
   core/builtin.c.
 - [DONE] Implement @ and !.
 - [DONE] Implement HERE, CELLS, and ALLOT.
-- Implement simple IO builtins U. and EMIT.
-- Fix ABORT implementation.
 - Add mechanism for builtin constants (such as BL, etc.).
 - Add mechanism for uservar definitions and refactor existing code
   that *should* point to uservars (for instance, HERE).
+- Refactor HERE to be a uservar.
+- Add BASE and PAD builtins.
+- Add CREATE, VARIABLE, CONSTANT, and , builtins.
+- Add VALUE and TO builtins. VALUE and CONSTANT should differ in that
+  CONSTANT should have some flag preventing update with TO.
+- Implement simple IO builtins U. and EMIT.
+- Fix ABORT implementation.
 
 Kernel
 ------
@@ -83,8 +88,8 @@ Kernel
   interpreted.
 - [DONE] Cleanup evaluate and evaluate_quit implementation, removing
   unnecessary parameters.
-- Implement different code handlers _constant, _variable, _thunk, and
-  _uservar.
+- [DONE] Implement _constant, _variable, and _uservar code handlers.
+- Implement _thunk code handler (for DOES>).
 - Always use size or sz as name to indicate size in API parameters.
 
 General IO

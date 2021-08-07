@@ -1,6 +1,7 @@
 #include "e4.h"
 #include "e4-task.h"
 
+/* FIXME: Rename user to something more reasonable here. */
 void e4__execute(struct e4__task *task, void *user)
 {
     void **code = user;
@@ -8,6 +9,12 @@ void e4__execute(struct e4__task *task, void *user)
 
     e4__DEREF(task->rp--) = task->ip + 1;
     entry(task, code + 1);
+}
+
+void e4__execute_constant(struct e4__task *task, void *user)
+{
+    e4__stack_push(task, e4__DEREF((e4__cell)user + 1));
+    e4__execute_ret(task);
 }
 
 void e4__execute_ret(struct e4__task *task)
@@ -34,4 +41,17 @@ void e4__execute_threaded(struct e4__task *task, void *user)
             e4__execute(task, e4__DEREF(task->ip));
         }
     }
+}
+
+void e4__execute_uservar(struct e4__task *task, void *user)
+{
+    register const e4__cell uv_offset = e4__DEREF((e4__cell)user + 1);
+    e4__stack_push(task, e4__task_uservar(task, (e4__usize)uv_offset));
+    e4__execute_ret(task);
+}
+
+void e4__execute_variable(struct e4__task *task, void *user)
+{
+    e4__stack_push(task, (e4__cell)user + 1);
+    e4__execute_ret(task);
 }

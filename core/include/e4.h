@@ -258,8 +258,11 @@ void e4__exception_throw(struct e4__task *task, e4__usize e);
 
 /* execute.c functions */
 void e4__execute(struct e4__task *task, void *user);
+void e4__execute_constant(struct e4__task *task, void *user);
 void e4__execute_ret(struct e4__task *task);
 void e4__execute_threaded(struct e4__task *task, void *user);
+void e4__execute_uservar(struct e4__task *task, void *user);
+void e4__execute_variable(struct e4__task *task, void *user);
 
 /* io.c functions */
 e4__usize e4__io_accept(struct e4__task *task, char *buf, e4__usize *n);
