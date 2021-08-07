@@ -25,17 +25,18 @@ TESTS_SRCS := $(shell find $(TESTS_SRC_DIRS) -name *.c)
 TESTS_OBJS := $(TESTS_SRCS:%=$(BUILD_DIR)/%.o)
 TESTS_DEPS := $(TESTS_OBJS:.o=.d)
 
-# TODO: Add amal.rb based amalgamated source file core target.
-# TODO: Add an additional repl target to build the repl based
-# on the amalgamated core target.
-
 CFLAGS := -Wall -std=c89 -Os -MMD -MP
 REPL_LDFLAGS := -ledit
 TESTS_LDFLAGS := -L$(BUILD_DIR) -le4
 
-# Default "all" target.
+# If a target fails, delete it.
+.DELETE_ON_ERROR:
+
 .PHONY: all amalgamation clean repl tests run-repl run-tests
+
+# Default "all" target.
 all: $(TARGET_LIB) amalgamation repl tests
+
 amalgamation: $(TARGET_AMALGAM)
 clean:
 	rm -rf $(BUILD_DIR)
