@@ -29,6 +29,7 @@
     _e4__BUILTIN_PROC(CLEAR)    \
     _e4__BUILTIN_PROC_N(COLON, ":") \
     _e4__BUILTIN_PROC(CR)   \
+    _e4__BUILTIN_PROC(CREATE)   \
     _e4__BUILTIN_PROC(DEPTH)    \
     _e4__BUILTIN_PROC_N(DOT, ".")    \
     _e4__BUILTIN_PROC_N(DOT_S, ".S")   \
@@ -251,6 +252,25 @@ static void e4__builtin_CR(struct e4__task *task, void *user)
     if ((io_res = e4__io_type(task, "\n", 1)))
         e4__exception_throw(task, io_res);
 
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_CREATE(struct e4__task *task, void *user)
+{
+    register const char *word;
+    register e4__u8 len;
+
+    e4__builtin_exec(task, e4__B_WORD, (e4__usize)' ');
+
+    word = (const char *)e4__stack_pop(task);
+
+    if (!(len = (e4__u8)*word++)) {
+        e4__exception_throw(task, e4__E_ZLNAME);
+        e4__execute_ret(task);
+        return;
+    }
+
+    e4__dict_entry(task, word, len, 0, e4__execute_variable, NULL);
     e4__execute_ret(task);
 }
 

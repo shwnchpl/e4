@@ -19,6 +19,23 @@ static void e4t__test_builtin_constants(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
 }
 
+/* Covers CREATE ? */
+static void e4t__test_builtin_data(void)
+{
+    struct e4__task *task = e4t__transient_task();
+    struct e4__dict_header *header;
+
+    e4t__term_obuf_consume();
+
+    e4t__ASSERT_OK(e4__evaluate(task, "CREATE foo 1 cells allot 531 foo !", -1));
+    e4t__ASSERT((header = e4__dict_lookup(task, "foo", 3)));
+    e4t__ASSERT_EQ(header->xt->data[0], 531);
+
+    header->xt->data[0] = (e4__cell)7393;
+    e4t__ASSERT_OK(e4__evaluate(task, "foo ?", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "7393 ");
+}
+
 /* Covers FORGET and look-ahead idiom (which uses builtin WORD) */
 static void e4t__test_builtin_forget(void)
 {
@@ -366,6 +383,7 @@ static void e4t__test_builtin_uservars(void)
 void e4t__test_builtin(void)
 {
     e4t__test_builtin_constants();
+    e4t__test_builtin_data();
     e4t__test_builtin_forget();
     e4t__test_builtin_io();
     e4t__test_builtin_math();

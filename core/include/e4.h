@@ -157,6 +157,7 @@ enum e4__builtin_id {
     e4__B_CLEAR,
     e4__B_COLON,
     e4__B_CR,
+    e4__B_CREATE,
     e4__B_DEPTH,
     e4__B_DOT,
     e4__B_DOT_S,
