@@ -71,7 +71,7 @@ e4__usize e4__mem_number(const char *buf, e4__usize length, e4__u8 base,
         e4__u8 flags, e4__usize *out)
 {
     register e4__bool number;
-    register e4__bool negate;
+    register e4__bool negate = 0;
     register e4__usize result = 0;
     register const char *start = buf;
 
@@ -80,13 +80,13 @@ e4__usize e4__mem_number(const char *buf, e4__usize length, e4__u8 base,
     if (base < 2) base = 2;
     if (base > 36) base = 36;
 
-    if (flags & e4__F_CHAR_LITERAL && length > 2 && buf[0] == '\'' &&
+    if ((flags & e4__F_CHAR_LITERAL) && length > 2 && buf[0] == '\'' &&
             buf[2] == '\'') {
         *out = buf[1];
         return 3;
     }
 
-    if (flags & e4__F_NEG_PREFIX && *buf == '-') {
+    if ((flags & e4__F_NEG_PREFIX) && *buf == '-') {
         negate = 1;
         ++buf;
     }
