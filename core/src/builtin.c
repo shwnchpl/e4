@@ -39,6 +39,8 @@
     _e4__BUILTIN_PROC(CELLS)    \
     _e4__BUILTIN_PROC(CLEAR)    \
     _e4__BUILTIN_PROC_N(COLON, ":") \
+    _e4__BUILTIN_PROC_N(COMMA, ",") \
+    _e4__BUILTIN_PROC(CONSTANT) \
     _e4__BUILTIN_PROC(CR)   \
     _e4__BUILTIN_PROC(CREATE)   \
     _e4__BUILTIN_PROC(DEPTH)    \
@@ -68,6 +70,7 @@
     _e4__BUILTIN_PROC_N(TO_NUMBER, ">NUMBER")   \
     _e4__BUILTIN_CONSTANT(TRUE, e4__BF_TRUE)    \
     _e4__BUILTIN_PROC(TUCK) \
+    _e4__BUILTIN_PROC(VARIABLE) \
     _e4__BUILTIN_PROC(WORD) \
     _e4__BUILTIN_PROC(WORDS)
 
@@ -243,6 +246,27 @@ static void e4__builtin_COLON(struct e4__task *task, void *user)
     e4__dict_entry(task, word, len, 0, e4__execute_threaded, NULL);
     task->compiling = 1;
     task->compiling_s0 = task->sp;
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_COMMA(struct e4__task *task, void *user)
+{
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+    e4__DEREF(task->here++) = e4__stack_pop(task);
+}
+
+static void e4__builtin_CONSTANT(struct e4__task *task, void *user)
+{
+    register const char *word;
+    register e4__u8 len;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+    _e4__BUILTIN_LOOKAHEAD(task, word, len);
+
+    e4__dict_entry(task, word, len, e4__F_CONSTANT, e4__execute_constant,
+            NULL);
+    e4__builtin_exec(task, e4__B_COMMA);
 
     e4__execute_ret(task);
 }
@@ -560,6 +584,19 @@ static void e4__builtin_TUCK(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
     e4__stack_tuck(task);
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_VARIABLE(struct e4__task *task, void *user)
+{
+    register const char *word;
+    register e4__u8 len;
+
+    _e4__BUILTIN_LOOKAHEAD(task, word, len);
+
+    e4__dict_entry(task, word, len, 0, e4__execute_variable, NULL);
+    ++task->here;
+
     e4__execute_ret(task);
 }
 

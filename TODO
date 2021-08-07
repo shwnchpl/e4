@@ -36,8 +36,6 @@ Parsing/Text Execution
 - Create e4__io_refill function and use where appropriate rather than
   calling builtin directly.
 - Determine if KEY should be writing to TIB.
-- Implement ' (LOOKUP builtin; should be case insensitive)
-- Implement EXECUTE (builtin).
 
 General Builtins
 ----------------
@@ -61,10 +59,12 @@ General Builtins
 - [DONE] Add mechanism for uservar definitions.
 - [DONE] Refactor HERE to be a uservar.
 - [DONE] Add BASE and PAD builtins.
-- Add CREATE, VARIABLE, CONSTANT, and , builtins.
+- [DONE] Add CREATE, VARIABLE, CONSTANT, and , builtins.
 - Add VALUE and TO builtins. VALUE and CONSTANT should differ in that
   CONSTANT should have some flag preventing update with TO.
 - Implement simple IO builtins U. and EMIT.
+- Implement ' (LOOKUP builtin; should be case insensitive)
+- Implement EXECUTE (builtin).
 - Fix ABORT implementation.
 
 Kernel

@@ -156,6 +156,8 @@ enum e4__builtin_id {
     e4__B_CELLS,
     e4__B_CLEAR,
     e4__B_COLON,
+    e4__B_COMMA,
+    e4__B_CONSTANT,
     e4__B_CR,
     e4__B_CREATE,
     e4__B_DEPTH,
@@ -185,6 +187,7 @@ enum e4__builtin_id {
     e4__B_TO_NUMBER,
     e4__B_TRUE,
     e4__B_TUCK,
+    e4__B_VARIABLE,
     e4__B_WORD,
     e4__B_WORDS,
     e4__BUILTIN_COUNT

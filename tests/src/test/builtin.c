@@ -19,7 +19,7 @@ static void e4t__test_builtin_constants(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
 }
 
-/* Covers CREATE ? */
+/* Covers , ! ? ALLOT CELLS CONSTANT CREATE VARIABLE */
 static void e4t__test_builtin_data(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -27,13 +27,29 @@ static void e4t__test_builtin_data(void)
 
     e4t__term_obuf_consume();
 
-    e4t__ASSERT_OK(e4__evaluate(task, "CREATE foo 1 cells allot 531 foo !", -1));
+    /* Test simple creation with allot allocation. */
+    e4t__ASSERT_OK(e4__evaluate(task, "create foo 1 cells allot 531 foo !", -1));
     e4t__ASSERT((header = e4__dict_lookup(task, "foo", 3)));
     e4t__ASSERT_EQ(header->xt->data[0], 531);
 
     header->xt->data[0] = (e4__cell)7393;
     e4t__ASSERT_OK(e4__evaluate(task, "foo ?", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "7393 ");
+
+    /* Test creation with comma allocation. */
+    e4t__ASSERT_OK(e4__evaluate(task, "create bar 1234 , 5678 ,", -1));
+    e4t__ASSERT((header = e4__dict_lookup(task, "bar", 3)));
+    e4t__ASSERT_EQ(header->xt->data[0], 1234);
+    e4t__ASSERT_EQ(header->xt->data[1], 5678);
+
+    /* Test constant creation. */
+    e4t__ASSERT_OK(e4__evaluate(task, "124816 constant bas bas", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 124816);
+
+    /* Test variable creation. */
+    e4t__ASSERT_OK(e4__evaluate(task, "variable quux 152938 quux !", -1));
+    e4t__ASSERT((header = e4__dict_lookup(task, "quux", 4)));
+    e4t__ASSERT_EQ(header->xt->data[0], 152938);
 }
 
 /* Covers FORGET and look-ahead idiom (which uses builtin WORD) */
