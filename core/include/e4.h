@@ -112,6 +112,7 @@ struct e4__io_func {
 #define e4__E_INVFORGET     (-15)
 #define e4__E_ZLNAME        (-16)
 #define e4__E_UNSUPPORTED   (-21)
+#define e4__E_CSMISMATCH    (-22)
 #define e4__E_QUIT          (-56)
 
 /* error constants - system */

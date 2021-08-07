@@ -96,9 +96,9 @@ Compilation
   acting on the task struct and updating HERE and other fields
   appropriately.
 - [DONE] Implement simple : compilation.
-- Check for stack balance at end of compilation. If stack is not
-  in the same position as it was at the start of compilation, throw
-  the appropriate exception and reject the definition.
+- [DONE] Check for stack balance at end of compilation. If stack is not
+  in the same position as it was at the start of compilation, throw the
+  appropriate exception and reject the definition.
 - Implement VARIABLE and CONSTANT.
 - Implement DOES>.
 

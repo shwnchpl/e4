@@ -194,6 +194,7 @@ static void e4__builtin_COLON(struct e4__task *task, void *user)
 
     e4__dict_entry(task, word, len, 0, e4__execute_threaded, NULL);
     task->compiling = 1;
+    task->compiling_s0 = task->sp;
 
     e4__execute_ret(task);
 }
@@ -420,8 +421,18 @@ static void e4__builtin_ROT(struct e4__task *task, void *user)
 
 static void e4__builtin_SEMICOLON(struct e4__task *task, void *user)
 {
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_EXIT]);
     task->compiling = 0;
+
+    if (task->compiling_s0 != task->sp) {
+        /* Stack imbalanced. Discard this word and raise
+           an exception. */
+        e4__dict_forget(task, task->dict->name, task->dict->nbytes);
+        e4__exception_throw(task, e4__E_CSMISMATCH);
+        e4__execute_ret(task);
+        return;
+    }
+
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_EXIT]);
     e4__execute_ret(task);
 }
 

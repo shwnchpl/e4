@@ -5,6 +5,7 @@
 static void e4t__test_compile_linear(void)
 {
     struct e4__task *task = e4t__transient_task();
+    struct e4__dict_header *header;
 
     /* Test that attempting to define a word with no name
        throws an exception. */
@@ -58,6 +59,34 @@ static void e4t__test_compile_linear(void)
     e4t__ASSERT_EQ(e4__stack_depth(task), 2);
     e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 7);
     e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 8);
+    e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
+
+    /* Test that a stack mismatch at compilation start and end throws
+       the appropriate exception and cancels compilation. */
+    e4__stack_push(task, (e4__cell)0x1234);
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo 2", -1));
+    e4__stack_push(task, (e4__cell)0x5678);
+    e4t__ASSERT_EQ(e4__evaluate(task, ";", -1), e4__E_CSMISMATCH);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4__stack_pop(task);
+    e4__stack_pop(task);
+    e4t__ASSERT_EQ((e4__usize)e4__dict_lookup(task, "foo", 3), 0);
+
+    /* Test that compiled code is as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo 2 5 + ;", -1));
+    e4t__ASSERT((header = e4__dict_lookup(task, "foo", 3)));
+    e4t__ASSERT_EQ((e4__usize)header->xt->code,
+            (e4__usize)e4__execute_threaded);
+    e4t__ASSERT_EQ((e4__usize)header->xt->data[0],
+            (e4__usize)&e4__BUILTIN_XT[e4__B_LITERAL]);
+    e4t__ASSERT_EQ((e4__usize)header->xt->data[1], 2);
+    e4t__ASSERT_EQ((e4__usize)header->xt->data[2],
+            (e4__usize)&e4__BUILTIN_XT[e4__B_LITERAL]);
+    e4t__ASSERT_EQ((e4__usize)header->xt->data[3], 5);
+    e4t__ASSERT_EQ((e4__usize)header->xt->data[4],
+            (e4__usize)&e4__BUILTIN_XT[e4__B_PLUS]);
+    e4t__ASSERT_EQ((e4__usize)header->xt->data[5],
+            (e4__usize)&e4__BUILTIN_XT[e4__B_EXIT]);
     e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
 }
 

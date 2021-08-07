@@ -66,6 +66,7 @@ struct e4__task
     e4__usize sz;
     e4__usize tib_sz;
     e4__bool compiling;
+    e4__cell compiling_s0;
     e4__usize base; /* Initialize to 10. */
     struct e4__dict_header *dict;
     struct e4__io_func io_func;
