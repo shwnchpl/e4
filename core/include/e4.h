@@ -278,6 +278,7 @@ e4__usize e4__io_key(struct e4__task *task, void *buf);
 e4__usize e4__io_type(struct e4__task *task, const char *buf, e4__usize n);
 
 /* mem.c functions */
+e4__usize e4__mem_cells(e4__usize n);
 e4__usize e4__mem_dict_entry(void *here, struct e4__dict_header *prev,
         const char *name, e4__u8 nbytes, e4__u8 flags, e4__code_ptr code,
         void *user);

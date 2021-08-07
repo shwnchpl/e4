@@ -222,8 +222,8 @@ static void e4__builtin_BYE(struct e4__task *task, void *user)
 static void e4__builtin_CELLS(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
-    e4__stack_push(task, (e4__cell)(sizeof(e4__cell) *
-            ((e4__usize)e4__stack_pop(task))));
+    e4__stack_push(task,
+            (e4__cell)e4__mem_cells((e4__usize)e4__stack_pop(task)));
     e4__execute_ret(task);
 }
 

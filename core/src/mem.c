@@ -3,6 +3,11 @@
 #include <string.h>
 #include <ctype.h>
 
+e4__usize e4__mem_cells(e4__usize n)
+{
+    return n * sizeof(e4__cell);
+}
+
 e4__usize e4__mem_dict_entry(void *here, struct e4__dict_header *prev,
         const char *name, e4__u8 nbytes, e4__u8 flags, e4__code_ptr code,
         void *user)
