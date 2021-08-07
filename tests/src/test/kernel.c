@@ -13,26 +13,26 @@ static void e4t__test_kernel_dict(void)
 
     _d("first-entry", (void *)0xabcde);
     e4t__ASSERT(_l("first-entry"));
-    e4t__ASSERT_EQ((e4__usize)_l("first-entry")->xt->code, 0xabcde);
+    e4t__ASSERT_EQ(_l("first-entry")->xt->code, 0xabcde);
 
     _d("second-entry", (void *)0x12345);
     e4t__ASSERT(_l("second-entry"));
-    e4t__ASSERT_EQ((e4__usize)_l("second-entry")->xt->code, 0x12345);
+    e4t__ASSERT_EQ(_l("second-entry")->xt->code, 0x12345);
 
     e4t__ASSERT(_l("first-entry"));
-    e4t__ASSERT_EQ((e4__usize)_l("first-entry")->xt->code, 0xabcde);
-    e4t__ASSERT_EQ((e4__usize)_l("FIRST-entry")->xt->code, 0xabcde);
+    e4t__ASSERT_EQ(_l("first-entry")->xt->code, 0xabcde);
+    e4t__ASSERT_EQ(_l("FIRST-entry")->xt->code, 0xabcde);
 
     /* Can't forget a word that isn't present or a builtin. */
-    e4t__ASSERT_EQ((e4__usize)_l("not-present"), (e4__usize)NULL);
+    e4t__ASSERT_EQ(_l("not-present"), NULL);
     e4t__ASSERT_EQ(_f("not-present"), e4__E_INVFORGET);
     e4t__ASSERT(_l("dup"));
     e4t__ASSERT_EQ(_f("dup"), e4__E_INVFORGET);
 
     /* FORGET forgets all words defined after a word. */
     e4t__ASSERT_OK(_f("first-entry"));
-    e4t__ASSERT_EQ((e4__usize)_l("first-entry"), (e4__usize)NULL);
-    e4t__ASSERT_EQ((e4__usize)_l("second-entry"), (e4__usize)NULL);
+    e4t__ASSERT_EQ(_l("first-entry"), NULL);
+    e4t__ASSERT_EQ(_l("second-entry"), NULL);
 
     #undef _f
     #undef _l
@@ -261,17 +261,17 @@ static void e4t__test_kernel_mem_dict(void)
     #define _l(s)   e4__mem_dict_lookup(dict, s, sizeof(s) - 1)
 
     _d("first-entry", (void *)0xabcde);
-    e4t__ASSERT_EQ((e4__usize)_l("first-entry"), (e4__usize)dict);
-    e4t__ASSERT_EQ((e4__usize)_l("first-entry")->xt->code, 0xabcde);
+    e4t__ASSERT_EQ(_l("first-entry"), dict);
+    e4t__ASSERT_EQ(_l("first-entry")->xt->code, 0xabcde);
     e4t__ASSERT_EQ((e4__usize)here % sizeof(e4__cell), 0);
 
     _d("second-entry", (void *)0x12345);
-    e4t__ASSERT_EQ((e4__usize)_l("second-entry"), (e4__usize)dict);
-    e4t__ASSERT_EQ((e4__usize)_l("second-entry")->xt->code, 0x12345);
+    e4t__ASSERT_EQ(_l("second-entry"), dict);
+    e4t__ASSERT_EQ(_l("second-entry")->xt->code, 0x12345);
 
     e4t__ASSERT(_l("first-entry"));
-    e4t__ASSERT_EQ((e4__usize)_l("first-entry")->xt->code, 0xabcde);
-    e4t__ASSERT_EQ((e4__usize)_l("FIRST-entry")->xt->code, 0xabcde);
+    e4t__ASSERT_EQ(_l("first-entry")->xt->code, 0xabcde);
+    e4t__ASSERT_EQ(_l("FIRST-entry")->xt->code, 0xabcde);
 
     e4t__ASSERT_EQ((e4__usize)_l("not-present"), (e4__usize)NULL);
 
@@ -373,12 +373,12 @@ static void e4t__test_kernel_stack(void)
     e4__stack_push(task, (void *)32);
 
     e4t__ASSERT_EQ(e4__stack_depth(task), 5);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_peek(task), 32);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 32);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 16);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 8);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 4);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 2);
+    e4t__ASSERT_EQ(e4__stack_peek(task), 32);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 32);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 16);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 8);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2);
     e4t__ASSERT_EQ(e4__stack_depth(task), 0);
 
     e4__stack_rpush(task, (void *)3);
@@ -387,12 +387,12 @@ static void e4t__test_kernel_stack(void)
     e4__stack_rpush(task, (void *)17);
     e4__stack_rpush(task, (void *)33);
 
-    e4t__ASSERT_EQ((e4__usize)e4__stack_rpeek(task), 33);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_rpop(task), 33);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_rpop(task), 17);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_rpop(task), 9);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_rpop(task), 5);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_rpop(task), 3);
+    e4t__ASSERT_EQ(e4__stack_rpeek(task), 33);
+    e4t__ASSERT_EQ(e4__stack_rpop(task), 33);
+    e4t__ASSERT_EQ(e4__stack_rpop(task), 17);
+    e4t__ASSERT_EQ(e4__stack_rpop(task), 9);
+    e4t__ASSERT_EQ(e4__stack_rpop(task), 5);
+    e4t__ASSERT_EQ(e4__stack_rpop(task), 3);
 }
 
 static void e4t__test_kernel_wordparse(void)

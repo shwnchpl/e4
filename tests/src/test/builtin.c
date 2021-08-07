@@ -23,15 +23,14 @@ static void e4t__test_builtin_forget(void)
 
     /* Test actually forgetting a word. */
     e4t__ASSERT_OK(e4__evaluate(task, "forget bar", -1));
-    e4t__ASSERT_EQ((e4__usize)e4__dict_lookup(task, "bar", 3),
-            (e4__usize)NULL);
+    e4t__ASSERT_EQ(e4__dict_lookup(task, "bar", 3), NULL);
 
     /* Test that contents of buffer after look-ahead are intact
        and executed as appropriate. */
     e4t__ASSERT_OK(e4__evaluate(task, "forget    foo 17 dup", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 2);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 17);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 17);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 17);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 17);
 }
 
 /* Covers CR . */
@@ -117,27 +116,25 @@ static void e4t__test_builtin_memmanip(void)
     e4t__ASSERT_EQ(slot, 4739);
     slot = 5193;
     e4t__ASSERT_OK(e4__evaluate(task, "@", -1));
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 5193);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5193);
 
     /* Test that CELLS returns the appropriate size. */
     e4t__ASSERT_OK(e4__evaluate(task, "1 cells 5 cells -10 cells", -1));
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), -10 * sizeof(e4__cell));
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 5 * sizeof(e4__cell));
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), sizeof(e4__cell));
+    e4t__ASSERT_EQ(e4__stack_pop(task), -10 * sizeof(e4__cell));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5 * sizeof(e4__cell));
+    e4t__ASSERT_EQ(e4__stack_pop(task), sizeof(e4__cell));
 
     /* Test that ALLOT and HERE interact as expected. */
     e4t__ASSERT_OK(e4__evaluate(task, "here 1 cells allot here", -1));
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task),
+    e4t__ASSERT_EQ(e4__stack_pop(task),
             (e4__usize)e4__stack_pop(task) + sizeof(e4__cell));
     e4t__ASSERT_OK(e4__evaluate(task, "here -1 cells allot here", -1));
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task),
+    e4t__ASSERT_EQ(e4__stack_pop(task),
             (e4__usize)e4__stack_pop(task) - sizeof(e4__cell));
     e4t__ASSERT_OK(e4__evaluate(task, "here 7 allot here", -1));
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task),
-            (e4__usize)e4__stack_pop(task) + 7);
+    e4t__ASSERT_EQ(e4__stack_pop(task), (e4__usize)e4__stack_pop(task) + 7);
     e4t__ASSERT_OK(e4__evaluate(task, "here -7 allot here", -1));
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task),
-            (e4__usize)e4__stack_pop(task) - 7);
+    e4t__ASSERT_EQ(e4__stack_pop(task), (e4__usize)e4__stack_pop(task) - 7);
 }
 
 /* Covers >NUMBER and BASE uservar */
@@ -151,7 +148,7 @@ static void e4t__test_builtin_parsenum(void)
 
     /* FIXME: Add more to this test once double-cell numbers have been
        implemented. */
-    e4t__ASSERT_EQ((e4__usize)e4__DEREF(base), 10);
+    e4t__ASSERT_EQ(e4__DEREF(base), 10);
 
     #define _push(s, n) \
         do {    \
@@ -231,30 +228,30 @@ static void e4t__test_builtin_parseword(void)
 
     e4__builtin_exec(task, e4__B_REFILL);
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), e4__BF_TRUE);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
 
-    e4__builtin_exec(task, e4__B_WORD, (e4__usize)' ');
+    e4__builtin_exec(task, e4__B_WORD, ' ');
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     res = (char *)e4__stack_pop(task);
     len = *res++;
     e4t__ASSERT_EQ(len, 5);
     e4t__ASSERT(!e4__mem_strncasecmp(res, "first", len));
 
-    e4__builtin_exec(task, e4__B_WORD, (e4__usize)' ');
+    e4__builtin_exec(task, e4__B_WORD, ' ');
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     res = (char *)e4__stack_pop(task);
     len = *res++;
     e4t__ASSERT_EQ(len, 6);
     e4t__ASSERT(!e4__mem_strncasecmp(res, "second", len));
 
-    e4__builtin_exec(task, e4__B_WORD, (e4__usize)' ');
+    e4__builtin_exec(task, e4__B_WORD, ' ');
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     res = (char *)e4__stack_pop(task);
     len = *res++;
     e4t__ASSERT_EQ(len, 5);
     e4t__ASSERT(!e4__mem_strncasecmp(res, "third", len));
 
-    e4__builtin_exec(task, e4__B_WORD, (e4__usize)' ');
+    e4__builtin_exec(task, e4__B_WORD, ' ');
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     res = (char *)e4__stack_pop(task);
     len = *res++;

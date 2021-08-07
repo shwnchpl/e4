@@ -21,17 +21,17 @@ static void e4t__test_compile_linear(void)
     e4t__ASSERT_OK(e4__evaluate(task, ": foo 17 ;", -1));
     e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 17);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 17);
 
     /* Test that compiling over a word works as expected. */
     e4t__ASSERT_OK(e4__evaluate(task, ": foo 43 ;", -1));
     e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 43);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 43);
     e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
     e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 17);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 17);
     e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
 
     /* Test that compilation state is preserved across multiple
@@ -44,9 +44,9 @@ static void e4t__test_compile_linear(void)
     e4t__ASSERT_EQ(e4__task_compiling(task), 0);
     e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 3);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 4);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 3);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 3);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2);
     e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
 
     /* Test that simple linear compilation is possible. */
@@ -54,11 +54,11 @@ static void e4t__test_compile_linear(void)
     e4t__ASSERT_OK(e4__evaluate(task, ": bar dup 1 + swap ;", -1));
     e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 7);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 7);
     e4t__ASSERT_OK(e4__evaluate(task, "foo bar", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 2);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 7);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 8);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 7);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 8);
     e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
 
     /* Test that a stack mismatch at compilation start and end throws
@@ -70,23 +70,18 @@ static void e4t__test_compile_linear(void)
     e4t__ASSERT_EQ(e4__stack_depth(task), 2);
     e4__stack_pop(task);
     e4__stack_pop(task);
-    e4t__ASSERT_EQ((e4__usize)e4__dict_lookup(task, "foo", 3), 0);
+    e4t__ASSERT_EQ(e4__dict_lookup(task, "foo", 3), 0);
 
     /* Test that compiled code is as expected. */
     e4t__ASSERT_OK(e4__evaluate(task, ": foo 2 5 + ;", -1));
     e4t__ASSERT((header = e4__dict_lookup(task, "foo", 3)));
-    e4t__ASSERT_EQ((e4__usize)header->xt->code,
-            (e4__usize)e4__execute_threaded);
-    e4t__ASSERT_EQ((e4__usize)header->xt->data[0],
-            (e4__usize)&e4__BUILTIN_XT[e4__B_LITERAL]);
-    e4t__ASSERT_EQ((e4__usize)header->xt->data[1], 2);
-    e4t__ASSERT_EQ((e4__usize)header->xt->data[2],
-            (e4__usize)&e4__BUILTIN_XT[e4__B_LITERAL]);
-    e4t__ASSERT_EQ((e4__usize)header->xt->data[3], 5);
-    e4t__ASSERT_EQ((e4__usize)header->xt->data[4],
-            (e4__usize)&e4__BUILTIN_XT[e4__B_PLUS]);
-    e4t__ASSERT_EQ((e4__usize)header->xt->data[5],
-            (e4__usize)&e4__BUILTIN_XT[e4__B_EXIT]);
+    e4t__ASSERT_EQ(header->xt->code, e4__execute_threaded);
+    e4t__ASSERT_EQ(header->xt->data[0], &e4__BUILTIN_XT[e4__B_LITERAL]);
+    e4t__ASSERT_EQ(header->xt->data[1], 2);
+    e4t__ASSERT_EQ(header->xt->data[2], &e4__BUILTIN_XT[e4__B_LITERAL]);
+    e4t__ASSERT_EQ(header->xt->data[3], 5);
+    e4t__ASSERT_EQ(header->xt->data[4], &e4__BUILTIN_XT[e4__B_PLUS]);
+    e4t__ASSERT_EQ(header->xt->data[5], &e4__BUILTIN_XT[e4__B_EXIT]);
     e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
 }
 

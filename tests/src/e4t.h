@@ -34,8 +34,8 @@
 
 #define e4t__ASSERT_EQ(e, v)    \
     do {    \
-        e4__usize e_ = (e); \
-        e4__usize v_ = (v); \
+        e4__usize e_ = ((e4__usize)(e));    \
+        e4__usize v_ = ((e4__usize)(v));    \
         ++e4t__assert_attemptcount; \
         if (e_ != v_) {   \
             fprintf(stderr, "Assert failed! (" __FILE__ ":%u) - " \

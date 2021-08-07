@@ -40,13 +40,13 @@ static void e4t__test_execute_meta(void)
     struct e4__task *task = e4t__transient_task();
 
     e4__execute(task, push_12345);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 0x12345);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0x12345);
     e4t__ASSERT_EQ(e4__stack_depth(task), 0);
 
     e4__execute(task, push_seq);
     e4t__ASSERT_EQ(e4__stack_depth(task), 2);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 0xabcde);
-    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 0x77777);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0xabcde);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0x77777);
 }
 
 static void e4t__test_execute_userfunc_setter(struct e4__task *task,
