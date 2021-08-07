@@ -19,7 +19,7 @@ static void e4t__test_builtin_constants(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
 }
 
-/* Covers , ! ? ALLOT CELLS CONSTANT CREATE VARIABLE */
+/* Covers , ' ! ? >BODY ALLOT CELLS CONSTANT CREATE EXECUTE VARIABLE */
 static void e4t__test_builtin_data(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -50,6 +50,21 @@ static void e4t__test_builtin_data(void)
     e4t__ASSERT_OK(e4__evaluate(task, "variable quux 152938 quux !", -1));
     e4t__ASSERT((header = e4__dict_lookup(task, "quux", 4)));
     e4t__ASSERT_EQ(header->xt->data[0], 152938);
+
+    /* Check that lookup of a word that hasn't been defined fails. */
+    e4t__ASSERT_EQ(e4__evaluate(task, "' notaword", -1), e4__E_UNDEFWORD);
+
+    /* Test variable lookup and modification. */
+    e4t__ASSERT_OK(e4__evaluate(task, "' quux", -1));
+    e4t__ASSERT_EQ(header->xt, e4__stack_peek(task));
+    e4t__ASSERT_OK(e4__evaluate(task, ">body 523407 swap !", -1));
+    e4t__ASSERT_EQ(header->xt->data[0], 523407);
+
+    /* Test execution of looked up values. */
+    e4t__ASSERT_OK(e4__evaluate(task, "51 49 ' + execute", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 100);
+    e4t__ASSERT_OK(e4__evaluate(task, "35 constant foo ' foo execute", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 35);
 }
 
 /* Covers FORGET and look-ahead idiom (which uses builtin WORD) */

@@ -48,6 +48,7 @@
     _e4__BUILTIN_PROC_N(DOT_S, ".S")   \
     _e4__BUILTIN_PROC(DROP) \
     _e4__BUILTIN_PROC(DUP)  \
+    _e4__BUILTIN_PROC(EXECUTE)  \
     _e4__BUILTIN_PROC_F(EXIT, e4__F_COMPONLY)   \
     _e4__BUILTIN_CONSTANT(FALSE, e4__BF_FALSE)  \
     _e4__BUILTIN_PROC_N(FETCH, "@") \
@@ -67,6 +68,8 @@
     _e4__BUILTIN_PROC_F(SKIP, e4__F_COMPONLY) \
     _e4__BUILTIN_PROC_N(STORE, "!") \
     _e4__BUILTIN_PROC(SWAP) \
+    _e4__BUILTIN_PROC_N(TICK, "'")  \
+    _e4__BUILTIN_PROC_N(TO_BODY, ">BODY")   \
     _e4__BUILTIN_PROC_N(TO_NUMBER, ">NUMBER")   \
     _e4__BUILTIN_CONSTANT(TRUE, e4__BF_TRUE)    \
     _e4__BUILTIN_PROC(TUCK) \
@@ -387,6 +390,13 @@ static void e4__builtin_EXIT(struct e4__task *task, void *user)
        that a return should occur. */
 }
 
+static void e4__builtin_EXECUTE(struct e4__task *task, void *user)
+{
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+    e4__execute(task, e4__stack_pop(task));
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_FETCH(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
@@ -543,6 +553,36 @@ static void e4__builtin_SWAP(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
     e4__stack_swap(task);
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_TICK(struct e4__task *task, void *user)
+{
+    register const char *word;
+    register e4__u8 len;
+    register struct e4__dict_header *header;
+
+    _e4__BUILTIN_LOOKAHEAD(task, word, len);
+
+    if (!(header = e4__dict_lookup(task, word, len))) {
+        e4__exception_throw(task, e4__E_UNDEFWORD);
+        e4__execute_ret(task);
+    }
+
+    e4__stack_push(task, (e4__cell)header->xt);
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_TO_BODY(struct e4__task *task, void *user)
+{
+    register struct e4__execute_token *tok;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+
+    tok = (struct e4__execute_token *)e4__stack_pop(task);
+    e4__stack_push(task, (e4__cell)&tok->data[0]);
+
     e4__execute_ret(task);
 }
 
