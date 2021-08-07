@@ -21,7 +21,9 @@
 /* FIXME: Let this support "compile time" flags, etc. */
 #define _e4__BUILTIN_DECL() \
     _e4__BUILTIN_PROC_FIRST(ABORT)  \
+    _e4__BUILTIN_PROC_FIRST(ALLOT)  \
     _e4__BUILTIN_PROC(BYE)  \
+    _e4__BUILTIN_PROC(CELLS)    \
     _e4__BUILTIN_PROC(CLEAR)    \
     _e4__BUILTIN_PROC_N(COLON, ":") \
     _e4__BUILTIN_PROC(CR)   \
@@ -31,7 +33,9 @@
     _e4__BUILTIN_PROC(DROP) \
     _e4__BUILTIN_PROC(DUP)  \
     _e4__BUILTIN_PROC_F(EXIT, e4__F_COMPONLY)   \
+    _e4__BUILTIN_PROC_N(FETCH, "@") \
     _e4__BUILTIN_PROC(FORGET)   \
+    _e4__BUILTIN_PROC(HERE) \
     _e4__BUILTIN_PROC_F(LITERAL, e4__F_COMPONLY)    \
     _e4__BUILTIN_PROC_N(MINUS, "-") \
     _e4__BUILTIN_PROC(OVER) \
@@ -42,6 +46,7 @@
     _e4__BUILTIN_PROC(ROT)  \
     _e4__BUILTIN_PROC_NF(SEMICOLON, ";", e4__F_IMMEDIATE | e4__F_COMPONLY)  \
     _e4__BUILTIN_PROC_F(SKIP, e4__F_COMPONLY) \
+    _e4__BUILTIN_PROC_N(STORE, "!") \
     _e4__BUILTIN_PROC(SWAP) \
     _e4__BUILTIN_PROC_N(TO_NUMBER, ">NUMBER")   \
     _e4__BUILTIN_PROC(TUCK) \
@@ -163,11 +168,27 @@ static void e4__builtin_ABORT(struct e4__task *task, void *user)
     task->ip = e4__DEREF(++task->rp);
 }
 
+static void e4__builtin_ALLOT(struct e4__task *task, void *user)
+{
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+    task->here = (e4__cell)((e4__u8 *)task->here +
+            (e4__usize)e4__stack_pop(task));
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_BYE(struct e4__task *task, void *user)
 {
     e4__exception_throw(task, e4__E_BYE);
 
     /* If exceptions aren't enabled, just return. */
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_CELLS(struct e4__task *task, void *user)
+{
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+    e4__stack_push(task, (e4__cell)(sizeof(e4__cell) *
+            ((e4__usize)e4__stack_pop(task))));
     e4__execute_ret(task);
 }
 
@@ -304,6 +325,13 @@ static void e4__builtin_EXIT(struct e4__task *task, void *user)
        that a return should occur. */
 }
 
+static void e4__builtin_FETCH(struct e4__task *task, void *user)
+{
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+    e4__stack_push(task, e4__DEREF(e4__stack_pop(task)));
+    e4__execute_ret(task);
+}
+
  /* XXX: From the Programming-Tools Extensions word set. */
 static void e4__builtin_FORGET(struct e4__task *task, void *user)
 {
@@ -324,6 +352,13 @@ static void e4__builtin_FORGET(struct e4__task *task, void *user)
     if ((res = e4__dict_forget(task, word, len)))
         e4__exception_throw(task, res);
 
+    e4__execute_ret(task);
+}
+
+/* FIXME: Implement this as a user variable. */
+static void e4__builtin_HERE(struct e4__task *task, void *user)
+{
+    e4__stack_push(task, task->here);
     e4__execute_ret(task);
 }
 
@@ -436,9 +471,17 @@ static void e4__builtin_SEMICOLON(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+/* FIXME: e4 specific extension. Consider removing. */
 static void e4__builtin_SKIP(struct e4__task *task, void *user)
 {
     task->ip = e4__DEREF(++task->rp) + 1;
+}
+
+static void e4__builtin_STORE(struct e4__task *task, void *user)
+{
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+    e4__DEREF(e4__stack_pop(task)) = e4__stack_pop(task);
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_SWAP(struct e4__task *task, void *user)

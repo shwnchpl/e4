@@ -55,11 +55,13 @@ General Builtins
   macros in core/builtin.c.
 - [DONE] Add compile-time flags to appropriate builtins in
   core/builtin.c.
-- Implement @ and !.
-- Implement HERE and ALLOT.
+- [DONE] Implement @ and !.
+- [DONE] Implement HERE, CELLS, and ALLOT.
+- Implement simple IO builtins U. and EMIT.
 - Fix ABORT implementation.
-- Implement simple IO builtins U., and EMIT.
 - Add mechanism for builtin constants (such as BL, etc.).
+- Add mechanism for uservar definitions and refactor existing code
+  that *should* point to uservars (for instance, HERE).
 
 Kernel
 ------

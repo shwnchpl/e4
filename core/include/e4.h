@@ -148,7 +148,9 @@ struct e4__io_func {
 /* builtin constants */
 enum e4__builtin_id {
     e4__B_ABORT = 0,
+    e4__B_ALLOT,
     e4__B_BYE,
+    e4__B_CELLS,
     e4__B_CLEAR,
     e4__B_COLON,
     e4__B_CR,
@@ -158,7 +160,9 @@ enum e4__builtin_id {
     e4__B_DROP,
     e4__B_DUP,
     e4__B_EXIT,
+    e4__B_FETCH,
     e4__B_FORGET,
+    e4__B_HERE,
     e4__B_LITERAL,
     e4__B_MINUS,
     e4__B_OVER,
@@ -169,6 +173,7 @@ enum e4__builtin_id {
     e4__B_ROT,
     e4__B_SEMICOLON,
     e4__B_SKIP,
+    e4__B_STORE,
     e4__B_SWAP,
     e4__B_TO_NUMBER,
     e4__B_TUCK,

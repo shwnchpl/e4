@@ -105,6 +105,41 @@ static void e4t__test_builtin_math(void)
     #undef _e
 }
 
+/* Covers @ ! ALLOT CELLS HERE */
+static void e4t__test_builtin_memmanip(void)
+{
+    struct e4__task *task = e4t__transient_task();
+    e4__usize slot;
+
+    /* Test ! and @ work correctly. */
+    e4__stack_push(task, (e4__cell)&slot);
+    e4t__ASSERT_OK(e4__evaluate(task, "dup 4739 swap !", -1));
+    e4t__ASSERT_EQ(slot, 4739);
+    slot = 5193;
+    e4t__ASSERT_OK(e4__evaluate(task, "@", -1));
+    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 5193);
+
+    /* Test that CELLS returns the appropriate size. */
+    e4t__ASSERT_OK(e4__evaluate(task, "1 cells 5 cells -10 cells", -1));
+    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), -10 * sizeof(e4__cell));
+    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), 5 * sizeof(e4__cell));
+    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task), sizeof(e4__cell));
+
+    /* Test that ALLOT and HERE interact as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task, "here 1 cells allot here", -1));
+    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task),
+            (e4__usize)e4__stack_pop(task) + sizeof(e4__cell));
+    e4t__ASSERT_OK(e4__evaluate(task, "here -1 cells allot here", -1));
+    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task),
+            (e4__usize)e4__stack_pop(task) - sizeof(e4__cell));
+    e4t__ASSERT_OK(e4__evaluate(task, "here 7 allot here", -1));
+    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task),
+            (e4__usize)e4__stack_pop(task) + 7);
+    e4t__ASSERT_OK(e4__evaluate(task, "here -7 allot here", -1));
+    e4t__ASSERT_EQ((e4__usize)e4__stack_pop(task),
+            (e4__usize)e4__stack_pop(task) - 7);
+}
+
 /* Covers >NUMBER and BASE uservar */
 static void e4t__test_builtin_parsenum(void)
 {
@@ -283,6 +318,7 @@ void e4t__test_builtin(void)
     e4t__test_builtin_forget();
     e4t__test_builtin_io();
     e4t__test_builtin_math();
+    e4t__test_builtin_memmanip();
     e4t__test_builtin_parsenum();
     e4t__test_builtin_parseword();
     e4t__test_builtin_stackmanip();
