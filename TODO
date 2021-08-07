@@ -55,8 +55,8 @@ General Builtins
   macros in core/builtin.c.
 - [DONE] Add compile-time flags to appropriate builtins in
   core/builtin.c.
-- Implement HERE and ALLOT.
 - Implement @ and !.
+- Implement HERE and ALLOT.
 - Fix ABORT implementation.
 - Implement simple IO builtins U., and EMIT.
 - Add mechanism for builtin constants (such as BL, etc.).
@@ -96,6 +96,9 @@ Compilation
   acting on the task struct and updating HERE and other fields
   appropriately.
 - [DONE] Implement simple : compilation.
+- Check for stack balance at end of compilation. If stack is not
+  in the same position as it was at the start of compilation, throw
+  the appropriate exception and reject the definition.
 - Implement VARIABLE and CONSTANT.
 - Implement DOES>.
 
@@ -135,6 +138,30 @@ Compilation
   DO, etc.
 - Add compile time semantics to LITERAL.
 - Figure out how to implement RECURSE.
+- Implement decompilation (ie. SEE). This only needs to work for words
+  defined with execute_threaded to start; everything else can just
+  display "builtin." The key way that this can be achieved is by
+  placing a special sentinel value on the stack *after* the final EXIT
+  call (this can be written by ;). The only other issue is how to
+  handle words like THEN etc. This can be done with a little bit of
+  look ahead state. If we know that IF is followed by BRANCH then some
+  address, then we can simply keep track of what that address is and
+  output THEN when we get to that address. We can use the stack for
+  this. On function entry, track initial stack count. When IF is
+  encountered, push THEN token (assuming we will need to do this with
+  something other than THEN as well; we may not, in which case only
+  an address is necessary) followed by an address. On each pass, before
+  writing anything else, if stack depth is greater than initial depth,
+  peek the top. If we're at that address, pop (once or twice, depending
+  on whether a THEN token is needed) then display the appropriate word
+  based on token. Aside from this, the only thing that needs to be done
+  is look up a word in *reverse* based on its XT, and display that if
+  it is present. If it isn't, we can assume it's a literal and just
+  include it. Alternatively, we can understand LITERAL and other key
+  words as look ahead words and not include them. Or, on the other
+  hand, we could just naively display the internal representation and
+  not worry about things like THEN and LITERAL. This is the easiest
+  solution and is probably a perfectly reasonable place to start.
 
 Kernel
 -----
