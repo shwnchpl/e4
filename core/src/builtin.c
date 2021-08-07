@@ -16,6 +16,17 @@
         }   \
     } while (0)
 
+#define _e4__BUILTIN_LOOKAHEAD(t, w, l) \
+    do {    \
+        e4__builtin_exec(t, e4__B_WORD, (e4__usize)' ');    \
+        w = (const char *)e4__stack_pop(t); \
+        if (!(l = (e4__u8)*w++)) {  \
+            e4__exception_throw(t, e4__E_ZLNAME);   \
+            e4__execute_ret(t);  \
+            return; \
+        }   \
+    } while (0)
+
 /* builtin dictionary definitions */
 
 /* FIXME: Let this support "compile time" flags, etc. */
@@ -227,15 +238,7 @@ static void e4__builtin_COLON(struct e4__task *task, void *user)
     register const char *word;
     register e4__u8 len;
 
-    e4__builtin_exec(task, e4__B_WORD, (e4__usize)' ');
-
-    word = (const char *)e4__stack_pop(task);
-
-    if (!(len = (e4__u8)*word++)) {
-        e4__exception_throw(task, e4__E_ZLNAME);
-        e4__execute_ret(task);
-        return;
-    }
+    _e4__BUILTIN_LOOKAHEAD(task, word, len);
 
     e4__dict_entry(task, word, len, 0, e4__execute_threaded, NULL);
     task->compiling = 1;
@@ -260,15 +263,7 @@ static void e4__builtin_CREATE(struct e4__task *task, void *user)
     register const char *word;
     register e4__u8 len;
 
-    e4__builtin_exec(task, e4__B_WORD, (e4__usize)' ');
-
-    word = (const char *)e4__stack_pop(task);
-
-    if (!(len = (e4__u8)*word++)) {
-        e4__exception_throw(task, e4__E_ZLNAME);
-        e4__execute_ret(task);
-        return;
-    }
+    _e4__BUILTIN_LOOKAHEAD(task, word, len);
 
     e4__dict_entry(task, word, len, 0, e4__execute_variable, NULL);
     e4__execute_ret(task);
@@ -382,15 +377,7 @@ static void e4__builtin_FORGET(struct e4__task *task, void *user)
     register e4__u8 len;
     register e4__usize res;
 
-    e4__builtin_exec(task, e4__B_WORD, (e4__usize)' ');
-
-    word = (const char *)e4__stack_pop(task);
-
-    if (!(len = (e4__u8)*word++)) {
-        e4__exception_throw(task, e4__E_ZLNAME);
-        e4__execute_ret(task);
-        return;
-    }
+    _e4__BUILTIN_LOOKAHEAD(task, word, len);
 
     if ((res = e4__dict_forget(task, word, len)))
         e4__exception_throw(task, res);
