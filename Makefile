@@ -3,6 +3,7 @@
 
 BUILD_DIR := build
 
+TARGET_AMALGAM := $(BUILD_DIR)/amalgamation/e4.c
 TARGET_LIB := $(BUILD_DIR)/libe4.a
 TARGET_REPL := $(BUILD_DIR)/e4
 TARGET_TESTS := $(BUILD_DIR)/e4-tests
@@ -28,26 +29,38 @@ TESTS_DEPS := $(TESTS_OBJS:.o=.d)
 # TODO: Add an additional repl target to build the repl based
 # on the amalgamated core target.
 
-CFLAGS := -Wall -std=c89 -MMD -MP
-REPL_LDFLAGS := -L$(BUILD_DIR) -le4 -ledit
+CFLAGS := -Wall -std=c89 -Os -MMD -MP
+REPL_LDFLAGS := -ledit
 TESTS_LDFLAGS := -L$(BUILD_DIR) -le4
 
 # Default "all" target.
-.PHONY: all clean run-repl run-tests
-all: $(TARGET_LIB) $(TARGET_REPL) $(TARGET_TESTS)
-run-repl: $(TARGET_REPL)
-	$(TARGET_REPL)
-run-tests: $(TARGET_TESTS)
-	$(TARGET_TESTS)
+.PHONY: all amalgamation clean repl tests run-repl run-tests
+all: $(TARGET_LIB) amalgamation repl tests
+amalgamation: $(TARGET_AMALGAM)
 clean:
 	rm -rf $(BUILD_DIR)
+repl: $(TARGET_REPL)
+tests: $(TARGET_TESTS)
+run-repl: repl
+	$(TARGET_REPL)
+run-tests: tests
+	$(TARGET_TESTS)
 
 # Actual targets.
+# XXX: Require objects to build separately before generating
+# an amalgamated header. It should always be possible to *not*
+# use the amalgamation.
+$(TARGET_AMALGAM): $(CORE_OBJS)
+	mkdir -p $(dir $(TARGET_AMALGAM))
+	amal.rb --headers $(INC_DIRS) --src $(CORE_SRC_DIRS) \
+		> $(TARGET_AMALGAM)
+	find $(INC_DIRS) -name '*.h' -exec cp {} $(dir $(TARGET_AMALGAM)) \;
+
 $(TARGET_LIB): $(CORE_OBJS)
 	$(AR) rcs $@ $(CORE_OBJS)
 
-$(TARGET_REPL): $(REPL_OBJS) $(TARGET_LIB)
-	$(CC) $(REPL_OBJS) $(REPL_LDFLAGS) -o $@
+$(TARGET_REPL): $(REPL_OBJS) $(TARGET_AMALGAM)
+	$(CC) $(TARGET_AMALGAM) $(REPL_OBJS) $(REPL_LDFLAGS) -o $@
 
 $(TARGET_TESTS): $(TESTS_OBJS) $(TARGET_LIB)
 	$(CC) $(TESTS_OBJS) $(TESTS_LDFLAGS) -o $@

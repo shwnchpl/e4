@@ -9,9 +9,9 @@ Repo Maintenance
 
 Build
 -----
-- Add an amalgamated source target using amal.rb.
-- Create a repl build that uses the amalgamated source target.
-- Make it possible to disable core extensions for an even smaller build.
+- [DONE] Add an amalgamated source target using amal.rb.
+- [DONE] Create a repl build that uses the amalgamated source target.
+- Make it possible to disable core extensions for an even smaller build?
 - Attempt to set up an AVR build (or some other 8-16 bit target build)
   to determine ROM size in that environment.
 
