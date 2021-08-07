@@ -169,7 +169,7 @@ const struct e4__execute_token e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
    stack as cells. These arguments should be explicitly cast
    to either e4__cell or e4__usize if they are not already one
    of those types. */
-void e4__builtin_exec_(e4__u8 count, /* struct e4__task *task, */
+void e4__builtin_exec_(e4__usize count, /* struct e4__task *task, */
         /* enum e4__builtin_id id, */ ...)
 {
     va_list ap;
