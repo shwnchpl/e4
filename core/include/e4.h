@@ -113,6 +113,7 @@ struct e4__io_func {
 #define e4__E_ZLNAME        (-16)
 #define e4__E_UNSUPPORTED   (-21)
 #define e4__E_CSMISMATCH    (-22)
+#define e4__E_INVNAMEARG    (-32)
 #define e4__E_QUIT          (-56)
 
 /* error constants - system */
@@ -186,10 +187,12 @@ enum e4__builtin_id {
     e4__B_STORE,
     e4__B_SWAP,
     e4__B_TICK,
+    e4__B_TO,
     e4__B_TO_BODY,
     e4__B_TO_NUMBER,
     e4__B_TRUE,
     e4__B_TUCK,
+    e4__B_VALUE,
     e4__B_VARIABLE,
     e4__B_WORD,
     e4__B_WORDS,
@@ -272,10 +275,10 @@ void e4__exception_throw(struct e4__task *task, e4__usize e);
 
 /* execute.c functions */
 void e4__execute(struct e4__task *task, void *user);
-void e4__execute_constant(struct e4__task *task, void *user);
 void e4__execute_ret(struct e4__task *task);
 void e4__execute_threaded(struct e4__task *task, void *user);
 void e4__execute_uservar(struct e4__task *task, void *user);
+void e4__execute_value(struct e4__task *task, void *user);
 void e4__execute_variable(struct e4__task *task, void *user);
 
 /* io.c functions */

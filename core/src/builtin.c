@@ -69,10 +69,12 @@
     _e4__BUILTIN_PROC_N(STORE, "!") \
     _e4__BUILTIN_PROC(SWAP) \
     _e4__BUILTIN_PROC_N(TICK, "'")  \
+    _e4__BUILTIN_PROC(TO)   \
     _e4__BUILTIN_PROC_N(TO_BODY, ">BODY")   \
     _e4__BUILTIN_PROC_N(TO_NUMBER, ">NUMBER")   \
     _e4__BUILTIN_CONSTANT(TRUE, e4__BF_TRUE)    \
     _e4__BUILTIN_PROC(TUCK) \
+    _e4__BUILTIN_PROC(VALUE)    \
     _e4__BUILTIN_PROC(VARIABLE) \
     _e4__BUILTIN_PROC(WORD) \
     _e4__BUILTIN_PROC(WORDS)
@@ -137,7 +139,7 @@ const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT] =
 #define _e4__BUILTIN_PROC_NF(w, n, f)   \
     {e4__builtin_##w, NULL},
 #define _e4__BUILTIN_CONSTANT(w, c) \
-    {e4__execute_constant, NULL, { (e4__cell)((e4__usize)(c)), }},
+    {e4__execute_value, NULL, { (e4__cell)((e4__usize)(c)), }},
 #define _e4__BUILTIN_USERVAR(w) \
     {e4__execute_uservar, NULL, {(e4__cell)((e4__usize)(e4__UV_##w))}},
 
@@ -267,8 +269,7 @@ static void e4__builtin_CONSTANT(struct e4__task *task, void *user)
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
     _e4__BUILTIN_LOOKAHEAD(task, word, len);
 
-    e4__dict_entry(task, word, len, e4__F_CONSTANT, e4__execute_constant,
-            NULL);
+    e4__dict_entry(task, word, len, e4__F_CONSTANT, e4__execute_value, NULL);
     e4__builtin_exec(task, e4__B_COMMA);
 
     e4__execute_ret(task);
@@ -574,6 +575,28 @@ static void e4__builtin_TICK(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_TO(struct e4__task *task, void *user)
+{
+    register const char *word;
+    register e4__u8 len;
+    register struct e4__dict_header *header;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+    _e4__BUILTIN_LOOKAHEAD(task, word, len);
+
+    if (!(header = e4__dict_lookup(task, word, len))) {
+        e4__exception_throw(task, e4__E_UNDEFWORD);
+        e4__execute_ret(task);
+    } else if ((header->flags & e4__F_CONSTANT) ||
+            header->xt->code != e4__execute_value) {
+        e4__exception_throw(task, e4__E_INVNAMEARG);
+        e4__execute_ret(task);
+    }
+
+    header->xt->data[0] = e4__stack_pop(task);
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_TO_BODY(struct e4__task *task, void *user)
 {
     register struct e4__execute_token *tok;
@@ -624,6 +647,20 @@ static void e4__builtin_TUCK(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
     e4__stack_tuck(task);
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_VALUE(struct e4__task *task, void *user)
+{
+    register const char *word;
+    register e4__u8 len;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+    _e4__BUILTIN_LOOKAHEAD(task, word, len);
+
+    e4__dict_entry(task, word, len, 0, e4__execute_value, NULL);
+    e4__builtin_exec(task, e4__B_COMMA);
+
     e4__execute_ret(task);
 }
 

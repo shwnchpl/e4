@@ -11,12 +11,6 @@ void e4__execute(struct e4__task *task, void *user)
     entry(task, code + 1);
 }
 
-void e4__execute_constant(struct e4__task *task, void *user)
-{
-    e4__stack_push(task, e4__DEREF((e4__cell)user + 1));
-    e4__execute_ret(task);
-}
-
 void e4__execute_ret(struct e4__task *task)
 {
     task->ip = e4__DEREF(++task->rp);
@@ -47,6 +41,12 @@ void e4__execute_uservar(struct e4__task *task, void *user)
 {
     register const e4__cell uv_offset = e4__DEREF((e4__cell)user + 1);
     e4__stack_push(task, e4__task_uservar(task, (e4__usize)uv_offset));
+    e4__execute_ret(task);
+}
+
+void e4__execute_value(struct e4__task *task, void *user)
+{
+    e4__stack_push(task, e4__DEREF((e4__cell)user + 1));
     e4__execute_ret(task);
 }
 

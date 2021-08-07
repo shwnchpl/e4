@@ -4,7 +4,7 @@
 static void e4t__test_execute_data(void)
 {
     static const void *constant_77[] = {
-        e4__execute_constant,
+        e4__execute_value,
         NULL,
         (void *)77
     };

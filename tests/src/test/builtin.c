@@ -19,7 +19,8 @@ static void e4t__test_builtin_constants(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
 }
 
-/* Covers , ' ! ? >BODY ALLOT CELLS CONSTANT CREATE EXECUTE VARIABLE */
+/* Covers , ' ! ? >BODY ALLOT CELLS CONSTANT CREATE EXECUTE TO VALUE
+   VARIABLE */
 static void e4t__test_builtin_data(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -65,6 +66,18 @@ static void e4t__test_builtin_data(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 100);
     e4t__ASSERT_OK(e4__evaluate(task, "35 constant foo ' foo execute", -1));
     e4t__ASSERT_EQ(e4__stack_pop(task), 35);
+
+    /* Test creating and updating a mutable constant (ie. value). */
+    e4t__ASSERT_OK(e4__evaluate(task, "35 value foo foo", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 35);
+    e4t__ASSERT_OK(e4__evaluate(task, "45 to foo foo", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 45);
+
+    /* Test that attempting to run TO on something other than a value
+       or an invalid name doesn't work. */
+    e4t__ASSERT_OK(e4__evaluate(task, "35 constant bar", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "25 to bar", -1), e4__E_INVNAMEARG);
+    e4t__ASSERT_EQ(e4__evaluate(task, "25 to notaname", -1), e4__E_UNDEFWORD);
 }
 
 /* Covers FORGET and look-ahead idiom (which uses builtin WORD) */
