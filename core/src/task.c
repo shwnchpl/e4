@@ -5,7 +5,7 @@
 
 e4__bool e4__task_compiling(struct e4__task *task)
 {
-    return task->compiling;
+    return !!task->compile.state;
 }
 
 struct e4__task* e4__task_create(void *buffer, e4__usize size)

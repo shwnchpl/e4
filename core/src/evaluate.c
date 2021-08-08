@@ -96,7 +96,7 @@ static e4__usize e4__evaluate_internal(struct e4__task *task)
         if (!len)
             continue;
 
-        if (task->compiling)
+        if (e4__task_compiling(task))
             e4__evaluate_compile(task, word, len);
         else
             e4__evaluate_interpret(task, word, len);
@@ -111,6 +111,8 @@ static void e4__evaluate_wrapper(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+/* XXX: If evaluate returns an exception code, it is the caller's
+   responsibility to clear the data stack. */
 e4__usize e4__evaluate(struct e4__task *task, const char *buf, e4__usize sz)
 {
     struct e4__io_src old_io_src;
@@ -168,7 +170,7 @@ void e4__evaluate_quit(struct e4__task *task)
         switch (res) {
             case e4__E_OK:
                 /* FIXME: Use CR here instead for newline? */
-                if (!task->compiling)
+                if (!task->compile.state)
                     e4__io_type(task, " ok\n", 4);
                 /* fall through */
             case e4__E_QUIT:

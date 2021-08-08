@@ -18,6 +18,15 @@ struct e4__io_src
     e4__usize sz;       /* input buffer size */
 };
 
+/* FIXME: Move to an e4-compile.h header file? */
+struct e4__compile_state
+{
+    e4__usize state;
+    e4__cell s0;
+    e4__cell here0;
+    struct e4__execute_token *xt;
+};
+
 /* FIXME: Move to some exception header file? */
 struct e4__exception_ctx
 {
@@ -58,15 +67,13 @@ struct e4__task
     e4__cell r0;
     e4__cell rp;
     e4__cell ip;
-    /* FIXME: Can these somehow be made to be flags? */
     e4__cell base_ptr;
     struct e4__io_src io_src;
+    struct e4__compile_state compile;
 
     /* System variables. */
     e4__usize sz;
     e4__usize tib_sz;
-    e4__bool compiling;
-    e4__cell compiling_s0;
     e4__usize base; /* Initialize to 10. */
     struct e4__dict_header *dict;
     struct e4__io_func io_func;

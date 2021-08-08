@@ -45,7 +45,8 @@ static void e4t__test_execute_does(void)
         (void *)&e4__BUILTIN_XT[e4__B_LITERAL],
         (void *)2,
         (void *)&e4__BUILTIN_XT[e4__B_PLUS],
-        (void *)&e4__BUILTIN_XT[e4__B_EXIT]
+        (void *)&e4__BUILTIN_XT[e4__B_EXIT],
+        (void *)&e4__BUILTIN_XT[e4__B_SENTINEL]
     };
     struct e4__task *task = e4t__transient_task();
 
@@ -68,21 +69,24 @@ static void e4t__test_execute_meta(void)
         NULL,
         &e4__BUILTIN_XT[e4__B_LITERAL],
         (void *)0x12345,
-        &e4__BUILTIN_XT[e4__B_EXIT]
+        &e4__BUILTIN_XT[e4__B_EXIT],
+        &e4__BUILTIN_XT[e4__B_SENTINEL]
     };
     static const void *push_abcde[] = {
         e4__execute_threaded,
         NULL,
         &e4__BUILTIN_XT[e4__B_LITERAL],
         (void *)0xabcde,
-        &e4__BUILTIN_XT[e4__B_EXIT]
+        &e4__BUILTIN_XT[e4__B_EXIT],
+        &e4__BUILTIN_XT[e4__B_SENTINEL]
     };
     static const void *push_77777[] = {
         e4__execute_threaded,
         NULL,
         &e4__BUILTIN_XT[e4__B_LITERAL],
         (void *)0x77777,
-        &e4__BUILTIN_XT[e4__B_EXIT]
+        &e4__BUILTIN_XT[e4__B_EXIT],
+        &e4__BUILTIN_XT[e4__B_SENTINEL]
     };
     const void *push_seq[] = {
         e4__execute_threaded,
@@ -93,7 +97,8 @@ static void e4t__test_execute_meta(void)
         push_abcde,
         &e4__BUILTIN_XT[e4__B_ABORT],
         push_12345,
-        &e4__BUILTIN_XT[e4__B_EXIT]
+        &e4__BUILTIN_XT[e4__B_EXIT],
+        &e4__BUILTIN_XT[e4__B_SENTINEL]
     };
 
     struct e4__task *task = e4t__transient_task();

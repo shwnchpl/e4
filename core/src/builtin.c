@@ -66,6 +66,7 @@
     _e4__BUILTIN_PROC(ROLL) \
     _e4__BUILTIN_PROC(ROT)  \
     _e4__BUILTIN_PROC_NF(SEMICOLON, ";", e4__F_IMMEDIATE | e4__F_COMPONLY)  \
+    _e4__BUILTIN_PROC_F(SENTINEL, e4__F_IMMEDIATE)  \
     _e4__BUILTIN_PROC_F(SKIP, e4__F_COMPONLY) \
     _e4__BUILTIN_PROC_N(STORE, "!") \
     _e4__BUILTIN_PROC(SWAP) \
@@ -250,10 +251,7 @@ static void e4__builtin_COLON(struct e4__task *task, void *user)
     _e4__BUILTIN_LOOKAHEAD(task, word, len);
 
     e4__dict_entry(task, word, len, 0, NULL, NULL);
-    e4__stack_push(task, (e4__cell)e4__execute_threaded);
-
-    task->compiling = 1;
-    task->compiling_s0 = task->sp;
+    e4__compile_start(task, task->dict->xt, e4__COMP_COLON);
 
     e4__execute_ret(task);
 }
@@ -308,15 +306,13 @@ static void e4__builtin_DEPTH(struct e4__task *task, void *user)
 
 static void e4__builtin_DOES(struct e4__task *task, void *user)
 {
-    if (task->compiling) {
+    if (e4__task_compiling(task)) {
         /* FIXME: Implement compilation semantics. */
     }
 
-    e4__stack_push(task, task->here);
-    e4__stack_push(task, (e4__cell)e4__execute_doesthunk);
+    e4__compile_start(task, task->dict->xt, e4__COMP_DOES);
 
-    task->compiling = 1;
-    task->compiling_s0 = task->sp;
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_DOT(struct e4__task *task, void *user)
@@ -404,7 +400,16 @@ static void e4__builtin_EXIT(struct e4__task *task, void *user)
 {
     /* XXX: This function doesn't actually do anything. It's address
        is simply understood by the threaded interpreter to indicate
-       that a return should occur. */
+       that a return should occur. The standard guarantees that this
+       is okay, as any compiler optimization that would cause its
+       address to compare equally to the address of some other function
+       would be a violation of the as-if clause.
+
+       Since this function is compile-only, is not immediate, and is
+       intercepted by executed_threaded, is should be entirely
+       unreachable. */
+    e4__exception_throw(task, e4__E_BUG);
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_EXECUTE(struct e4__task *task, void *user)
@@ -538,31 +543,21 @@ static void e4__builtin_ROT(struct e4__task *task, void *user)
 
 static void e4__builtin_SEMICOLON(struct e4__task *task, void *user)
 {
-    e4__code_ptr compiling_code;
+    e4__usize res;
 
-    task->compiling = 0;
+    if ((res = e4__compile_finish(task)))
+        e4__exception_throw(task, res);
 
-    if (task->compiling_s0 != task->sp) {
-        /* After this exception, it is highly likely the stack is in
-           a very bad state. The best way for user code to recover
-           from this is probably to clear it completely. */
-        e4__dict_forget(task, task->dict->name, task->dict->nbytes);
-        e4__exception_throw(task, e4__E_CSMISMATCH);
-        e4__execute_ret(task);
-        return;
-    }
+    e4__execute_ret(task);
+}
 
-    /* We know that we pushed to the stack when entering compiling
-       mode, so there must be a code pointer for us to pop now. */
-    compiling_code = (e4__code_ptr)e4__stack_pop(task);
-
-    /* If compiling_code is a doesthunk, We know there's value for
-       us to pop. */
-    if (compiling_code == e4__execute_doesthunk)
-        task->dict->xt->user = e4__stack_pop(task);
-
-    task->dict->xt->code = compiling_code;
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_EXIT]);
+static void e4__builtin_SENTINEL(struct e4__task *task, void *user)
+{
+    /* XXX: This function's sole purpose is to act as a unique
+       identifier. The standard guarantees that this is okay, as any
+       compiler optimization that would cause its address to compare
+       equally to the address of some other function would be
+       a violation of the as-if clause. */
     e4__execute_ret(task);
 }
 

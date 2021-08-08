@@ -119,6 +119,7 @@ struct e4__io_func {
 /* error constants - system */
 #define e4__E_FAILURE       (-256)
 #define e4__E_BYE           (-257)
+#define e4__E_BUG           (-257)
 
 /* flag constants - dictionary entry */
 #define e4__F_IMMEDIATE     (0x01)
@@ -184,6 +185,7 @@ enum e4__builtin_id {
     e4__B_ROLL,
     e4__B_ROT,
     e4__B_SEMICOLON,
+    e4__B_SENTINEL,
     e4__B_SKIP,
     e4__B_STORE,
     e4__B_SWAP,
@@ -203,6 +205,11 @@ enum e4__builtin_id {
 /* source ID constants */
 #define e4__SID_STR         (-1)
 #define e4__SID_UID         (0)
+
+/* compilation mode/state constants */
+#define e4__COMP_COLON      ( 1 )
+#define e4__COMP_DOES       ( 2 )
+#define e4__COMP_NONAME     ( 3 )
 
 /* task constants */
 /* TODO: Determine if this is sensible. */
@@ -239,7 +246,10 @@ void e4__builtin_exec_(e4__usize count, /* struct e4__task *task, */
 
 /* compile.c functions */
 void e4__compile_cell(struct e4__task *task, e4__cell cell);
+e4__usize e4__compile_finish(struct e4__task *task);
 void e4__compile_literal(struct e4__task *task, e4__cell num);
+void e4__compile_start(struct e4__task *task, struct e4__execute_token *xt,
+        e4__usize mode);
 
 /* dict.c functions */
 void e4__dict_entry(struct e4__task *task, const char *name, e4__u8 nbytes,
