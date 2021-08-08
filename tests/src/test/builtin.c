@@ -99,11 +99,26 @@ static void e4t__test_builtin_does(void)
 {
     struct e4__task *task = e4t__transient_task();
 
-    /* Test that does> behaves correctly at interpret time. */
+    /* Test that DOES> behaves correctly at interpret time. */
     e4t__ASSERT_OK(e4__evaluate(task, "create f 20 , does> @ 55 + ; f", -1));
     e4t__ASSERT_EQ(e4__stack_pop(task), 75);
     e4t__ASSERT_OK(e4__evaluate(task, "103 ' f >body ! f", -1));
     e4t__ASSERT_EQ(e4__stack_pop(task), 158);
+
+    /* Test that DOES> heaves correctly at compile time. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo create , does> @ 10 + ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "5 foo bar bar", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 15);
+
+    /* Test that double DOES> works as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo create , does> @ 10 + does> @ 67 + ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "5 foo bar", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "create bas 33 , bas @", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 33);
+    e4t__ASSERT_OK(e4__evaluate(task, "bar", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 15);
+    e4t__ASSERT_OK(e4__evaluate(task, "bas", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 100);
 }
 
 /* Covers FORGET and look-ahead idiom (which uses builtin WORD) */

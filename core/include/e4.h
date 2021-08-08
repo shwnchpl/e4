@@ -120,6 +120,7 @@ struct e4__io_func {
 #define e4__E_FAILURE       (-256)
 #define e4__E_BYE           (-257)
 #define e4__E_BUG           (-257)
+#define e4__E_INVBUILTINMUT (-258)
 
 /* flag constants - dictionary entry */
 #define e4__F_IMMEDIATE     (0x01)
@@ -163,6 +164,7 @@ enum e4__builtin_id {
     e4__B_CR,
     e4__B_CREATE,
     e4__B_DEPTH,
+    e4__B_DLITERAL,
     e4__B_DOES,
     e4__B_DOT,
     e4__B_DOT_S,

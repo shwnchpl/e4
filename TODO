@@ -64,25 +64,7 @@ General Builtins
 - [DONE] Implement EXECUTE (builtin).
 - Add VALUE and TO builtins. VALUE and CONSTANT should differ in that
   CONSTANT should have some flag preventing update with TO.
-- Implement DOES> builtin. If currently compiling, does checks that
-  s0 is even to current stack pointer and if not throws a control
-  structure mismatch. Otherwise, it appends the rest of the definition
-  such that when the word is interpreted it applies those DOES>
-  semantics as though DOES> had been interpreted. When DOES> is
-  interpreted, it enters compilation mode and begins compiling thunk
-  words onto HERE. When ; is encountered, compilation mode is exited
-  and the code pointer for the most recent definition is replaced with
-  the does thunk pointer. The user pointer for this definition is set
-  to the beginning of the does block that has just been compiled. This
-  block is executed using the execute_threaded code handler. When DOES>
-  detects that it has been called in compilation mode, it will need to
-  actually compile in a word that, when executed, will have the correct
-  semantics, as we as reserve space for an end pointer. This handler,
-  when encountered during execution, should read ahead one cell to get
-  the length of the data to follow, then copy that data to the most
-  recent definition as specified by the interpretation semantics of
-  DOES>. It should also ensure that the next instruction executed is
-  a return instruction.
+- [DONE] Implement DOES> builtin.
 - Implement simple IO builtins U. and EMIT.
 - Fix ABORT implementation.
 

@@ -44,6 +44,7 @@
     _e4__BUILTIN_PROC(CR)   \
     _e4__BUILTIN_PROC(CREATE)   \
     _e4__BUILTIN_PROC(DEPTH)    \
+    _e4__BUILTIN_PROC_F(DLITERAL, e4__F_COMPONLY)   \
     _e4__BUILTIN_PROC_NF(DOES, "DOES>", e4__F_IMMEDIATE)    \
     _e4__BUILTIN_PROC_N(DOT, ".")    \
     _e4__BUILTIN_PROC_N(DOT_S, ".S")   \
@@ -210,6 +211,8 @@ static void e4__builtin_ABORT(struct e4__task *task, void *user)
     for (i = 1; &task->rp[i] <= task->r0; ++i)
         task->rp[i] = RETURN;
     task->ip = e4__DEREF(++task->rp);
+
+    /* e4__execute_ret intentionally omitted. */
 }
 
 static void e4__builtin_ALLOT(struct e4__task *task, void *user)
@@ -305,13 +308,65 @@ static void e4__builtin_DEPTH(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_DOES(struct e4__task *task, void *user)
+/* XXX: e4 system word. */
+static void e4__builtin_DLITERAL(struct e4__task *task, void *user)
 {
-    if (e4__task_compiling(task)) {
-        /* FIXME: Implement compilation semantics. */
+    static const void *RETURN_THUNK[] =
+    {
+        &e4__BUILTIN_XT[e4__B_EXIT]
+    };
+
+    e4__usize res;
+
+    if (task->dict->flags & e4__F_BUILTIN) {
+        e4__exception_throw(task, e4__E_INVBUILTINMUT);
+        e4__execute_ret(task);
+        return;
     }
 
     e4__compile_start(task, task->dict->xt, e4__COMP_DOES);
+
+    /* Return from this function. */
+    e4__execute_ret(task);
+
+    /* Advance the instruction pointer until SENTINEL has been
+       encountered, compiling each word along the way. */
+    do {
+        e4__compile_cell(task, e4__DEREF(task->ip++));
+    } while (e4__DEREF(task->ip) != (e4__cell)&e4__BUILTIN_XT[e4__B_SENTINEL]);
+
+    if ((res = e4__compile_finish(task)))
+        /* We haven't touched the stack. This should absolutely never
+           happen, but if it does, pass the exception along. */
+        e4__exception_throw(task, res);
+
+    /* Set the instruction pointer to a return thunk so that we can
+       return as we would have at the end of threaded_execute of the
+       word containing DLITERAL. */
+    task->ip = (e4__cell)RETURN_THUNK;
+
+    /* e4__execute_ret intentionally omitted. */
+}
+
+static void e4__builtin_DOES(struct e4__task *task, void *user)
+{
+    /* XXX: Section 6.1.1250 of the standard specifies that DOES> has
+       undefined interpretation semantics but specifies that its
+       compilation semantics are simply to copy its run-time semantics
+       into the definition being compiled. This means that it should
+       be okay to comply with the standard by compiling in other words
+       so long as those word achieve the correct semantics. Which means
+       it should also be okay to allow DOES> to have interpretation
+       semantics that match those compiled run-time semantics, even if
+       these interpretation semantics are achieved via a different
+       mechanism from the compiled run-time semantics. */
+    if (e4__task_compiling(task))
+        e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_DLITERAL]);
+    else if (task->dict->flags & e4__F_BUILTIN)
+        /* Invalid attempt to mutate a builtin. */
+        e4__exception_throw(task, e4__E_INVBUILTINMUT);
+    else
+        e4__compile_start(task, task->dict->xt, e4__COMP_DOES);
 
     e4__execute_ret(task);
 }
@@ -445,8 +500,10 @@ static void e4__builtin_FORGET(struct e4__task *task, void *user)
 static void e4__builtin_LITERAL(struct e4__task *task, void *user)
 {
     /* FIXME: Add compilation semantics for this word. */
-    *task->sp-- = e4__DEREF2(++task->rp);
+    e4__stack_push(task, e4__DEREF2(++task->rp));
     task->ip = e4__DEREF(task->rp) + 1;
+
+    /* e4__execute_ret intentionally omitted. */
 }
 
 static void e4__builtin_MINUS(struct e4__task *task, void *user)
@@ -566,6 +623,8 @@ static void e4__builtin_SENTINEL(struct e4__task *task, void *user)
 static void e4__builtin_SKIP(struct e4__task *task, void *user)
 {
     task->ip = e4__DEREF(++task->rp) + 1;
+
+    /* e4__execute_ret intentionally omitted. */
 }
 
 static void e4__builtin_STORE(struct e4__task *task, void *user)
