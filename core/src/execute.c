@@ -11,6 +11,14 @@ void e4__execute(struct e4__task *task, void *user)
     entry(task, code + 1);
 }
 
+void e4__execute_doesthunk(struct e4__task *task, void *user)
+{
+    /* Push the address of the data pointer onto the stack then
+       branch to the address in user. */
+    e4__stack_push(task, (e4__cell)user + 1);
+    e4__execute_threaded(task, e4__DEREF(user) - 1);
+}
+
 void e4__execute_ret(struct e4__task *task)
 {
     task->ip = e4__DEREF(++task->rp);

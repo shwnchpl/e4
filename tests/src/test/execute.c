@@ -35,6 +35,31 @@ static void e4t__test_execute_data(void)
     e4t__ASSERT_EQ(e4__DEREF(e4__stack_pop(task)), 10);
 }
 
+static void e4t__test_execute_does(void)
+{
+    void *addtwo_const[] = {
+        e4__execute_doesthunk,
+        NULL,
+        (void *)10,
+        (void *)&e4__BUILTIN_XT[e4__B_FETCH],
+        (void *)&e4__BUILTIN_XT[e4__B_LITERAL],
+        (void *)2,
+        (void *)&e4__BUILTIN_XT[e4__B_PLUS],
+        (void *)&e4__BUILTIN_XT[e4__B_EXIT]
+    };
+    struct e4__task *task = e4t__transient_task();
+
+    addtwo_const[1] = &addtwo_const[3];
+    e4__execute(task, addtwo_const);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 12);
+
+    addtwo_const[2] = (void *)51;
+    e4__execute(task, addtwo_const);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 53);
+}
+
 /* Covers ABORT LIT SKIP and nested execution. */
 static void e4t__test_execute_meta(void)
 {
@@ -112,6 +137,7 @@ static void e4t__test_execute_userfunc(void)
 void e4t__test_execute(void)
 {
     e4t__test_execute_data();
+    e4t__test_execute_does();
     e4t__test_execute_meta();
     e4t__test_execute_userfunc();
 }

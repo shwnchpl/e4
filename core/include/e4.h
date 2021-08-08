@@ -275,6 +275,7 @@ void e4__exception_throw(struct e4__task *task, e4__usize e);
 
 /* execute.c functions */
 void e4__execute(struct e4__task *task, void *user);
+void e4__execute_doesthunk(struct e4__task *task, void *user);
 void e4__execute_ret(struct e4__task *task);
 void e4__execute_threaded(struct e4__task *task, void *user);
 void e4__execute_uservar(struct e4__task *task, void *user);

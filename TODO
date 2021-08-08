@@ -107,7 +107,7 @@ Kernel
 - [DONE] Cleanup evaluate and evaluate_quit implementation, removing
   unnecessary parameters.
 - [DONE] Implement _constant, _variable, and _uservar code handlers.
-- Implement _thunk code handler (for DOES>).
+- [DONE] Implement _thunk code handler (for DOES>).
 - Always use size or sz as name to indicate size in API parameters.
 
 General IO
