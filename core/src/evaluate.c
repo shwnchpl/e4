@@ -112,7 +112,8 @@ static void e4__evaluate_wrapper(struct e4__task *task, void *user)
 }
 
 /* XXX: If evaluate returns an exception code, it is the caller's
-   responsibility to clear the data stack. */
+   responsibility to clear the data stack and cancel any compilation
+   that is currently in progress. */
 e4__usize e4__evaluate(struct e4__task *task, const char *buf, e4__usize sz)
 {
     struct e4__io_src old_io_src;
@@ -185,8 +186,10 @@ void e4__evaluate_quit(struct e4__task *task)
                 register char *buf = (char *)task->here;
                 register char *num;
 
-                /* XXX: An uncaught exception clears the stack. */
+                /* XXX: An uncaught exception clears the stack and
+                   cancels any in-progress compilation. */
                 e4__stack_clear(task);
+                e4__compile_cancel(task);
 
                 e4__io_type(task, " EXCEPTION: ", 12);
                 num = e4__num_format(res, task->base, e4__F_SIGNED, buf, 130);

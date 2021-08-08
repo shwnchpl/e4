@@ -245,6 +245,7 @@ void e4__builtin_exec_(e4__usize count, /* struct e4__task *task, */
         /* enum e4__builtin_id id, */ ...);
 
 /* compile.c functions */
+void e4__compile_cancel(struct e4__task *task);
 void e4__compile_cell(struct e4__task *task, e4__cell cell);
 e4__usize e4__compile_finish(struct e4__task *task);
 void e4__compile_literal(struct e4__task *task, e4__cell num);

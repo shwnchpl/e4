@@ -73,6 +73,20 @@ static void e4t__test_builtin_data(void)
     e4t__ASSERT_OK(e4__evaluate(task, "45 to foo foo", -1));
     e4t__ASSERT_EQ(e4__stack_pop(task), 45);
 
+    /* Test that the compilation semantics of TO are correct. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": set-foo to foo ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "55 set-foo foo", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 55);
+
+    e4t__ASSERT_EQ(e4__evaluate(task, ": set-flom to", -1), e4__E_ZLNAME);
+    e4__compile_cancel(task);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": set-flom to flom ;", -1), e4__E_UNDEFWORD);
+    e4__compile_cancel(task);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": set-flom to ;", -1), e4__E_INVNAMEARG);
+    e4__compile_cancel(task);
+
+    e4__stack_clear(task);
+
     /* Test that attempting to run TO on something other than a value
        or an invalid name doesn't work. */
     e4t__ASSERT_OK(e4__evaluate(task, "35 constant bar", -1));

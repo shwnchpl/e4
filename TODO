@@ -125,6 +125,7 @@ Compilation
   in the same position as it was at the start of compilation, throw the
   appropriate exception and reject the definition.
 - Implement :NONAME and DEFER builtins.
+- Check for nested compilation everywhere relevant.
 
 Testing
 -------

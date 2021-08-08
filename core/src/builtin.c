@@ -71,7 +71,7 @@
     _e4__BUILTIN_PROC_N(STORE, "!") \
     _e4__BUILTIN_PROC(SWAP) \
     _e4__BUILTIN_PROC_N(TICK, "'")  \
-    _e4__BUILTIN_PROC(TO)   \
+    _e4__BUILTIN_PROC_F(TO, e4__F_IMMEDIATE)    \
     _e4__BUILTIN_PROC_N(TO_BODY, ">BODY")   \
     _e4__BUILTIN_PROC_N(TO_NUMBER, ">NUMBER")   \
     _e4__BUILTIN_CONSTANT(TRUE, e4__BF_TRUE)    \
@@ -605,7 +605,9 @@ static void e4__builtin_TO(struct e4__task *task, void *user)
     register e4__u8 len;
     register struct e4__dict_header *header;
 
-    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+    if (!e4__task_compiling(task))
+        _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+
     _e4__BUILTIN_LOOKAHEAD(task, word, len);
 
     if (!(header = e4__dict_lookup(task, word, len))) {
@@ -617,7 +619,12 @@ static void e4__builtin_TO(struct e4__task *task, void *user)
         e4__execute_ret(task);
     }
 
-    header->xt->data[0] = e4__stack_pop(task);
+    if (e4__task_compiling(task)) {
+        e4__compile_literal(task, (e4__cell)&header->xt->data[0]);
+        e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_STORE]);
+    } else
+        header->xt->data[0] = e4__stack_pop(task);
+
     e4__execute_ret(task);
 }
 

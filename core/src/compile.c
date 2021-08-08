@@ -1,6 +1,31 @@
 #include "e4.h"
 #include "e4-task.h"
 
+void e4__compile_cancel(struct e4__task *task)
+{
+    /* Attempt to restore HERE to a reasonable state. */
+    switch (task->compile.state) {
+        case 0:
+            return;
+        case e4__COMP_COLON:
+            /* Forget the most recently defined word. */
+            e4__dict_forget(task, task->dict->name, task->dict->nbytes);
+            break;
+        case e4__COMP_NONAME:
+            /* Set here to the provided xt. */
+            task->here = (e4__cell)task->compile.xt;
+            break;
+        case e4__COMP_DOES:
+        default:
+            /* Simply restore HERE to whatever it was when
+               compilation started. */
+            task->here = task->compile.here0;
+            break;
+    };
+
+    task->compile.state = 0;
+}
+
 void e4__compile_cell(struct e4__task *task, e4__cell cell)
 {
     e4__DEREF(task->here++) = cell;
@@ -8,43 +33,24 @@ void e4__compile_cell(struct e4__task *task, e4__cell cell)
 
 e4__usize e4__compile_finish(struct e4__task *task)
 {
-    register const e4__usize mode = task->compile.state;
-
-    task->compile.state = 0;
-
     if (task->compile.s0 != task->sp) {
-        /* Attempt to restore HERE to a reasonable state. */
-        switch (mode) {
-            case e4__COMP_COLON:
-                /* Forget the most recently defined word. */
-                e4__dict_forget(task, task->dict->name, task->dict->nbytes);
-                break;
-            case e4__COMP_NONAME:
-                /* Set here to the provided xt. */
-                task->here = (e4__cell)task->compile.xt;
-                break;
-            case e4__COMP_DOES:
-            default:
-                /* Simply restore HERE to whatever it was when
-                   compilation started. */
-                task->here = task->compile.here0;
-                break;
-        };
-
+        e4__compile_cancel(task);
         return e4__E_CSMISMATCH;
     }
 
-    if (mode == e4__COMP_DOES) {
+    if (task->compile.state == e4__COMP_DOES) {
         task->compile.xt->code = e4__execute_doesthunk;
         task->compile.xt->user = task->compile.here0;
     } else {
-        if (mode == e4__COMP_NONAME)
+        if (task->compile.state == e4__COMP_NONAME)
             e4__stack_push(task, (e4__cell)task->compile.xt);
         task->compile.xt->code = e4__execute_threaded;
     }
 
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_EXIT]);
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_SENTINEL]);
+
+    task->compile.state = 0;
 
     return e4__E_OK;
 }
