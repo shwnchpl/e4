@@ -260,6 +260,7 @@ static void e4__builtin_COMMA(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
     e4__DEREF(task->here++) = e4__stack_pop(task);
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_CONSTANT(struct e4__task *task, void *user)
