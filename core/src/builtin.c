@@ -44,6 +44,7 @@
     _e4__BUILTIN_PROC(CR)   \
     _e4__BUILTIN_PROC(CREATE)   \
     _e4__BUILTIN_PROC(DEPTH)    \
+    _e4__BUILTIN_PROC_NF(DOES, "DOES>", e4__F_IMMEDIATE)    \
     _e4__BUILTIN_PROC_N(DOT, ".")    \
     _e4__BUILTIN_PROC_N(DOT_S, ".S")   \
     _e4__BUILTIN_PROC(DROP) \
@@ -248,7 +249,9 @@ static void e4__builtin_COLON(struct e4__task *task, void *user)
 
     _e4__BUILTIN_LOOKAHEAD(task, word, len);
 
-    e4__dict_entry(task, word, len, 0, e4__execute_threaded, NULL);
+    e4__dict_entry(task, word, len, 0, NULL, NULL);
+    e4__stack_push(task, (e4__cell)e4__execute_threaded);
+
     task->compiling = 1;
     task->compiling_s0 = task->sp;
 
@@ -301,6 +304,19 @@ static void e4__builtin_DEPTH(struct e4__task *task, void *user)
 {
     e4__stack_push(task, (e4__cell)e4__stack_depth(task));
     e4__execute_ret(task);
+}
+
+static void e4__builtin_DOES(struct e4__task *task, void *user)
+{
+    if (task->compiling) {
+        /* FIXME: Implement compilation semantics. */
+    }
+
+    e4__stack_push(task, task->here);
+    e4__stack_push(task, (e4__cell)e4__execute_doesthunk);
+
+    task->compiling = 1;
+    task->compiling_s0 = task->sp;
 }
 
 static void e4__builtin_DOT(struct e4__task *task, void *user)
@@ -522,17 +538,30 @@ static void e4__builtin_ROT(struct e4__task *task, void *user)
 
 static void e4__builtin_SEMICOLON(struct e4__task *task, void *user)
 {
+    e4__code_ptr compiling_code;
+
     task->compiling = 0;
 
     if (task->compiling_s0 != task->sp) {
-        /* Stack imbalanced. Discard this word and raise
-           an exception. */
+        /* After this exception, it is highly likely the stack is in
+           a very bad state. The best way for user code to recover
+           from this is probably to clear it completely. */
         e4__dict_forget(task, task->dict->name, task->dict->nbytes);
         e4__exception_throw(task, e4__E_CSMISMATCH);
         e4__execute_ret(task);
         return;
     }
 
+    /* We know that we pushed to the stack when entering compiling
+       mode, so there must be a code pointer for us to pop now. */
+    compiling_code = (e4__code_ptr)e4__stack_pop(task);
+
+    /* If compiling_code is a doesthunk, We know there's value for
+       us to pop. */
+    if (compiling_code == e4__execute_doesthunk)
+        task->dict->xt->user = e4__stack_pop(task);
+
+    task->dict->xt->code = compiling_code;
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_EXIT]);
     e4__execute_ret(task);
 }

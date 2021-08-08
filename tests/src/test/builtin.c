@@ -80,6 +80,18 @@ static void e4t__test_builtin_data(void)
     e4t__ASSERT_EQ(e4__evaluate(task, "25 to notaname", -1), e4__E_UNDEFWORD);
 }
 
+/* Covers , @ ' ! >BODY CREATE DOES> PLUS */
+static void e4t__test_builtin_does(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* Test that does> behaves correctly at interpret time. */
+    e4t__ASSERT_OK(e4__evaluate(task, "create f 20 , does> @ 55 + ; f", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 75);
+    e4t__ASSERT_OK(e4__evaluate(task, "103 ' f >body ! f", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 158);
+}
+
 /* Covers FORGET and look-ahead idiom (which uses builtin WORD) */
 static void e4t__test_builtin_forget(void)
 {
@@ -428,6 +440,7 @@ void e4t__test_builtin(void)
 {
     e4t__test_builtin_constants();
     e4t__test_builtin_data();
+    e4t__test_builtin_does();
     e4t__test_builtin_forget();
     e4t__test_builtin_io();
     e4t__test_builtin_math();

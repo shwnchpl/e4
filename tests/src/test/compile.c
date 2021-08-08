@@ -67,10 +67,8 @@ static void e4t__test_compile_linear(void)
     e4t__ASSERT_OK(e4__evaluate(task, ": foo 2", -1));
     e4__stack_push(task, (e4__cell)0x5678);
     e4t__ASSERT_EQ(e4__evaluate(task, ";", -1), e4__E_CSMISMATCH);
-    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
-    e4__stack_pop(task);
-    e4__stack_pop(task);
-    e4t__ASSERT_EQ(e4__dict_lookup(task, "foo", 3), 0);
+    e4__stack_clear(task);
+    e4t__ASSERT_EQ(e4__dict_lookup(task, "foo", 3), NULL);
 
     /* Test that compiled code is as expected. */
     e4t__ASSERT_OK(e4__evaluate(task, ": foo 2 5 + ;", -1));
