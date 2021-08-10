@@ -1,14 +1,12 @@
-#ifndef e4_TASK_H_
-#define e4_TASK_H_
+#ifndef e4_INTERNAL_H_
+#define e4_INTERNAL_H_
 
-/* e4 task structure and internal API definitions */
-/* FIXME: Should this file just be e4-internal.h? */
+/* e4 internal declarations and definitions */
 
 #include "e4.h"
 
 #include <setjmp.h>
 
-/* FIXME: Move to an e4-io.h header file? */
 struct e4__io_src
 {
     e4__cell buffer;    /* input buffer */
@@ -18,7 +16,6 @@ struct e4__io_src
     e4__usize sz;       /* input buffer size */
 };
 
-/* FIXME: Move to an e4-compile.h header file? */
 struct e4__compile_state
 {
     e4__usize state;
@@ -27,7 +24,6 @@ struct e4__compile_state
     struct e4__execute_token *xt;
 };
 
-/* FIXME: Move to some exception header file? */
 struct e4__exception_ctx
 {
     jmp_buf ctx;
@@ -82,4 +78,4 @@ struct e4__task
     struct e4__exception_ctx exception;
 };
 
-#endif /* e4_TASK_H_ */
+#endif /* e4_INTERNAL_H_ */

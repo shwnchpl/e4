@@ -1,5 +1,5 @@
 #include "e4.h"
-#include "e4-task.h"
+#include "../kernel/e4-internal.h"
 
 #include <stdarg.h>
 #include <string.h>
@@ -31,11 +31,11 @@
 
 /* FIXME: Make some of these conditional here and elsewhere in this
    file. */
-#include "builtin/CORE.decl.inc"
-#include "builtin/CORE-EXT.decl.inc"
-#include "builtin/SYSTEM.decl.inc"
-#include "builtin/TOOLS.decl.inc"
-#include "builtin/TOOLS-EXT.decl.inc"
+#include "CORE.decl.inc"
+#include "CORE-EXT.decl.inc"
+#include "SYSTEM.decl.inc"
+#include "TOOLS.decl.inc"
+#include "TOOLS-EXT.decl.inc"
 
 #define _e4__BUILTIN_PROC(w)    \
     _e4__BUILTIN_PROC_NF(w, #w, 0)
@@ -172,8 +172,8 @@ void e4__builtin_exec_(e4__usize count, /* struct e4__task *task, */
 
 /* builtin implementations */
 
-#include "builtin/CORE.def.inc"
-#include "builtin/CORE-EXT.def.inc"
-#include "builtin/SYSTEM.def.inc"
-#include "builtin/TOOLS.def.inc"
-#include "builtin/TOOLS-EXT.def.inc"
+#include "CORE.def.inc"
+#include "CORE-EXT.def.inc"
+#include "SYSTEM.def.inc"
+#include "TOOLS.def.inc"
+#include "TOOLS-EXT.def.inc"

@@ -1,5 +1,5 @@
 #include "e4.h"
-#include "e4-task.h"
+#include "e4-internal.h"
 
 void e4__compile_cancel(struct e4__task *task)
 {

@@ -1,5 +1,5 @@
 #include "e4.h"
-#include "e4-task.h"
+#include "e4-internal.h"
 
 /* FIXME: Rename user to something more reasonable here. */
 void e4__execute(struct e4__task *task, void *user)

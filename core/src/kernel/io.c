@@ -1,5 +1,5 @@
 #include "e4.h"
-#include "e4-task.h"
+#include "e4-internal.h"
 
 #include <string.h>
 

@@ -1,5 +1,5 @@
 #include "e4.h"
-#include "e4-task.h"
+#include "e4-internal.h"
 
 /* FIXME: Rename user to something sane here and in e4__execute. */
 e4__usize e4__exception_catch(struct e4__task * task, void *user)

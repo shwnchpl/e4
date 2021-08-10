@@ -34,6 +34,10 @@ Parsing/Text Execution
   to pay attention to count.
 - [DONE] Implement >NUMBER (builtin/C API)
 - [DONE] Reverse mem_parse API to match mem_number API semantics.
+- Create e4__io_refill function and use where appropriate rather than
+  calling builtin directly.
+- Consider creating e4__io_word (or something) and moving builtin
+  word logic into kernel functions.
 
 General Builtins
 ----------------
@@ -230,6 +234,4 @@ Transfer Station
 
 Parsing/Text Execution
 ----------------------
-- Create e4__io_refill function and use where appropriate rather than
-  calling builtin directly.
 - Determine if KEY should be writing to TIB.
