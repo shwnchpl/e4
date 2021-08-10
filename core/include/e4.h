@@ -130,6 +130,7 @@ struct e4__io_func {
 #define e4__F_COMPONLY      (0x02)
 #define e4__F_CONSTANT      (0x04)
 #define e4__F_BUILTIN       (0x08)
+#define e4__F_COMPILING     (0x10)
 
 /* flag constants - numeric parsing */
 #define e4__F_NEG_PREFIX    (0x01)
@@ -158,6 +159,7 @@ enum e4__builtin_id {
     e4__B_ALLOT,
     e4__B_BASE,
     e4__B_BL,
+    e4__B_BRACKET_TICK,
     e4__B_BYE,
     e4__B_CELLS,
     e4__B_CLEAR,

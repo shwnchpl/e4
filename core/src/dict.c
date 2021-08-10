@@ -30,8 +30,11 @@ e4__usize e4__dict_forget(struct e4__task *task, const char *name,
     return e4__E_OK;
 }
 
+/* Look up a dictionary entry. Will not check the top entry if it
+   has the e4__F_COMPILING flag set. */
 struct e4__dict_header* e4__dict_lookup(struct e4__task *task,
         const char *name, e4__u8 nbytes)
 {
-    return e4__mem_dict_lookup(task->dict, name, nbytes);
+    return e4__mem_dict_lookup(task->dict->flags & e4__F_COMPILING ?
+            task->dict->link : task->dict, name, nbytes);
 }

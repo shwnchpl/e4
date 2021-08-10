@@ -44,6 +44,8 @@ e4__usize e4__compile_finish(struct e4__task *task)
     } else {
         if (task->compile.state == e4__COMP_NONAME)
             e4__stack_push(task, (e4__cell)task->compile.xt);
+        else if (task->compile.state == e4__COMP_COLON)
+            task->dict->flags &= ~e4__F_COMPILING;
         task->compile.xt->code = e4__execute_threaded;
     }
 

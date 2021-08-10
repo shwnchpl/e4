@@ -73,11 +73,6 @@ static void e4t__test_builtin_data(void)
     e4t__ASSERT_OK(e4__evaluate(task, "45 to foo foo", -1));
     e4t__ASSERT_EQ(e4__stack_pop(task), 45);
 
-    /* Test that the compilation semantics of TO are correct. */
-    e4t__ASSERT_OK(e4__evaluate(task, ": set-foo to foo ;", -1));
-    e4t__ASSERT_OK(e4__evaluate(task, "55 set-foo foo", -1));
-    e4t__ASSERT_EQ(e4__stack_pop(task), 55);
-
     e4t__ASSERT_EQ(e4__evaluate(task, ": set-flom to", -1), e4__E_ZLNAME);
     e4__compile_cancel(task);
     e4t__ASSERT_EQ(e4__evaluate(task, ": set-flom to flom ;", -1), e4__E_UNDEFWORD);
@@ -104,21 +99,6 @@ static void e4t__test_builtin_does(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 75);
     e4t__ASSERT_OK(e4__evaluate(task, "103 ' f >body ! f", -1));
     e4t__ASSERT_EQ(e4__stack_pop(task), 158);
-
-    /* Test that DOES> heaves correctly at compile time. */
-    e4t__ASSERT_OK(e4__evaluate(task, ": foo create , does> @ 10 + ;", -1));
-    e4t__ASSERT_OK(e4__evaluate(task, "5 foo bar bar", -1));
-    e4t__ASSERT_EQ(e4__stack_pop(task), 15);
-
-    /* Test that double DOES> works as expected. */
-    e4t__ASSERT_OK(e4__evaluate(task, ": foo create , does> @ 10 + does> @ 67 + ;", -1));
-    e4t__ASSERT_OK(e4__evaluate(task, "5 foo bar", -1));
-    e4t__ASSERT_OK(e4__evaluate(task, "create bas 33 , bas @", -1));
-    e4t__ASSERT_EQ(e4__stack_pop(task), 33);
-    e4t__ASSERT_OK(e4__evaluate(task, "bar", -1));
-    e4t__ASSERT_EQ(e4__stack_pop(task), 15);
-    e4t__ASSERT_OK(e4__evaluate(task, "bas", -1));
-    e4t__ASSERT_EQ(e4__stack_pop(task), 100);
 }
 
 /* Covers ABORT */
@@ -162,6 +142,26 @@ static void e4t__test_builtin_forget(void)
     e4t__ASSERT_EQ(e4__stack_depth(task), 2);
     e4t__ASSERT_EQ(e4__stack_pop(task), 17);
     e4t__ASSERT_EQ(e4__stack_pop(task), 17);
+}
+
+/* Covers ['] TO and ancillary compilation words */
+static void e4t__test_builtin_immediate(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* Test that ['] behaves as expected. */
+    e4t__ASSERT_EQ(e4__evaluate(task, "['] dup", -1), e4__E_COMPONLYWORD);
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo ['] dup ; foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), &e4__BUILTIN_XT[e4__B_DUP]);
+
+    /* Test that the compilation semantics of TO are correct. */
+    e4t__ASSERT_OK(e4__evaluate(task, "35 value foo foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 35);
+    e4t__ASSERT_OK(e4__evaluate(task, ": set-foo to foo ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "55 set-foo foo", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 55);
 }
 
 /* Covers . ? CR BASE PAD */
@@ -483,6 +483,7 @@ void e4t__test_builtin(void)
     e4t__test_builtin_does();
     e4t__test_builtin_exceptions();
     e4t__test_builtin_forget();
+    e4t__test_builtin_immediate();
     e4t__test_builtin_io();
     e4t__test_builtin_math();
     e4t__test_builtin_memmanip();

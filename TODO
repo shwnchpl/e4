@@ -66,6 +66,7 @@ General Builtins
   in that CONSTANT should have some flag preventing update with TO.
 - [DONE] Implement DOES> builtin.
 - [DONE] Fix ABORT implementation.
+- [DONE] Implement ['] builtin.
 - Implement simple IO builtins U. and EMIT.
 
 Kernel

@@ -35,6 +35,8 @@
     _e4__BUILTIN_PROC(ALLOT)    \
     _e4__BUILTIN_USERVAR(BASE) \
     _e4__BUILTIN_CONSTANT(BL, ' ')  \
+    _e4__BUILTIN_PROC_NF(BRACKET_TICK, "[']",   \
+            e4__F_IMMEDIATE | e4__F_COMPONLY)   \
     _e4__BUILTIN_PROC(BYE)  \
     _e4__BUILTIN_PROC(CELLS)    \
     _e4__BUILTIN_PROC(CLEAR)    \
@@ -233,6 +235,27 @@ static void e4__builtin_ALLOT(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_BRACKET_TICK(struct e4__task *task, void *user)
+{
+    const register e4__usize depth = e4__stack_depth(task);
+
+    /* Call interpretation time tick. */
+    e4__builtin_exec(task, e4__B_TICK);
+
+    if (e4__stack_depth(task) != depth + 1) {
+        /* TICK failed and exceptions are disabled. Nothing we can do
+           here but just return. */
+        e4__execute_ret(task);
+        return;
+    }
+
+    /* Compile xt from the top of the stack into the current
+       function. */
+    e4__compile_literal(task, e4__stack_pop(task));
+
+    e4__execute_ret(task);
+}
+
  /* XXX: From the Programming-Tools Extensions word set. */
 static void e4__builtin_BYE(struct e4__task *task, void *user)
 {
@@ -263,7 +286,7 @@ static void e4__builtin_COLON(struct e4__task *task, void *user)
 
     _e4__BUILTIN_LOOKAHEAD(task, word, len);
 
-    e4__dict_entry(task, word, len, 0, NULL, NULL);
+    e4__dict_entry(task, word, len, e4__F_COMPILING, NULL, NULL);
     e4__compile_start(task, task->dict->xt, e4__COMP_COLON);
 
     e4__execute_ret(task);
