@@ -41,8 +41,13 @@ static void e4t__test_compile_failure(void)
     e4t__ASSERT_EQ(e4__dict_lookup(task, "foo", 3), NULL);
     e4t__ASSERT_EQ(e4__task_uservar(task, e4__UV_HERE), here);
 
-    /* FIXME: Once :NONAME has been implemented, add a test that
-       the above conditions hold for it as well. */
+    /* Test that the above is true for :NONAME as well. */
+    here = e4__task_uservar(task, e4__UV_HERE);
+    e4t__ASSERT_OK(e4__evaluate(task, ":noname 2", -1));
+    e4__stack_push(task, (e4__cell)0x5678);
+    e4t__ASSERT_EQ(e4__evaluate(task, ";", -1), e4__E_CSMISMATCH);
+    e4__stack_clear(task);
+    e4t__ASSERT_EQ(e4__task_uservar(task, e4__UV_HERE), here);
 
     /* Test that the above is true when compiling with DOES> as well
        and additionally that the failure does not corrupt the existing
@@ -141,10 +146,22 @@ static void e4t__test_compile_linear(void)
     e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
 }
 
+static void e4t__test_compile_noname(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    e4t__ASSERT_OK(e4__evaluate(task, ":noname 2 5 + ;", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_OK(e4__evaluate(task, "execute", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 7);
+}
+
 void e4t__test_compile(void)
 {
     /* FIXME: Add direct compilation API tests? */
     e4t__test_compile_does();
     e4t__test_compile_failure();
     e4t__test_compile_linear();
+    e4t__test_compile_noname();
 }

@@ -41,6 +41,7 @@
     _e4__BUILTIN_PROC(CELLS)    \
     _e4__BUILTIN_PROC(CLEAR)    \
     _e4__BUILTIN_PROC_N(COLON, ":") \
+    _e4__BUILTIN_PROC_N(COLON_NONAME, ":NONAME")    \
     _e4__BUILTIN_PROC_N(COMMA, ",") \
     _e4__BUILTIN_PROC(CONSTANT) \
     _e4__BUILTIN_PROC(CR)   \
@@ -288,6 +289,27 @@ static void e4__builtin_COLON(struct e4__task *task, void *user)
 
     e4__dict_entry(task, word, len, e4__F_COMPILING, NULL, NULL);
     e4__compile_start(task, task->dict->xt, e4__COMP_COLON);
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_COLON_NONAME(struct e4__task *task, void *user)
+{
+    register struct e4__execute_token *xt =
+            (struct e4__execute_token *)task->here;
+    register e4__usize unaligned;
+
+    task->here = (e4__cell)((e4__u8 *)task->here + sizeof(*xt) -
+            sizeof(xt->data));
+
+    /* FIXME: This probably shouldn't be possible. Confirm that it
+       isn't with some kind of compile time assert rather than doing
+       this. */
+    if ((unaligned = (e4__usize)task->here % sizeof(e4__cell)))
+        task->here = (e4__cell)((e4__u8 *)task->here + sizeof(e4__cell)
+                - unaligned);
+
+    e4__compile_start(task, xt, e4__COMP_NONAME);
 
     e4__execute_ret(task);
 }

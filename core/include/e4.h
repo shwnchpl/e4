@@ -164,6 +164,7 @@ enum e4__builtin_id {
     e4__B_CELLS,
     e4__B_CLEAR,
     e4__B_COLON,
+    e4__B_COLON_NONAME,
     e4__B_COMMA,
     e4__B_CONSTANT,
     e4__B_CR,
