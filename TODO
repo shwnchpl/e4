@@ -128,8 +128,7 @@ Testing
 - [DONE] Migrate builtin WORD tests.
 - [DONE] Migrate dict entry creation tests.
 - [DONE] Add exception tests (see uncommitted diff).
-- Figure out some way to cover WORDS in tests.
-- Figure out some way to cover return stack corruption in tests.
+- [DONE] Figure out some way to cover WORDS in tests.
 
 REPL
 ----
@@ -203,6 +202,12 @@ General Builtins
   padding to align.
 - Implement EVALUATE (builtin)
 - Implement THROW and CATCH builtins.
+
+Testing
+-------
+- Figure out some way to cover return stack corruption in tests.
+- Cover user IO errors in tests (ie. user provided IO handler returns
+  non-zero).
 
 
 Version 0.9

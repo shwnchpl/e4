@@ -181,7 +181,7 @@ static void e4t__test_builtin_immediate(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 55);
 }
 
-/* Covers . ? CR BASE EMIT PAD U. */
+/* Covers . ? CR BASE EMIT PAD U. WORDS */
 static void e4t__test_builtin_io(void)
 {
     /* XXX: Parts of this test only work correctly on a 64 bit
@@ -228,6 +228,12 @@ static void e4t__test_builtin_io(void)
     /* Test that EMIT behaves as expected. */
     e4t__ASSERT_OK(e4__evaluate(task, "'0' 'o' 'f' emit emit emit", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "fo0");
+
+    /* Test that newly created words appear at the front of WORDS. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": flom345 ; : blom938 ;", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "words", -1), 0);
+    e4t__ASSERT(!e4__mem_strncasecmp(e4t__term_obuf_consume(),
+                "blom938 flom345 ", 16));
 }
 
 /* Covers + - . */
@@ -236,6 +242,8 @@ static void e4t__test_builtin_math(void)
     struct e4__task *task = e4t__transient_task();
 
     #define _e(s)   e4__evaluate(task, s, sizeof(s) - 1)
+
+    e4t__term_obuf_consume();
 
     e4t__ASSERT_EQ(_e("+"), e4__E_STKUNDERFLOW);
     e4t__ASSERT_EQ(_e("1 +"), e4__E_STKUNDERFLOW);

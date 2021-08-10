@@ -49,6 +49,7 @@ static e4__usize e4t__term_obuf_type(void *user, const char *buf, e4__usize n)
 {
     struct e4t__term_obuf *b = &e4t__term_ob;
 
+    /* XXX: Rather than returning an error, simply copy what we can. */
     if (b->offset + n > (sizeof(b->buf[0]) - 1))
         n = sizeof(b->buf[0]) - 1 - b->offset;
 

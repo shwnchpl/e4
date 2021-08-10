@@ -56,18 +56,25 @@ static void e4__builtin_QUESTION(struct e4__task *task, void *user)
 static void e4__builtin_WORDS(struct e4__task *task, void *user)
 {
     struct e4__dict_header *e = task->dict;
+    register e4__usize io_res = e4__E_OK;
     e4__usize written = 0;
 
     while (e) {
         written += e->nbytes + 1;
         if (written > 79) {
-            e4__io_type(task, "\n", 1);
+            if ((io_res = e4__io_type(task, "\n", 1)))
+                break;
             written = e->nbytes + 1;
         }
-        e4__io_type(task, e->name, e->nbytes);
-        e4__io_type(task, " ", 1);
+        if ((io_res = e4__io_type(task, e->name, e->nbytes)))
+            break;
+        if ((io_res = e4__io_type(task, " ", 1)))
+            break;
         e = e->link;
     }
+
+    if (io_res)
+        e4__exception_throw(task, io_res);
 
     e4__execute_ret(task);
 }
