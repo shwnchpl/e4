@@ -108,6 +108,7 @@ struct e4__io_func {
 
 /* error constants - standard */
 #define e4__E_OK            (0)
+#define e4__E_ABORT         (-1)
 #define e4__E_STKUNDERFLOW  (-4)
 #define e4__E_UNDEFWORD     (-13)
 #define e4__E_COMPONLYWORD  (-14)

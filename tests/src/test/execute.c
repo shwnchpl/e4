@@ -61,7 +61,7 @@ static void e4t__test_execute_does(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 53);
 }
 
-/* Covers ABORT LIT SKIP and nested execution. */
+/* Covers ABORT (exceptions disabled) LIT SKIP and nested execution. */
 static void e4t__test_execute_meta(void)
 {
     static const void *push_12345[] = {
@@ -88,7 +88,19 @@ static void e4t__test_execute_meta(void)
         &e4__BUILTIN_XT[e4__B_EXIT],
         &e4__BUILTIN_XT[e4__B_SENTINEL]
     };
-    const void *push_seq[] = {
+    static const void *push_seq_exit[] = {
+        e4__execute_threaded,
+        NULL,
+        &e4__BUILTIN_XT[e4__B_SKIP],
+        push_12345,
+        push_77777,
+        push_abcde,
+        &e4__BUILTIN_XT[e4__B_EXIT],
+        push_12345,
+        &e4__BUILTIN_XT[e4__B_EXIT],
+        &e4__BUILTIN_XT[e4__B_SENTINEL]
+    };
+    static const void *push_seq_abort[] = {
         e4__execute_threaded,
         NULL,
         &e4__BUILTIN_XT[e4__B_SKIP],
@@ -100,17 +112,20 @@ static void e4t__test_execute_meta(void)
         &e4__BUILTIN_XT[e4__B_EXIT],
         &e4__BUILTIN_XT[e4__B_SENTINEL]
     };
-
     struct e4__task *task = e4t__transient_task();
 
     e4__execute(task, push_12345);
     e4t__ASSERT_EQ(e4__stack_pop(task), 0x12345);
     e4t__ASSERT_EQ(e4__stack_depth(task), 0);
 
-    e4__execute(task, push_seq);
+    e4__execute(task, push_seq_exit);
     e4t__ASSERT_EQ(e4__stack_depth(task), 2);
     e4t__ASSERT_EQ(e4__stack_pop(task), 0xabcde);
     e4t__ASSERT_EQ(e4__stack_pop(task), 0x77777);
+
+    /* Test exception disabled ABORT behavior. */
+    e4__execute(task, push_seq_abort);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
 }
 
 static void e4t__test_execute_userfunc_setter(struct e4__task *task,

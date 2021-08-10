@@ -159,6 +159,11 @@ const struct e4__execute_token e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
 #undef _e4__BUILTIN_PROC
 #undef _e4__BUILTIN_DECL
 
+static const void *_e4__BUILTIN_RETURN_THUNK[] =
+{
+    &e4__BUILTIN_XT[e4__B_EXIT]
+};
+
 /* TODO: Add some sort of e4__builtin_thunk which basically just calls
    e4__execute on whatever is pointed to by the *user field. This could
    allow for builtins implemented in Forth that don't need to be
@@ -201,18 +206,23 @@ void e4__builtin_exec_(e4__usize count, /* struct e4__task *task, */
 
 static void e4__builtin_ABORT(struct e4__task *task, void *user)
 {
-    /* FIXME: Implement this function correctly. */
     register int i;
-    static const void *RETURN[] =
-    {
-        &e4__BUILTIN_XT[e4__B_EXIT]
-    };
+
+    /* First, try to just throw an abort exception. */
+    e4__exception_throw(task, e4__E_ABORT);
+
+    /* Okay, exceptions aren't enabled, meaning we definitely aren't
+       running within the context of quit. Attempt to perform the
+       core ABORT semantics outlined in 6.1.0670 by manually clearing
+       the data stack and filling the return stack with immediate
+       return thunks. */
+
+    e4__stack_clear(task);
 
     for (i = 1; &task->rp[i] <= task->r0; ++i)
-        task->rp[i] = RETURN;
-    task->ip = e4__DEREF(++task->rp);
+        task->rp[i] = _e4__BUILTIN_RETURN_THUNK;
 
-    /* e4__execute_ret intentionally omitted. */
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_ALLOT(struct e4__task *task, void *user)
@@ -311,11 +321,6 @@ static void e4__builtin_DEPTH(struct e4__task *task, void *user)
 /* XXX: e4 system word. */
 static void e4__builtin_DLITERAL(struct e4__task *task, void *user)
 {
-    static const void *RETURN_THUNK[] =
-    {
-        &e4__BUILTIN_XT[e4__B_EXIT]
-    };
-
     e4__usize res;
 
     if (task->dict->flags & e4__F_BUILTIN) {
@@ -343,7 +348,7 @@ static void e4__builtin_DLITERAL(struct e4__task *task, void *user)
     /* Set the instruction pointer to a return thunk so that we can
        return as we would have at the end of threaded_execute of the
        word containing DLITERAL. */
-    task->ip = (e4__cell)RETURN_THUNK;
+    task->ip = (e4__cell)_e4__BUILTIN_RETURN_THUNK;
 
     /* e4__execute_ret intentionally omitted. */
 }
