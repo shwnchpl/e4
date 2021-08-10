@@ -93,7 +93,8 @@ Kernel
   unnecessary parameters.
 - [DONE] Implement _constant, _variable, and _uservar code handlers.
 - [DONE] Implement _thunk code handler (for DOES>).
-- Always use size or sz as name to indicate size in API parameters.
+- [DONE] Always use size or sz as name to indicate size in API
+  parameters.
 
 General IO
 ----------

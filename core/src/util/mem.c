@@ -135,23 +135,23 @@ e4__usize e4__mem_number(const char *buf, e4__usize length, e4__u8 base,
     return 0;
 }
 
-e4__usize e4__mem_parse(const char *buf, char delim, e4__usize size,
+e4__usize e4__mem_parse(const char *buf, char delim, e4__usize sz,
         e4__usize flags, const char **out)
 {
     /* out is always set. */
     register e4__usize length;
 
     if (flags & e4__F_SKIP_LEADING)
-        while (size && *buf == delim)
-            ++buf, --size;
+        while (sz && *buf == delim)
+            ++buf, --sz;
 
     *out = buf;
 
     /* FIXME: Consider wrapping the end on newline behavior around some
        kind of flag. */
     length = 0;
-    while (size && *buf != delim && *buf != '\n')
-        ++buf, --size, ++length;
+    while (sz && *buf != delim && *buf != '\n')
+        ++buf, --sz, ++length;
 
     return length;
 }

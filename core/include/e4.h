@@ -329,9 +329,9 @@ e4__usize e4__mem_dict_entry(void *here, struct e4__dict_header *prev,
 struct e4__dict_header* e4__mem_dict_lookup(struct e4__dict_header *dict,
         const char *name, e4__u8 nbytes);
 int e4__mem_strncasecmp(const char *left, const char *right, e4__usize n);
-e4__usize e4__mem_number(const char *buf, e4__usize size, e4__u8 base,
+e4__usize e4__mem_number(const char *buf, e4__usize sz, e4__u8 base,
         e4__u8 flags, e4__usize *out);
-e4__usize e4__mem_parse(const char *buf, char delim, e4__usize size,
+e4__usize e4__mem_parse(const char *buf, char delim, e4__usize sz,
         e4__usize flags, const char **length);
 
 /* num.c functions */
@@ -342,9 +342,9 @@ e4__usize e4__num_sdiv(e4__usize n, e4__usize d);
 
 /* task.c functions */
 e4__bool e4__task_compiling(struct e4__task *task);
-struct e4__task* e4__task_create(void *buffer, e4__usize size);
+struct e4__task* e4__task_create(void *buffer, e4__usize sz);
 void e4__task_io_init(struct e4__task *task, struct e4__io_func *io);
 void e4__task_io_get(struct e4__task *task, struct e4__io_func *io);
-e4__cell e4__task_uservar(struct e4__task *task, e4__usize size);
+e4__cell e4__task_uservar(struct e4__task *task, e4__usize offset);
 
 #endif /* e4_H_ */

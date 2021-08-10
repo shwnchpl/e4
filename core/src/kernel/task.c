@@ -8,18 +8,18 @@ e4__bool e4__task_compiling(struct e4__task *task)
     return !!task->compile.state;
 }
 
-struct e4__task* e4__task_create(void *buffer, e4__usize size)
+struct e4__task* e4__task_create(void *buffer, e4__usize sz)
 {
     register struct e4__task *task;
     register const e4__cell c0 = buffer;
 
     /* Align size to pointer width. */
-    size = size / sizeof(e4__cell) * sizeof(e4__cell);
+    sz = sz / sizeof(e4__cell) * sizeof(e4__cell);
 
-    if (size < e4__TASK_MIN_SZ)
+    if (sz < e4__TASK_MIN_SZ)
         return NULL;
 
-    memset(buffer, 0, size);
+    memset(buffer, 0, sz);
 
     /* FIXME: Verify that these fields are all a reasonable size (per
        standard Forth 2012) with the minimum task size e4 will
@@ -41,7 +41,7 @@ struct e4__task* e4__task_create(void *buffer, e4__usize size)
     */
 
     task = buffer;
-    task->sz = size;
+    task->sz = sz;
     task->dict = (struct e4__dict_header *)
             &e4__BUILTIN_HEADER[e4__BUILTIN_COUNT - 1];
 
@@ -50,16 +50,16 @@ struct e4__task* e4__task_create(void *buffer, e4__usize size)
        e4__cell), so this is safe. */
 
     task->here = c0 + sizeof(*task) / sizeof(e4__cell);
-    task->pad = c0 + (70 * size) / (100 * sizeof(e4__cell));
-    task->s0 = c0 + (85 * size) / (100 * sizeof(e4__cell));
+    task->pad = c0 + (70 * sz) / (100 * sizeof(e4__cell));
+    task->s0 = c0 + (85 * sz) / (100 * sizeof(e4__cell));
     task->sp = task->s0;
-    task->tib = c0 + (85 * size) / (100 * sizeof(e4__cell)) + 1;
-    task->tib_sz = (((e4__u8 *)c0 + (90 * size) / 100) -
+    task->tib = c0 + (85 * sz) / (100 * sizeof(e4__cell)) + 1;
+    task->tib_sz = (((e4__u8 *)c0 + (90 * sz) / 100) -
             (e4__u8 *)task->tib - 1);
     task->base_ptr = (e4__cell)&task->base;
     task->io_src.buffer = task->tib;
     task->io_src.sz = task->tib_sz;
-    task->r0 = c0 + size / sizeof(e4__cell) - 1;
+    task->r0 = c0 + sz / sizeof(e4__cell) - 1;
     task->rp = task->r0;
     task->base = 10;
 
