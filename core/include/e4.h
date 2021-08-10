@@ -169,6 +169,9 @@ enum e4__builtin_id {
     e4__B_CONSTANT,
     e4__B_CR,
     e4__B_CREATE,
+    e4__B_DEFER,
+    e4__B_DEFER_FETCH,
+    e4__B_DEFER_STORE,
     e4__B_DEPTH,
     e4__B_DLITERAL,
     e4__B_DOES,
@@ -295,6 +298,7 @@ void e4__exception_throw(struct e4__task *task, e4__usize e);
 
 /* execute.c functions */
 void e4__execute(struct e4__task *task, void *user);
+void e4__execute_deferthunk(struct e4__task *task, void *user);
 void e4__execute_doesthunk(struct e4__task *task, void *user);
 void e4__execute_ret(struct e4__task *task);
 void e4__execute_threaded(struct e4__task *task, void *user);

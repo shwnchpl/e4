@@ -35,6 +35,47 @@ static void e4t__test_execute_data(void)
     e4t__ASSERT_EQ(e4__DEREF(e4__stack_pop(task)), 10);
 }
 
+static void e4t__test_execute_defer(void)
+{
+    static const void *yield_5[] = {
+        e4__execute_threaded,
+        NULL,
+        &e4__BUILTIN_XT[e4__B_LITERAL],
+        (void *)3,
+        &e4__BUILTIN_XT[e4__B_LITERAL],
+        (void *)2,
+        &e4__BUILTIN_XT[e4__B_PLUS],
+        &e4__BUILTIN_XT[e4__B_EXIT],
+        &e4__BUILTIN_XT[e4__B_SENTINEL]
+    };
+    static const void *yield_16[] = {
+        e4__execute_threaded,
+        NULL,
+        &e4__BUILTIN_XT[e4__B_LITERAL],
+        (void *)10,
+        &e4__BUILTIN_XT[e4__B_LITERAL],
+        (void *)6,
+        &e4__BUILTIN_XT[e4__B_PLUS],
+        &e4__BUILTIN_XT[e4__B_EXIT],
+        &e4__BUILTIN_XT[e4__B_SENTINEL]
+    };
+    void *defer_num[] = {
+        e4__execute_deferthunk,
+        (void *)yield_5
+    };
+    struct e4__task *task = e4t__transient_task();
+
+    e4__execute(task, defer_num);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+
+    defer_num[1] = (void *)yield_16;
+
+    e4__execute(task, defer_num);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 16);
+}
+
 static void e4t__test_execute_does(void)
 {
     void *addtwo_const[] = {
@@ -157,6 +198,7 @@ static void e4t__test_execute_userfunc(void)
 void e4t__test_execute(void)
 {
     e4t__test_execute_data();
+    e4t__test_execute_defer();
     e4t__test_execute_does();
     e4t__test_execute_meta();
     e4t__test_execute_userfunc();

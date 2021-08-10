@@ -46,6 +46,9 @@
     _e4__BUILTIN_PROC(CONSTANT) \
     _e4__BUILTIN_PROC(CR)   \
     _e4__BUILTIN_PROC(CREATE)   \
+    _e4__BUILTIN_PROC(DEFER)    \
+    _e4__BUILTIN_PROC_N(DEFER_FETCH, "DEFER@")  \
+    _e4__BUILTIN_PROC_N(DEFER_STORE, "DEFER!")  \
     _e4__BUILTIN_PROC(DEPTH)    \
     _e4__BUILTIN_PROC_F(DLITERAL, e4__F_COMPONLY)   \
     _e4__BUILTIN_PROC_NF(DOES, "DOES>", e4__F_IMMEDIATE)    \
@@ -354,6 +357,43 @@ static void e4__builtin_CREATE(struct e4__task *task, void *user)
     _e4__BUILTIN_LOOKAHEAD(task, word, len);
 
     e4__dict_entry(task, word, len, 0, e4__execute_variable, NULL);
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_DEFER(struct e4__task *task, void *user)
+{
+    register const char *word;
+    register e4__u8 len;
+
+    _e4__BUILTIN_LOOKAHEAD(task, word, len);
+
+    e4__dict_entry(task, word, len, 0, e4__execute_deferthunk,
+            (e4__cell)&e4__BUILTIN_XT[e4__B_ABORT]);
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_DEFER_FETCH(struct e4__task *task, void *user)
+{
+    struct e4__execute_token *xt;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+
+    xt = (struct e4__execute_token *)e4__stack_pop(task);
+    e4__stack_push(task, (e4__cell)xt->user);
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_DEFER_STORE(struct e4__task *task, void *user)
+{
+    struct e4__execute_token *xt;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    xt = (struct e4__execute_token *)e4__stack_pop(task);
+    xt->user = e4__stack_pop(task);
+
     e4__execute_ret(task);
 }
 

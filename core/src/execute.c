@@ -11,6 +11,13 @@ void e4__execute(struct e4__task *task, void *user)
     entry(task, code + 1);
 }
 
+void e4__execute_deferthunk(struct e4__task *task, void *user)
+{
+    /* Execute whatever execution token is pointed to by the
+       user pointer. */
+    e4__execute(task, e4__DEREF(user));
+}
+
 void e4__execute_doesthunk(struct e4__task *task, void *user)
 {
     /* Push the address of the data pointer onto the stack then

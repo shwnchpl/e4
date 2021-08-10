@@ -89,7 +89,24 @@ static void e4t__test_builtin_data(void)
     e4t__ASSERT_EQ(e4__evaluate(task, "25 to notaname", -1), e4__E_UNDEFWORD);
 }
 
-/* Covers , @ ' ! >BODY CREATE DOES> PLUS */
+/* Covers :NONAME ABORT DEFER DEFER! DEFER@ */
+static void e4t__test_builtin_defer(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    e4t__ASSERT_OK(e4__evaluate(task, "defer foo", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "foo", -1), e4__E_ABORT);
+    e4t__ASSERT_OK(e4__evaluate(task, "' foo defer@", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), &e4__BUILTIN_XT[e4__B_ABORT]);
+
+    e4t__ASSERT_OK(e4__evaluate(task, ":noname 2 2 + ; ' foo defer!", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+}
+
+/* Covers , @ ' ! >BODY CREATE DOES> (interpret) PLUS */
 static void e4t__test_builtin_does(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -480,6 +497,7 @@ void e4t__test_builtin(void)
 {
     e4t__test_builtin_constants();
     e4t__test_builtin_data();
+    e4t__test_builtin_defer();
     e4t__test_builtin_does();
     e4t__test_builtin_exceptions();
     e4t__test_builtin_forget();

@@ -106,7 +106,7 @@ Compilation
   in the same position as it was at the start of compilation, throw the
   appropriate exception and reject the definition.
 - [DONE] Implement :NONAME builtin.
-- Implement DEFER, DEFER@, and DEFER! builtins.
+- [DONE] Implement DEFER, DEFER@, and DEFER! builtins.
 - Check for nested compilation everywhere relevant.
 
 Testing
