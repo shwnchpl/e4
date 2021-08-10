@@ -23,6 +23,7 @@
     _e4__BUILTIN_PROC_N(DOT, ".")    \
     _e4__BUILTIN_PROC(DROP) \
     _e4__BUILTIN_PROC(DUP)  \
+    _e4__BUILTIN_PROC(EMIT) \
     _e4__BUILTIN_PROC(EXECUTE)  \
     _e4__BUILTIN_PROC_F(EXIT, e4__F_COMPONLY)   \
     _e4__BUILTIN_PROC_N(FETCH, "@") \
@@ -39,6 +40,7 @@
     _e4__BUILTIN_PROC_N(TICK, "'")  \
     _e4__BUILTIN_PROC_N(TO_BODY, ">BODY")   \
     _e4__BUILTIN_PROC_N(TO_NUMBER, ">NUMBER")   \
+    _e4__BUILTIN_PROC_N(U_DOT, "U.")  \
     _e4__BUILTIN_PROC(VARIABLE) \
     _e4__BUILTIN_PROC(WORD)
 

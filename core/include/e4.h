@@ -172,6 +172,7 @@ enum e4__builtin_id {
     e4__B_DOT,
     e4__B_DROP,
     e4__B_DUP,
+    e4__B_EMIT,
     e4__B_EXECUTE,
     e4__B_EXIT,
     e4__B_FETCH,
@@ -188,6 +189,7 @@ enum e4__builtin_id {
     e4__B_TICK,
     e4__B_TO_BODY,
     e4__B_TO_NUMBER,
+    e4__B_U_DOT,
     e4__B_VARIABLE,
     e4__B_WORD,
 

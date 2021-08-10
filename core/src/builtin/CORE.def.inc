@@ -187,6 +187,18 @@ static void e4__builtin_DUP(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_EMIT(struct e4__task *task, void *user)
+{
+    char c;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+
+    c = (char)(e4__usize)e4__stack_pop(task);
+    e4__io_type(task, &c, 1);
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_EXECUTE(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
@@ -356,6 +368,31 @@ static void e4__builtin_TO_NUMBER(struct e4__task *task, void *user)
 
     e4__stack_push(task, (e4__cell)(buf + consumed));
     e4__stack_push(task, (e4__cell)(length - consumed));
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_U_DOT(struct e4__task *task, void *user)
+{
+    /* FIXME: Once pictured numeric output has been implemented, use
+       that instead of this implementation. */
+    register e4__usize io_res;
+    register char *num;
+    register char *buf;
+    register e4__usize len;
+    register e4__usize n;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+
+    buf = (char *)task->here;
+    n = (e4__usize)e4__stack_pop(task);
+
+    num = e4__num_format(n, task->base, 0, buf, 130);
+    len = &buf[130] - num;
+    num[len++] = ' ';
+
+    if ((io_res = e4__io_type(task, num, len)))
+        e4__exception_throw(task, io_res);
 
     e4__execute_ret(task);
 }

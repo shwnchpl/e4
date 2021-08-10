@@ -69,7 +69,7 @@ General Builtins
 - [DONE] Implement DOES> builtin.
 - [DONE] Fix ABORT implementation.
 - [DONE] Implement ['] builtin.
-- Implement simple IO builtins U. and EMIT.
+- [DONE] Implement simple IO builtins U. and EMIT.
 
 Kernel
 ------

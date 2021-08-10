@@ -181,9 +181,13 @@ static void e4t__test_builtin_immediate(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 55);
 }
 
-/* Covers . ? CR BASE PAD */
+/* Covers . ? CR BASE EMIT PAD U. */
 static void e4t__test_builtin_io(void)
 {
+    /* XXX: Parts of this test only work correctly on a 64 bit
+       system that represents negative numbers using two's
+       complement. */
+
     struct e4__task *task = e4t__transient_task();
 
     e4t__term_obuf_consume();
@@ -214,6 +218,16 @@ static void e4t__test_builtin_io(void)
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "\n");
     e4t__ASSERT_OK(e4__evaluate(task, "cr cr", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "\n\n");
+
+    /* Test that U. behaves as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task, "-1 u.", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "18446744073709551615 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "-25 u.", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "18446744073709551591 ");
+
+    /* Test that EMIT behaves as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task, "'0' 'o' 'f' emit emit emit", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "fo0");
 }
 
 /* Covers + - . */
