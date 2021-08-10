@@ -16,19 +16,6 @@ static char* repl_prompt(EditLine *el)
     return "";
 }
 
-#if 0 /* FIXME: Remove this code. It doesn't work well. */
-/* FIXME: This doesn't work right at all. For some reason, history
-   ends up being corrupted. Additionally, hitting enter in vi command
-   mode leaves the cursor in the wrong position. It's probably *much*
-   simpler to just allow newlines to be printed and deal with it. */
-static unsigned char repl_newline(EditLine *el, int ch)
-{
-    el_insertstr(el, " ");
-    fprintf(stdout, " ");
-    return CC_NEWLINE;
-}
-#endif
-
 static e4__usize repl_accept(void *user, char *buf, e4__usize *n)
 {
     int d = 0;
@@ -87,12 +74,6 @@ int main(int argc, char **argv)
     el_set(el, EL_SIGNAL, 1);
     el_set(el, EL_HIST, history, hist);
     el_set(el, EL_PROMPT, repl_prompt);
-
-#if 0 /* FIXME: Remove this code. It doesn't work well. */
-    el_set(el, EL_ADDFN, "silent-nl", "process input line", repl_newline);
-    el_set(el, EL_BIND, "-a", "\n", "silent-nl", NULL);
-    el_set(el, EL_BIND, "\n", "silent-nl", NULL);
-#endif
 
     el_source(el, NULL);
 
