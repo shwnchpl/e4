@@ -66,30 +66,17 @@ static void e4__builtin_DEFER_STORE(struct e4__task *task, void *user)
 static void e4__builtin_REFILL(struct e4__task *task, void *user)
 {
     register e4__usize io_res;
+    e4__usize bf;
 
-    /* Unless SOURCE-ID is user input device, just return false. */
-    if (task->io_src.sid) {
-        e4__stack_push(task, (e4__cell)e4__BF_FALSE);
-        return;
-    }
+    /* FIXME: Verify that the behavior of this builtin is correct. */
 
-    /* Attempt to read the entire buffer. */
-    task->io_src.length = task->io_src.sz;
-    io_res = e4__io_accept(task, (char *)task->io_src.buffer,
-            &task->io_src.length);
-    if (io_res) {
-        /* We've failed. Say the buffer is empty. */
-        task->io_src.length = 0;
+    if ((io_res = e4__io_refill(task, &bf)))
         e4__exception_throw(task, io_res);
 
-        /* If we happen to be here, exceptions aren't enabled, so we
-           we may as well return false. */
-        e4__stack_push(task, (e4__cell)e4__BF_FALSE);
-        e4__execute_ret(task);
-        return;
-    }
-
-    e4__stack_push(task, (e4__cell)e4__BF_TRUE);
+    /* If we happen to be here either all is well or exceptions aren't
+        enabled. In either case, we may as well push the boolean flag
+        result and return. */
+    e4__stack_push(task, (e4__cell)bf);
 
     e4__execute_ret(task);
 }

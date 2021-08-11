@@ -413,38 +413,13 @@ static void e4__builtin_VARIABLE(struct e4__task *task, void *user)
 static void e4__builtin_WORD(struct e4__task *task, void *user)
 {
     register char delim;
-    register e4__usize length;
-    register e4__u8 clamped_length;
-    const char *word = NULL;
 
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
 
-    /* Parse word. */
-    delim = (e4__usize)e4__stack_pop(task);
-    word = (const char *)task->io_src.buffer + (e4__usize)task->io_src.in;
+    /* FIXME: Verify that the behavior of this builtin is correct. */
 
-    if ((e4__usize)task->io_src.length > (e4__usize)task->io_src.in)
-        length = (e4__usize)task->io_src.length - (e4__usize)task->io_src.in;
-    else
-        length = 0;
-
-    length = e4__mem_parse(word, delim, length, e4__F_SKIP_LEADING, &word);
-
-    /* XXX: Ambiguous condition. We take only the first 255 bytes of
-       a parsed string that is longer than this, but we advance >IN
-       to the actual end of the word (beyond the encountered delim),
-       as per the specified delim. */
-
-    /* Write word to HERE. */
-    /* FIXME: Check that there is space in HERE before writing
-       to it. */
-    clamped_length = length < 256 ? (e4__u8)length : 255;
-    *((e4__u8 *)task->here) = clamped_length;
-    memcpy((e4__u8 *)task->here + 1, word, clamped_length);
-
-    /* Update offset and push result. */
-    task->io_src.in = word + length + 1 - (const char *)task->io_src.buffer;
-    e4__stack_push(task, task->here);
+    delim = (char)(e4__usize)e4__stack_pop(task);
+    e4__stack_push(task, (e4__cell)e4__io_word(task, delim));
 
     e4__execute_ret(task);
 }

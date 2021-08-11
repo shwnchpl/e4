@@ -84,13 +84,9 @@ static e4__usize e4__evaluate_internal(struct e4__task *task)
         register const char *word;
         register e4__u8 len;
 
-        /* FIXME: Expose WORD in some way so that it isn't necessary
-           to call it like this? */
-        e4__builtin_exec(task, e4__B_WORD, (e4__usize)' ');
-
         /* FIXME: Execute builtin lookup here and catch the exception
            rather than doing this? */
-        word = (const char *)e4__stack_pop(task);
+        word = e4__io_word(task, ' ');
         len = (e4__u8)*word++;
 
         if (!len)
@@ -163,11 +159,8 @@ void e4__evaluate_quit(struct e4__task *task)
         task->io_src.length = 0;
         task->io_src.sz = task->tib_sz;
 
-        /* FIXME: Create e4__io_refill function and use that? */
-        e4__builtin_exec(task, e4__B_REFILL);
-        e4__stack_pop(task);
-
-        res = e4__evaluate_internal(task);
+        res = e4__io_refill(task, NULL);
+        res = res ? res : e4__evaluate_internal(task);
         switch (res) {
             case e4__E_OK:
                 /* FIXME: Use CR here instead for newline? */

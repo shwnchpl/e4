@@ -34,10 +34,6 @@ Parsing/Text Execution
   to pay attention to count.
 - [DONE] Implement >NUMBER (builtin/C API)
 - [DONE] Reverse mem_parse API to match mem_number API semantics.
-- Create e4__io_refill function and use where appropriate rather than
-  calling builtin directly.
-- Consider creating e4__io_word (or something) and moving builtin
-  word logic into kernel functions.
 
 General Builtins
 ----------------
@@ -95,6 +91,10 @@ Kernel
 - [DONE] Implement _thunk code handler (for DOES>).
 - [DONE] Always use size or sz as name to indicate size in API
   parameters.
+- [DONE] Create e4__io_refill function and use where appropriate rather
+  than calling builtin directly.
+- [DONE] Consider creating e4__io_word (or something) and moving builtin
+  word logic into kernel functions.
 
 General IO
 ----------
