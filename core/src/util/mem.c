@@ -91,15 +91,18 @@ e4__usize e4__mem_number(const char *buf, e4__usize length, e4__u8 base,
         ++buf;
     }
 
-    if (flags & e4__F_BASE_PREFIX)
+    if ((flags & e4__F_BASE_PREFIX) && length > 1)
         switch (*buf++) {
             case '0':
-                switch (*buf++) {
-                    case 'x': case 'X': base = 16; break;
-                    case 'o': case 'O': base = 8; break;
-                    case 'b': case 'B': base = 2; break;
-                    default: buf -= 2; break;
-                }
+                if (length > 2)
+                    switch (*buf++) {
+                        case 'x': case 'X': base = 16; break;
+                        case 'o': case 'O': base = 8; break;
+                        case 'b': case 'B': base = 2; break;
+                        default: buf -= 2; break;
+                    }
+                else
+                    buf -= 1;
                 break;
             case '$': base = 16; break;
             case '#': base = 10; break;
