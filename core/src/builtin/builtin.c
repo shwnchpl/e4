@@ -16,6 +16,15 @@
         }   \
     } while (0)
 
+#define _e4__BUILTIN_EXPECT_REF(t)  \
+    do {    \
+        if (e4__stack_depth(t) < 1) {   \
+            e4__exception_throw(t, e4__E_CSMISMATCH);   \
+            e4__execute_ret(t); \
+            return; \
+        }   \
+    } while (0)
+
 #define _e4__BUILTIN_LOOKAHEAD(t, w, l) \
     do {    \
         e4__builtin_exec(t, e4__B_WORD, (e4__usize)' ');    \

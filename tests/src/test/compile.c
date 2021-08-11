@@ -1,12 +1,87 @@
 #include "e4.h"
 #include "../e4t.h" /* FIXME: Add this to an include path? */
 
+/* Covers ELSE IF THEN */
+static void e4t__test_compile_conditional(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* Test that any attempt to compile an unbalanced control
+       structure fails. */
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo if ;", -1), e4__E_CSMISMATCH);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo else", -1), e4__E_CSMISMATCH);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo then", -1), e4__E_CSMISMATCH);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo if else ;", -1), e4__E_CSMISMATCH);
+
+    /* Test that empty if/then and empty if/else/then sequences
+       correctly do nothing. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo if then ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "5 true foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+    e4t__ASSERT_OK(e4__evaluate(task, "5 false foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo if else then ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "5 true foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+    e4t__ASSERT_OK(e4__evaluate(task, "5 false foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+
+    /* Test that IF throws the appropriate exception on underflow. */
+    e4t__ASSERT_EQ(e4__evaluate(task, "foo", -1), e4__E_STKUNDERFLOW);
+
+    /* Test that if/then works as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo if 100 then ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "true foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 100);
+    e4t__ASSERT_OK(e4__evaluate(task, "false foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
+
+    /* Ensure that IF works correctly with any nonzero value. */
+    e4t__ASSERT_OK(e4__evaluate(task, "0o3071250 foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 100);
+    e4t__ASSERT_OK(e4__evaluate(task, "0b1100101 foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 100);
+    e4t__ASSERT_OK(e4__evaluate(task, "-375 foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 100);
+
+    /* Test that if/then/else works as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo if 100 else 50 then ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "true foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 100);
+    e4t__ASSERT_OK(e4__evaluate(task, "false foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 50);
+
+    /* Ensure that multiple layers of nesting works as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task,
+                ": foo if drop 100 else if 50 else 25 then then ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "true true foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 100);
+    e4t__ASSERT_OK(e4__evaluate(task, "true false foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 50);
+    e4t__ASSERT_OK(e4__evaluate(task, "false false foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 25);
+}
+
 /* Covers DOES> (compile semantics) */
 static void e4t__test_compile_does(void)
 {
     struct e4__task *task = e4t__transient_task();
 
-    /* Test that DOES> beheaves correctly at compile time. */
+    /* Test that DOES> behaves correctly at compile time. */
     e4t__ASSERT_OK(e4__evaluate(task, ": foo create , does> @ 10 + ;", -1));
     e4t__ASSERT_OK(e4__evaluate(task, "5 foo bar bar", -1));
     e4t__ASSERT_EQ(e4__stack_pop(task), 15);
@@ -160,6 +235,7 @@ static void e4t__test_compile_noname(void)
 void e4t__test_compile(void)
 {
     /* FIXME: Add direct compilation API tests? */
+    e4t__test_compile_conditional();
     e4t__test_compile_does();
     e4t__test_compile_failure();
     e4t__test_compile_linear();

@@ -187,6 +187,23 @@ static void e4__builtin_DUP(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_ELSE(struct e4__task *task, void *user)
+{
+    register e4__cell ref;
+
+    _e4__BUILTIN_EXPECT_REF(task);
+
+    /* Branch unconditionally to new forward ref and point old forward
+       ref to the instruction immediately following (thereby skipping
+       the unconditional branch). */
+    ref = e4__stack_pop(task);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_BRANCH]);
+    e4__stack_push(task, task->here++);
+    e4__DEREF(ref) = (e4__cell)(task->here - ref);
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_EMIT(struct e4__task *task, void *user)
 {
     char c;
@@ -226,6 +243,14 @@ static void e4__builtin_FETCH(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
     e4__stack_push(task, e4__DEREF(e4__stack_pop(task)));
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_IF(struct e4__task *task, void *user)
+{
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_BRANCH0]);
+    e4__stack_push(task, task->here++);
+
     e4__execute_ret(task);
 }
 
@@ -305,6 +330,19 @@ static void e4__builtin_SWAP(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
     e4__stack_swap(task);
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_THEN(struct e4__task *task, void *user)
+{
+    register e4__cell ref;
+
+    _e4__BUILTIN_EXPECT_REF(task);
+
+    /* Resolve forward reference. */
+    ref = e4__stack_pop(task);
+    e4__DEREF(ref) = (e4__cell)(task->here - ref);
+
     e4__execute_ret(task);
 }
 

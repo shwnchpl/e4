@@ -27,8 +27,9 @@ Version 0.2
 Compilation
 -----------
 - [DONE] Implement compiletime BRANCH and BRANCH0 builtins.
-- Add conditional structure words like IF, THEN, BEGIN, WHILE, LOOP,
-  DO, etc.
+- [DONE] Add conditional structure words like IF, ELSE, and THEN.
+- Add loop words BEGIN, WHILE, LOOP, DO, etc.
+- Add conditional structure words CASE OF ENDCASE ENDOF etc.
 - Add POSTPONE and IMMEDIATE words.
 - Add compile time semantics to LITERAL. This may require actually
   adding another word, LIT, that takes the place of LITERAL's current
@@ -66,6 +67,10 @@ Compilation
 
 General Builtins
 ----------------
+- Implement core builtin logic/comparison words: = < > 0< 0= AND INVERT
+  NEGATE OR XOR.
+- Implement core extension logic/comparison words: 0<> 0> <> U>.
+- Implement UNUSED.
 - Implement S", S\", and C". These words should use transient memory
   (possibly just HERE) during runtime, but during compile time they
   should compile a string directly into the definition as appropriate.
@@ -76,6 +81,8 @@ General Builtins
   padding to align.
 - Implement EVALUATE (builtin)
 - Implement THROW and CATCH builtins.
+- Make IMMEDIATE/COMPONLY flag specification order consistent in
+  builtin declarations.
 
 General IO
 ----------
