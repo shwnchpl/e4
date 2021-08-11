@@ -92,6 +92,17 @@ Kernel
 - Handle dictionary overflows and other overflows.
 - Consider improving exception printing (ie. printing exception name
   along with number).
+- Consider adding some kind of NO_INTERPRET or INTERNAL flag for words
+  that can never be used correctly (whether interpreting or compiling)
+  from a non-system context (for instance, BRANCH, BRANCH0, and LITERAL
+  as currently implemented). Making words that need to have some effect
+  compile only and immediate then checking whether compiling as a hack
+  is not sufficient because those words may be called from a word
+  marked IMMEDIATE. Alternatively, some other word to bake in addresses
+  (such as [LIT]), which risky, could be handy. With such a word, it
+  would be possible to write things like : SKIP BRANCH [LIT] 1 ; (which
+  itself is also more risky than useful, although that doesn't mean
+  there could be no reasonable application).
 
 Testing
 -------

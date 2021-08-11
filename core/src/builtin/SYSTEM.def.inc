@@ -76,12 +76,4 @@ static void e4__builtin_SENTINEL(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-/* FIXME: e4 specific extension. Consider removing. */
-static void e4__builtin_SKIP(struct e4__task *task, void *user)
-{
-    task->ip = e4__DEREF(++task->rp) + 1;
-
-    /* e4__execute_ret intentionally omitted. */
-}
-
 /* vim: set ft=c: */

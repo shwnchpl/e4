@@ -178,9 +178,8 @@ static void e4t__test_execute_does(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 53);
 }
 
-/* Covers ABORT (exceptions disabled) LIT SKIP and nested execution. */
-/* FIXME: Consider renaming/refactoring/splitting this function. */
-static void e4t__test_execute_meta(void)
+/* Covers ABORT (exceptions disabled) LITERAL and nested execution. */
+static void e4t__test_execute_nested(void)
 {
     static const void *push_12345[] = {
         e4__execute_threaded,
@@ -209,8 +208,6 @@ static void e4t__test_execute_meta(void)
     static const void *push_seq_exit[] = {
         e4__execute_threaded,
         NULL,
-        &e4__BUILTIN_XT[e4__B_SKIP],
-        push_12345,
         push_77777,
         push_abcde,
         &e4__BUILTIN_XT[e4__B_EXIT],
@@ -221,8 +218,6 @@ static void e4t__test_execute_meta(void)
     static const void *push_seq_abort[] = {
         e4__execute_threaded,
         NULL,
-        &e4__BUILTIN_XT[e4__B_SKIP],
-        push_12345,
         push_77777,
         push_abcde,
         &e4__BUILTIN_XT[e4__B_ABORT],
@@ -278,6 +273,6 @@ void e4t__test_execute(void)
     e4t__test_execute_data();
     e4t__test_execute_defer();
     e4t__test_execute_does();
-    e4t__test_execute_meta();
+    e4t__test_execute_nested();
     e4t__test_execute_userfunc();
 }

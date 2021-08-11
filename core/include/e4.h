@@ -216,7 +216,6 @@ enum e4__builtin_id {
     e4__B_CLEAR,
     e4__B_DLITERAL,
     e4__B_SENTINEL,
-    e4__B_SKIP,
 
     /* TOOLS words */
     e4__B_DOT_S,
