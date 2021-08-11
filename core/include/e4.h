@@ -1,6 +1,9 @@
 #ifndef e4_H_
 #define e4_H_
 
+#define e4__VERSION_NUMBER      1000
+#define e4__VERSION_STRING      "0.1.0"
+
 #if defined(e4__LOAD_CONFIG)
     /* To inject configuration into e4, provide the e4__USIZE_DEFINED
        preprocessor token using your build system and create a file

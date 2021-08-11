@@ -9,8 +9,6 @@ Repo Maintenance
 
 Build
 -----
-- [DONE] Add an amalgamated source target using amal.rb.
-- [DONE] Create a repl build that uses the amalgamated source target.
 - Make it possible to specify e4__DISABLE_EXTENSIONS (or some other
   similar macro) to build the smallest version of e4 possible. This
   can include the exceptions word set and some words from the tools
@@ -23,122 +21,6 @@ Build
   builds seem to be at around 21K when targeting the ATMega328p).
 
 
-Version 0.1
-===========
-
-Parsing/Text Execution
-----------------------
-- [DONE] Implement WORD (builtin)
-- [DONE] Make existing LOOKUP C API case insensitive?
-- [DONE] Fix WORD implementation to correctly advance >IN and also
-  to pay attention to count.
-- [DONE] Implement >NUMBER (builtin/C API)
-- [DONE] Reverse mem_parse API to match mem_number API semantics.
-
-General Builtins
-----------------
-- [DONE] Implement basic static manipulation words CLEAR, DEPTH, DROP,
-  DUP, OVER, ROT, ROLL, SWAP, and TUCK.
-- [DONE] Implement REFILL.
-- [DONE] Implement FORGET. It should stop looking once it hits builtin
-  words.
-- [DONE] Implement CR.
-- [DONE] Implement + and -.
-- [DONE] Implement ..
-- [DONE] Add appropriate asserts to all existing builtins.
-- [DONE] Implement WORDS.
-- [DONE] Add the ability to add flags to builtins defined with the
-  macros in core/builtin.c.
-- [DONE] Add compile-time flags to appropriate builtins in
-  core/builtin.c.
-- [DONE] Implement @ and !.
-- [DONE] Implement HERE, CELLS, and ALLOT.
-- [DONE] Add mechanism for builtin constants (such as BL, etc.).
-- [DONE] Add mechanism for uservar definitions.
-- [DONE] Refactor HERE to be a uservar.
-- [DONE] Add BASE and PAD builtins.
-- [DONE] Add CREATE, VARIABLE, CONSTANT, and , builtins.
-- [DONE] Implement ' (LOOKUP builtin; should be case insensitive)
-- [DONE] Implement EXECUTE (builtin).
-- [DONE] Add VALUE and TO builtins. VALUE and CONSTANT should differ
-  in that CONSTANT should have some flag preventing update with TO.
-- [DONE] Implement DOES> builtin.
-- [DONE] Fix ABORT implementation.
-- [DONE] Implement ['] builtin.
-- [DONE] Implement simple IO builtins U. and EMIT.
-
-Kernel
-------
-- [DONE] Move entire builtin dictionary into ROM.
-- [DONE] Get rid of fields like POB and SQ and just use HERE instead
-  to save space. The dedicated static PAD space can stay.
-- [DONE] Create custom integer types that are the same width as e4__cell
-  and use these where appropriate (as opposed to unsigned long etc.).
-- [DONE] Creating custom integer types for u8 and bool as well rather
-  than simply using char.
-- [DONE] Implement numeric signed division.
-- [DONE] Implement preliminary evaluate utility function.
-- [DONE] Implement exceptions using setjmp/longjmp.
-- [DONE] Implement QUIT using exceptions etc.
-- [DONE] Figure out stack underflow checking for builtins etc.
-- [DONE] Implement RET as a utility function and cleanup RET builtin
-  definition.
-- [DONE] Prevent builtins with the COMPONLY flag set from being
-  interpreted.
-- [DONE] Cleanup evaluate and evaluate_quit implementation, removing
-  unnecessary parameters.
-- [DONE] Implement _constant, _variable, and _uservar code handlers.
-- [DONE] Implement _thunk code handler (for DOES>).
-- [DONE] Always use size or sz as name to indicate size in API
-  parameters.
-- [DONE] Create e4__io_refill function and use where appropriate rather
-  than calling builtin directly.
-- [DONE] Consider creating e4__io_word (or something) and moving builtin
-  word logic into kernel functions.
-
-General IO
-----------
-- [DONE] Implement two's complement integer formatting.
-
-Compilation
------------
-- [DONE] Refactor dict API into mem_dict API.
-- [DONE] Add true dict API that allows creating a new dict entry by
-  acting on the task struct and updating HERE and other fields
-  appropriately.
-- [DONE] Implement simple : compilation.
-- [DONE] Check for stack balance at end of compilation. If stack is not
-  in the same position as it was at the start of compilation, throw the
-  appropriate exception and reject the definition.
-- [DONE] Implement :NONAME builtin.
-- [DONE] Implement DEFER, DEFER@, and DEFER! builtins.
-- Check for nested compilation everywhere relevant.
-
-Testing
--------
-- [DONE] Create a test harness.
-- [DONE] Finalize test harness organization.
-- [DONE] Migrate digit formatting tests.
-- [DONE] Migrate basic two's complement tests.
-- [DONE] Migrate two's complement signed division tests.
-- [DONE] Migrate numeric parsing tests.
-- [DONE] Migrate builtin word parsing tests.
-- [DONE] Migrate stack API tests.
-- [DONE] Migrate >NUMBER builtin tests.
-- [DONE] Migrate builtin WORD tests.
-- [DONE] Migrate dict entry creation tests.
-- [DONE] Add exception tests (see uncommitted diff).
-- [DONE] Figure out some way to cover WORDS in tests.
-
-REPL
-----
-- [DONE] Create actual simple REPL using libedit or some other utility.
-- [DONE] Figure out having \n user input print a space rather than
-  newline while maintaining all other \n semantics using libedit (or
-  otherwise abandon this goal and delete the commented out code in
-  repl/main.c).
-
-
 Version 0.2
 ===========
 
@@ -147,7 +29,14 @@ Compilation
 - Implement compiletime BRANCH0, BRANCH, AHEAD, etc.
 - Add conditional structure words like IF, THEN, BEGIN, WHILE, LOOP,
   DO, etc.
-- Add compile time semantics to LITERAL.
+- Add POSTPONE and IMMEDIATE words.
+- Add compile time semantics to LITERAL. This may require actually
+  adding another word, LIT, that takes the place of LITERAL's current
+  non-standard behavior, since the current LITERAL needs to be
+  executable in IMMEDIATE words. It would probably be worth renaming
+  DLITERAL to DLIT or something along those lines as part of this
+  change.
+- Check for nested compilation everywhere relevant.
 - Figure out how to implement RECURSE.
 - Implement decompilation (ie. SEE). This only needs to work for words
   defined with execute_threaded to start; everything else can just
@@ -174,22 +63,6 @@ Compilation
   not worry about things like THEN and LITERAL. This is the easiest
   solution and is probably a perfectly reasonable place to start.
 
-Kernel
------
-- Add support for double cell numbers (including arithmetic etc.).
-- Update words meant to support double width numbers that are currently
-  implemented without any such support. This includes >NUMBER.
-- Add more two's complement utility macros as needed and use them where
-  appropriate.
-- Implement signed modulo and other single width math operators.
-- Handle dictionary overflows and other overflows.
-- Consider improving exception printing (ie. printing exception name
-  along with number).
-
-General IO
-----------
-- Implement pictured numeric output.
-
 General Builtins
 ----------------
 - Implement S", S\", and C". These words should use transient memory
@@ -202,6 +75,22 @@ General Builtins
   padding to align.
 - Implement EVALUATE (builtin)
 - Implement THROW and CATCH builtins.
+
+General IO
+----------
+- Implement pictured numeric output.
+
+Kernel
+-----
+- Add support for double cell numbers (including arithmetic etc.).
+- Update words meant to support double width numbers that are currently
+  implemented without any such support. This includes >NUMBER.
+- Add more two's complement utility macros as needed and use them where
+  appropriate.
+- Implement signed modulo and other single width math operators.
+- Handle dictionary overflows and other overflows.
+- Consider improving exception printing (ie. printing exception name
+  along with number).
 
 Testing
 -------
@@ -237,7 +126,3 @@ Transfer Station
 ================
 
 (won't do lists; cleared after each release)
-
-Parsing/Text Execution
-----------------------
-- Determine if KEY should be writing to TIB.
