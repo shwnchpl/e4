@@ -26,7 +26,7 @@ Version 0.2
 
 Compilation
 -----------
-- Implement compiletime BRANCH0, BRANCH, AHEAD, etc.
+- [DONE] Implement compiletime BRANCH and BRANCH0 builtins.
 - Add conditional structure words like IF, THEN, BEGIN, WHILE, LOOP,
   DO, etc.
 - Add POSTPONE and IMMEDIATE words.
@@ -36,6 +36,7 @@ Compilation
   executable in IMMEDIATE words. It would probably be worth renaming
   DLITERAL to DLIT or something along those lines as part of this
   change.
+- Implement AHEAD?
 - Check for nested compilation everywhere relevant.
 - Figure out how to implement RECURSE.
 - Implement decompilation (ie. SEE). This only needs to work for words
@@ -109,6 +110,12 @@ Documentation
 - Document all implementation-defined behavior as per Forth 2012 4.1.1.
 - Document all ambiguous condition handling as per Forth 2012 4.1.2.
 - Provide other system documentation as per by Forth 2012 4.1.3.
+
+Kernel
+------
+- Consider adding optional IO handlers to allow for supporting the
+  FILE wordset. If this is done, also add FILE related builtins
+  and the appropriate hooks to the REPL.
 
 General Builtins
 ----------------

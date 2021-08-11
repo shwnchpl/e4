@@ -211,6 +211,8 @@ enum e4__builtin_id {
     e4__B_VALUE,
 
     /* SYSTEM words */
+    e4__B_BRANCH,
+    e4__B_BRANCH0,
     e4__B_CLEAR,
     e4__B_DLITERAL,
     e4__B_SENTINEL,

@@ -1,6 +1,82 @@
 #include "e4.h"
 #include "../e4t.h" /* FIXME: Add this to an include path? */
 
+static void e4t__test_execute_branch(void)
+{
+    static const void *branch_skip[] = {
+        e4__execute_threaded,
+        NULL,
+        &e4__BUILTIN_XT[e4__B_LITERAL],
+        (void *)1,
+        &e4__BUILTIN_XT[e4__B_BRANCH],
+        (void *)5,
+        &e4__BUILTIN_XT[e4__B_LITERAL],
+        (void *)2,
+        &e4__BUILTIN_XT[e4__B_LITERAL],
+        (void *)3,
+        &e4__BUILTIN_XT[e4__B_LITERAL],
+        (void *)4,
+        &e4__BUILTIN_XT[e4__B_EXIT],
+        &e4__BUILTIN_XT[e4__B_SENTINEL]
+    };
+    static const void *branch_conditional[] = {
+        e4__execute_threaded,
+        NULL,
+        &e4__BUILTIN_XT[e4__B_LITERAL],
+        (void *)1,
+        &e4__BUILTIN_XT[e4__B_BRANCH0],
+        (void *)5,
+        &e4__BUILTIN_XT[e4__B_LITERAL],
+        (void *)0,
+        &e4__BUILTIN_XT[e4__B_BRANCH0],
+        (void *)3,
+        &e4__BUILTIN_XT[e4__B_LITERAL],
+        (void *)10,
+        &e4__BUILTIN_XT[e4__B_LITERAL],
+        (void *)20,
+        &e4__BUILTIN_XT[e4__B_EXIT],
+        &e4__BUILTIN_XT[e4__B_SENTINEL]
+    };
+    static const void *branch_negative[] = {
+        e4__execute_threaded,
+        NULL,
+        &e4__BUILTIN_XT[e4__B_BRANCH],
+        (void *)6,
+        &e4__BUILTIN_XT[e4__B_LITERAL],
+        (void *)1,
+        &e4__BUILTIN_XT[e4__B_LITERAL],
+        (void *)2,
+        &e4__BUILTIN_XT[e4__B_EXIT],
+        &e4__BUILTIN_XT[e4__B_LITERAL],
+        (void *)3,
+        &e4__BUILTIN_XT[e4__B_LITERAL],
+        (void *)4,
+        &e4__BUILTIN_XT[e4__B_BRANCH],
+        (void *)e4__USIZE_NEGATE(10),
+        &e4__BUILTIN_XT[e4__B_EXIT],
+        &e4__BUILTIN_XT[e4__B_SENTINEL]
+    };
+    struct e4__task *task = e4t__transient_task();
+
+    e4__execute(task, branch_skip);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 1);
+
+    e4__stack_clear(task);
+    e4__execute(task, branch_conditional);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 20);
+
+    e4__stack_clear(task);
+    e4__execute(task, branch_negative);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 4);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 3);
+}
+
 static void e4t__test_execute_data(void)
 {
     static const void *constant_77[] = {
@@ -103,6 +179,7 @@ static void e4t__test_execute_does(void)
 }
 
 /* Covers ABORT (exceptions disabled) LIT SKIP and nested execution. */
+/* FIXME: Consider renaming/refactoring/splitting this function. */
 static void e4t__test_execute_meta(void)
 {
     static const void *push_12345[] = {
@@ -197,6 +274,7 @@ static void e4t__test_execute_userfunc(void)
 
 void e4t__test_execute(void)
 {
+    e4t__test_execute_branch();
     e4t__test_execute_data();
     e4t__test_execute_defer();
     e4t__test_execute_does();
