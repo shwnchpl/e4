@@ -34,6 +34,20 @@ static void e4__builtin_ALLOT(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_AND(struct e4__task *task, void *user)
+{
+    register e4__usize l, r;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    r = (e4__usize)e4__stack_pop(task);
+    l = (e4__usize)e4__stack_pop(task);
+
+    e4__stack_push(task, (e4__cell)(l & r));
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_BRACKET_TICK(struct e4__task *task, void *user)
 {
     const register e4__usize depth = e4__stack_depth(task);
@@ -216,6 +230,20 @@ static void e4__builtin_EMIT(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_EQUALS(struct e4__task *task, void *user)
+{
+    register e4__usize l, r;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    r = (e4__usize)e4__stack_pop(task);
+    l = (e4__usize)e4__stack_pop(task);
+
+    e4__stack_push(task, (e4__cell)(r == l ? e4__BF_TRUE : e4__BF_FALSE));
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_EXECUTE(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
@@ -246,10 +274,51 @@ static void e4__builtin_FETCH(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_GREATER_THAN(struct e4__task *task, void *user)
+{
+    register e4__usize l, r, f;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    r = (e4__usize)e4__stack_pop(task);
+    l = (e4__usize)e4__stack_pop(task);
+    f = e4__USIZE_IS_NEGATIVE(r) == e4__USIZE_IS_NEGATIVE(l) ?
+        l > r : e4__USIZE_IS_NEGATIVE(r) > e4__USIZE_IS_NEGATIVE(l);
+
+    e4__stack_push(task, (e4__cell)(f ? e4__BF_TRUE : e4__BF_FALSE));
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_IF(struct e4__task *task, void *user)
 {
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_BRANCH0]);
     e4__stack_push(task, task->here++);
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_INVERT(struct e4__task *task, void *user)
+{
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+
+    e4__stack_push(task, (e4__cell)(~(e4__usize)e4__stack_pop(task)));
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_LESS_THAN(struct e4__task *task, void *user)
+{
+    register e4__usize l, r, f;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    r = (e4__usize)e4__stack_pop(task);
+    l = (e4__usize)e4__stack_pop(task);
+    f = e4__USIZE_IS_NEGATIVE(r) == e4__USIZE_IS_NEGATIVE(l) ?
+        l < r : e4__USIZE_IS_NEGATIVE(r) < e4__USIZE_IS_NEGATIVE(l);
+
+    e4__stack_push(task, (e4__cell)(f ? e4__BF_TRUE : e4__BF_FALSE));
 
     e4__execute_ret(task);
 }
@@ -272,6 +341,30 @@ static void e4__builtin_MINUS(struct e4__task *task, void *user)
     r = (e4__usize)e4__stack_pop(task);
     l = (e4__usize)e4__stack_pop(task);
     e4__stack_push(task, (e4__cell)(l - r));
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_NEGATE(struct e4__task *task, void *user)
+{
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+
+    e4__stack_push(task,
+            (e4__cell)e4__USIZE_NEGATE((e4__usize)e4__stack_pop(task)));
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_OR(struct e4__task *task, void *user)
+{
+    register e4__usize l, r;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    r = (e4__usize)e4__stack_pop(task);
+    l = (e4__usize)e4__stack_pop(task);
+
+    e4__stack_push(task, (e4__cell)(r | l));
 
     e4__execute_ret(task);
 }
@@ -448,6 +541,20 @@ static void e4__builtin_VARIABLE(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_XOR(struct e4__task *task, void *user)
+{
+    register e4__usize l, r;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    r = (e4__usize)e4__stack_pop(task);
+    l = (e4__usize)e4__stack_pop(task);
+
+    e4__stack_push(task, (e4__cell)(r ^ l));
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_WORD(struct e4__task *task, void *user)
 {
     register char delim;
@@ -458,6 +565,32 @@ static void e4__builtin_WORD(struct e4__task *task, void *user)
 
     delim = (char)(e4__usize)e4__stack_pop(task);
     e4__stack_push(task, (e4__cell)e4__io_word(task, delim));
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_ZERO_EQUALS(struct e4__task *task, void *user)
+{
+    register e4__usize f;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+
+    f = !e4__stack_pop(task);
+
+    e4__stack_push(task, (e4__cell)(f ? e4__BF_TRUE : e4__BF_FALSE));
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_ZERO_LESS(struct e4__task *task, void *user)
+{
+    register e4__usize f;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+
+    f = e4__USIZE_IS_NEGATIVE((e4__usize)e4__stack_pop(task));
+
+    e4__stack_push(task, (e4__cell)(f ? e4__BF_TRUE : e4__BF_FALSE));
 
     e4__execute_ret(task);
 }

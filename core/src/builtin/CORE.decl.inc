@@ -5,9 +5,11 @@
    file and it is *not* designed to work correctly in any other
    context. */
 
+
 #define _e4__BUILTIN_CORE_DECL()    \
     _e4__BUILTIN_PROC_FIRST(ABORT)  \
     _e4__BUILTIN_PROC(ALLOT)    \
+    _e4__BUILTIN_PROC(AND)  \
     _e4__BUILTIN_USERVAR(BASE) \
     _e4__BUILTIN_CONSTANT(BL, ' ')  \
     _e4__BUILTIN_PROC_NF(BRACKET_TICK, "[']",   \
@@ -25,13 +27,19 @@
     _e4__BUILTIN_PROC(DUP)  \
     _e4__BUILTIN_PROC_F(ELSE, e4__F_COMPONLY | e4__F_IMMEDIATE) \
     _e4__BUILTIN_PROC(EMIT) \
+    _e4__BUILTIN_PROC_N(EQUALS, "=")    \
     _e4__BUILTIN_PROC(EXECUTE)  \
     _e4__BUILTIN_PROC_F(EXIT, e4__F_COMPONLY)   \
     _e4__BUILTIN_PROC_N(FETCH, "@") \
+    _e4__BUILTIN_PROC_N(GREATER_THAN, ">")  \
     _e4__BUILTIN_USERVAR(HERE)  \
     _e4__BUILTIN_PROC_F(IF, e4__F_COMPONLY | e4__F_IMMEDIATE)   \
+    _e4__BUILTIN_PROC(INVERT)   \
+    _e4__BUILTIN_PROC_N(LESS_THAN, "<") \
     _e4__BUILTIN_PROC_F(LITERAL, e4__F_COMPONLY)    \
     _e4__BUILTIN_PROC_N(MINUS, "-") \
+    _e4__BUILTIN_PROC(NEGATE)   \
+    _e4__BUILTIN_PROC(OR)   \
     _e4__BUILTIN_PROC(OVER) \
     _e4__BUILTIN_PROC_N(PLUS, "+")  \
     _e4__BUILTIN_PROC(QUIT) \
@@ -45,6 +53,9 @@
     _e4__BUILTIN_PROC_N(TO_NUMBER, ">NUMBER")   \
     _e4__BUILTIN_PROC_N(U_DOT, "U.")  \
     _e4__BUILTIN_PROC(VARIABLE) \
-    _e4__BUILTIN_PROC(WORD)
+    _e4__BUILTIN_PROC(WORD) \
+    _e4__BUILTIN_PROC(XOR)  \
+    _e4__BUILTIN_PROC_N(ZERO_EQUALS, "0=")  \
+    _e4__BUILTIN_PROC_N(ZERO_LESS, "0<")
 
 /* vim: set ft=c: */

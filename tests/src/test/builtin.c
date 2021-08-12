@@ -236,6 +236,103 @@ static void e4t__test_builtin_io(void)
                 "blom938 flom345 ", 16));
 }
 
+/* Covers = < > 0< 0= AND INVERT NEGATE OR XOR */
+static void e4t__test_builtin_logic(void)
+{
+    /* XXX: Parts of this test only work correctly on a 64 bit
+       system that represents negative numbers using two's
+       complement. */
+
+    struct e4__task *task = e4t__transient_task();
+
+    /* Test basic equality words. */
+    e4t__ASSERT_OK(e4__evaluate(task, "5 5 =", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+    e4t__ASSERT_OK(e4__evaluate(task, "5 4 =", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+    e4t__ASSERT_OK(e4__evaluate(task, "0 0=", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+    e4t__ASSERT_OK(e4__evaluate(task, "50 0=", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+
+    /* Test negation related words. */
+    e4t__ASSERT_OK(e4__evaluate(task, "5 negate", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), -5);
+    e4t__ASSERT_OK(e4__evaluate(task, "-5 negate", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+    e4t__ASSERT_OK(e4__evaluate(task, "0 negate", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_OK(e4__evaluate(task, "-153 0<", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+    e4t__ASSERT_OK(e4__evaluate(task, "-153 0<", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+    e4t__ASSERT_OK(e4__evaluate(task, "135 0<", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+    e4t__ASSERT_OK(e4__evaluate(task, "0 0<", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+
+    /* Test bitwise operators. */
+    e4t__ASSERT_OK(e4__evaluate(task, "12 3 or", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 15);
+    e4t__ASSERT_OK(e4__evaluate(task, "7 3 or", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 7);
+    e4t__ASSERT_OK(e4__evaluate(task, "8 7 and", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_OK(e4__evaluate(task, "10394 15 and", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 10);
+    e4t__ASSERT_OK(e4__evaluate(task, "15 5 xor", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 10);
+    e4t__ASSERT_OK(e4__evaluate(task, "301415 1234 xor", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 302517);
+    e4t__ASSERT_OK(e4__evaluate(task, "0 invert", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), -1);
+    e4t__ASSERT_OK(e4__evaluate(task, "0 invert", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), -1);
+    e4t__ASSERT_OK(e4__evaluate(task, "5 invert", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), -6);
+    e4t__ASSERT_OK(e4__evaluate(task, "-7 invert", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 6);
+
+    /* Test signed comparison. */
+    e4t__ASSERT_OK(e4__evaluate(task, "0 0 <", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+    e4t__ASSERT_OK(e4__evaluate(task, "0 1 <", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+    e4t__ASSERT_OK(e4__evaluate(task, "1 0 <", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+    e4t__ASSERT_OK(e4__evaluate(task, "-1 0 <", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+    e4t__ASSERT_OK(e4__evaluate(task, "1 -1 <", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+    e4t__ASSERT_OK(e4__evaluate(task, "50 40 <", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+    e4t__ASSERT_OK(e4__evaluate(task, "-50 -40 <", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+    e4t__ASSERT_OK(e4__evaluate(task, "9223372036854775807 1 <", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+    e4t__ASSERT_OK(e4__evaluate(task, "1 9223372036854775807 <", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "0 0 >", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+    e4t__ASSERT_OK(e4__evaluate(task, "0 1 >", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+    e4t__ASSERT_OK(e4__evaluate(task, "1 0 >", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+    e4t__ASSERT_OK(e4__evaluate(task, "-1 0 >", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+    e4t__ASSERT_OK(e4__evaluate(task, "1 -1 >", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+    e4t__ASSERT_OK(e4__evaluate(task, "50 40 >", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+    e4t__ASSERT_OK(e4__evaluate(task, "-50 -40 >", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+    e4t__ASSERT_OK(e4__evaluate(task, "-9223372036854775808 1 >", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+    e4t__ASSERT_OK(e4__evaluate(task, "1 -9223372036854775808 >", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+}
+
 /* Covers + - . */
 static void e4t__test_builtin_math(void)
 {
@@ -525,6 +622,7 @@ void e4t__test_builtin(void)
     e4t__test_builtin_forget();
     e4t__test_builtin_immediate();
     e4t__test_builtin_io();
+    e4t__test_builtin_logic();
     e4t__test_builtin_math();
     e4t__test_builtin_memmanip();
     e4t__test_builtin_parsenum();
