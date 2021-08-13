@@ -55,6 +55,7 @@
     _e4__BUILTIN_PROC_N(TO_BODY, ">BODY")   \
     _e4__BUILTIN_PROC_N(TO_NUMBER, ">NUMBER")   \
     _e4__BUILTIN_PROC_N(U_DOT, "U.")  \
+    _e4__BUILTIN_PROC_N(U_LESS_THAN, "U<")  \
     _e4__BUILTIN_PROC(VARIABLE) \
     _e4__BUILTIN_PROC(WORD) \
     _e4__BUILTIN_PROC(XOR)  \

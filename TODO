@@ -28,18 +28,21 @@ Compilation
 -----------
 - [DONE] Implement compiletime BRANCH and BRANCH0 builtins.
 - [DONE] Add conditional structure words like IF, ELSE, and THEN.
+- Implement RECURSE. This is easy to do since RECURSE only needs
+  to compile in the address of the XT of the current dictionary
+  entry.
 - Add loop words BEGIN, WHILE, LOOP, DO, etc.
 - Add conditional structure words CASE OF ENDCASE ENDOF etc.
 - Add POSTPONE and IMMEDIATE words.
+- Consider adding a COMPILE-ONLY/RESTRICT word.
 - Add compile time semantics to LITERAL. This may require actually
   adding another word, LIT, that takes the place of LITERAL's current
   non-standard behavior, since the current LITERAL needs to be
   executable in IMMEDIATE words. It would probably be worth renaming
-  DLITERAL to DLIT or something along those lines as part of this
-  change.
+  DLITERAL to DLIT, DOES_LIT, or something along those lines as part
+  of this change.
 - Implement AHEAD?
 - Check for nested compilation everywhere relevant.
-- Figure out how to implement RECURSE.
 - Implement decompilation (ie. SEE). This only needs to work for words
   defined with execute_threaded to start; everything else can just
   display "builtin." The key way that this can be achieved is by
@@ -71,7 +74,11 @@ General Builtins
   INVERT NEGATE OR XOR.
 - [DONE] Implement *.
 - [DONE] Implement /, MOD, /MOD.
+- [DONE] Implement U<.
+- Throw division by zero exceptions when necessary in / and /MOD.
 - Implement core extension logic/comparison words: 0<> 0> <> U>.
+- Implement COUNT, TYPE, .", and some sort of STRING_LIT builtin.
+- Implement C@, C,, C!, ALIGN, and ALIGNED.
 - Implement UNUSED.
 - Implement S", S\", and C". These words should use transient memory
   (possibly just HERE) during runtime, but during compile time they
@@ -99,6 +106,13 @@ Kernel
   appropriate.
 - Implement signed modulo and other single width math operators.
 - Handle dictionary overflows and other overflows.
+- Consider refactoring some builtins into raw threaded code. For some
+  simple ones (like HEX, DECIMAL, etc.), this will likely take up
+  *way* less space. Even things like MOD and / can be put in terms of
+  /MOD. This should save quite a bit of space. Just like constants can
+  be defined with macros, can make an _e4_BUILTIN_THUNK* family of
+  macros that declare a static const void *[] array then put the address
+  of that array into the dictionary.
 - Consider improving exception printing (ie. printing exception name
   along with number).
 - Consider adding some kind of NO_INTERPRET or INTERNAL flag for words

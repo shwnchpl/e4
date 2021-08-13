@@ -207,6 +207,7 @@ enum e4__builtin_id {
     e4__B_TO_BODY,
     e4__B_TO_NUMBER,
     e4__B_U_DOT,
+    e4__B_U_LESS_THAN,
     e4__B_VARIABLE,
     e4__B_WORD,
     e4__B_XOR,

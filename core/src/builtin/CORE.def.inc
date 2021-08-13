@@ -596,6 +596,20 @@ static void e4__builtin_U_DOT(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_U_LESS_THAN(struct e4__task *task, void *user)
+{
+    register e4__usize l, r;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    r = (e4__usize)e4__stack_pop(task);
+    l = (e4__usize)e4__stack_pop(task);
+
+    e4__stack_push(task, (e4__cell)(l < r ? e4__BF_TRUE : e4__BF_FALSE));
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_VARIABLE(struct e4__task *task, void *user)
 {
     register const char *word;
