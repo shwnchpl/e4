@@ -28,9 +28,8 @@ Compilation
 -----------
 - [DONE] Implement compiletime BRANCH and BRANCH0 builtins.
 - [DONE] Add conditional structure words like IF, ELSE, and THEN.
-- Implement RECURSE. This is easy to do since RECURSE only needs
-  to compile in the address of the XT of the current dictionary
-  entry.
+- [DONE] Implement RECURSE. This is easy to do since RECURSE only needs
+  to compile in the address of the XT of the current dictionary entry.
 - Add loop words BEGIN, WHILE, LOOP, DO, etc.
 - Add conditional structure words CASE OF ENDCASE ENDOF etc.
 - Add POSTPONE and IMMEDIATE words.
@@ -79,6 +78,7 @@ General Builtins
   code and refactor those builtins to be  implemented in threaded code.
 - [DONE] Throw division by zero exceptions where necessary.
 - Implement core extension logic/comparison words: 0<> 0> <> U>.
+- Implement (.
 - Implement COUNT, TYPE, .", and some sort of STRING_LIT builtin.
 - Implement C@, C,, C!, ALIGN, and ALIGNED.
 - Implement UNUSED.

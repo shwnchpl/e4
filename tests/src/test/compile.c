@@ -232,6 +232,31 @@ static void e4t__test_compile_noname(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 7);
 }
 
+static void e4t__tesT_compile_recursive(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* Test that RECURSE works correctly in colon definitions. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": factorial "
+            "dup 2 < if drop 1 exit then dup 1 - recurse * ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "5 factorial", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 120);
+    e4t__ASSERT_OK(e4__evaluate(task, "10 factorial", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 3628800);
+
+    /* Test that RECURSE works correctly in :NONAME definitions. */
+    e4t__ASSERT_OK(e4__evaluate(task, ":noname "
+            "dup 2 < if drop 1 exit then dup 1 - recurse + ; constant s", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "10 s execute", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 55);
+    e4t__ASSERT_OK(e4__evaluate(task, "15 s execute", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 120);
+}
+
 void e4t__test_compile(void)
 {
     /* FIXME: Add direct compilation API tests? */
@@ -240,4 +265,5 @@ void e4t__test_compile(void)
     e4t__test_compile_failure();
     e4t__test_compile_linear();
     e4t__test_compile_noname();
+    e4t__tesT_compile_recursive();
 }

@@ -411,6 +411,16 @@ static void e4__builtin_ROT(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_RECURSE(struct e4__task *task, void *user)
+{
+    /* XXX: Ambiguous behavior--in a DOES> clause that exists within
+       a colon definition, RECURSE refers to the function being defined
+       by the colon definition, *not* to the code that is part of the
+       DOES> clause. This does not throw an exception. */
+    e4__compile_cell(task, (e4__cell)task->compile.xt);
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_SEMICOLON(struct e4__task *task, void *user)
 {
     e4__usize res;
