@@ -75,6 +75,8 @@ General Builtins
 - [DONE] Implement *.
 - [DONE] Implement /, MOD, /MOD.
 - [DONE] Implement U<.
+- [DONE] Add macro handling for implementing some builtins as threaded
+  code and refactor those builtins to be  implemented in threaded code.
 - Throw division by zero exceptions when necessary in / and /MOD.
 - Implement core extension logic/comparison words: 0<> 0> <> U>.
 - Implement COUNT, TYPE, .", and some sort of STRING_LIT builtin.
@@ -106,13 +108,6 @@ Kernel
   appropriate.
 - Implement signed modulo and other single width math operators.
 - Handle dictionary overflows and other overflows.
-- Consider refactoring some builtins into raw threaded code. For some
-  simple ones (like HEX, DECIMAL, etc.), this will likely take up
-  *way* less space. Even things like MOD and / can be put in terms of
-  /MOD. This should save quite a bit of space. Just like constants can
-  be defined with macros, can make an _e4_BUILTIN_THUNK* family of
-  macros that declare a static const void *[] array then put the address
-  of that array into the dictionary.
 - Consider improving exception printing (ie. printing exception name
   along with number).
 - Consider adding some kind of NO_INTERPRET or INTERNAL flag for words

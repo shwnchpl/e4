@@ -68,8 +68,6 @@ static void e4__builtin_REFILL(struct e4__task *task, void *user)
     register e4__usize io_res;
     e4__usize bf;
 
-    /* FIXME: Verify that the behavior of this builtin is correct. */
-
     if ((io_res = e4__io_refill(task, &bf)))
         e4__exception_throw(task, io_res);
 

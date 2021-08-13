@@ -46,12 +46,14 @@ static void e4__builtin_DOT_S(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_QUESTION(struct e4__task *task, void *user)
-{
-    e4__builtin_exec(task, e4__B_FETCH);
-    e4__builtin_exec(task, e4__B_DOT);
-    e4__execute_ret(task);
-}
+static const void *e4__builtin_QUESTION[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_FETCH],
+    &e4__BUILTIN_XT[e4__B_DOT],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL],
+};
 
 static void e4__builtin_WORDS(struct e4__task *task, void *user)
 {

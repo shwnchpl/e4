@@ -345,18 +345,14 @@ static void e4__builtin_MINUS(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_MOD(struct e4__task *task, void *user)
-{
-    register e4__usize n, d;
-
-    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
-
-    d = (e4__usize)e4__stack_pop(task);
-    n = (e4__usize)e4__stack_pop(task);
-    e4__stack_push(task, (e4__cell)e4__num_smod(n, d));
-
-    e4__execute_ret(task);
-}
+static const void *e4__builtin_MOD[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_SLASH_MOD],
+    &e4__BUILTIN_XT[e4__B_DROP],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
 
 static void e4__builtin_NEGATE(struct e4__task *task, void *user)
 {
@@ -425,7 +421,17 @@ static void e4__builtin_SEMICOLON(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_SLASH(struct e4__task *task, void *user)
+static const void *e4__builtin_SLASH[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_SLASH_MOD],
+    &e4__BUILTIN_XT[e4__B_SWAP],
+    &e4__BUILTIN_XT[e4__B_DROP],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
+static void e4__builtin_SLASH_MOD(struct e4__task *task, void *user)
 {
     register e4__usize n, d;
 
@@ -433,19 +439,6 @@ static void e4__builtin_SLASH(struct e4__task *task, void *user)
        compiler, system division and modulo are either symmetric or
        floored, depending on what your compiler does. If you're using
        a C99 compiler, they're symmetric. */
-
-    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
-
-    d = (e4__usize)e4__stack_pop(task);
-    n = (e4__usize)e4__stack_pop(task);
-    e4__stack_push(task, (e4__cell)e4__num_sdiv(n, d));
-
-    e4__execute_ret(task);
-}
-
-static void e4__builtin_SLASH_MOD(struct e4__task *task, void *user)
-{
-    register e4__usize n, d;
 
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
 

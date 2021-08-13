@@ -7,7 +7,7 @@
 
 #define _e4__BUILTIN_TOOLS_DECL()    \
     _e4__BUILTIN_PROC_N(DOT_S, ".S")   \
-    _e4__BUILTIN_PROC_N(QUESTION, "?")  \
+    _e4__BUILTIN_THUNK_N(QUESTION, "?") \
     _e4__BUILTIN_PROC(WORDS)
 
 /* vim: set ft=c: */
