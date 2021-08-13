@@ -113,6 +113,7 @@ struct e4__io_func {
 #define e4__E_OK            (0)
 #define e4__E_ABORT         (-1)
 #define e4__E_STKUNDERFLOW  (-4)
+#define e4__E_DIVBYZERO     (-10)
 #define e4__E_UNDEFWORD     (-13)
 #define e4__E_COMPONLYWORD  (-14)
 #define e4__E_INVFORGET     (-15)

@@ -538,6 +538,11 @@ static void e4t__test_builtin_math(void)
     e4t__ASSERT_OK(_e("-7 -3 /mod swap . ."));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-1 2 ");
 
+    /* Test that division by zero throws the expected exception. */
+    e4t__ASSERT_EQ(_e("10 0 /"), e4__E_DIVBYZERO);
+    e4t__ASSERT_EQ(_e("10 0 mod"), e4__E_DIVBYZERO);
+    e4t__ASSERT_EQ(_e("10 0 /mod"), e4__E_DIVBYZERO);
+
     #undef _e
 }
 

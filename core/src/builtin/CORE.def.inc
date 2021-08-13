@@ -444,6 +444,13 @@ static void e4__builtin_SLASH_MOD(struct e4__task *task, void *user)
 
     d = (e4__usize)e4__stack_pop(task);
     n = (e4__usize)e4__stack_pop(task);
+
+    if (!d) {
+        e4__exception_throw(task, e4__E_DIVBYZERO);
+        e4__execute_ret(task);
+        return;
+    }
+
     e4__stack_push(task, (e4__cell)e4__num_smod(n, d));
     e4__stack_push(task, (e4__cell)e4__num_sdiv(n, d));
 
