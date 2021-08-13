@@ -196,6 +196,7 @@ enum e4__builtin_id {
     e4__B_QUIT,
     e4__B_ROT,
     e4__B_SEMICOLON,
+    e4__B_STAR,
     e4__B_STORE,
     e4__B_SWAP,
     e4__B_THEN,

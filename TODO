@@ -69,6 +69,7 @@ General Builtins
 ----------------
 - [DONE] Implement core builtin logic/comparison words: = < > 0< 0= AND
   INVERT NEGATE OR XOR.
+- [DONE] Implement *.
 - Implement core extension logic/comparison words: 0<> 0> <> U>.
 - Implement UNUSED.
 - Implement S", S\", and C". These words should use transient memory

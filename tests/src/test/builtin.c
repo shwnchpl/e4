@@ -333,10 +333,13 @@ static void e4t__test_builtin_logic(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
 }
 
-/* Covers + - . */
+/* Covers + - . U. */
 static void e4t__test_builtin_math(void)
 {
     struct e4__task *task = e4t__transient_task();
+
+    /* XXX: Parts of this test only work correctly on a 64 bit
+       system. */
 
     #define _e(s)   e4__evaluate(task, s, sizeof(s) - 1)
 
@@ -384,6 +387,38 @@ static void e4t__test_builtin_math(void)
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "1 ");
     e4t__ASSERT_OK(_e("0  1 - . "));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-1 ");
+
+    /* Test basic multiplication functionality. */
+    e4t__ASSERT_OK(_e("0 0 * . "));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 ");
+    e4t__ASSERT_OK(_e("0 1 * . "));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 ");
+    e4t__ASSERT_OK(_e("1 0 * . "));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 ");
+    e4t__ASSERT_OK(_e("1 2 * . "));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "2 ");
+    e4t__ASSERT_OK(_e("2 1 * . "));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "2 ");
+    e4t__ASSERT_OK(_e("3 3 * . "));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "9 ");
+    e4t__ASSERT_OK(_e("-3 3 * . "));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-9 ");
+    e4t__ASSERT_OK(_e("3 -3 * . "));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-9 ");
+    e4t__ASSERT_OK(_e("-3 -3 * . "));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "9 ");
+
+    /* Test that there is no overflow when multiplying two signed or
+       unsigned numbers requiring less than or equal to 64 bits to
+       represent. */
+    e4t__ASSERT_OK(_e("0xffffffff 0xffffffff * u."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "18446744065119617025 ");
+    e4t__ASSERT_OK(_e("4611686018427387904 -2 * ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-9223372036854775808 ");
+    e4t__ASSERT_OK(_e("-4611686018427387904 2 * ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-9223372036854775808 ");
+    e4t__ASSERT_OK(_e("-4611686018427387903 -2 * ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "9223372036854775806 ");
 
     #undef _e
 }

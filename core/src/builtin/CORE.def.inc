@@ -412,6 +412,29 @@ static void e4__builtin_SEMICOLON(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_STAR(struct e4__task *task, void *user)
+{
+    register e4__usize l, r;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    r = (e4__usize)e4__stack_pop(task);
+    l = (e4__usize)e4__stack_pop(task);
+
+    /* XXX: Multiplication can just be done directly since, per section
+       3.2.2.2 of the standard, the results after arithmetic overflows
+       and/or underflows are implementation defined. In this
+       implementation, any multiplication operation, whether signed or
+       unsigned, that can accurately be represented in the number of
+       bits used to store an e4__cell, will have an accurate result.
+       In the event of an overflow, the result will be truncated with
+       high bits discarded and low bits kept per the unsigned
+       multiplication implementation on the host system. */
+    e4__stack_push(task, (e4__cell)(r * l));
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_STORE(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
