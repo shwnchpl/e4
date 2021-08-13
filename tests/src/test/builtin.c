@@ -333,13 +333,13 @@ static void e4t__test_builtin_logic(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
 }
 
-/* Covers + - . U. */
+/* Covers + - . / /MOD MOD U. */
 static void e4t__test_builtin_math(void)
 {
     struct e4__task *task = e4t__transient_task();
 
     /* XXX: Parts of this test only work correctly on a 64 bit
-       system. */
+       system with symmetric (rather than floored) division. */
 
     #define _e(s)   e4__evaluate(task, s, sizeof(s) - 1)
 
@@ -419,6 +419,112 @@ static void e4t__test_builtin_math(void)
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-9223372036854775808 ");
     e4t__ASSERT_OK(_e("-4611686018427387903 -2 * ."));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "9223372036854775806 ");
+
+    /* Test division and modulo words. */
+    e4t__ASSERT_OK(_e("0 1 / ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 ");
+    e4t__ASSERT_OK(_e("1 1 / ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "1 ");
+    e4t__ASSERT_OK(_e("2 1 / ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "2 ");
+    e4t__ASSERT_OK(_e("-1 1 / ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-1 ");
+    e4t__ASSERT_OK(_e("-2 1 / ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-2 ");
+    e4t__ASSERT_OK(_e("0 -1 / ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 ");
+    e4t__ASSERT_OK(_e("1 -1 / ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-1 ");
+    e4t__ASSERT_OK(_e("2 -1 / ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-2 ");
+    e4t__ASSERT_OK(_e("-1 -1 / ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "1 ");
+    e4t__ASSERT_OK(_e("-2 -1 / ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "2 ");
+    e4t__ASSERT_OK(_e("2 2 / ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "1 ");
+    e4t__ASSERT_OK(_e("-1 -1 / ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "1 ");
+    e4t__ASSERT_OK(_e("-2 -2 / ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "1 ");
+    e4t__ASSERT_OK(_e("7 3 / ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "2 ");
+    e4t__ASSERT_OK(_e("7 -3 / ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-2 ");
+    e4t__ASSERT_OK(_e("-7 3 / ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-2 ");
+    e4t__ASSERT_OK(_e("-7 -3 / ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "2 ");
+
+    e4t__ASSERT_OK(_e("0 1 mod ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 ");
+    e4t__ASSERT_OK(_e("1 1 mod ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 ");
+    e4t__ASSERT_OK(_e("2 1 mod ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 ");
+    e4t__ASSERT_OK(_e("-1 1 mod ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 ");
+    e4t__ASSERT_OK(_e("-2 1 mod ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 ");
+    e4t__ASSERT_OK(_e("0 -1 mod ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 ");
+    e4t__ASSERT_OK(_e("1 -1 mod ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 ");
+    e4t__ASSERT_OK(_e("2 -1 mod ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 ");
+    e4t__ASSERT_OK(_e("-1 -1 mod ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 ");
+    e4t__ASSERT_OK(_e("-2 -1 mod ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 ");
+    e4t__ASSERT_OK(_e("2 2 mod ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 ");
+    e4t__ASSERT_OK(_e("-1 -1 mod ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 ");
+    e4t__ASSERT_OK(_e("-2 -2 mod ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 ");
+    e4t__ASSERT_OK(_e("7 3 mod ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "1 ");
+    e4t__ASSERT_OK(_e("7 -3 mod ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "1 ");
+    e4t__ASSERT_OK(_e("-7 3 mod ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-1 ");
+    e4t__ASSERT_OK(_e("-7 -3 mod ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-1 ");
+
+    e4t__ASSERT_OK(_e("0 1 /mod swap . ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 0 ");
+    e4t__ASSERT_OK(_e("1 1 /mod swap . ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 1 ");
+    e4t__ASSERT_OK(_e("2 1 /mod swap . ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 2 ");
+    e4t__ASSERT_OK(_e("-1 1 /mod swap . ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 -1 ");
+    e4t__ASSERT_OK(_e("-2 1 /mod swap . ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 -2 ");
+    e4t__ASSERT_OK(_e("0 -1 /mod swap . ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 0 ");
+    e4t__ASSERT_OK(_e("1 -1 /mod swap . ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 -1 ");
+    e4t__ASSERT_OK(_e("2 -1 /mod swap . ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 -2 ");
+    e4t__ASSERT_OK(_e("-1 -1 /mod swap . ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 1 ");
+    e4t__ASSERT_OK(_e("-2 -1 /mod swap . ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 2 ");
+    e4t__ASSERT_OK(_e("2 2 /mod swap . ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 1 ");
+    e4t__ASSERT_OK(_e("-1 -1 /mod swap . ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 1 ");
+    e4t__ASSERT_OK(_e("-2 -2 /mod swap . ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 1 ");
+    e4t__ASSERT_OK(_e("7 3 /mod swap . ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "1 2 ");
+    e4t__ASSERT_OK(_e("7 -3 /mod swap . ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "1 -2 ");
+    e4t__ASSERT_OK(_e("-7 3 /mod swap . ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-1 -2 ");
+    e4t__ASSERT_OK(_e("-7 -3 /mod swap . ."));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-1 2 ");
 
     #undef _e
 }

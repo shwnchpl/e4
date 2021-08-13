@@ -334,13 +334,26 @@ static void e4__builtin_LITERAL(struct e4__task *task, void *user)
 
 static void e4__builtin_MINUS(struct e4__task *task, void *user)
 {
-    e4__usize l, r;
+    register e4__usize l, r;
 
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
 
     r = (e4__usize)e4__stack_pop(task);
     l = (e4__usize)e4__stack_pop(task);
     e4__stack_push(task, (e4__cell)(l - r));
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_MOD(struct e4__task *task, void *user)
+{
+    register e4__usize n, d;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    d = (e4__usize)e4__stack_pop(task);
+    n = (e4__usize)e4__stack_pop(task);
+    e4__stack_push(task, (e4__cell)e4__num_smod(n, d));
 
     e4__execute_ret(task);
 }
@@ -378,7 +391,7 @@ static void e4__builtin_OVER(struct e4__task *task, void *user)
 
 static void e4__builtin_PLUS(struct e4__task *task, void *user)
 {
-    e4__usize l, r;
+    register e4__usize l, r;
 
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
 
@@ -408,6 +421,38 @@ static void e4__builtin_SEMICOLON(struct e4__task *task, void *user)
 
     if ((res = e4__compile_finish(task)))
         e4__exception_throw(task, res);
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_SLASH(struct e4__task *task, void *user)
+{
+    register e4__usize n, d;
+
+    /* XXX: Implementation defined behavior--if you're using a C89
+       compiler, system division and modulo are either symmetric or
+       floored, depending on what your compiler does. If you're using
+       a C99 compiler, they're symmetric. */
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    d = (e4__usize)e4__stack_pop(task);
+    n = (e4__usize)e4__stack_pop(task);
+    e4__stack_push(task, (e4__cell)e4__num_sdiv(n, d));
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_SLASH_MOD(struct e4__task *task, void *user)
+{
+    register e4__usize n, d;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    d = (e4__usize)e4__stack_pop(task);
+    n = (e4__usize)e4__stack_pop(task);
+    e4__stack_push(task, (e4__cell)e4__num_smod(n, d));
+    e4__stack_push(task, (e4__cell)e4__num_sdiv(n, d));
 
     e4__execute_ret(task);
 }

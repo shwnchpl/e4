@@ -242,6 +242,11 @@ static void e4t__test_kernel_math(void)
     e4t__ASSERT_EQ(e4__num_sdiv((e4__usize)10, (e4__usize)-3), -3);
     e4t__ASSERT_EQ(e4__num_sdiv((e4__usize)-10, (e4__usize)-3), 3);
     e4t__ASSERT_EQ(e4__num_sdiv((e4__usize)10, (e4__usize)3), 3);
+
+    e4t__ASSERT_EQ(e4__num_smod((e4__usize)10, (e4__usize)7), 3);
+    e4t__ASSERT_EQ(e4__num_smod((e4__usize)-10, (e4__usize)7), -3);
+    e4t__ASSERT_EQ(e4__num_smod((e4__usize)10, (e4__usize)-7), 3);
+    e4t__ASSERT_EQ(e4__num_smod((e4__usize)-10, (e4__usize)-7), -3);
 }
 
 static void e4t__test_kernel_mem_dict(void)

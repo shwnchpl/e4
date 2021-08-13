@@ -5,7 +5,6 @@
    file and it is *not* designed to work correctly in any other
    context. */
 
-
 #define _e4__BUILTIN_CORE_DECL()    \
     _e4__BUILTIN_PROC_FIRST(ABORT)  \
     _e4__BUILTIN_PROC(ALLOT)    \
@@ -38,6 +37,7 @@
     _e4__BUILTIN_PROC_N(LESS_THAN, "<") \
     _e4__BUILTIN_PROC_F(LITERAL, e4__F_COMPONLY)    \
     _e4__BUILTIN_PROC_N(MINUS, "-") \
+    _e4__BUILTIN_PROC(MOD)  \
     _e4__BUILTIN_PROC(NEGATE)   \
     _e4__BUILTIN_PROC(OR)   \
     _e4__BUILTIN_PROC(OVER) \
@@ -45,6 +45,8 @@
     _e4__BUILTIN_PROC(QUIT) \
     _e4__BUILTIN_PROC(ROT)  \
     _e4__BUILTIN_PROC_NF(SEMICOLON, ";", e4__F_IMMEDIATE | e4__F_COMPONLY)  \
+    _e4__BUILTIN_PROC_N(SLASH, "/") \
+    _e4__BUILTIN_PROC_N(SLASH_MOD, "/MOD") \
     _e4__BUILTIN_PROC_N(STAR, "*")  \
     _e4__BUILTIN_PROC_N(STORE, "!") \
     _e4__BUILTIN_PROC(SWAP) \

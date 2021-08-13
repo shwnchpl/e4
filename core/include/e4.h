@@ -189,6 +189,7 @@ enum e4__builtin_id {
     e4__B_LESS_THAN,
     e4__B_LITERAL,
     e4__B_MINUS,
+    e4__B_MOD,
     e4__B_NEGATE,
     e4__B_OR,
     e4__B_OVER,
@@ -196,6 +197,8 @@ enum e4__builtin_id {
     e4__B_QUIT,
     e4__B_ROT,
     e4__B_SEMICOLON,
+    e4__B_SLASH,
+    e4__B_SLASH_MOD,
     e4__B_STAR,
     e4__B_STORE,
     e4__B_SWAP,
@@ -361,6 +364,7 @@ e4__usize e4__num_digit(e4__usize u, e4__u8 base, char *d);
 char* e4__num_format(e4__usize n, e4__u8 base, e4__u8 flags, char *buf,
         e4__usize sz);
 e4__usize e4__num_sdiv(e4__usize n, e4__usize d);
+e4__usize e4__num_smod(e4__usize n, e4__usize d);
 
 /* task.c functions */
 e4__bool e4__task_compiling(struct e4__task *task);

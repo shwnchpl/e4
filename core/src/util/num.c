@@ -52,3 +52,24 @@ e4__usize e4__num_sdiv(e4__usize n, e4__usize d)
 
     return n;
 }
+
+e4__usize e4__num_smod(e4__usize n, e4__usize d)
+{
+    register e4__bool negate = 0;
+
+    if (e4__USIZE_IS_NEGATIVE(n)) {
+        n = e4__USIZE_NEGATE(n);
+        negate = 1;
+    }
+
+    if (e4__USIZE_IS_NEGATIVE(d)) {
+        d = e4__USIZE_NEGATE(d);
+    }
+
+    n = n % d;
+
+    if (negate)
+        n = e4__USIZE_NEGATE(n);
+
+    return n;
+}
