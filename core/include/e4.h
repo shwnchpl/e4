@@ -173,6 +173,9 @@ enum e4__builtin_id {
     e4__B_BASE,
     e4__B_BL,
     e4__B_BRACKET_TICK,
+    e4__B_C_COMMA,
+    e4__B_C_FETCH,
+    e4__B_C_STORE,
     e4__B_CELLS,
     e4__B_CELL_PLUS,
     e4__B_CHARS,
@@ -316,6 +319,7 @@ void e4__builtin_exec_(e4__usize count, /* struct e4__task *task, */
 /* compile.c functions */
 void e4__compile_cancel(struct e4__task *task);
 void e4__compile_cell(struct e4__task *task, e4__cell cell);
+void e4__compile_char(struct e4__task *task, e4__cell cell);
 e4__usize e4__compile_finish(struct e4__task *task);
 void e4__compile_literal(struct e4__task *task, e4__cell num);
 void e4__compile_start(struct e4__task *task, struct e4__execute_token *xt,

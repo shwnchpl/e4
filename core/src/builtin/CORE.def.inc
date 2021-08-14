@@ -92,6 +92,38 @@ static void e4__builtin_BRACKET_TICK(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_C_COMMA(struct e4__task *task, void *user)
+{
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+    e4__compile_char(task, e4__stack_pop(task));
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_C_FETCH(struct e4__task *task, void *user)
+{
+    register e4__u8 *c;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+
+    c = (e4__u8 *)e4__stack_pop(task);
+    e4__stack_push(task, (e4__cell)((e4__usize)*c));
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_C_STORE(struct e4__task *task, void *user)
+{
+    register e4__u8 *c, v;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    c = (e4__u8 *)e4__stack_pop(task);
+    v = (e4__u8)((e4__usize)e4__stack_pop(task) & 0xff);
+    *c = v;
+
+    e4__execute_ret(task);
+}
+
 static const void *e4__builtin_CELLS[] = {
     e4__execute_threaded,
     NULL,
@@ -148,7 +180,7 @@ static void e4__builtin_COLON(struct e4__task *task, void *user)
 static void e4__builtin_COMMA(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
-    e4__DEREF(task->here++) = e4__stack_pop(task);
+    e4__compile_cell(task, e4__stack_pop(task));
     e4__execute_ret(task);
 }
 

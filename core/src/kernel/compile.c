@@ -31,6 +31,13 @@ void e4__compile_cell(struct e4__task *task, e4__cell cell)
     e4__DEREF(task->here++) = cell;
 }
 
+void e4__compile_char(struct e4__task *task, e4__cell cell)
+{
+    register e4__u8 *c = (e4__u8 *)task->here;
+    *c++ = (e4__u8)((e4__usize)cell & 0xff);
+    task->here = (e4__cell)c;
+}
+
 e4__usize e4__compile_finish(struct e4__task *task)
 {
     if (task->compile.s0 != task->sp) {

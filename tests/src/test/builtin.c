@@ -657,14 +657,14 @@ static void e4t__test_builtin_math(void)
     #undef _e
 }
 
-/* Covers @ ! ALIGN ALIGNED ALLOT CELLS HERE */
+/* Covers @ ! ALIGN ALIGNED ALLOT C, C@ C! CELLS HERE */
 static void e4t__test_builtin_memmanip(void)
 {
     struct e4__task *task = e4t__transient_task();
     e4__usize slot, here0, here1;
 
-    /* XXX: Parts of this test only work correctly on a 64 bit
-       system. */
+    /* XXX: Parts of this test only work correctly on a little endian
+       64 bit system. */
 
     /* Test that CHARS and CELLS return the appropriate counts. */
     e4t__ASSERT_OK(e4__evaluate(task, "51 cells", -1));
@@ -741,6 +741,48 @@ static void e4t__test_builtin_memmanip(void)
     here1 = (e4__usize)e4__stack_pop(task);
     e4t__ASSERT(!(here1 % sizeof(e4__cell)));
     e4t__ASSERT(here1 == here0);
+
+    /* Test basic character/byte allocation and access. */
+    e4t__ASSERT_OK(e4__evaluate(task,
+            "create foo here 'h' c, 'e' c, 'l' c, 'l' c, 'o' c, align here",
+            -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__stack_pop(task) + 1);
+    e4t__ASSERT_OK(e4__evaluate(task, "foo 0 chars + c@", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 'h');
+    e4t__ASSERT_OK(e4__evaluate(task, "foo 1 chars + c@", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 'e');
+    e4t__ASSERT_OK(e4__evaluate(task, "foo 2 chars + c@", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 'l');
+    e4t__ASSERT_OK(e4__evaluate(task, "foo 3 chars + c@", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 'l');
+    e4t__ASSERT_OK(e4__evaluate(task, "foo 4 chars + c@", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 'o');
+
+    /* Test that bytes are cleared when a cell is written over them. */
+    e4t__ASSERT_OK(e4__evaluate(task, "0 foo !", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "foo 0 chars + c@", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_OK(e4__evaluate(task, "foo 1 chars + c@", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_OK(e4__evaluate(task, "foo 2 chars + c@", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_OK(e4__evaluate(task, "foo 3 chars + c@", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_OK(e4__evaluate(task, "foo 4 chars + c@", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    /* Test that settings bytes functions correctly. */
+    e4t__ASSERT_OK(e4__evaluate(task, "0x20 foo 0 chars + c!", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "0x40 foo 2 chars + c!", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "0x60 foo 4 chars + c!", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "foo 0 chars + c@", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0x20);
+    e4t__ASSERT_OK(e4__evaluate(task, "foo 2 chars + c@", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0x40);
+    e4t__ASSERT_OK(e4__evaluate(task, "foo 4 chars + c@", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0x60);
+    e4t__ASSERT_OK(e4__evaluate(task, "foo @", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0x6000400020);
 }
 
 /* Covers >NUMBER and BASE uservar */

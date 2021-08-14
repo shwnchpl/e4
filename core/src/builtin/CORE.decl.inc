@@ -15,6 +15,9 @@
     _e4__BUILTIN_CONSTANT(BL, ' ')  \
     _e4__BUILTIN_PROC_NF(BRACKET_TICK, "[']",   \
            e4__F_IMMEDIATE | e4__F_COMPONLY)   \
+    _e4__BUILTIN_PROC_N(C_COMMA, "C,")  \
+    _e4__BUILTIN_PROC_N(C_FETCH, "C@")  \
+    _e4__BUILTIN_PROC_N(C_STORE, "C!")  \
     _e4__BUILTIN_THUNK(CELLS)   \
     _e4__BUILTIN_THUNK_N(CELL_PLUS, "CELL+")    \
     _e4__BUILTIN_THUNK(CHARS)   \
