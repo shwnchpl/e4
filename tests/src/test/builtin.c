@@ -663,6 +663,18 @@ static void e4t__test_builtin_memmanip(void)
     struct e4__task *task = e4t__transient_task();
     e4__usize slot;
 
+    /* Test that CHARS and CELLS return the appropriate counts. */
+    e4t__ASSERT_OK(e4__evaluate(task, "51 cells", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 51 * sizeof(e4__cell));
+    e4t__ASSERT_OK(e4__evaluate(task, "51 chars", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 51 * sizeof(e4__u8));
+
+    /* Test that char and cell advancing pointers work as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task, "8 cell+", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 8 + sizeof(e4__cell));
+    e4t__ASSERT_OK(e4__evaluate(task, "8 char+", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 8 + sizeof(e4__u8));
+
     /* Test ! and @ work correctly. */
     e4__stack_push(task, (e4__cell)&slot);
     e4t__ASSERT_OK(e4__evaluate(task, "dup 4739 swap !", -1));

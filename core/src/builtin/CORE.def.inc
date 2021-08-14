@@ -79,6 +79,36 @@ static const void *e4__builtin_CELLS[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
+static const void *e4__builtin_CELL_PLUS[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_LITERAL],
+    (void *)sizeof(e4__cell),
+    &e4__BUILTIN_XT[e4__B_PLUS],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
+static const void *e4__builtin_CHARS[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_LITERAL],
+    (void *)sizeof(e4__u8),
+    &e4__BUILTIN_XT[e4__B_STAR],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
+static const void *e4__builtin_CHAR_PLUS[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_LITERAL],
+    (void *)sizeof(e4__u8),
+    &e4__BUILTIN_XT[e4__B_PLUS],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
 static void e4__builtin_COLON(struct e4__task *task, void *user)
 {
     register const char *word;

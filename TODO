@@ -81,8 +81,9 @@ General Builtins
 - [DONE] Implement core extension logic/comparison words: 0<> 0> <> U>.
 - [DONE] Implement ( and \.
 - [DONE] Implement 1+, 1-, 2*, 2/, LSHIFT, and RSHIFT.
-- Implement CELL+, CHAR+, and CHARS.
-- Implement C@, C,, C!, ALIGN, and ALIGNED.
+- [DONE] Implement CELL+, CHAR+, and CHARS.
+- Implement ALIGN and ALIGNED.
+- Implement C@, C,, and C!.
 - Implement COUNT, TYPE, .", and some sort of STRING_LIT builtin.
 - Implement UNUSED.
 - Implement S", S\", and C". These words should use transient memory
