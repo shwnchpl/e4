@@ -7,8 +7,13 @@
 
 static void e4__builtin_BRANCH(struct e4__task *task, void *user)
 {
-    const e4__usize offset = (e4__usize)e4__DEREF2(++task->rp);
+    register e4__usize offset;
 
+    /* Since we're manipulating rp directly rather than calling
+       e4__execute_ret, ensure that we aren't going to underflow. */
+    _e4__BUILTIN_EXPECT_RDEPTH(task, 1);
+
+    offset = (e4__usize)e4__DEREF2(++task->rp);
     task->ip = e4__DEREF(task->rp) + offset;
 
     /* e4__execute_ret intentionally omitted. */
@@ -16,8 +21,11 @@ static void e4__builtin_BRANCH(struct e4__task *task, void *user)
 
 static void e4__builtin_BRANCH0(struct e4__task *task, void *user)
 {
-    e4__usize offset;
+    register e4__usize offset;
 
+    /* Since we're manipulating rp directly rather than calling
+       e4__execute_ret, ensure that we aren't going to underflow. */
+    _e4__BUILTIN_EXPECT_RDEPTH(task, 1);
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
 
     offset = (e4__usize)e4__DEREF2(++task->rp);

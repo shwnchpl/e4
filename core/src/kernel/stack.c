@@ -59,6 +59,11 @@ void e4__stack_rot(struct e4__task *task)
     e4__DEREF(task->sp + 1) = tmp;
 }
 
+e4__usize e4__stack_rdepth(struct e4__task *task)
+{
+    return task->r0 - task->rp;
+}
+
 e4__cell e4__stack_rpeek(struct e4__task *task)
 {
     return e4__DEREF(task->rp + 1);
@@ -67,6 +72,11 @@ e4__cell e4__stack_rpeek(struct e4__task *task)
 e4__cell e4__stack_rpop(struct e4__task *task)
 {
     return e4__DEREF(++task->rp);
+}
+
+void e4__stack_rpush(struct e4__task *task, void *v)
+{
+    e4__DEREF(task->rp--) = v;
 }
 
 /* XXX: Core extension. */
@@ -81,11 +91,6 @@ void e4__stack_roll(struct e4__task *task)
     }
 
     e4__DEREF(task->sp + 1) = tmp;
-}
-
-void e4__stack_rpush(struct e4__task *task, void *v)
-{
-    e4__DEREF(task->rp--) = v;
 }
 
 void e4__stack_swap(struct e4__task *task)

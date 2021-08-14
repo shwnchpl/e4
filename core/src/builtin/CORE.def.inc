@@ -405,6 +405,10 @@ static void e4__builtin_LESS_THAN(struct e4__task *task, void *user)
 
 static void e4__builtin_LITERAL(struct e4__task *task, void *user)
 {
+    /* Since we're manipulating rp directly rather than calling
+       e4__execute_ret, ensure that we aren't going to underflow. */
+    _e4__BUILTIN_EXPECT_RDEPTH(task, 1);
+
     /* FIXME: Add compilation semantics for this word. */
     e4__stack_push(task, e4__DEREF2(++task->rp));
     task->ip = e4__DEREF(task->rp) + 1;

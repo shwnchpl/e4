@@ -118,6 +118,7 @@ struct e4__io_func {
 #define e4__E_OK            (0)
 #define e4__E_ABORT         (-1)
 #define e4__E_STKUNDERFLOW  (-4)
+#define e4__E_RSTKUNDERFLOW (-6)
 #define e4__E_DIVBYZERO     (-10)
 #define e4__E_UNDEFWORD     (-13)
 #define e4__E_COMPONLYWORD  (-14)
@@ -125,6 +126,7 @@ struct e4__io_func {
 #define e4__E_ZLNAME        (-16)
 #define e4__E_UNSUPPORTED   (-21)
 #define e4__E_CSMISMATCH    (-22)
+#define e4__E_RSTKIMBALANCE (-25)
 #define e4__E_INVNAMEARG    (-32)
 #define e4__E_QUIT          (-56)
 
@@ -343,10 +345,11 @@ e4__cell e4__stack_peek(struct e4__task *task);
 e4__cell e4__stack_pop(struct e4__task *task);
 void e4__stack_push(struct e4__task *task, void *v);
 void e4__stack_rot(struct e4__task *task);
+e4__usize e4__stack_rdepth(struct e4__task *task);
 e4__cell e4__stack_rpeek(struct e4__task *task);
 e4__cell e4__stack_rpop(struct e4__task *task);
-void e4__stack_roll(struct e4__task *task);
 void e4__stack_rpush(struct e4__task *task, void *v);
+void e4__stack_roll(struct e4__task *task);
 void e4__stack_swap(struct e4__task *task);
 void e4__stack_tuck(struct e4__task *task);
 

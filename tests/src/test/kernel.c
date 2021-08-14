@@ -270,12 +270,14 @@ static void e4t__test_kernel_stack(void)
     e4__stack_rpush(task, (void *)17);
     e4__stack_rpush(task, (void *)33);
 
+    e4t__ASSERT_EQ(e4__stack_rdepth(task), 5);
     e4t__ASSERT_EQ(e4__stack_rpeek(task), 33);
     e4t__ASSERT_EQ(e4__stack_rpop(task), 33);
     e4t__ASSERT_EQ(e4__stack_rpop(task), 17);
     e4t__ASSERT_EQ(e4__stack_rpop(task), 9);
     e4t__ASSERT_EQ(e4__stack_rpop(task), 5);
     e4t__ASSERT_EQ(e4__stack_rpop(task), 3);
+    e4t__ASSERT_EQ(e4__stack_rdepth(task), 0);
 }
 
 void e4t__test_kernel(void)

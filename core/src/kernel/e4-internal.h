@@ -68,6 +68,7 @@ struct e4__task
     struct e4__compile_state compile;
 
     /* System variables. */
+    e4__cell tr0;
     e4__usize sz;
     e4__usize tib_sz;
     e4__usize base; /* Initialize to 10. */

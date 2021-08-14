@@ -148,6 +148,7 @@ void e4__evaluate_quit(struct e4__task *task)
     while (running) {
         register e4__usize res;
 
+        /* FIXME: Consider adding an e4__stack_rclear API. */
         task->rp = task->r0;
 
         /* Reset IO src to TIB. */
