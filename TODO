@@ -84,7 +84,7 @@ General Builtins
 - [DONE] Implement CELL+, CHAR+, and CHARS.
 - [DONE] Implement ALIGN and ALIGNED.
 - [DONE] Implement C@, C,, and C!.
-- Implement >R, R>, R@.
+- [DONE] Implement >R, R>, R@.
 - Implement COUNT, TYPE, .", and some sort of STRING_LIT builtin.
 - Implement UNUSED.
 - Implement S", S\", and C". These words should use transient memory

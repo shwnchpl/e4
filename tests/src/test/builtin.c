@@ -906,6 +906,68 @@ static void e4t__test_builtin_parseword(void)
     e4t__ASSERT_EQ(len, 0);
 }
 
+/* Covers >R R> R@ */
+static void e4t__test_builtin_rstackmanip(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* Test that attempting to interpret return stack manipulation words
+       fails and that >r reports data stack underflow correctly. */
+    e4t__ASSERT_EQ(e4__evaluate(task, "r@", -1), e4__E_COMPONLYWORD);
+    e4t__ASSERT_EQ(e4__evaluate(task, "r>", -1), e4__E_COMPONLYWORD);
+    e4t__ASSERT_EQ(e4__evaluate(task, ">r", -1), e4__E_COMPONLYWORD);
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo >r ;", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "foo", -1), e4__E_STKUNDERFLOW);
+    e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
+
+    /* Test that attempting invalid return stack manipulations throws
+       exceptions as appropriate. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": marker-hack ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo r> ;", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "foo", -1), e4__E_RSTKUNDERFLOW);
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo r> r> ;", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "foo", -1), e4__E_RSTKUNDERFLOW);
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo r> r> r> ;", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "foo", -1), e4__E_RSTKUNDERFLOW);
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo >r ;", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 foo", -1), e4__E_RSTKIMBALANCE);
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo >r >r ;", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 foo", -1), e4__E_RSTKIMBALANCE);
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo >r >r >r ;", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 foo", -1), e4__E_RSTKIMBALANCE);
+    e4t__ASSERT_OK(e4__evaluate(task, "forget marker-hack", -1));
+
+    /* Test that these exceptions are thrown even when a thread is
+       being run within another thread. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": marker-hack ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo r> ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, ": bar foo ;", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "bar", -1), e4__E_RSTKUNDERFLOW);
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo r> r> ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, ": bar foo ;", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "bar", -1), e4__E_RSTKUNDERFLOW);
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo r> r> r> ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, ": bar foo ;", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "bar", -1), e4__E_RSTKUNDERFLOW);
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo >r ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, ": bar foo ;", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 bar", -1), e4__E_RSTKIMBALANCE);
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo >r >r ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, ": bar foo ;", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 bar", -1), e4__E_RSTKIMBALANCE);
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo >r >r >r ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, ": bar foo ;", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 bar", -1), e4__E_RSTKIMBALANCE);
+    e4t__ASSERT_OK(e4__evaluate(task, "forget marker-hack", -1));
+
+    /* Test that moving to and from the return stack works correctly. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": my-dup >r r@ r> ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "5 my-dup", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+}
+
 /* Covers CLEAR .S DROP DUP OVER ROT SWAP TUCK ROLL QUIT */
 static void e4t__test_builtin_stackmanip(void)
 {
@@ -992,6 +1054,7 @@ void e4t__test_builtin(void)
     e4t__test_builtin_memmanip();
     e4t__test_builtin_parsenum();
     e4t__test_builtin_parseword();
+    e4t__test_builtin_rstackmanip();
     e4t__test_builtin_stackmanip();
     e4t__test_builtin_uservars();
 }

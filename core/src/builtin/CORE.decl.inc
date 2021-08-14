@@ -55,6 +55,8 @@
     _e4__BUILTIN_THUNK_NF(PAREN, "(", e4__F_IMMEDIATE)  \
     _e4__BUILTIN_PROC_N(PLUS, "+")  \
     _e4__BUILTIN_PROC(QUIT) \
+    _e4__BUILTIN_PROC_NF(R_FETCH, "R@", e4__F_COMPONLY) \
+    _e4__BUILTIN_PROC_NF(R_FROM, "R>", e4__F_COMPONLY)  \
     _e4__BUILTIN_PROC_F(RECURSE, e4__F_COMPONLY | e4__F_IMMEDIATE)  \
     _e4__BUILTIN_PROC(ROT)  \
     _e4__BUILTIN_PROC(RSHIFT)   \
@@ -68,6 +70,7 @@
     _e4__BUILTIN_PROC_N(TICK, "'")  \
     _e4__BUILTIN_PROC_N(TO_BODY, ">BODY")   \
     _e4__BUILTIN_PROC_N(TO_NUMBER, ">NUMBER")   \
+    _e4__BUILTIN_PROC_NF(TO_R, ">R", e4__F_COMPONLY)    \
     _e4__BUILTIN_THUNK_N(TWO_SLASH, "2/")   \
     _e4__BUILTIN_THUNK_N(TWO_STAR, "2*")    \
     _e4__BUILTIN_PROC_N(U_DOT, "U.")  \
