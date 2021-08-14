@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 
+/* FIXME: This function is unused internally. Consider removing. */
 e4__usize e4__mem_cells(e4__usize n)
 {
     return n * sizeof(e4__cell);

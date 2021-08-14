@@ -69,13 +69,15 @@ static void e4__builtin_BRACKET_TICK(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_CELLS(struct e4__task *task, void *user)
-{
-    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
-    e4__stack_push(task,
-            (e4__cell)e4__mem_cells((e4__usize)e4__stack_pop(task)));
-    e4__execute_ret(task);
-}
+static const void *e4__builtin_CELLS[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_LITERAL],
+    (void *)sizeof(e4__cell),
+    &e4__BUILTIN_XT[e4__B_STAR],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
 
 static void e4__builtin_COLON(struct e4__task *task, void *user)
 {
