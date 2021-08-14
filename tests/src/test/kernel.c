@@ -93,6 +93,7 @@ static void e4t__test_kernel_exceptions_da(struct e4__task *task, void *user)
             (e4__cell)e4__USIZE_NEGATE(ex),
         };
         e4__exception_catch(task, &xt);
+        e4__execute_ret(task);
         return;
     }
 
