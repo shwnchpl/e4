@@ -26,6 +26,29 @@ static void e4__builtin_ABORT(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static const void *e4__builtin_ALIGN[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_HERE],
+    &e4__BUILTIN_XT[e4__B_DUP],
+    &e4__BUILTIN_XT[e4__B_ALIGNED],
+    &e4__BUILTIN_XT[e4__B_SWAP],
+    &e4__BUILTIN_XT[e4__B_MINUS],
+    &e4__BUILTIN_XT[e4__B_ALLOT],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
+static void e4__builtin_ALIGNED(struct e4__task *task, void *user)
+{
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+
+    e4__stack_push(task,
+            (e4__cell)e4__mem_aligned((e4__usize)e4__stack_pop(task)));
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_ALLOT(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);

@@ -7,6 +7,8 @@
 
 #define _e4__BUILTIN_CORE_DECL()    \
     _e4__BUILTIN_PROC_FIRST(ABORT)  \
+    _e4__BUILTIN_THUNK(ALIGN)   \
+    _e4__BUILTIN_PROC(ALIGNED)  \
     _e4__BUILTIN_PROC(ALLOT)    \
     _e4__BUILTIN_PROC(AND)  \
     _e4__BUILTIN_USERVAR(BASE) \

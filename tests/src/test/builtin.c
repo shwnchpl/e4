@@ -657,11 +657,14 @@ static void e4t__test_builtin_math(void)
     #undef _e
 }
 
-/* Covers @ ! ALLOT CELLS HERE */
+/* Covers @ ! ALIGN ALIGNED ALLOT CELLS HERE */
 static void e4t__test_builtin_memmanip(void)
 {
     struct e4__task *task = e4t__transient_task();
-    e4__usize slot;
+    e4__usize slot, here0, here1;
+
+    /* XXX: Parts of this test only work correctly on a 64 bit
+       system. */
 
     /* Test that CHARS and CELLS return the appropriate counts. */
     e4t__ASSERT_OK(e4__evaluate(task, "51 cells", -1));
@@ -700,6 +703,44 @@ static void e4t__test_builtin_memmanip(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), (e4__usize)e4__stack_pop(task) + 7);
     e4t__ASSERT_OK(e4__evaluate(task, "here -7 allot here", -1));
     e4t__ASSERT_EQ(e4__stack_pop(task), (e4__usize)e4__stack_pop(task) - 7);
+
+    /* Test that alignment builtins work as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task, "0 aligned", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_OK(e4__evaluate(task, "1 aligned", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 8);
+    e4t__ASSERT_OK(e4__evaluate(task, "2 aligned", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 8);
+    e4t__ASSERT_OK(e4__evaluate(task, "3 aligned", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 8);
+    e4t__ASSERT_OK(e4__evaluate(task, "4 aligned", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 8);
+    e4t__ASSERT_OK(e4__evaluate(task, "5 aligned", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 8);
+    e4t__ASSERT_OK(e4__evaluate(task, "6 aligned", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 8);
+    e4t__ASSERT_OK(e4__evaluate(task, "7 aligned", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 8);
+    e4t__ASSERT_OK(e4__evaluate(task, "8 aligned", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 8);
+    e4t__ASSERT_OK(e4__evaluate(task, "9 aligned", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 16);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "here", -1));
+    e4t__ASSERT(!((e4__usize)e4__stack_pop(task) % sizeof(e4__cell)));
+    e4t__ASSERT_OK(e4__evaluate(task, "3 allot here", -1));
+    here0= (e4__usize)e4__stack_pop(task);
+    e4t__ASSERT(here0 % sizeof(e4__cell));
+    e4t__ASSERT_OK(e4__evaluate(task, "align here", -1));
+    here1 = (e4__usize)e4__stack_pop(task);
+    e4t__ASSERT(!(here1 % sizeof(e4__cell)));
+    e4t__ASSERT(here1 > here0);
+    here0 = here1;
+
+    e4t__ASSERT_OK(e4__evaluate(task, "align here", -1));
+    here1 = (e4__usize)e4__stack_pop(task);
+    e4t__ASSERT(!(here1 % sizeof(e4__cell)));
+    e4t__ASSERT(here1 == here0);
 }
 
 /* Covers >NUMBER and BASE uservar */

@@ -82,7 +82,7 @@ General Builtins
 - [DONE] Implement ( and \.
 - [DONE] Implement 1+, 1-, 2*, 2/, LSHIFT, and RSHIFT.
 - [DONE] Implement CELL+, CHAR+, and CHARS.
-- Implement ALIGN and ALIGNED.
+- [DONE] Implement ALIGN and ALIGNED.
 - Implement C@, C,, and C!.
 - Implement COUNT, TYPE, .", and some sort of STRING_LIT builtin.
 - Implement UNUSED.
