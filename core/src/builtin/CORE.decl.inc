@@ -36,9 +36,12 @@
     _e4__BUILTIN_PROC(INVERT)   \
     _e4__BUILTIN_PROC_N(LESS_THAN, "<") \
     _e4__BUILTIN_PROC_F(LITERAL, e4__F_COMPONLY)    \
+    _e4__BUILTIN_PROC(LSHIFT)   \
     _e4__BUILTIN_PROC_N(MINUS, "-") \
     _e4__BUILTIN_THUNK(MOD) \
     _e4__BUILTIN_PROC(NEGATE)   \
+    _e4__BUILTIN_THUNK_N(ONE_MINUS, "1-")   \
+    _e4__BUILTIN_THUNK_N(ONE_PLUS, "1+")    \
     _e4__BUILTIN_PROC(OR)   \
     _e4__BUILTIN_PROC(OVER) \
     _e4__BUILTIN_THUNK_NF(PAREN, "(", e4__F_IMMEDIATE)  \
@@ -46,6 +49,7 @@
     _e4__BUILTIN_PROC(QUIT) \
     _e4__BUILTIN_PROC_F(RECURSE, e4__F_COMPONLY | e4__F_IMMEDIATE)  \
     _e4__BUILTIN_PROC(ROT)  \
+    _e4__BUILTIN_PROC(RSHIFT)   \
     _e4__BUILTIN_PROC_NF(SEMICOLON, ";", e4__F_IMMEDIATE | e4__F_COMPONLY)  \
     _e4__BUILTIN_THUNK_N(SLASH, "/")    \
     _e4__BUILTIN_PROC_N(SLASH_MOD, "/MOD") \
@@ -56,6 +60,8 @@
     _e4__BUILTIN_PROC_N(TICK, "'")  \
     _e4__BUILTIN_PROC_N(TO_BODY, ">BODY")   \
     _e4__BUILTIN_PROC_N(TO_NUMBER, ">NUMBER")   \
+    _e4__BUILTIN_THUNK_N(TWO_SLASH, "2/")   \
+    _e4__BUILTIN_THUNK_N(TWO_STAR, "2*")    \
     _e4__BUILTIN_PROC_N(U_DOT, "U.")  \
     _e4__BUILTIN_PROC_N(U_LESS_THAN, "U<")  \
     _e4__BUILTIN_PROC(VARIABLE) \

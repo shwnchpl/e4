@@ -325,6 +325,19 @@ static void e4__builtin_LITERAL(struct e4__task *task, void *user)
     /* e4__execute_ret intentionally omitted. */
 }
 
+static void e4__builtin_LSHIFT(struct e4__task *task, void *user)
+{
+    register e4__usize l, r;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    r = (e4__usize)e4__stack_pop(task);
+    l = (e4__usize)e4__stack_pop(task);
+    e4__stack_push(task, (e4__cell)(l << r));
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_MINUS(struct e4__task *task, void *user)
 {
     register e4__usize l, r;
@@ -356,6 +369,26 @@ static void e4__builtin_NEGATE(struct e4__task *task, void *user)
 
     e4__execute_ret(task);
 }
+
+static const void *e4__builtin_ONE_MINUS[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_LITERAL],
+    (void *)1,
+    &e4__BUILTIN_XT[e4__B_MINUS],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
+static const void *e4__builtin_ONE_PLUS[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_LITERAL],
+    (void *)1,
+    &e4__BUILTIN_XT[e4__B_PLUS],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
 
 static void e4__builtin_OR(struct e4__task *task, void *user)
 {
@@ -412,6 +445,19 @@ static void e4__builtin_ROT(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 3);
     e4__stack_rot(task);
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_RSHIFT(struct e4__task *task, void *user)
+{
+    register e4__usize l, r;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    r = (e4__usize)e4__stack_pop(task);
+    l = (e4__usize)e4__stack_pop(task);
+    e4__stack_push(task, (e4__cell)(l >> r));
+
     e4__execute_ret(task);
 }
 
@@ -584,6 +630,26 @@ static void e4__builtin_TO_NUMBER(struct e4__task *task, void *user)
 
     e4__execute_ret(task);
 }
+
+static const void *e4__builtin_TWO_SLASH[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_LITERAL],
+    (void *)1,
+    &e4__BUILTIN_XT[e4__B_RSHIFT],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
+static const void *e4__builtin_TWO_STAR[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_LITERAL],
+    (void *)1,
+    &e4__BUILTIN_XT[e4__B_LSHIFT],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
 
 static void e4__builtin_U_DOT(struct e4__task *task, void *user)
 {

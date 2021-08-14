@@ -428,7 +428,7 @@ static void e4t__test_builtin_logic(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
 }
 
-/* Covers + - . / /MOD MOD U. */
+/* Covers + - . / 1+ 1- 2* 2/ /MOD LSHIFT MOD RSHIFT U. */
 static void e4t__test_builtin_math(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -625,6 +625,34 @@ static void e4t__test_builtin_math(void)
     e4t__ASSERT_EQ(_e("10 0 /"), e4__E_DIVBYZERO);
     e4t__ASSERT_EQ(_e("10 0 mod"), e4__E_DIVBYZERO);
     e4t__ASSERT_EQ(_e("10 0 /mod"), e4__E_DIVBYZERO);
+
+    /* Test that shift operators work as expected. */
+    e4t__ASSERT_OK(_e("1 5 lshift"));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 32);
+    e4t__ASSERT_OK(_e("5 0 lshift"));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+    e4t__ASSERT_OK(_e("234 4 rshift"));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 14);
+    e4t__ASSERT_OK(_e("16 2 rshift"));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+    e4t__ASSERT_OK(_e("15 2/"));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 7);
+    e4t__ASSERT_OK(_e("7 2/"));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 3);
+    e4t__ASSERT_OK(_e("3 2*"));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 6);
+    e4t__ASSERT_OK(_e("6 2*"));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 12);
+
+    /* Test that increment and decrement words work correctly. */
+    e4t__ASSERT_OK(_e("5 1+"));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 6);
+    e4t__ASSERT_OK(_e("6 1+"));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 7);
+    e4t__ASSERT_OK(_e("-50 1-"));
+    e4t__ASSERT_EQ(e4__stack_pop(task), -51);
+    e4t__ASSERT_OK(_e("-51 1-"));
+    e4t__ASSERT_EQ(e4__stack_pop(task), -52);
 
     #undef _e
 }
