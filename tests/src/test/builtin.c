@@ -29,7 +29,8 @@ static void e4t__test_builtin_data(void)
     e4t__term_obuf_consume();
 
     /* Test simple creation with allot allocation. */
-    e4t__ASSERT_OK(e4__evaluate(task, "create foo 1 cells allot 531 foo !", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "create foo 1 cells allot 531 foo !",
+            -1));
     e4t__ASSERT((header = e4__dict_lookup(task, "foo", 3)));
     e4t__ASSERT_EQ(header->xt->data[0], 531);
 
@@ -75,9 +76,11 @@ static void e4t__test_builtin_data(void)
 
     e4t__ASSERT_EQ(e4__evaluate(task, ": set-flom to", -1), e4__E_ZLNAME);
     e4__compile_cancel(task);
-    e4t__ASSERT_EQ(e4__evaluate(task, ": set-flom to flom ;", -1), e4__E_UNDEFWORD);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": set-flom to flom ;", -1),
+            e4__E_UNDEFWORD);
     e4__compile_cancel(task);
-    e4t__ASSERT_EQ(e4__evaluate(task, ": set-flom to ;", -1), e4__E_INVNAMEARG);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": set-flom to ;", -1),
+            e4__E_INVNAMEARG);
     e4__compile_cancel(task);
 
     e4__stack_clear(task);

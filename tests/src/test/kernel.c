@@ -316,7 +316,8 @@ static void e4t__test_kernel_quit(void)
     e4__evaluate_quit(task);
 }
 
-static e4__usize e4t__test_kernel_quit_accept(void *user, char *buf, e4__usize *n)
+static e4__usize e4t__test_kernel_quit_accept(void *user, char *buf,
+        e4__usize *n)
 {
     struct e4t__test_kernel_quit_data *test_data = user;
 

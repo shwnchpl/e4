@@ -11,7 +11,8 @@ static void e4t__test_compile_conditional(void)
     e4t__ASSERT_EQ(e4__evaluate(task, ": foo if ;", -1), e4__E_CSMISMATCH);
     e4t__ASSERT_EQ(e4__evaluate(task, ": foo else", -1), e4__E_CSMISMATCH);
     e4t__ASSERT_EQ(e4__evaluate(task, ": foo then", -1), e4__E_CSMISMATCH);
-    e4t__ASSERT_EQ(e4__evaluate(task, ": foo if else ;", -1), e4__E_CSMISMATCH);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo if else ;", -1),
+            e4__E_CSMISMATCH);
 
     /* Test that empty if/then and empty if/else/then sequences
        correctly do nothing. */
@@ -87,7 +88,8 @@ static void e4t__test_compile_does(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 15);
 
     /* Test that double DOES> works as expected. */
-    e4t__ASSERT_OK(e4__evaluate(task, ": foo create , does> @ 10 + does> @ 67 + ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": foo create , does> @ 10 + does> @ 67 + ;", -1));
     e4t__ASSERT_OK(e4__evaluate(task, "5 foo bar", -1));
     e4t__ASSERT_OK(e4__evaluate(task, "create bas 33 , bas @", -1));
     e4t__ASSERT_EQ(e4__stack_pop(task), 33);
