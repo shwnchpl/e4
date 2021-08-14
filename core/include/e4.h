@@ -371,6 +371,7 @@ e4__usize e4__io_type(struct e4__task *task, const char *buf, e4__usize n);
 char* e4__io_word(struct e4__task *task, char delim);
 
 /* mem.c functions */
+e4__usize e4__mem_aligned(e4__usize n);
 e4__usize e4__mem_cells(e4__usize n);
 e4__usize e4__mem_dict_entry(void *here, struct e4__dict_header *prev,
         const char *name, e4__u8 nbytes, e4__u8 flags, e4__code_ptr code,

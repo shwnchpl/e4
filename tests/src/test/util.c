@@ -84,8 +84,8 @@ static void e4t__test_util_numparse(void)
 
 static void e4t__test_util_math(void)
 {
-    /* XXX: Parts of this test only work correctly on a system that
-       represents negative numbers using two's complement. */
+    /* XXX: Parts of this test only work correctly on a 64 bit system
+       that represents negative numbers using two's complement. */
     e4t__ASSERT_EQ(e4__USIZE_NEGATE((e4__usize)5), -5);
     e4t__ASSERT_EQ(e4__USIZE_IS_NEGATIVE((e4__usize)-5), 1);
 
@@ -98,6 +98,17 @@ static void e4t__test_util_math(void)
     e4t__ASSERT_EQ(e4__num_smod((e4__usize)-10, (e4__usize)7), -3);
     e4t__ASSERT_EQ(e4__num_smod((e4__usize)10, (e4__usize)-7), 3);
     e4t__ASSERT_EQ(e4__num_smod((e4__usize)-10, (e4__usize)-7), -3);
+
+    e4t__ASSERT_EQ(e4__mem_aligned(0), 0);
+    e4t__ASSERT_EQ(e4__mem_aligned(1), 8);
+    e4t__ASSERT_EQ(e4__mem_aligned(2), 8);
+    e4t__ASSERT_EQ(e4__mem_aligned(3), 8);
+    e4t__ASSERT_EQ(e4__mem_aligned(4), 8);
+    e4t__ASSERT_EQ(e4__mem_aligned(5), 8);
+    e4t__ASSERT_EQ(e4__mem_aligned(6), 8);
+    e4t__ASSERT_EQ(e4__mem_aligned(7), 8);
+    e4t__ASSERT_EQ(e4__mem_aligned(8), 8);
+    e4t__ASSERT_EQ(e4__mem_aligned(9), 16);
 }
 
 static void e4t__test_util_mem_dict(void)

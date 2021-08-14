@@ -3,6 +3,13 @@
 #include <string.h>
 #include <ctype.h>
 
+e4__usize e4__mem_aligned(e4__usize n)
+{
+    if (n % sizeof(e4__cell))
+        n += (sizeof(e4__cell) - (n % sizeof(e4__cell)));
+    return n;
+}
+
 /* FIXME: This function is unused internally. Consider removing. */
 e4__usize e4__mem_cells(e4__usize n)
 {
@@ -29,9 +36,7 @@ e4__usize e4__mem_dict_entry(void *here, struct e4__dict_header *prev,
     sz = sizeof(*header) + nbytes;
 
     /* Align size. */
-    /* FIXME: Clean this up. */
-    if (sz % sizeof(void *))
-        sz += (sizeof(void *) - (sz % sizeof(void *)));
+    sz = e4__mem_aligned(sz);
 
     header->xt = (struct e4__execute_token *)((e4__u8 *)here + sz);
     header->xt->user = user;
