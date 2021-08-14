@@ -74,5 +74,6 @@ void e4t__test_builtin(void);
 void e4t__test_compile(void);
 void e4t__test_execute(void);
 void e4t__test_kernel(void);
+void e4t__test_util(void);
 
 #endif /* e4t_H_ */

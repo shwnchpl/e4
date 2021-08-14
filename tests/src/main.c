@@ -37,6 +37,7 @@ int main(void)
     e4t__test_compile();
     e4t__test_execute();
     e4t__test_kernel();
+    e4t__test_util();
 
     fprintf(stderr, "Tests complete! (%lu of %lu passed; %lu failed)\n",
             e4t__assert_attemptcount - e4t__assert_failcount,
