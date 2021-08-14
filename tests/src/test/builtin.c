@@ -1,6 +1,60 @@
 #include "e4.h"
 #include "../e4t.h" /* FIXME: Add this to an include path? */
 
+/* Covers ( \ */
+static void e4t__test_builtin_comments(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* Test that comments work correctly when interpreting. */
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 ( this is a comment) 3", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 3);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 3);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 1);
+    e4t__ASSERT_OK(e4__evaluate(task, "( no need to follow with space)3", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 3);
+    e4t__ASSERT_OK(e4__evaluate(task, "5 4 ( happy to term at EOL", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "3", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 3);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 3);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "5 4 \\ term at EOL", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "3", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 3);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 3);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+
+    /* Test that comments work correctly when compiling. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo 1 2 ( this is a comment) 3 ; foo",
+            -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 3);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 3);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 1);
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": foo ( no need to follow with space)3 ; foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 3);
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo 5 4 ( term at EOL", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "3 ; foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 3);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 3);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo 5 4 \\ term at EOL", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "3 ; foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 3);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 3);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+}
+
 /* Covers BL FALSE TRUE */
 static void e4t__test_builtin_constants(void)
 {
@@ -801,6 +855,7 @@ static void e4t__test_builtin_uservars(void)
 
 void e4t__test_builtin(void)
 {
+    e4t__test_builtin_comments();
     e4t__test_builtin_constants();
     e4t__test_builtin_data();
     e4t__test_builtin_defer();

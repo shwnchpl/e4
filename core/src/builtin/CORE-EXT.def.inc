@@ -5,6 +5,17 @@
    file and it is *not* designed to work correctly in any other
    context. */
 
+static const void *e4__builtin_BACKSLASH[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_LITERAL],
+    (void *)((e4__usize)'\n'),
+    &e4__BUILTIN_XT[e4__B_WORD],
+    &e4__BUILTIN_XT[e4__B_DROP],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
 static void e4__builtin_COLON_NONAME(struct e4__task *task, void *user)
 {
     register struct e4__execute_token *xt =

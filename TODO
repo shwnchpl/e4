@@ -79,9 +79,11 @@ General Builtins
 - [DONE] Throw division by zero exceptions where necessary.
 - [DONE] Refactor builtin XT table to not include unused data field.
 - [DONE] Implement core extension logic/comparison words: 0<> 0> <> U>.
-- Implement (.
-- Implement COUNT, TYPE, .", and some sort of STRING_LIT builtin.
+- [DONE] Implement ( and \.
+- Implement 1+, 1-, 2*, 2/, LSHIFT, and RSHIFT.
+- Implement CELL+, CHAR+, and CHARS.
 - Implement C@, C,, C!, ALIGN, and ALIGNED.
+- Implement COUNT, TYPE, .", and some sort of STRING_LIT builtin.
 - Implement UNUSED.
 - Implement S", S\", and C". These words should use transient memory
   (possibly just HERE) during runtime, but during compile time they
@@ -102,7 +104,9 @@ General IO
 
 Kernel
 -----
-- Add support for double cell numbers (including arithmetic etc.).
+- Add support for double cell numbers (including arithmetic, the text
+  interpreter extension for numbers of the format XXXX. as outlined in
+  section 8.3.1 of the standard, etc.).
 - Update words meant to support double width numbers that are currently
   implemented without any such support. This includes >NUMBER.
 - Add more two's complement utility macros as needed and use them where

@@ -199,6 +199,7 @@ enum e4__builtin_id {
     e4__B_NEGATE,
     e4__B_OR,
     e4__B_OVER,
+    e4__B_PAREN,
     e4__B_PLUS,
     e4__B_QUIT,
     e4__B_RECURSE,
@@ -222,6 +223,7 @@ enum e4__builtin_id {
     e4__B_ZERO_LESS,
 
     /* CORE EXT words */
+    e4__B_BACKSLASH,
     e4__B_COLON_NONAME,
     e4__B_DEFER,
     e4__B_DEFER_FETCH,

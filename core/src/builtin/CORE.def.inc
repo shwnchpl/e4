@@ -378,6 +378,17 @@ static void e4__builtin_OVER(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static const void *e4__builtin_PAREN[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_LITERAL],
+    (void *)((e4__usize)')'),
+    &e4__BUILTIN_XT[e4__B_WORD],
+    &e4__BUILTIN_XT[e4__B_DROP],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
 static void e4__builtin_PLUS(struct e4__task *task, void *user)
 {
     register e4__usize l, r;
