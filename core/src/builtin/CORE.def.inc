@@ -274,21 +274,14 @@ static void e4__builtin_FETCH(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_GREATER_THAN(struct e4__task *task, void *user)
-{
-    register e4__usize l, r, f;
-
-    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
-
-    r = (e4__usize)e4__stack_pop(task);
-    l = (e4__usize)e4__stack_pop(task);
-    f = e4__USIZE_IS_NEGATIVE(r) == e4__USIZE_IS_NEGATIVE(l) ?
-        l > r : e4__USIZE_IS_NEGATIVE(r) > e4__USIZE_IS_NEGATIVE(l);
-
-    e4__stack_push(task, (e4__cell)(f ? e4__BF_TRUE : e4__BF_FALSE));
-
-    e4__execute_ret(task);
-}
+static const void *e4__builtin_GREATER_THAN[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_SWAP],
+    &e4__BUILTIN_XT[e4__B_LESS_THAN],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
 
 static void e4__builtin_IF(struct e4__task *task, void *user)
 {
@@ -661,30 +654,24 @@ static void e4__builtin_WORD(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_ZERO_EQUALS(struct e4__task *task, void *user)
-{
-    register e4__usize f;
+static const void *e4__builtin_ZERO_EQUALS[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_LITERAL],
+    (void *)0,
+    &e4__BUILTIN_XT[e4__B_EQUALS],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
 
-    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
-
-    f = !e4__stack_pop(task);
-
-    e4__stack_push(task, (e4__cell)(f ? e4__BF_TRUE : e4__BF_FALSE));
-
-    e4__execute_ret(task);
-}
-
-static void e4__builtin_ZERO_LESS(struct e4__task *task, void *user)
-{
-    register e4__usize f;
-
-    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
-
-    f = e4__USIZE_IS_NEGATIVE((e4__usize)e4__stack_pop(task));
-
-    e4__stack_push(task, (e4__cell)(f ? e4__BF_TRUE : e4__BF_FALSE));
-
-    e4__execute_ret(task);
-}
+static const void *e4__builtin_ZERO_LESS[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_LITERAL],
+    (void *)0,
+    &e4__BUILTIN_XT[e4__B_LESS_THAN],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
 
 /* vim: set ft=c: */

@@ -30,7 +30,7 @@
     _e4__BUILTIN_PROC(EXECUTE)  \
     _e4__BUILTIN_PROC_F(EXIT, e4__F_COMPONLY)   \
     _e4__BUILTIN_PROC_N(FETCH, "@") \
-    _e4__BUILTIN_PROC_N(GREATER_THAN, ">")  \
+    _e4__BUILTIN_THUNK_N(GREATER_THAN, ">") \
     _e4__BUILTIN_USERVAR(HERE)  \
     _e4__BUILTIN_PROC_F(IF, e4__F_COMPONLY | e4__F_IMMEDIATE)   \
     _e4__BUILTIN_PROC(INVERT)   \
@@ -60,7 +60,7 @@
     _e4__BUILTIN_PROC(VARIABLE) \
     _e4__BUILTIN_PROC(WORD) \
     _e4__BUILTIN_PROC(XOR)  \
-    _e4__BUILTIN_PROC_N(ZERO_EQUALS, "0=")  \
-    _e4__BUILTIN_PROC_N(ZERO_LESS, "0<")
+    _e4__BUILTIN_THUNK_N(ZERO_EQUALS, "0=") \
+    _e4__BUILTIN_THUNK_N(ZERO_LESS, "0<")
 
 /* vim: set ft=c: */
