@@ -91,8 +91,11 @@ static void e4t__test_execute_data(void)
     };
     static const void *uservar_base[] = {
         e4__execute_uservar,
-        NULL,
         (void *)e4__UV_BASE
+    };
+    static const void *userval_c[] = {
+        e4__execute_userval,
+        (void *)((e4__usize)'c')
     };
     struct e4__task *task = e4t__transient_task();
 
@@ -109,6 +112,10 @@ static void e4t__test_execute_data(void)
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_peek(task), e4__task_uservar(task, e4__UV_BASE));
     e4t__ASSERT_EQ(e4__DEREF(e4__stack_pop(task)), 10);
+
+    e4__execute(task, userval_c);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 'c');
 }
 
 static void e4t__test_execute_defer(void)

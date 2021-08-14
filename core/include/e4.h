@@ -93,6 +93,11 @@ struct e4__dict_header {
     const char *name;
 };
 
+struct e4__execute_tuple {
+    e4__code_ptr code;
+    void *user;
+};
+
 struct e4__execute_token {
     e4__code_ptr code;
     void *user;
@@ -287,7 +292,7 @@ enum e4__builtin_id {
 /* builtin declarations */
 /* FIXME: Should the header table even be exposed here? */
 extern const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT];
-extern const struct e4__execute_token e4__BUILTIN_XT[e4__BUILTIN_COUNT];
+extern const struct e4__execute_tuple e4__BUILTIN_XT[e4__BUILTIN_COUNT];
 void e4__builtin_exec_(e4__usize count, /* struct e4__task *task, */
         /* enum e4__builtin_id id, */ ...);
 
@@ -338,6 +343,7 @@ void e4__execute_deferthunk(struct e4__task *task, void *user);
 void e4__execute_doesthunk(struct e4__task *task, void *user);
 void e4__execute_ret(struct e4__task *task);
 void e4__execute_threaded(struct e4__task *task, void *user);
+void e4__execute_userval(struct e4__task *task, void *user);
 void e4__execute_uservar(struct e4__task *task, void *user);
 void e4__execute_value(struct e4__task *task, void *user);
 void e4__execute_variable(struct e4__task *task, void *user);

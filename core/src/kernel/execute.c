@@ -52,9 +52,16 @@ void e4__execute_threaded(struct e4__task *task, void *user)
     }
 }
 
+void e4__execute_userval(struct e4__task *task, void *user)
+{
+    register const e4__cell val = e4__DEREF(user);
+    e4__stack_push(task, val);
+    e4__execute_ret(task);
+}
+
 void e4__execute_uservar(struct e4__task *task, void *user)
 {
-    register const e4__cell uv_offset = e4__DEREF((e4__cell)user + 1);
+    register const e4__cell uv_offset = e4__DEREF(user);
     e4__stack_push(task, e4__task_uservar(task, (e4__usize)uv_offset));
     e4__execute_ret(task);
 }

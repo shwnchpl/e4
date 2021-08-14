@@ -77,6 +77,7 @@ General Builtins
 - [DONE] Add macro handling for implementing some builtins as threaded
   code and refactor those builtins to be  implemented in threaded code.
 - [DONE] Throw division by zero exceptions where necessary.
+- [DONE] Refactor builtin XT table to not include unused data field.
 - Implement core extension logic/comparison words: 0<> 0> <> U>.
 - Implement (.
 - Implement COUNT, TYPE, .", and some sort of STRING_LIT builtin.
@@ -106,7 +107,6 @@ Kernel
   implemented without any such support. This includes >NUMBER.
 - Add more two's complement utility macros as needed and use them where
   appropriate.
-- Implement signed modulo and other single width math operators.
 - Handle dictionary overflows and other overflows.
 - Consider improving exception printing (ie. printing exception name
   along with number).
@@ -121,6 +121,9 @@ Kernel
   would be possible to write things like : SKIP BRANCH [LIT] 1 ; (which
   itself is also more risky than useful, although that doesn't mean
   there could be no reasonable application).
+- Refactor code that takes the size of the execute_token structure and
+  subtracts the size of the data field when allocating to take the size
+  of an execute_tuple structure instead?
 
 Testing
 -------

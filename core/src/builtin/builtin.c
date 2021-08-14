@@ -131,11 +131,11 @@ const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT] =
 #define _e4__BUILTIN_THUNK_NF(w, n, f)  \
     {e4__execute_deferthunk, e4__builtin_##w},
 #define _e4__BUILTIN_CONSTANT(w, c) \
-    {e4__execute_value, NULL, { (e4__cell)((e4__usize)(c)), }},
+    {e4__execute_userval, (void *)((e4__usize)(c))},
 #define _e4__BUILTIN_USERVAR(w) \
-    {e4__execute_uservar, NULL, {(e4__cell)((e4__usize)(e4__UV_##w))}},
+    {e4__execute_uservar, (void *)((e4__usize)(e4__UV_##w))},
 
-const struct e4__execute_token e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
+const struct e4__execute_tuple e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
 {
     _e4__BUILTIN_CORE_DECL()
     _e4__BUILTIN_CORE_EXT_DECL()
