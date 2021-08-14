@@ -12,7 +12,7 @@
         ++e4t__assert_attemptcount; \
         if (!(e)) {   \
             fprintf(stderr, "Assert failed! (" __FILE__ ":%u) - "   \
-                    "\"" #e "\" evaluated to 0\n", __LINE__); \
+                    "\"%s\" evaluated to 0\n", __LINE__, #e);   \
             ++e4t__assert_failcount;    \
         }   \
     } while (0)
