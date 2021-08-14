@@ -236,7 +236,7 @@ static void e4t__test_builtin_io(void)
                 "blom938 flom345 ", 16));
 }
 
-/* Covers = < > 0< 0= AND INVERT NEGATE OR U< XOR */
+/* Covers = < > <> 0< 0> 0<> 0= AND INVERT NEGATE OR U< U> XOR */
 static void e4t__test_builtin_logic(void)
 {
     /* XXX: Parts of this test only work correctly on a 64 bit
@@ -250,10 +250,10 @@ static void e4t__test_builtin_logic(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
     e4t__ASSERT_OK(e4__evaluate(task, "5 4 =", -1));
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
-    e4t__ASSERT_OK(e4__evaluate(task, "0 0=", -1));
-    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
-    e4t__ASSERT_OK(e4__evaluate(task, "50 0=", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "5 5 <>", -1));
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+    e4t__ASSERT_OK(e4__evaluate(task, "5 4 <>", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
 
     /* Test negation related words. */
     e4t__ASSERT_OK(e4__evaluate(task, "5 negate", -1));
@@ -262,14 +262,29 @@ static void e4t__test_builtin_logic(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 5);
     e4t__ASSERT_OK(e4__evaluate(task, "0 negate", -1));
     e4t__ASSERT_EQ(e4__stack_pop(task), 0);
-    e4t__ASSERT_OK(e4__evaluate(task, "-153 0<", -1));
-    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+
+    /* Test zero comparison related words. */
     e4t__ASSERT_OK(e4__evaluate(task, "-153 0<", -1));
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
     e4t__ASSERT_OK(e4__evaluate(task, "135 0<", -1));
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
     e4t__ASSERT_OK(e4__evaluate(task, "0 0<", -1));
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+    e4t__ASSERT_OK(e4__evaluate(task, "-153 0>", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+    e4t__ASSERT_OK(e4__evaluate(task, "135 0>", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+    e4t__ASSERT_OK(e4__evaluate(task, "0 0>", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "0 0=", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+    e4t__ASSERT_OK(e4__evaluate(task, "50 0=", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+    e4t__ASSERT_OK(e4__evaluate(task, "0 0<>", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+    e4t__ASSERT_OK(e4__evaluate(task, "5 0<>", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
 
     /* Test bitwise operators. */
     e4t__ASSERT_OK(e4__evaluate(task, "12 3 or", -1));
@@ -343,6 +358,17 @@ static void e4t__test_builtin_logic(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
     e4t__ASSERT_OK(e4__evaluate(task, "1 -1 u<", -1));
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "0 0 u>", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+    e4t__ASSERT_OK(e4__evaluate(task, "0 1 u>", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+    e4t__ASSERT_OK(e4__evaluate(task, "1 0 u>", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+    e4t__ASSERT_OK(e4__evaluate(task, "-1 0 u>", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+    e4t__ASSERT_OK(e4__evaluate(task, "1 -1 u>", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
 }
 
 /* Covers + - . / /MOD MOD U. */

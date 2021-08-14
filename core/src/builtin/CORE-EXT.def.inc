@@ -63,6 +63,15 @@ static void e4__builtin_DEFER_STORE(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static const void *e4__builtin_NOT_EQUALS[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_EQUALS],
+    &e4__BUILTIN_XT[e4__B_INVERT],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
 static void e4__builtin_REFILL(struct e4__task *task, void *user)
 {
     register e4__usize io_res;
@@ -123,6 +132,15 @@ static void e4__builtin_TUCK(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static const void *e4__builtin_U_GREATER_THAN[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_SWAP],
+    &e4__BUILTIN_XT[e4__B_U_LESS_THAN],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
 static void e4__builtin_VALUE(struct e4__task *task, void *user)
 {
     register const char *word;
@@ -136,5 +154,25 @@ static void e4__builtin_VALUE(struct e4__task *task, void *user)
 
     e4__execute_ret(task);
 }
+
+static const void *e4__builtin_ZERO_GREATER[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_LITERAL],
+    (void *)0,
+    &e4__BUILTIN_XT[e4__B_GREATER_THAN],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
+static const void *e4__builtin_ZERO_NOT_EQUALS[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_LITERAL],
+    (void *)0,
+    &e4__BUILTIN_XT[e4__B_NOT_EQUALS],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
 
 /* vim: set ft=c: */

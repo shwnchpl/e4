@@ -227,13 +227,17 @@ enum e4__builtin_id {
     e4__B_DEFER_FETCH,
     e4__B_DEFER_STORE,
     e4__B_FALSE,
+    e4__B_NOT_EQUALS,
     e4__B_PAD,
     e4__B_REFILL,
     e4__B_ROLL,
     e4__B_TO,
     e4__B_TRUE,
     e4__B_TUCK,
+    e4__B_U_GREATER_THAN,
     e4__B_VALUE,
+    e4__B_ZERO_GREATER,
+    e4__B_ZERO_NOT_EQUALS,
 
     /* SYSTEM words */
     e4__B_BRANCH,

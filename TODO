@@ -78,7 +78,7 @@ General Builtins
   code and refactor those builtins to be  implemented in threaded code.
 - [DONE] Throw division by zero exceptions where necessary.
 - [DONE] Refactor builtin XT table to not include unused data field.
-- Implement core extension logic/comparison words: 0<> 0> <> U>.
+- [DONE] Implement core extension logic/comparison words: 0<> 0> <> U>.
 - Implement (.
 - Implement COUNT, TYPE, .", and some sort of STRING_LIT builtin.
 - Implement C@, C,, C!, ALIGN, and ALIGNED.
