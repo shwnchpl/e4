@@ -32,20 +32,28 @@ TESTS_LDFLAGS := -L$(BUILD_DIR) -le4
 # If a target fails, delete it.
 .DELETE_ON_ERROR:
 
-.PHONY: all amalgamation clean repl tests run-repl run-tests
+.PHONY: all amalgamation clean repl tests run-repl run-tests longest-lines
 
 # Default "all" target.
 all: $(TARGET_LIB) amalgamation repl tests
 
+# Actual build/clean targets.
 amalgamation: $(TARGET_AMALGAM)
 clean:
 	rm -rf $(BUILD_DIR)
 repl: $(TARGET_REPL)
 tests: $(TARGET_TESTS)
+
+# Utility targets to run the repl and tests.
 run-repl: repl
 	$(TARGET_REPL)
 run-tests: tests
 	$(TARGET_TESTS)
+
+# Utility target to find the longest line length in each source/header
+# file.
+longest-lines:
+	find . -name '*.[ch]' -o -name '*.inc' | xargs wc -L
 
 # Actual targets.
 # XXX: Require objects to build separately before generating
