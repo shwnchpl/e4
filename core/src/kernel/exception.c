@@ -22,6 +22,7 @@ e4__usize e4__exception_catch(struct e4__task * task, void *user)
                 task->sp = saved_sp;
             task->rp = saved_rp;
             task->io_src = saved_io_src;
+            task->ip = NULL;
         }
         task->exception_valid = 0;
     } else {
@@ -44,6 +45,7 @@ e4__usize e4__exception_catch(struct e4__task * task, void *user)
             task->sp = saved_sp;
             task->rp = saved_rp;
             task->io_src = saved_io_src;
+            task->ip = NULL;
         }
 
         task->exception = old_ex;

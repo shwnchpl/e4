@@ -143,6 +143,7 @@ Testing
 - Figure out some way to cover return stack corruption in tests.
 - Cover user IO errors in tests (ie. user provided IO handler returns
   non-zero).
+- Cover the fact that ip is set to NULL after an exception.
 
 
 Version 0.9

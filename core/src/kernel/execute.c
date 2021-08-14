@@ -4,11 +4,19 @@
 /* FIXME: Rename user to something more reasonable here. */
 void e4__execute(struct e4__task *task, void *user)
 {
+    register const e4__bool ip_valid = task->ip != NULL;
     void **code = user;
     e4__code_ptr entry = *code;
 
-    e4__DEREF(task->rp--) = task->ip + 1;
+    /* If the instruction pointer is currently NULL, simply return
+       to NULL. */
+    e4__DEREF(task->rp--) = ip_valid ? task->ip + 1 : NULL;
+
     entry(task, code + 1);
+
+    /* If ip was NULL, restore it to NULL. */
+    if (!ip_valid)
+        task->ip = NULL;
 }
 
 void e4__execute_deferthunk(struct e4__task *task, void *user)
