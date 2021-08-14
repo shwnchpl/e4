@@ -24,6 +24,7 @@ void e4__execute_deferthunk(struct e4__task *task, void *user)
     /* Execute whatever execution token is pointed to by the
        user pointer. */
     e4__execute(task, e4__DEREF(user));
+    e4__execute_ret(task);
 }
 
 void e4__execute_doesthunk(struct e4__task *task, void *user)
