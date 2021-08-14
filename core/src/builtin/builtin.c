@@ -181,7 +181,7 @@ void e4__builtin_exec_(e4__usize count, /* struct e4__task *task, */
 {
     va_list ap;
     register struct e4__task *task;
-    register enum e4__builtin_id id;
+    register unsigned id;
 
     if (count < 2)
         return;
@@ -189,7 +189,7 @@ void e4__builtin_exec_(e4__usize count, /* struct e4__task *task, */
     va_start(ap, count);
 
     task = va_arg(ap, struct e4__task *);
-    id = va_arg(ap, enum e4__builtin_id);
+    id = va_arg(ap, unsigned);
     count -= 2;
 
     while (count--)
