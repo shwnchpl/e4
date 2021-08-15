@@ -5,6 +5,16 @@
    file and it is *not* designed to work correctly in any other
    context. */
 
+static void e4__builtin_AGAIN(struct e4__task *task, void *user)
+{
+    _e4__BUILTIN_EXPECT_REF(task, 1);
+
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_BRANCH]);
+    e4__compile_cell(task, (e4__cell)(e4__stack_pop(task) - task->here));
+
+    e4__execute_ret(task);
+}
+
 static const void *e4__builtin_BACKSLASH[] = {
     e4__execute_threaded,
     NULL,

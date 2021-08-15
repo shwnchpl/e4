@@ -6,6 +6,7 @@
    context. */
 
 #define _e4__BUILTIN_CORE_EXT_DECL()    \
+    _e4__BUILTIN_PROC_F(AGAIN, e4__F_COMPONLY | e4__F_IMMEDIATE)    \
     _e4__BUILTIN_THUNK_NF(BACKSLASH, "\\", e4__F_IMMEDIATE) \
     _e4__BUILTIN_PROC_N(COLON_NONAME, ":NONAME")    \
     _e4__BUILTIN_PROC(DEFER)    \

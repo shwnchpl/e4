@@ -234,7 +234,7 @@ static void e4t__test_compile_noname(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 7);
 }
 
-static void e4t__tesT_compile_recursive(void)
+static void e4t__test_compile_recursive(void)
 {
     struct e4__task *task = e4t__transient_task();
 
@@ -259,6 +259,72 @@ static void e4t__tesT_compile_recursive(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 120);
 }
 
+/* Covers AGAIN BEGIN UNTIL REPEAT WHILE and various other builtins */
+static void e4t__test_compile_while_loop(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* Test that looping words do nothing when balanced incorrectly. */
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo begin ;", -1), e4__E_CSMISMATCH);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo again", -1), e4__E_CSMISMATCH);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo until", -1), e4__E_CSMISMATCH);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo while", -1), e4__E_STKUNDERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo repeat", -1), e4__E_CSMISMATCH);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo begin while ;", -1),
+            e4__E_CSMISMATCH);
+    e4t__ASSERT_EQ(e4__evaluate(task, "5 : foo while repeat ;", -1),
+            e4__E_CSMISMATCH);
+    e4__stack_clear(task);
+
+    e4t__term_obuf_consume();
+
+    /* Test that non-nested loops function correctly. */
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": broken-range >r begin dup 1+ dup r@ 1- < invert "
+            "until r> drop ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "0 5 broken-range .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<5> 0 1 2 3 4 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "0 0 broken-range .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<2> 0 1 ");
+
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": consume depth if begin . depth 0= until then ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "0 1 2 3 4 5 consume", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "5 4 3 2 1 0 ");
+
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": infinite-consume begin depth 0= if exit then . again ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "0 1 2 3 4 5 infinite-consume", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "5 4 3 2 1 0 ");
+
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": range >r begin dup r@ < while dup 1+ repeat r> drop drop ;",
+            -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "0 5 range .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<5> 0 1 2 3 4 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "0 0 range .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<0> ");
+
+    /* Test that nested loops work as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": foo "
+                "1 begin "
+                    "dup . ':' emit bl emit "
+                    "dup begin "
+                        "dup . 1+ "
+                        "dup 4 > "
+                    "until "
+                    "drop cr 1+ "
+                    "dup 4 > "
+                "until ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(),
+            "1 : 1 2 3 4 \n"
+            "2 : 2 3 4 \n"
+            "3 : 3 4 \n"
+            "4 : 4 \n");
+}
+
 void e4t__test_compile(void)
 {
     /* FIXME: Add direct compilation API tests? */
@@ -267,5 +333,6 @@ void e4t__test_compile(void)
     e4t__test_compile_failure();
     e4t__test_compile_linear();
     e4t__test_compile_noname();
-    e4t__tesT_compile_recursive();
+    e4t__test_compile_recursive();
+    e4t__test_compile_while_loop();
 }

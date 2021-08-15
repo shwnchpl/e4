@@ -26,9 +26,9 @@
         }   \
     } while (0)
 
-#define _e4__BUILTIN_EXPECT_REF(t)  \
+#define _e4__BUILTIN_EXPECT_REF(t, c)   \
     do {    \
-        if (e4__stack_depth(t) < 1) {   \
+        if (e4__stack_depth(t) < c) {   \
             e4__exception_throw(t, e4__E_CSMISMATCH);   \
             e4__execute_ret(t); \
             return; \

@@ -71,6 +71,14 @@ static void e4__builtin_AND(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static const void *e4__builtin_BEGIN[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_HERE],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
 static void e4__builtin_BRACKET_TICK(struct e4__task *task, void *user)
 {
     const register e4__usize depth = e4__stack_depth(task);
@@ -292,7 +300,7 @@ static void e4__builtin_ELSE(struct e4__task *task, void *user)
 {
     register e4__cell ref;
 
-    _e4__BUILTIN_EXPECT_REF(task);
+    _e4__BUILTIN_EXPECT_REF(task, 1);
 
     /* Branch unconditionally to new forward ref and point old forward
        ref to the instruction immediately following (thereby skipping
@@ -588,6 +596,21 @@ static void e4__builtin_RECURSE(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_REPEAT(struct e4__task *task, void *user)
+{
+    register e4__cell ref;
+
+    _e4__BUILTIN_EXPECT_REF(task, 2);
+
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_BRANCH]);
+    e4__compile_cell(task, (e4__cell)(e4__stack_pop(task) - task->here));
+
+    ref = e4__stack_pop(task);
+    e4__DEREF(ref) = (e4__cell)(task->here - ref);
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_SEMICOLON(struct e4__task *task, void *user)
 {
     e4__usize res;
@@ -675,9 +698,8 @@ static void e4__builtin_THEN(struct e4__task *task, void *user)
 {
     register e4__cell ref;
 
-    _e4__BUILTIN_EXPECT_REF(task);
+    _e4__BUILTIN_EXPECT_REF(task, 1);
 
-    /* Resolve forward reference. */
     ref = e4__stack_pop(task);
     e4__DEREF(ref) = (e4__cell)(task->here - ref);
 
@@ -820,6 +842,16 @@ static void e4__builtin_U_LESS_THAN(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_UNTIL(struct e4__task *task, void *user)
+{
+    _e4__BUILTIN_EXPECT_REF(task, 1);
+
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_BRANCH0]);
+    e4__compile_cell(task, (e4__cell)(e4__stack_pop(task) - task->here));
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_VARIABLE(struct e4__task *task, void *user)
 {
     register const char *word;
@@ -832,6 +864,15 @@ static void e4__builtin_VARIABLE(struct e4__task *task, void *user)
 
     e4__execute_ret(task);
 }
+
+static const void *e4__builtin_WHILE[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_IF],
+    &e4__BUILTIN_XT[e4__B_SWAP],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
 
 static void e4__builtin_XOR(struct e4__task *task, void *user)
 {
