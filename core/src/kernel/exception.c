@@ -6,6 +6,7 @@ e4__usize e4__exception_catch(struct e4__task * task, void *user)
 {
     register const e4__cell saved_sp = task->sp;
     register const e4__cell saved_rp = task->rp;
+    register const e4__cell saved_tr0 = task->tr0;
     const struct e4__io_src saved_io_src = task->io_src;
     register const e4__usize saved_e = task->exception_code;
     register e4__usize result;
@@ -21,6 +22,7 @@ e4__usize e4__exception_catch(struct e4__task * task, void *user)
             if (task->exception_code != e4__E_QUIT)
                 task->sp = saved_sp;
             task->rp = saved_rp;
+            task->tr0 = saved_tr0;
             task->io_src = saved_io_src;
             task->ip = NULL;
         }
@@ -44,6 +46,7 @@ e4__usize e4__exception_catch(struct e4__task * task, void *user)
 
             task->sp = saved_sp;
             task->rp = saved_rp;
+            task->tr0 = saved_tr0;
             task->io_src = saved_io_src;
             task->ip = NULL;
         }

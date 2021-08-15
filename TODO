@@ -111,13 +111,10 @@ Kernel
 - Add support for double cell numbers (including arithmetic, the text
   interpreter extension for numbers of the format XXXX. as outlined in
   section 8.3.1 of the standard, etc.).
-- Ensure tr0 always has a coherent value, especially across exceptions.
-  To make tr0 always have a coherent value, it will be necessary to at
-  least set it to r0 on task initialization and preserve its value
-  across exceptions. With this in place, implement and use an
-  e4__stack_rtdepth API where appropriate and write the relevant tests
-  (which will likely be easier to implement once THROW/CATCH builtins
-  are in place) to ensure behavior is always correct.
+- [DONE] Ensure tr0 always has a coherent value, especially across
+  exceptions. To make tr0 always have a coherent value, it will be
+  necessary to at least set it to r0 on task initialization and preserve
+  its value across exceptions.
 - Update words meant to support double width numbers that are currently
   implemented without any such support. This includes >NUMBER.
 - Add more two's complement utility macros as needed and use them where
@@ -159,6 +156,8 @@ Testing
 - Cover the fact that ip is set to NULL after an exception.
 - Cover return stack underflow in the event of a direct call to
   e4__execute_ret.
+- Cover tr0 coherence (with and without exceptions enabled) in tests.
+  This will be easier to fully cover once exceptions are enabled.
 
 
 Version 0.9

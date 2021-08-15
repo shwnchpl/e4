@@ -16,13 +16,10 @@
         }   \
     } while (0)
 
-/* FIXME: Ensure that tr0 always has a coherent value and use some
-   e4__stack_rtdepth API here to access it instead of doing the math
-   inline. Also, ensure this is *really* correct. */
 #define _e4__BUILTIN_EXPECT_RDEPTH(t, c)    \
     do {    \
         register const e4__usize _c = (e4__usize)(c);   \
-        if (task->tr0 - task->rp - 1 < _c) { \
+        if (e4__stack_rdepth(task) < _c) { \
             e4__exception_throw(t, e4__E_RSTKUNDERFLOW);    \
             e4__execute_ret(task);  \
             return; \

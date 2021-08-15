@@ -71,11 +71,9 @@ void e4__execute_ret(struct e4__task *task)
 void e4__execute_threaded(struct e4__task *task, void *user)
 {
     register int depth = 1;
-    register e4__cell target_rp = e4__stack_rpop(task);
 
     e4__stack_rpush(task, task->tr0);
     task->tr0 = task->rp;
-    e4__stack_rpush(task, target_rp);
 
     task->ip = (e4__cell)user + 1;
 
@@ -90,16 +88,15 @@ void e4__execute_threaded(struct e4__task *task, void *user)
                thread on the return stack. Can assume it's valid and
                restore it if it matches what we expect when we
                encounter it again. */
+            e4__stack_rpush(task, task->ip + 1);
             e4__stack_rpush(task, task->tr0);
             task->tr0 = task->rp;
 
             /* Begin executing thread. */
-            e4__stack_rpush(task, task->ip + 1);
             task->ip = e4__DEREF(task->ip) + 2;
         } else if (e4__DEREF(task->ip) ==
                 (e4__cell)&e4__BUILTIN_XT[e4__B_EXIT]) {
             depth -= 1;
-            e4__execute_ret(task);
 
             /* Check and restore thread return stack base pointer. */
             if (depth) {
@@ -108,6 +105,7 @@ void e4__execute_threaded(struct e4__task *task, void *user)
                     task->rp = task->tr0;
                 }
                 task->tr0 = e4__stack_rpop(task);
+                e4__execute_ret(task);
             }
         } else {
             e4__execute(task, e4__DEREF(task->ip));
@@ -120,6 +118,7 @@ void e4__execute_threaded(struct e4__task *task, void *user)
     }
 
     task->tr0 = e4__stack_rpop(task);
+    e4__execute_ret(task);
 }
 
 void e4__execute_userval(struct e4__task *task, void *user)

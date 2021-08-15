@@ -61,6 +61,7 @@ struct e4__task* e4__task_create(void *buffer, e4__usize sz)
     task->io_src.sz = task->tib_sz;
     task->r0 = c0 + sz / sizeof(e4__cell) - 1;
     task->rp = task->r0;
+    task->tr0 = task->r0;
     task->base = 10;
 
     return task;
