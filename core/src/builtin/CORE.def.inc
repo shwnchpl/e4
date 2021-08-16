@@ -397,7 +397,8 @@ static void e4__builtin_INVERT(struct e4__task *task, void *user)
 
 static void e4__builtin_LESS_THAN(struct e4__task *task, void *user)
 {
-    register e4__usize l, r, f;
+    register e4__usize l, r;
+    register e4__bool f;
 
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
 
@@ -433,6 +434,40 @@ static void e4__builtin_LSHIFT(struct e4__task *task, void *user)
     r = (e4__usize)e4__stack_pop(task);
     l = (e4__usize)e4__stack_pop(task);
     e4__stack_push(task, (e4__cell)(l << r));
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_MAX(struct e4__task *task, void *user)
+{
+    register e4__usize l, r;
+    register e4__bool f;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    r = (e4__usize)e4__stack_pop(task);
+    l = (e4__usize)e4__stack_pop(task);
+    f = e4__USIZE_IS_NEGATIVE(r) == e4__USIZE_IS_NEGATIVE(l) ?
+        l < r : e4__USIZE_IS_NEGATIVE(r) < e4__USIZE_IS_NEGATIVE(l);
+
+    e4__stack_push(task, (e4__cell)(f ? r : l));
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_MIN(struct e4__task *task, void *user)
+{
+    register e4__usize l, r;
+    register e4__bool f;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    r = (e4__usize)e4__stack_pop(task);
+    l = (e4__usize)e4__stack_pop(task);
+    f = e4__USIZE_IS_NEGATIVE(r) == e4__USIZE_IS_NEGATIVE(l) ?
+        l < r : e4__USIZE_IS_NEGATIVE(r) < e4__USIZE_IS_NEGATIVE(l);
+
+    e4__stack_push(task, (e4__cell)(f ? l : r));
 
     e4__execute_ret(task);
 }

@@ -31,8 +31,8 @@ Compilation
 - [DONE] Implement RECURSE. This is easy to do since RECURSE only needs
   to compile in the address of the XT of the current dictionary entry.
 - [DONE] Implement  BEGIN, UNTIL, AGAIN, WHILE, and REPEAT.
+- [DONE] Implement MIN and MAX.
 - Implement DO, ?DO, LOOP, LOOP+, UNLOOP, LEAVE, I, and J.
-- Implement MIN and MAX.
 - Implement HEX and DECIMAL.
 - Implement 2DUP, 2DROP, 2OVER, 2SWAP.
 - Add conditional structure words CASE OF ENDCASE ENDOF etc.

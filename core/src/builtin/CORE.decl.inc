@@ -46,6 +46,8 @@
     _e4__BUILTIN_PROC_N(LESS_THAN, "<") \
     _e4__BUILTIN_PROC_F(LITERAL, e4__F_COMPONLY)    \
     _e4__BUILTIN_PROC(LSHIFT)   \
+    _e4__BUILTIN_PROC(MAX)  \
+    _e4__BUILTIN_PROC(MIN)  \
     _e4__BUILTIN_PROC_N(MINUS, "-") \
     _e4__BUILTIN_THUNK(MOD) \
     _e4__BUILTIN_PROC(NEGATE)   \

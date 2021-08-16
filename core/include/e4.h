@@ -206,6 +206,8 @@ enum e4__builtin_id {
     e4__B_LESS_THAN,
     e4__B_LITERAL,
     e4__B_LSHIFT,
+    e4__B_MAX,
+    e4__B_MIN,
     e4__B_MINUS,
     e4__B_MOD,
     e4__B_NEGATE,
