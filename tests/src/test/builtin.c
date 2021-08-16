@@ -291,6 +291,12 @@ static void e4t__test_builtin_io(void)
     e4t__ASSERT_EQ(e4__evaluate(task, "words", -1), 0);
     e4t__ASSERT(!e4__mem_strncasecmp(e4t__term_obuf_consume(),
                 "blom938 flom345 ", 16));
+
+    /* Test DECIMAL and HEX convenience words. */
+    e4t__ASSERT_OK(e4__evaluate(task, "hex base @ decimal base @", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 10);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 16);
 }
 
 /* Covers = < > <> 0< 0> 0<> 0= AND INVERT NEGATE OR U< U> XOR */

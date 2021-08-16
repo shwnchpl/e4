@@ -84,6 +84,17 @@ static void e4__builtin_DEFER_STORE(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static const void *e4__builtin_HEX[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_LITERAL],
+    (void *)16,
+    &e4__BUILTIN_XT[e4__B_BASE],
+    &e4__BUILTIN_XT[e4__B_STORE],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
 static const void *e4__builtin_NOT_EQUALS[] = {
     e4__execute_threaded,
     NULL,

@@ -228,6 +228,17 @@ static void e4__builtin_CREATE(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static const void *e4__builtin_DECIMAL[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_LITERAL],
+    (void *)10,
+    &e4__BUILTIN_XT[e4__B_BASE],
+    &e4__BUILTIN_XT[e4__B_STORE],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
 static void e4__builtin_DEPTH(struct e4__task *task, void *user)
 {
     e4__stack_push(task, (e4__cell)e4__stack_depth(task));

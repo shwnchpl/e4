@@ -28,6 +28,7 @@
     _e4__BUILTIN_PROC(CONSTANT) \
     _e4__BUILTIN_PROC(CR)   \
     _e4__BUILTIN_PROC(CREATE)   \
+    _e4__BUILTIN_THUNK(DECIMAL) \
     _e4__BUILTIN_PROC(DEPTH)    \
     _e4__BUILTIN_PROC_NF(DOES, "DOES>", e4__F_IMMEDIATE)    \
     _e4__BUILTIN_PROC_N(DOT, ".")    \

@@ -32,8 +32,8 @@ Compilation
   to compile in the address of the XT of the current dictionary entry.
 - [DONE] Implement  BEGIN, UNTIL, AGAIN, WHILE, and REPEAT.
 - [DONE] Implement MIN and MAX.
+- [DONE] Implement HEX and DECIMAL.
 - Implement DO, ?DO, LOOP, LOOP+, UNLOOP, LEAVE, I, and J.
-- Implement HEX and DECIMAL.
 - Implement 2DUP, 2DROP, 2OVER, 2SWAP.
 - Add conditional structure words CASE OF ENDCASE ENDOF etc.
 - Add POSTPONE and IMMEDIATE words.
