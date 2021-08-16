@@ -31,8 +31,6 @@ Compilation
 - [DONE] Implement RECURSE. This is easy to do since RECURSE only needs
   to compile in the address of the XT of the current dictionary entry.
 - [DONE] Implement  BEGIN, UNTIL, AGAIN, WHILE, and REPEAT.
-- [DONE] Implement MIN and MAX.
-- [DONE] Implement HEX and DECIMAL.
 - Implement DO, ?DO, LOOP, LOOP+, UNLOOP, LEAVE, I, and J.
 - Implement 2DUP, 2DROP, 2OVER, 2SWAP.
 - Add conditional structure words CASE OF ENDCASE ENDOF etc.
@@ -89,9 +87,11 @@ General Builtins
 - [DONE] Implement ALIGN and ALIGNED.
 - [DONE] Implement C@, C,, and C!.
 - [DONE] Implement >R, R>, R@.
-- Add support for "synonym" builtins (where one builtin literally just
-  has the XT of another builtin, potentially with different flags).
-  Implement both BEGIN and I in this way.
+- [DONE] Implement MIN and MAX.
+- [DONE] Implement HEX and DECIMAL.
+- [DONE] Add support for "pun" builtins (builtins that simply execute
+  another builtin, potentially with different flags). Update the BEGIN
+  implementation in this way (as compiletime immediate HERE).
 - Implement COUNT, TYPE, .", and some sort of STRING_LIT builtin.
 - Implement UNUSED.
 - Implement S", S\", and C". These words should use transient memory

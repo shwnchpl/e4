@@ -71,14 +71,6 @@ static void e4__builtin_AND(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static const void *e4__builtin_BEGIN[] = {
-    e4__execute_threaded,
-    NULL,
-    &e4__BUILTIN_XT[e4__B_HERE],
-    &e4__BUILTIN_XT[e4__B_EXIT],
-    &e4__BUILTIN_XT[e4__B_SENTINEL]
-};
-
 static void e4__builtin_BRACKET_TICK(struct e4__task *task, void *user)
 {
     const register e4__usize depth = e4__stack_depth(task);
