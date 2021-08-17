@@ -29,6 +29,7 @@
 #define _e4__BUILTIN_EXPECT_REF(t, c)   \
     do {    \
         if (e4__stack_depth(t) < c) {   \
+            e4__compile_cancel(t);  \
             e4__exception_throw(t, e4__E_CSMISMATCH);   \
             e4__execute_ret(t); \
             return; \

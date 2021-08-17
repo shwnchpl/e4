@@ -9,10 +9,15 @@ static void e4t__test_compile_conditional(void)
     /* Test that any attempt to compile an unbalanced control
        structure fails. */
     e4t__ASSERT_EQ(e4__evaluate(task, ": foo if ;", -1), e4__E_CSMISMATCH);
+    e4t__ASSERT(!e4__task_compiling(task));
     e4t__ASSERT_EQ(e4__evaluate(task, ": foo else", -1), e4__E_CSMISMATCH);
+    e4t__ASSERT(!e4__task_compiling(task));
     e4t__ASSERT_EQ(e4__evaluate(task, ": foo then", -1), e4__E_CSMISMATCH);
+    e4t__ASSERT(!e4__task_compiling(task));
     e4t__ASSERT_EQ(e4__evaluate(task, ": foo if else ;", -1),
             e4__E_CSMISMATCH);
+    e4t__ASSERT(!e4__task_compiling(task));
+    e4__stack_clear(task);
 
     /* Test that empty if/then and empty if/else/then sequences
        correctly do nothing. */
@@ -142,6 +147,10 @@ static void e4t__test_compile_failure(void)
     /* Test that a dictionary entry is not available while it is being
        compiled. */
     here = e4__task_uservar(task, e4__UV_HERE);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": word-5738 word-5738", -1),
+                e4__E_UNDEFWORD);
+    e4__stack_clear(task);
+    e4__compile_cancel(task);
     e4t__ASSERT_EQ(e4__evaluate(task, ": word-5738 ['] word-5738", -1),
                 e4__E_UNDEFWORD);
     e4__stack_clear(task);
@@ -269,6 +278,8 @@ static void e4t__test_compile_while_loop(void)
     e4t__ASSERT_EQ(e4__evaluate(task, ": foo again", -1), e4__E_CSMISMATCH);
     e4t__ASSERT_EQ(e4__evaluate(task, ": foo until", -1), e4__E_CSMISMATCH);
     e4t__ASSERT_EQ(e4__evaluate(task, ": foo while", -1), e4__E_STKUNDERFLOW);
+    e4t__ASSERT(e4__task_compiling(task));
+    e4__compile_cancel(task);
     e4t__ASSERT_EQ(e4__evaluate(task, ": foo repeat", -1), e4__E_CSMISMATCH);
     e4t__ASSERT_EQ(e4__evaluate(task, ": foo begin while ;", -1),
             e4__E_CSMISMATCH);
