@@ -32,7 +32,7 @@ TESTS_LDFLAGS := -L$(BUILD_DIR) -le4
 # If a target fails, delete it.
 .DELETE_ON_ERROR:
 
-.PHONY: all amalgamation clean repl tests run-repl run-tests longest-lines
+.PHONY: all amalgamation clean repl tests run-repl run-tests longest-lines tags
 
 # Default "all" target.
 all: $(TARGET_LIB) amalgamation repl tests
@@ -54,6 +54,11 @@ run-tests: tests
 # file.
 longest-lines:
 	find . -name '*.[ch]' -o -name '*.inc' | xargs wc -L
+
+# Utility target to generate tags. Requires the clean target, to ensure
+# that tags do not erroneously point into the amalgamation.
+tags: clean
+	ctags -R .
 
 # Actual targets.
 # XXX: Require objects to build separately before generating
