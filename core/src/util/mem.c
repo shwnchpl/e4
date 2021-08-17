@@ -51,8 +51,8 @@ e4__usize e4__mem_dict_entry(void *here, struct e4__dict_header *prev,
     return sz;
 }
 
-struct e4__dict_header* e4__mem_dict_lookup(struct e4__dict_header *dict,
-        const char *name, e4__u8 nbytes)
+const struct e4__dict_header* e4__mem_dict_lookup(
+        const struct e4__dict_header *dict, const char *name, e4__u8 nbytes)
 {
     while (dict) {
         if (nbytes == dict->nbytes &&

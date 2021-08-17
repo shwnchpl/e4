@@ -162,7 +162,7 @@ static void e4t__test_compile_failure(void)
 static void e4t__test_compile_linear(void)
 {
     struct e4__task *task = e4t__transient_task();
-    struct e4__dict_header *header;
+    const struct e4__dict_header *header;
 
     /* Test that attempting to define a word with no name
        throws an exception. */

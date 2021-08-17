@@ -748,7 +748,7 @@ static void e4__builtin_TICK(struct e4__task *task, void *user)
 {
     register const char *word;
     register e4__u8 len;
-    register struct e4__dict_header *header;
+    register const struct e4__dict_header *header;
 
     _e4__BUILTIN_LOOKAHEAD(task, word, len);
 

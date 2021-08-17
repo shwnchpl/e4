@@ -13,11 +13,11 @@ static void e4__evaluate_wrapper(struct e4__task *task, void *user);
 static void e4__evaluate_compile(struct e4__task *task, const char *word,
         e4__u8 len)
 {
-    register struct e4__dict_header *header;
+    register const struct e4__dict_header *header;
     register e4__usize pcount;
     e4__usize num;
 
-    header = e4__mem_dict_lookup(task->dict, word, len);
+    header = e4__dict_lookup(task, word, len);
 
     if (header) {
         if (header->flags & e4__F_IMMEDIATE)
@@ -41,11 +41,11 @@ static void e4__evaluate_compile(struct e4__task *task, const char *word,
 static void e4__evaluate_interpret(struct e4__task *task, const char *word,
         e4__u8 len)
 {
-    register struct e4__dict_header *header;
+    register const struct e4__dict_header *header;
     register e4__usize pcount;
     e4__usize num;
 
-    header = e4__mem_dict_lookup(task->dict, word, len);
+    header = e4__dict_lookup(task, word, len);
 
     if (header) {
         if (header->flags & e4__F_COMPONLY)

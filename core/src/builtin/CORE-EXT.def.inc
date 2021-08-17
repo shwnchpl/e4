@@ -132,7 +132,7 @@ static void e4__builtin_TO(struct e4__task *task, void *user)
 {
     register const char *word;
     register e4__u8 len;
-    register struct e4__dict_header *header;
+    register const struct e4__dict_header *header;
 
     if (!e4__task_compiling(task))
         _e4__BUILTIN_EXPECT_DEPTH(task, 1);

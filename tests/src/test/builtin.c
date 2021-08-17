@@ -78,7 +78,7 @@ static void e4t__test_builtin_constants(void)
 static void e4t__test_builtin_data(void)
 {
     struct e4__task *task = e4t__transient_task();
-    struct e4__dict_header *header;
+    const struct e4__dict_header *header;
 
     e4t__term_obuf_consume();
 
