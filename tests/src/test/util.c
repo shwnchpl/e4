@@ -117,6 +117,7 @@ static void e4t__test_util_mem_dict(void)
     void *here = buf;
     e4__usize wrote;
     struct e4__dict_header *dict = NULL;
+    const struct e4__dict_header *last;
 
     #define _d(s, c)    \
         do {    \
@@ -126,7 +127,9 @@ static void e4t__test_util_mem_dict(void)
             here += wrote;  \
         } while (0)
     #define _l(s)   e4__mem_dict_lookup(dict, s, sizeof(s) - 1)
+    #define _s(d, p)    e4__mem_dict_suggest(d, p, sizeof(p) - 1)
 
+    /* Test basic lookup. */
     _d("first-entry", (void *)0xabcde);
     e4t__ASSERT_EQ(_l("first-entry"), dict);
     e4t__ASSERT_EQ(_l("first-entry")->xt->code, 0xabcde);
@@ -142,6 +145,20 @@ static void e4t__test_util_mem_dict(void)
 
     e4t__ASSERT_EQ((e4__usize)_l("not-present"), (e4__usize)NULL);
 
+    /* Test prefix suggestion. */
+    _d("prefix-first", (void *)0x11111);
+    _d("prefix-second", (void *)0x22222);
+    _d("prefix-third", (void *)0x33333);
+
+    e4t__ASSERT((last = _s(dict, "prefix")));
+    e4t__ASSERT_EQ(last->xt->code, 0x33333);
+    e4t__ASSERT((last = _s(last->link, "prefix")));
+    e4t__ASSERT_EQ(last->xt->code, 0x22222);
+    e4t__ASSERT((last = _s(last->link, "prefix")));
+    e4t__ASSERT_EQ(last->xt->code, 0x11111);
+    e4t__ASSERT(!(last = _s(last->link, "prefix")));
+
+    #undef _s
     #undef _l
     #undef _d
 }

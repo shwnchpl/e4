@@ -38,3 +38,14 @@ const struct e4__dict_header* e4__dict_lookup(struct e4__task *task,
     return e4__mem_dict_lookup((task->dict->flags & e4__F_COMPILING) ?
             task->dict->link : task->dict, name, nbytes);
 }
+
+/* Suggest a dictionary entry. Will not check the top entry if it
+   has the e4__F_COMPILING flag set. */
+const struct e4__dict_header* e4__dict_suggest(struct e4__task *task,
+        const struct e4__dict_header *from, const char *prefix,
+        e4__u8 pbytes)
+{
+    return e4__mem_dict_suggest(from ? from->link :
+            (task->dict->flags & e4__F_COMPILING) ?  task->dict->link :
+            task->dict, prefix, pbytes);
+}

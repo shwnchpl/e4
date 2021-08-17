@@ -64,6 +64,19 @@ const struct e4__dict_header* e4__mem_dict_lookup(
     return NULL;
 }
 
+const struct e4__dict_header* e4__mem_dict_suggest(
+        const struct e4__dict_header *dict, const char *prefix, e4__u8 pbytes)
+{
+    while (dict) {
+        if (pbytes <= dict->nbytes &&
+                !e4__mem_strncasecmp(dict->name, prefix, pbytes))
+            return dict;
+        dict = dict->link;
+    }
+
+    return NULL;
+}
+
 int e4__mem_strncasecmp(const char *left, const char *right, e4__usize n)
 {
     while (n-- > 0 && tolower(*left++) == tolower(*right++))

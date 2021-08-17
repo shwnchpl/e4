@@ -346,6 +346,9 @@ e4__usize e4__dict_forget(struct e4__task *task, const char *name,
         e4__u8 nbytes);
 const struct e4__dict_header* e4__dict_lookup(struct e4__task *task,
         const char *name, e4__u8 nbytes);
+const struct e4__dict_header* e4__dict_suggest(struct e4__task *task,
+        const struct e4__dict_header *from, const char *prefix,
+        e4__u8 pbytes);
 
 /* stack.c functions */
 void e4__stack_clear(struct e4__task *task);
@@ -399,6 +402,8 @@ e4__usize e4__mem_dict_entry(void *here, struct e4__dict_header *prev,
         void *user);
 const struct e4__dict_header* e4__mem_dict_lookup(
         const struct e4__dict_header *dict, const char *name, e4__u8 nbytes);
+const struct e4__dict_header* e4__mem_dict_suggest(
+        const struct e4__dict_header *dict, const char *prefix, e4__u8 pbytes);
 int e4__mem_strncasecmp(const char *left, const char *right, e4__usize n);
 e4__usize e4__mem_number(const char *buf, e4__usize sz, e4__u8 base,
         e4__u8 flags, e4__usize *out);

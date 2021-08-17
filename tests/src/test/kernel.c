@@ -6,11 +6,14 @@
 static void e4t__test_kernel_dict(void)
 {
     struct e4__task *task = e4t__transient_task();
+    const struct e4__dict_header *sug;
 
     #define _d(s, c)    e4__dict_entry(task, s, sizeof(s) - 1, 0, c, NULL)
     #define _l(s)       e4__dict_lookup(task, s, sizeof(s) - 1)
+    #define _s(l, p)    e4__dict_suggest(task, l, p, sizeof(p) - 1)
     #define _f(s)       e4__dict_forget(task, s, sizeof(s) - 1)
 
+    /* Simply insertion and lookup. */
     _d("first-entry", (void *)0xabcde);
     e4t__ASSERT(_l("first-entry"));
     e4t__ASSERT_EQ(_l("first-entry")->xt->code, 0xabcde);
@@ -34,7 +37,23 @@ static void e4t__test_kernel_dict(void)
     e4t__ASSERT_EQ(_l("first-entry"), NULL);
     e4t__ASSERT_EQ(_l("second-entry"), NULL);
 
+    /* Prefix suggestion functions correctly. */
+    _d("prefix73-first", (void *)0x11111);
+    _d("prefix73-second", (void *)0x22222);
+    _d("prefix73-third", (void *)0x33333);
+
+    e4t__ASSERT((sug = _s(NULL, "prefix73")));
+    e4t__ASSERT_EQ(sug->xt->code, 0x33333);
+    e4t__ASSERT((sug = _s(sug, "prefix73")));
+    e4t__ASSERT_EQ(sug->xt->code, 0x22222);
+    e4t__ASSERT((sug = _s(sug, "prefix73")));
+    e4t__ASSERT_EQ(sug->xt->code, 0x11111);
+    e4t__ASSERT(!(sug = _s(sug, "prefix73")));
+    e4t__ASSERT((sug = _s(sug, "prefix73")));
+    e4t__ASSERT_EQ(sug->xt->code, 0x33333);
+
     #undef _f
+    #undef _s
     #undef _l
     #undef _d
 }
