@@ -76,7 +76,7 @@
     _e4__BUILTIN_THUNK_NF(w, #w, f)
 
 #define _e4__BUILTIN_PUN(w, t)  \
-    _e4__BUILTIN_PUN_NF(w, t, t, #w, 0)
+    _e4__BUILTIN_PUN_NF(w, t, #w, 0)
 
 #define _e4__BUILTIN_PUN_N(w, t, n) \
     _e4__BUILTIN_PUN_NF(w, t, n, 0)

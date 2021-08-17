@@ -104,6 +104,25 @@ static const void *e4__builtin_NOT_EQUALS[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
+static void e4__builtin_QUESTION_DO(struct e4__task *task, void *user)
+{
+    /* FIXME: Use 2DUP once available. */
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_OVER]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_OVER]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_SWAP]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TO_R]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TO_R]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_EQUALS]);
+
+    e4__stack_push(task, task->here);
+
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_INVERT]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_BRANCH0]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_SENTINEL]);
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_REFILL(struct e4__task *task, void *user)
 {
     register e4__usize io_res;

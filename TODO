@@ -31,8 +31,10 @@ Compilation
 - [DONE] Implement RECURSE. This is easy to do since RECURSE only needs
   to compile in the address of the XT of the current dictionary entry.
 - [DONE] Implement  BEGIN, UNTIL, AGAIN, WHILE, and REPEAT.
-- Implement DO, ?DO, LOOP, LOOP+, UNLOOP, LEAVE, I, and J.
-- Implement 2DUP, 2DROP, 2OVER, 2SWAP.
+- [DONE] Implement DO, ?DO, LOOP, LOOP+, and LEAVE.
+- Implement I, J, and UNLOOP.
+- Implement 2DUP, 2DROP, 2OVER, 2SWAP. Update builtins to use these
+  words where appropriate.
 - Add conditional structure words CASE OF ENDCASE ENDOF etc.
 - Add POSTPONE and IMMEDIATE words.
 - Consider adding a COMPILE-ONLY/RESTRICT word.
@@ -114,6 +116,8 @@ General IO
 Kernel
 ------
 - [DONE] Throw exceptions in the event of return stack corruption.
+- Handle dictionary overflows and other overflows. Especially
+  dictionary overflow.
 - Add e4__task_interrupt API. This API can be called from a signal
   handler or an ISR (as long as the e4__task is *known* not to be
   running) and it sets a flag in the task that will throw an
@@ -138,7 +142,6 @@ Kernel
   implemented without any such support. This includes >NUMBER.
 - Add more two's complement utility macros as needed and use them where
   appropriate.
-- Handle dictionary overflows and other overflows.
 - Consider improving exception printing (ie. printing exception name
   along with number).
 - Consider adding an e4__stack_rclear API and using where appropriate.

@@ -237,6 +237,22 @@ static void e4__builtin_DEPTH(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_DO(struct e4__task *task, void *user)
+{
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_SWAP]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TO_R]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TO_R]);
+    e4__compile_literal(task, (e4__cell)0);
+
+    e4__stack_push(task, task->here);
+
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_INVERT]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_BRANCH0]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_SENTINEL]);
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_DOES(struct e4__task *task, void *user)
 {
     /* XXX: Section 6.1.1250 of the standard specifies that DOES> has
@@ -398,6 +414,14 @@ static void e4__builtin_INVERT(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_LEAVE(struct e4__task *task, void *user)
+{
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_BRANCH]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_SENTINEL]);
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_LESS_THAN(struct e4__task *task, void *user)
 {
     register e4__usize l, r;
@@ -427,6 +451,22 @@ static void e4__builtin_LITERAL(struct e4__task *task, void *user)
 
     /* e4__execute_ret intentionally omitted. */
 }
+
+static const void *e4__builtin_LOOP[] = {
+    e4__execute_threaded,
+    NULL,
+    /* FIXME: Use COMPILE, or actually correctly implemented LITERAL
+       instead here. */
+    &e4__BUILTIN_XT[e4__B_LITERAL],
+    &e4__BUILTIN_XT[e4__B_LITERAL],
+    &e4__BUILTIN_XT[e4__B_COMMA],
+    &e4__BUILTIN_XT[e4__B_LITERAL],
+    (void *)1,
+    &e4__BUILTIN_XT[e4__B_COMMA],
+    &e4__BUILTIN_XT[e4__B_PLUS_LOOP],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
 
 static void e4__builtin_LSHIFT(struct e4__task *task, void *user)
 {
@@ -570,6 +610,44 @@ static void e4__builtin_PLUS(struct e4__task *task, void *user)
     e4__stack_push(task, (e4__cell)(l + r));
 
     e4__execute_ret(task);
+}
+
+static void e4__builtin_PLUS_LOOP(struct e4__task *task, void *user)
+{
+    register e4__cell ref;
+
+    _e4__BUILTIN_EXPECT_REF(task, 1);
+
+    /* FIXME: Replace with 2DUP, and 2DROP when available? */
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_R_FROM]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_PLUS]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_R_FROM]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_OVER]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_OVER]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TO_R]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TO_R]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_SWAP]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_EQUALS]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_BRANCH]);
+
+    ref = e4__stack_pop(task);
+    e4__compile_cell(task, (e4__cell)(ref - task->here));
+
+    /* Handle intermediary LEAVE and branch on positive break
+       condition. */
+    while (ref < task->here) {
+        if (*ref == (e4__cell)&e4__BUILTIN_XT[e4__B_SENTINEL])
+            *ref = (e4__cell)(task->here - ref);
+        ++ref;
+    }
+
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_R_FROM]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_R_FROM]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_DROP]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_DROP]);
+
+    e4__execute_ret(task);
+
 }
 
 static void e4__builtin_QUIT(struct e4__task *task, void *user)
