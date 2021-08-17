@@ -159,9 +159,16 @@ Kernel
 
 REPL
 ----
-- Configure REPL to interpret tab as 4 spaces (or possibly for
-  completion somehow by resetting IO callbacks and intercepting the
-  output from WORDS then reverting?).
+- [DONE] Add tab-completion to the repl.
+- Source ~/.e4-editrc to allow for e4 specific input overrides. For
+  example, tab completion on tab could be disabled by macro binding
+  the tab key to two or four spaces.
+- Implement a custom signal handler or custom signal handlers so that
+  it's possible to handle SIGINT and call e4__task_interrupt, once
+  it has been implemented. Signal handlers will need to take
+  appropriate action to keep libedit happy as well (in particular, it
+  is necessary to call el_resize upon receipt of SIGWINCH).
+
 
 Testing
 -------
