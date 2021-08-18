@@ -84,6 +84,15 @@
 #define _e4__BUILTIN_PUN_F(w, t, f) \
     _e4__BUILTIN_PUN_NF(w, t, #w, f)
 
+#define _e4__BUILTIN_ALIAS(w, t)    \
+    _e4__BUILTIN_ALIAS_NF(w, t, #w, 0)
+
+#define _e4__BUILTIN_ALIAS_N(w, t, n)   \
+    _e4__BUILTIN_ALIAS_NF(w, t, n, 0)
+
+#define _e4__BUILTIN_ALIAS_F(w, t, f)   \
+    _e4__BUILTIN_ALIAS_NF(w, t, #w, f)
+
 /* Declare builtin functions. */
 #define _e4__BUILTIN_PROC_FIRST(w)  _e4__BUILTIN_PROC(w)
 #define _e4__BUILTIN_PROC_NF(w, n, f)   \
@@ -91,6 +100,7 @@
 #define _e4__BUILTIN_THUNK_NF(w, n, f)  \
     static const void *e4__builtin_##w[];
 #define _e4__BUILTIN_PUN_NF(w, t, n, f)
+#define _e4__BUILTIN_ALIAS_NF(w, t, n, f)
 
 #define _e4__BUILTIN_CONSTANT(w, c)
 #define _e4__BUILTIN_USERVAR(w)
@@ -103,6 +113,7 @@ _e4__BUILTIN_TOOLS_EXT_DECL();
 
 #undef _e4__BUILTIN_USERVAR
 #undef _e4__BUILTIN_CONSTANT
+#undef _e4__BUILTIN_ALIAS_NF
 #undef _e4__BUILTIN_PUN_NF
 #undef _e4__BUILTIN_THUNK_NF
 #undef _e4__BUILTIN_PROC_NF
@@ -127,6 +138,8 @@ _e4__BUILTIN_TOOLS_EXT_DECL();
     _e4__BUILTIN_PROC_NF(w, n, f)
 #define _e4__BUILTIN_PUN_NF(w, t, n, f) \
     _e4__BUILTIN_PROC_NF(w, n, f)
+#define _e4__BUILTIN_ALIAS_NF(w, t, n, f)   \
+    _e4__BUILTIN_PROC_NF(w, n, f)
 #define _e4__BUILTIN_CONSTANT(w, c) \
     _e4__BUILTIN_PROC_F(w, e4__F_CONSTANT)
 #define _e4__BUILTIN_USERVAR(w) \
@@ -143,6 +156,7 @@ const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT] =
 
 #undef _e4__BUILTIN_USERVAR
 #undef _e4__BUILTIN_CONSTANT
+#undef _e4__BUILTIN_ALIAS_NF
 #undef _e4__BUILTIN_PUN_NF
 #undef _e4__BUILTIN_THUNK_NF
 #undef _e4__BUILTIN_PROC_NF
@@ -157,6 +171,8 @@ const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT] =
     {e4__execute_deferthunk, e4__builtin_##w},
 #define _e4__BUILTIN_PUN_NF(w, t, n, f) \
     {e4__execute_deferthunk, (void *)&e4__BUILTIN_XT[e4__B_##t]},
+#define _e4__BUILTIN_ALIAS_NF(w, t, n, f)   \
+    {e4__builtin_##t, NULL},
 #define _e4__BUILTIN_CONSTANT(w, c) \
     {e4__execute_userval, (void *)((e4__usize)(c))},
 #define _e4__BUILTIN_USERVAR(w) \
@@ -173,6 +189,7 @@ const struct e4__execute_tuple e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
 
 #undef _e4__BUILTIN_USERVAR
 #undef _e4__BUILTIN_CONSTANT
+#undef _e4__BUILTIN_ALIAS_NF
 #undef _e4__BUILTIN_PUN_NF
 #undef _e4__BUILTIN_THUNK_NF
 #undef _e4__BUILTIN_PROC_NF

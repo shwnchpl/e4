@@ -414,6 +414,19 @@ static void e4__builtin_INVERT(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_J(struct e4__task *task, void *user)
+{
+    _e4__BUILTIN_EXPECT_RDEPTH(task, 5);
+
+    /* The top of the return stack is the place to which *we* must
+       return, so consume that value before doing anything else. */
+    e4__execute_ret(task);
+
+    e4__stack_push(task, task->rp[3]);
+
+    /* e4__execute_ret intentionally omitted. */
+}
+
 static void e4__builtin_LEAVE(struct e4__task *task, void *user)
 {
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_BRANCH]);
@@ -956,6 +969,21 @@ static void e4__builtin_U_LESS_THAN(struct e4__task *task, void *user)
     e4__stack_push(task, (e4__cell)(l < r ? e4__BF_TRUE : e4__BF_FALSE));
 
     e4__execute_ret(task);
+}
+
+static void e4__builtin_UNLOOP(struct e4__task *task, void *user)
+{
+    _e4__BUILTIN_EXPECT_RDEPTH(task, 3);
+
+    /* The top of the return stack is the place to which *we* must
+       return, so consume that value before doing anything else. */
+    e4__execute_ret(task);
+
+    /* Discard the top two return stack entries. */
+    e4__stack_rpop(task);
+    e4__stack_rpop(task);
+
+    /* e4__execute_ret intentionally omitted. */
 }
 
 static void e4__builtin_UNTIL(struct e4__task *task, void *user)

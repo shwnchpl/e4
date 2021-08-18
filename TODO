@@ -32,9 +32,11 @@ Compilation
   to compile in the address of the XT of the current dictionary entry.
 - [DONE] Implement  BEGIN, UNTIL, AGAIN, WHILE, and REPEAT.
 - [DONE] Implement DO, ?DO, LOOP, LOOP+, and LEAVE.
-- Implement I, J, and UNLOOP.
+- [DONE] Implement I, J, and UNLOOP.
 - Implement 2DUP, 2DROP, 2OVER, 2SWAP. Update builtins to use these
   words where appropriate.
+- Implement some system +LOOP word that executes LOOP/LOOP+ execution
+  semantics to save RAM space?
 - Add conditional structure words CASE OF ENDCASE ENDOF etc.
 - Add POSTPONE and IMMEDIATE words.
 - Consider adding a COMPILE-ONLY/RESTRICT word.

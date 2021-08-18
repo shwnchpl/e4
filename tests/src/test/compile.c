@@ -268,7 +268,8 @@ static void e4t__test_compile_recursive(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 120);
 }
 
-/* Covers ?DO +LOOP DO LEAVE LOOP and various other builtins */
+/* Covers ?DO +LOOP DO I J LEAVE LOOP UNLOOP and various other
+   builtins */
 static void e4t__test_compile_do_loop(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -283,7 +284,7 @@ static void e4t__test_compile_do_loop(void)
     /* Test that LEAVE works correctly. */
     e4t__ASSERT_OK(e4__evaluate(task,
             ": foo do "
-                "r@ dup . dup "
+                "i dup . dup "
                 "5 = if "
                     "drop leave "
                 "else 12 = if "
@@ -298,29 +299,47 @@ static void e4t__test_compile_do_loop(void)
 
     /* Test that ?DO loops work correctly. */
     e4t__ASSERT_OK(e4__evaluate(task,
-            ": foo do r@ dup . 10 = if leave then loop ;", -1));
+            ": foo do i  dup . 10 = if leave then loop ;", -1));
     e4t__ASSERT_OK(e4__evaluate(task, "8 8 foo", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "8 9 10 ");
     e4t__ASSERT_OK(e4__evaluate(task,
-            ": foo ?do r@ dup . 10 = if leave then loop ;", -1));
+            ": foo ?do i dup . 10 = if leave then loop ;", -1));
     e4t__ASSERT_OK(e4__evaluate(task, "8 8 foo", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "");
 
     /* Test that +LOOP works as expected. */
-    e4t__ASSERT_OK(e4__evaluate(task, ": foo 10 0 do r@ . 2 +loop ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo 10 0 do i . 2 +loop ;", -1));
     e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 2 4 6 8 ");
 
     /* Test that nested do loops work correctly. */
     e4t__ASSERT_OK(e4__evaluate(task,
-            ": foo 5 0 do r@ . ':' emit bl 5 r@ do r@ . loop cr loop ;", -1));
+            ": foo 5 0 do i . ':' emit bl emit 5 i do i . j . loop cr loop ;",
+            -1));
     e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(),
-        "0 :0 1 2 3 4 \n"
-        "1 :1 2 3 4 \n"
-        "2 :2 3 4 \n"
-        "3 :3 4 \n"
-        "4 :4 \n");
+        "0 : 0 0 1 0 2 0 3 0 4 0 \n"
+        "1 : 1 1 2 1 3 1 4 1 \n"
+        "2 : 2 2 3 2 4 2 \n"
+        "3 : 3 3 4 3 \n"
+        "4 : 4 4 \n");
+
+    /* Test that UNLOOP is necessary and behaves as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": foo 5 swap do i 5 > if exit then i . loop 500 . ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "2 foo", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "2 3 4 500 ");
+    e4t__ASSERT_EQ(e4__evaluate(task, "9 foo", -1), e4__E_RSTKIMBALANCE);
+    e4t__term_obuf_consume();
+
+    e4t__ASSERT_OK(e4__evaluate(task, "forget foo forget foo forget foo", -1));
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": foo 5 swap do i 5 > if unloop exit then i . loop 500 . ;",
+            -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "2 foo", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "2 3 4 500 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "9 foo", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "");
 }
 
 /* Covers AGAIN BEGIN UNTIL REPEAT WHILE and various other builtins */
