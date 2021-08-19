@@ -956,7 +956,7 @@ static void e4t__test_builtin_parseword(void)
     e4t__ASSERT_EQ(len, 0);
 }
 
-/* Covers >R R> R@ */
+/* Covers >R 2>R 2R> 2R@ R> R@ */
 static void e4t__test_builtin_rstackmanip(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -1015,6 +1015,35 @@ static void e4t__test_builtin_rstackmanip(void)
     e4t__ASSERT_OK(e4__evaluate(task, "5 my-dup", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 2);
     e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+
+    /* Test that 2-variants of return stack manipulation words work
+       correctly. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": my-swap >r >r 2r> ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "10 20 my-swap", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 10);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 20);
+
+    e4t__ASSERT_OK(e4__evaluate(task, ": my-other-swap 2>r r> r> ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "30 40 my-other-swap", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 30);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 40);
+
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": my-other-other-swap >r >r 2r@ r> r> drop drop ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "50 60 my-other-other-swap", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 50);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 60);
+
+    e4t__ASSERT_OK(e4__evaluate(task, ": my-2dup 2>r 2r@ 2r> ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "5 7 my-2dup", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 4);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 7);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 7);
     e4t__ASSERT_EQ(e4__stack_pop(task), 5);
 }
 

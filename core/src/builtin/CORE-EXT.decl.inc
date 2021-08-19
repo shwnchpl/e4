@@ -25,6 +25,9 @@
     _e4__BUILTIN_PROC_F(TO, e4__F_IMMEDIATE)    \
     _e4__BUILTIN_CONSTANT(TRUE, e4__BF_TRUE)    \
     _e4__BUILTIN_PROC(TUCK) \
+    _e4__BUILTIN_PROC_N(TWO_R_FETCH, "2R@") \
+    _e4__BUILTIN_PROC_N(TWO_R_FROM, "2R>")  \
+    _e4__BUILTIN_PROC_N(TWO_TO_R, "2>R")    \
     _e4__BUILTIN_THUNK_N(U_GREATER_THAN, "U>")  \
     _e4__BUILTIN_PROC(VALUE)    \
     _e4__BUILTIN_THUNK_N(ZERO_GREATER, "0>")  \

@@ -230,6 +230,58 @@ static void e4__builtin_TUCK(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_TWO_R_FETCH(struct e4__task *task, void *user)
+{
+    register e4__cell l, r;
+
+    _e4__BUILTIN_EXPECT_RDEPTH(task, 3);
+
+    /* The top of the return stack is the place to which *we* must
+       return, so consume that value before doing anything else. */
+    e4__execute_ret(task);
+
+    r = e4__stack_rpop(task);
+    l = e4__stack_rpop(task);
+
+    e4__stack_push(task, l);
+    e4__stack_push(task, r);
+
+    e4__stack_rpush(task, l);
+    e4__stack_rpush(task, r);
+
+    /* e4__execute_ret intentionally omitted. */
+}
+
+static void e4__builtin_TWO_R_FROM(struct e4__task *task, void *user)
+{
+    _e4__BUILTIN_EXPECT_RDEPTH(task, 3);
+
+    /* The top of the return stack is the place to which *we* must
+       return, so consume that value before doing anything else. */
+    e4__execute_ret(task);
+
+    e4__stack_push(task, e4__stack_rpop(task));
+    e4__stack_push(task, e4__stack_rpop(task));
+    e4__stack_swap(task);
+
+    /* e4__execute_ret intentionally omitted. */
+}
+
+static void e4__builtin_TWO_TO_R(struct e4__task *task, void *user)
+{
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    /* The top of the return stack is the place to which *we* must
+       return, so consume that value before doing anything else. */
+    e4__execute_ret(task);
+
+    e4__stack_swap(task);
+    e4__stack_rpush(task, e4__stack_pop(task));
+    e4__stack_rpush(task, e4__stack_pop(task));
+
+    /* e4__execute_ret intentionally omitted. */
+}
+
 static const void *e4__builtin_U_GREATER_THAN[] = {
     e4__execute_threaded,
     NULL,
