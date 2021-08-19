@@ -144,6 +144,27 @@ static void e4t__test_compile_failure(void)
     e4t__ASSERT_OK(e4__evaluate(task, "bar @", -1));
     e4t__ASSERT_EQ(e4__stack_pop(task), 46810);
 
+    /* Test that all of the above are true even when compilation is
+       canceled while suspended. */
+    here = e4__task_uservar(task, e4__UV_HERE);
+
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo 324 [", -1));
+    e4__compile_cancel(task);
+    e4__stack_clear(task);
+    e4t__ASSERT_EQ(e4__task_uservar(task, e4__UV_HERE), here);
+
+    e4t__ASSERT_OK(e4__evaluate(task, ":noname 59 [", -1));
+    e4__compile_cancel(task);
+    e4__stack_clear(task);
+    e4t__ASSERT_EQ(e4__task_uservar(task, e4__UV_HERE), here);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "create foo 71 , ", -1));
+    here = e4__task_uservar(task, e4__UV_HERE);
+    e4t__ASSERT_OK(e4__evaluate(task, "does> @ [", -1));
+    e4__compile_cancel(task);
+    e4__stack_clear(task);
+    e4t__ASSERT_EQ(e4__task_uservar(task, e4__UV_HERE), here);
+
     /* Test that a dictionary entry is not available while it is being
        compiled. */
     here = e4__task_uservar(task, e4__UV_HERE);
@@ -278,6 +299,64 @@ static void e4t__test_compile_recursive(void)
     e4t__ASSERT_OK(e4__evaluate(task, "15 s execute", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), 120);
+}
+
+static void e4t__test_compile_suspendresume(void)
+{
+    struct e4__task *task = e4t__transient_task();
+    e4__cell here;
+
+    e4t__term_obuf_consume();
+
+    /* Test that suspending and resuming works correctly in trivial
+       cases. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo [ 2 2 + ] literal ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+
+    e4t__ASSERT_OK(e4__evaluate(task, ":noname [ 50 ] literal ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "execute", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 50);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "create foo 70 , does> [ 1234 . ] @ ;",
+            -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "1234 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "");
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 70);
+
+    /* Test that it is possible to finish compilation while
+       suspended, no matter what type of compilation is occurring. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo 324 [", -1));
+    e4t__ASSERT_OK(e4__compile_finish(task));
+    e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 324);
+
+    e4t__ASSERT_OK(e4__evaluate(task, ":noname 59 [", -1));
+    e4t__ASSERT_OK(e4__compile_finish(task));
+    e4t__ASSERT_OK(e4__evaluate(task, "execute", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 59);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "create bar 71 , does> @ [", -1));
+    e4t__ASSERT_OK(e4__compile_finish(task));
+    e4t__ASSERT_OK(e4__evaluate(task, "bar", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 71);
+
+    /* Test that anonymous compilation resume works correctly. */
+    here = e4__task_uservar(task, e4__UV_HERE);
+    e4t__ASSERT_OK(e4__evaluate(task, "] 2 2 + [", -1));
+    e4t__ASSERT_EQ(e4__task_uservar(task, e4__UV_HERE), &here[5]);
+    e4t__ASSERT_EQ(&e4__BUILTIN_XT[e4__B_LIT_CELL], here[0]);
+    e4t__ASSERT_EQ(2, here[1]);
+    e4t__ASSERT_EQ(&e4__BUILTIN_XT[e4__B_LIT_CELL], here[2]);
+    e4t__ASSERT_EQ(2, here[3]);
+    e4t__ASSERT_EQ(&e4__BUILTIN_XT[e4__B_PLUS], here[4]);
 }
 
 /* Covers ?DO +LOOP DO I J LEAVE LOOP UNLOOP and various other
@@ -432,6 +511,7 @@ void e4t__test_compile(void)
     e4t__test_compile_literal();
     e4t__test_compile_noname();
     e4t__test_compile_recursive();
+    e4t__test_compile_suspendresume();
     e4t__test_compile_do_loop();
     e4t__test_compile_while_loop();
 }

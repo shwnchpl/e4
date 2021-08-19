@@ -208,6 +208,7 @@ enum e4__builtin_id {
     e4__B_INVERT,
     e4__B_J,
     e4__B_LEAVE,
+    e4__B_LEFT_BRACKET,
     e4__B_LESS_THAN,
     e4__B_LIT_CELL,
     e4__B_LITERAL,
@@ -230,6 +231,7 @@ enum e4__builtin_id {
     e4__B_R_FROM,
     e4__B_RECURSE,
     e4__B_REPEAT,
+    e4__B_RIGHT_BRACKET,
     e4__B_ROT,
     e4__B_RSHIFT,
     e4__B_SEMICOLON,
@@ -345,8 +347,10 @@ void e4__compile_cell(struct e4__task *task, e4__cell cell);
 void e4__compile_char(struct e4__task *task, e4__cell cell);
 e4__usize e4__compile_finish(struct e4__task *task);
 void e4__compile_literal(struct e4__task *task, e4__cell num);
+void e4__compile_resume(struct e4__task *task);
 void e4__compile_start(struct e4__task *task, struct e4__execute_token *xt,
         e4__usize mode);
+void e4__compile_suspend(struct e4__task *task);
 
 /* dict.c functions */
 void e4__dict_entry(struct e4__task *task, const char *name, e4__u8 nbytes,

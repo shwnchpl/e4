@@ -19,6 +19,7 @@ struct e4__io_src
 struct e4__compile_state
 {
     e4__usize state;
+    e4__usize sus_state;
     e4__cell s0;
     e4__cell here0;
     struct e4__execute_token *xt;

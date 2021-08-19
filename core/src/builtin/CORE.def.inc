@@ -435,6 +435,12 @@ static void e4__builtin_LEAVE(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_LEFT_BRACKET(struct e4__task *task, void *user)
+{
+    e4__compile_suspend(task);
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_LESS_THAN(struct e4__task *task, void *user)
 {
     register e4__usize l, r;
@@ -702,6 +708,12 @@ static void e4__builtin_R_FROM(struct e4__task *task, void *user)
     e4__stack_push(task, e4__stack_rpop(task));
 
     /* e4__execute_ret intentionally omitted. */
+}
+
+static void e4__builtin_RIGHT_BRACKET(struct e4__task *task, void *user)
+{
+    e4__compile_resume(task);
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_ROT(struct e4__task *task, void *user)
