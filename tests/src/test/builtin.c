@@ -688,7 +688,7 @@ static void e4t__test_builtin_math(void)
     #undef _e
 }
 
-/* Covers @ ! ALIGN ALIGNED ALLOT C, C@ C! CELLS HERE */
+/* Covers @ ! +! 2@ 2! ALIGN ALIGNED ALLOT C, C@ C! CELLS HERE */
 static void e4t__test_builtin_memmanip(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -802,7 +802,7 @@ static void e4t__test_builtin_memmanip(void)
     e4t__ASSERT_OK(e4__evaluate(task, "foo 4 chars + c@", -1));
     e4t__ASSERT_EQ(e4__stack_pop(task), 0);
 
-    /* Test that settings bytes functions correctly. */
+    /* Test that setting bytes functions correctly. */
     e4t__ASSERT_OK(e4__evaluate(task, "0x20 foo 0 chars + c!", -1));
     e4t__ASSERT_OK(e4__evaluate(task, "0x40 foo 2 chars + c!", -1));
     e4t__ASSERT_OK(e4__evaluate(task, "0x60 foo 4 chars + c!", -1));
@@ -814,6 +814,25 @@ static void e4t__test_builtin_memmanip(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 0x60);
     e4t__ASSERT_OK(e4__evaluate(task, "foo @", -1));
     e4t__ASSERT_EQ(e4__stack_pop(task), 0x6000400020);
+
+    /* Test that 2@, 2!, and !+ work as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task, "create foo 10 , 20 ,", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "foo 2@", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 10);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 20);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "50 100 foo 2!", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "foo @ foo cell+ @", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 50);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 100);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "25 foo !", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "225 foo +!", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "foo @", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 250);
 }
 
 /* Covers >NUMBER and BASE uservar */

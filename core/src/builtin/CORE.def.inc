@@ -678,6 +678,19 @@ static void e4__builtin_PLUS_LOOP(struct e4__task *task, void *user)
 
 }
 
+static const void *e4__builtin_PLUS_STORE[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_DUP],
+    &e4__BUILTIN_XT[e4__B_FETCH],
+    &e4__BUILTIN_XT[e4__B_ROT],
+    &e4__BUILTIN_XT[e4__B_PLUS],
+    &e4__BUILTIN_XT[e4__B_SWAP],
+    &e4__BUILTIN_XT[e4__B_STORE],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
 static void e4__builtin_QUIT(struct e4__task *task, void *user)
 {
     e4__evaluate_quit(task);
@@ -951,6 +964,18 @@ static const void *e4__builtin_TWO_DUP[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
+static const void *e4__builtin_TWO_FETCH[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_DUP],
+    &e4__BUILTIN_XT[e4__B_CELL_PLUS],
+    &e4__BUILTIN_XT[e4__B_FETCH],
+    &e4__BUILTIN_XT[e4__B_SWAP],
+    &e4__BUILTIN_XT[e4__B_FETCH],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
 static const void *e4__builtin_TWO_OVER[] = {
     e4__execute_threaded,
     NULL,
@@ -980,6 +1005,18 @@ static const void *e4__builtin_TWO_STAR[] = {
     &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)1,
     &e4__BUILTIN_XT[e4__B_LSHIFT],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
+static const void *e4__builtin_TWO_STORE[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_SWAP],
+    &e4__BUILTIN_XT[e4__B_OVER],
+    &e4__BUILTIN_XT[e4__B_STORE],
+    &e4__BUILTIN_XT[e4__B_CELL_PLUS],
+    &e4__BUILTIN_XT[e4__B_STORE],
     &e4__BUILTIN_XT[e4__B_EXIT],
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
