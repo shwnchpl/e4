@@ -1,7 +1,8 @@
 #include "e4.h"
 #include "e4-internal.h"
 
-/* FIXME: Rename user to something more reasonable here. */
+/* FIXME: Rename user to something more reasonable? */
+
 void e4__execute(struct e4__task *task, void *user)
 {
     register const e4__bool ip_valid = task->ip != NULL;
@@ -33,6 +34,19 @@ void e4__execute_doesthunk(struct e4__task *task, void *user)
        branch to the address in user. */
     e4__stack_push(task, (e4__cell)user + 1);
     e4__execute_threaded(task, e4__DEREF(user) - 1);
+}
+
+void e4__execute_marker(struct e4__task *task, void *user)
+{
+    const struct e4__dict_header *header =
+            (struct e4__dict_header *)e4__DEREF(user);
+
+    /* Restore dictionary state to just before this marker was
+       created. */
+    task->dict = header->link;
+    task->here = (e4__cell)header;
+
+    e4__execute_ret(task);
 }
 
 void e4__execute_ret(struct e4__task *task)

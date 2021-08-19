@@ -36,12 +36,10 @@ Compilation
 - [DONE] Rename LITERAL to LIT_CELL and DLITERAL to LIT_DOES.
 - [DONE] Implement LITERAL.
 - [DONE] Implement [ and ].
-- Implement 2DUP, 2DROP, 2OVER, 2SWAP. Update builtins to use these
-  words where appropriate.
+- [DONE] Implement MARKER.
 - Implement some system +LOOP word that executes LOOP/LOOP+ execution
   semantics to save RAM space? This can be done using the same
   return stack manipulation techniques used for words like R@ and J.
-- Implement marker using LIT_MARKER system builtin.
 - Add conditional structure words CASE OF ENDCASE ENDOF etc.
 - Add POSTPONE and IMMEDIATE words.
 - Consider adding a COMPILE-ONLY/RESTRICT word.
@@ -95,6 +93,9 @@ General Builtins
 - [DONE] Add support for "pun" builtins (builtins that simply execute
   another builtin, potentially with different flags). Update the BEGIN
   implementation in this way (as compiletime immediate HERE).
+- Implement NIP.
+- Implement 2DUP, 2DROP, 2OVER, 2SWAP. Update builtins to use these
+  words where appropriate.
 - Implement COUNT, TYPE, .", and some sort of STRING_LIT builtin.
 - Implement UNUSED.
 - Implement S", S\", and C". These words should use transient memory

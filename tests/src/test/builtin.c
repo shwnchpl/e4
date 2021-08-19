@@ -186,10 +186,12 @@ static void e4t__test_builtin_exceptions(void)
     e4t__ASSERT_EQ(e4__evaluate(task, "abort", -1), e4__E_ABORT);
 }
 
-/* Covers FORGET and look-ahead idiom (which uses builtin WORD) */
+/* Covers FORGET, MARKER and look-ahead idiom (which uses builtin
+   WORD) */
 static void e4t__test_builtin_forget(void)
 {
     struct e4__task *task = e4t__transient_task();
+    e4__cell here;
 
     /* Test that FORGET fails on zero length names. */
     e4t__ASSERT_EQ(e4__evaluate(task, "forget", -1), e4__E_ZLNAME);
@@ -216,6 +218,15 @@ static void e4t__test_builtin_forget(void)
     e4t__ASSERT_EQ(e4__stack_depth(task), 2);
     e4t__ASSERT_EQ(e4__stack_pop(task), 17);
     e4t__ASSERT_EQ(e4__stack_pop(task), 17);
+
+    /* Test that creating and executing a marker restores HERE. */
+    here = e4__task_uservar(task, e4__UV_HERE);
+    e4t__ASSERT_OK(e4__evaluate(task, "marker bar", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "20 cells allot", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, ": quux 1 1 + ;", -1));
+    e4t__ASSERT(e4__task_uservar(task, e4__UV_HERE) != here);
+    e4t__ASSERT_OK(e4__evaluate(task, "bar", -1));
+    e4t__ASSERT_EQ(e4__task_uservar(task, e4__UV_HERE), here);
 }
 
 /* Covers ['] TO and ancillary compilation words */

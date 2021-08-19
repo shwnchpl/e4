@@ -95,6 +95,31 @@ static const void *e4__builtin_HEX[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
+static void e4__builtin_MARKER(struct e4__task *task, void *user)
+{
+    register const char *word;
+    register e4__u8 len;
+
+    /* XXX: The standard doesn't explicitly allow for interpret only
+       words, however in this implementation there is no meaningful
+       way to execute a marker from the context of a word defined after
+       that marker (which would be any word to which the marker would be
+       available in the first place) without pulling the rug out from
+       under yourself. Technically things should be mostly okay so long
+       as no further allocations are made in any word evaluated before
+       returning into words/code that is still allocated, but this is
+       by and large a footgun with no reasonable application.
+
+       If you want code that doesn't crash, do *NOT* try to invoke
+       markers either when compiling or from compiled words. */
+
+    _e4__BUILTIN_LOOKAHEAD(task, word, len);
+
+    e4__dict_entry(task, word, len, 0, e4__execute_marker, task->here);
+
+    e4__execute_ret(task);
+}
+
 static const void *e4__builtin_NOT_EQUALS[] = {
     e4__execute_threaded,
     NULL,
@@ -152,6 +177,11 @@ static void e4__builtin_TO(struct e4__task *task, void *user)
     register const char *word;
     register e4__u8 len;
     register const struct e4__dict_header *header;
+
+    /* XXX: This implementation would not produce sensible results if it
+       were baked into a definition (IMMEDIATE or not) manually via ',
+       ['], or any other mechanism. According to section 6.2.2295 of the
+       standard, this is fine. */
 
     if (!e4__task_compiling(task))
         _e4__BUILTIN_EXPECT_DEPTH(task, 1);

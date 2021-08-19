@@ -267,6 +267,7 @@ enum e4__builtin_id {
     e4__B_DEFER_STORE,
     e4__B_FALSE,
     e4__B_HEX,
+    e4__B_MARKER,
     e4__B_NOT_EQUALS,
     e4__B_PAD,
     e4__B_QUESTION_DO,
@@ -393,6 +394,7 @@ void e4__exception_throw(struct e4__task *task, e4__usize e);
 void e4__execute(struct e4__task *task, void *user);
 void e4__execute_deferthunk(struct e4__task *task, void *user);
 void e4__execute_doesthunk(struct e4__task *task, void *user);
+void e4__execute_marker(struct e4__task *task, void *user);
 void e4__execute_ret(struct e4__task *task);
 void e4__execute_threaded(struct e4__task *task, void *user);
 void e4__execute_userval(struct e4__task *task, void *user);
