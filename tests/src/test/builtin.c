@@ -999,7 +999,8 @@ static void e4t__test_builtin_rstackmanip(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 5);
 }
 
-/* Covers CLEAR .S DROP DUP OVER NIP PICK ROT SWAP TUCK ROLL QUIT */
+/* Covers CLEAR .S 2DROP 2DUP 2OVER 2SWAP DROP DUP OVER NIP PICK ROT
+   SWAP TUCK ROLL QUIT */
 static void e4t__test_builtin_stackmanip(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -1073,6 +1074,16 @@ static void e4t__test_builtin_stackmanip(void)
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 2 3 1 ");
     e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 3 pick .s clear", -1),
             e4__E_STKUNDERFLOW);
+
+    /* Test that 2-variants of words work as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task, "10 20 2drop .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<0> ");
+    e4t__ASSERT_OK(e4__evaluate(task, "10 20 2dup .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 10 20 10 20 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "10 20 30 40 2over .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<6> 10 20 30 40 10 20 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "10 20 30 40 2swap .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 30 40 10 20 ");
 }
 
 /* Covers BASE HERE PAD */
