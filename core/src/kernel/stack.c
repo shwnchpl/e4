@@ -41,6 +41,11 @@ e4__cell e4__stack_peek(struct e4__task *task)
     return e4__DEREF(task->sp + 1);
 }
 
+e4__cell e4__stack_pick(struct e4__task *task, e4__usize u)
+{
+    return e4__DEREF(task->sp + u + 1);
+}
+
 e4__cell e4__stack_pop(struct e4__task *task)
 {
     return e4__DEREF(++task->sp);

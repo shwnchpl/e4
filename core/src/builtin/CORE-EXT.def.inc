@@ -120,6 +120,15 @@ static void e4__builtin_MARKER(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static const void *e4__builtin_NIP[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_SWAP],
+    &e4__BUILTIN_XT[e4__B_DROP],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
 static const void *e4__builtin_NOT_EQUALS[] = {
     e4__execute_threaded,
     NULL,
@@ -128,6 +137,14 @@ static const void *e4__builtin_NOT_EQUALS[] = {
     &e4__BUILTIN_XT[e4__B_EXIT],
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
+
+static void e4__builtin_PICK(struct e4__task *task, void *user)
+{
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+    _e4__BUILTIN_EXPECT_DEPTH(task, (e4__usize)e4__stack_peek(task) + 2);
+    e4__stack_push(task, e4__stack_pick(task, (e4__usize)e4__stack_pop(task)));
+    e4__execute_ret(task);
+}
 
 static void e4__builtin_QUESTION_DO(struct e4__task *task, void *user)
 {

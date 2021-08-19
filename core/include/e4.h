@@ -268,8 +268,10 @@ enum e4__builtin_id {
     e4__B_FALSE,
     e4__B_HEX,
     e4__B_MARKER,
+    e4__B_NIP,
     e4__B_NOT_EQUALS,
     e4__B_PAD,
+    e4__B_PICK,
     e4__B_QUESTION_DO,
     e4__B_REFILL,
     e4__B_ROLL,
@@ -371,6 +373,7 @@ void e4__stack_drop(struct e4__task *task);
 void e4__stack_dup(struct e4__task *task);
 void e4__stack_over(struct e4__task *task);
 e4__cell e4__stack_peek(struct e4__task *task);
+e4__cell e4__stack_pick(struct e4__task *task, e4__usize u);
 e4__cell e4__stack_pop(struct e4__task *task);
 void e4__stack_push(struct e4__task *task, void *v);
 void e4__stack_rot(struct e4__task *task);

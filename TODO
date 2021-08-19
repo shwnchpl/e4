@@ -68,7 +68,7 @@ General Builtins
 - [DONE] Add support for "pun" builtins (builtins that simply execute
   another builtin, potentially with different flags). Update the BEGIN
   implementation in this way (as compiletime immediate HERE).
-- Implement NIP and PICK.
+- [DONE] Implement NIP and PICK.
 - Implement 2DUP, 2DROP, 2OVER, 2SWAP. Update builtins to use these
   words where appropriate.
 - Implement 2>R, 2R>, and 2R@.

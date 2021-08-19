@@ -999,7 +999,7 @@ static void e4t__test_builtin_rstackmanip(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 5);
 }
 
-/* Covers CLEAR .S DROP DUP OVER ROT SWAP TUCK ROLL QUIT */
+/* Covers CLEAR .S DROP DUP OVER NIP PICK ROT SWAP TUCK ROLL QUIT */
 static void e4t__test_builtin_stackmanip(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -1059,6 +1059,20 @@ static void e4t__test_builtin_stackmanip(void)
     e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 quit 4 5", -1), e4__E_QUIT);
     e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 2 3 ");
+
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 nip .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<2> 1 3 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 4 nip .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 2 4 ");
+
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 0 pick .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 2 3 3 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 1 pick .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 2 3 2 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 2 pick .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 2 3 1 ");
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 3 pick .s clear", -1),
+            e4__E_STKUNDERFLOW);
 }
 
 /* Covers BASE HERE PAD */
