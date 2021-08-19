@@ -1043,8 +1043,18 @@ static void e4t__test_builtin_stackmanip(void)
     e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 tuck .s clear", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 1 3 2 3 ");
 
-    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 4 5 4 roll .s clear", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 4 5 0 roll .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<5> 1 2 3 4 5 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 4 5 1 roll .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<5> 1 2 3 5 4 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 4 5 2 roll .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<5> 1 2 4 5 3 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 4 5 3 roll .s clear", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<5> 1 3 4 5 2 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 3 4 5 4 roll .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<5> 2 3 4 5 1 ");
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 4 5 5 roll .s clear", -1),
+            e4__E_STKUNDERFLOW);
 
     e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 quit 4 5", -1), e4__E_QUIT);
     e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1));

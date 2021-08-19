@@ -167,7 +167,7 @@ static void e4__builtin_REFILL(struct e4__task *task, void *user)
 static void e4__builtin_ROLL(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
-    _e4__BUILTIN_EXPECT_DEPTH(task, (e4__usize)e4__stack_peek(task) + 1);
+    _e4__BUILTIN_EXPECT_DEPTH(task, (e4__usize)e4__stack_peek(task) + 2);
     e4__stack_roll(task);
     e4__execute_ret(task);
 }

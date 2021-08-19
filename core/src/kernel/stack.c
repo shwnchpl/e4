@@ -83,10 +83,10 @@ void e4__stack_rpush(struct e4__task *task, void *v)
 void e4__stack_roll(struct e4__task *task)
 {
     register e4__usize u = (e4__usize)e4__stack_pop(task);
-    register const e4__cell tmp = e4__DEREF(task->sp + u);
+    register const e4__cell tmp = e4__DEREF(task->sp + 1 + u);
 
-    while (u > 1) {
-        e4__DEREF(task->sp + u) = e4__DEREF(task->sp + u - 1);
+    while (u > 0) {
+        e4__DEREF(task->sp + 1 + u) = e4__DEREF(task->sp + u);
         --u;
     }
 
