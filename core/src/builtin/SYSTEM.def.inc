@@ -40,7 +40,7 @@ static void e4__builtin_CLEAR(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_DLITERAL(struct e4__task *task, void *user)
+static void e4__builtin_LIT_DOES(struct e4__task *task, void *user)
 {
     e4__usize res;
 
@@ -68,7 +68,7 @@ static void e4__builtin_DLITERAL(struct e4__task *task, void *user)
 
     /* Set the instruction pointer to a return thunk so that we can
        return as we would have at the end of threaded_execute of the
-       word containing DLITERAL. */
+       word containing LIT_DOES. */
     task->ip = (e4__cell)_e4__BUILTIN_RETURN_THUNK;
 
     /* e4__execute_ret intentionally omitted. */

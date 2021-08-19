@@ -209,7 +209,7 @@ enum e4__builtin_id {
     e4__B_J,
     e4__B_LEAVE,
     e4__B_LESS_THAN,
-    e4__B_LITERAL,
+    e4__B_LIT_CELL,
     e4__B_LOOP,
     e4__B_LSHIFT,
     e4__B_MAX,
@@ -281,7 +281,7 @@ enum e4__builtin_id {
     e4__B_BRANCH,
     e4__B_BRANCH0,
     e4__B_CLEAR,
-    e4__B_DLITERAL,
+    e4__B_LIT_DOES,
     e4__B_SENTINEL,
 
     /* TOOLS words */

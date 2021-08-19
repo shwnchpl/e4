@@ -6,15 +6,15 @@ static void e4t__test_execute_branch(void)
     static const void *branch_skip[] = {
         e4__execute_threaded,
         NULL,
-        &e4__BUILTIN_XT[e4__B_LITERAL],
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)1,
         &e4__BUILTIN_XT[e4__B_BRANCH],
         (void *)5,
-        &e4__BUILTIN_XT[e4__B_LITERAL],
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)2,
-        &e4__BUILTIN_XT[e4__B_LITERAL],
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)3,
-        &e4__BUILTIN_XT[e4__B_LITERAL],
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)4,
         &e4__BUILTIN_XT[e4__B_EXIT],
         &e4__BUILTIN_XT[e4__B_SENTINEL]
@@ -22,17 +22,17 @@ static void e4t__test_execute_branch(void)
     static const void *branch_conditional[] = {
         e4__execute_threaded,
         NULL,
-        &e4__BUILTIN_XT[e4__B_LITERAL],
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)1,
         &e4__BUILTIN_XT[e4__B_BRANCH0],
         (void *)5,
-        &e4__BUILTIN_XT[e4__B_LITERAL],
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)0,
         &e4__BUILTIN_XT[e4__B_BRANCH0],
         (void *)3,
-        &e4__BUILTIN_XT[e4__B_LITERAL],
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)10,
-        &e4__BUILTIN_XT[e4__B_LITERAL],
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)20,
         &e4__BUILTIN_XT[e4__B_EXIT],
         &e4__BUILTIN_XT[e4__B_SENTINEL]
@@ -42,14 +42,14 @@ static void e4t__test_execute_branch(void)
         NULL,
         &e4__BUILTIN_XT[e4__B_BRANCH],
         (void *)6,
-        &e4__BUILTIN_XT[e4__B_LITERAL],
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)1,
-        &e4__BUILTIN_XT[e4__B_LITERAL],
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)2,
         &e4__BUILTIN_XT[e4__B_EXIT],
-        &e4__BUILTIN_XT[e4__B_LITERAL],
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)3,
-        &e4__BUILTIN_XT[e4__B_LITERAL],
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)4,
         &e4__BUILTIN_XT[e4__B_BRANCH],
         (void *)e4__USIZE_NEGATE(10),
@@ -123,9 +123,9 @@ static void e4t__test_execute_defer(void)
     static const void *yield_5[] = {
         e4__execute_threaded,
         NULL,
-        &e4__BUILTIN_XT[e4__B_LITERAL],
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)3,
-        &e4__BUILTIN_XT[e4__B_LITERAL],
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)2,
         &e4__BUILTIN_XT[e4__B_PLUS],
         &e4__BUILTIN_XT[e4__B_EXIT],
@@ -134,9 +134,9 @@ static void e4t__test_execute_defer(void)
     static const void *yield_16[] = {
         e4__execute_threaded,
         NULL,
-        &e4__BUILTIN_XT[e4__B_LITERAL],
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)10,
-        &e4__BUILTIN_XT[e4__B_LITERAL],
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)6,
         &e4__BUILTIN_XT[e4__B_PLUS],
         &e4__BUILTIN_XT[e4__B_EXIT],
@@ -166,7 +166,7 @@ static void e4t__test_execute_does(void)
         NULL,
         (void *)10,
         (void *)&e4__BUILTIN_XT[e4__B_FETCH],
-        (void *)&e4__BUILTIN_XT[e4__B_LITERAL],
+        (void *)&e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)2,
         (void *)&e4__BUILTIN_XT[e4__B_PLUS],
         (void *)&e4__BUILTIN_XT[e4__B_EXIT],
@@ -185,13 +185,13 @@ static void e4t__test_execute_does(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 53);
 }
 
-/* Covers ABORT (exceptions disabled) LITERAL and nested execution. */
+/* Covers ABORT (exceptions disabled) LIT_CELL and nested execution. */
 static void e4t__test_execute_nested(void)
 {
     static const void *push_12345[] = {
         e4__execute_threaded,
         NULL,
-        &e4__BUILTIN_XT[e4__B_LITERAL],
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)0x12345,
         &e4__BUILTIN_XT[e4__B_EXIT],
         &e4__BUILTIN_XT[e4__B_SENTINEL]
@@ -199,7 +199,7 @@ static void e4t__test_execute_nested(void)
     static const void *push_abcde[] = {
         e4__execute_threaded,
         NULL,
-        &e4__BUILTIN_XT[e4__B_LITERAL],
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)0xabcde,
         &e4__BUILTIN_XT[e4__B_EXIT],
         &e4__BUILTIN_XT[e4__B_SENTINEL]
@@ -207,7 +207,7 @@ static void e4t__test_execute_nested(void)
     static const void *push_77777[] = {
         e4__execute_threaded,
         NULL,
-        &e4__BUILTIN_XT[e4__B_LITERAL],
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)0x77777,
         &e4__BUILTIN_XT[e4__B_EXIT],
         &e4__BUILTIN_XT[e4__B_SENTINEL]

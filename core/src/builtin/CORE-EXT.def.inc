@@ -18,7 +18,7 @@ static void e4__builtin_AGAIN(struct e4__task *task, void *user)
 static const void *e4__builtin_BACKSLASH[] = {
     e4__execute_threaded,
     NULL,
-    &e4__BUILTIN_XT[e4__B_LITERAL],
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)((e4__usize)'\n'),
     &e4__BUILTIN_XT[e4__B_WORD],
     &e4__BUILTIN_XT[e4__B_DROP],
@@ -87,7 +87,7 @@ static void e4__builtin_DEFER_STORE(struct e4__task *task, void *user)
 static const void *e4__builtin_HEX[] = {
     e4__execute_threaded,
     NULL,
-    &e4__BUILTIN_XT[e4__B_LITERAL],
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)16,
     &e4__BUILTIN_XT[e4__B_BASE],
     &e4__BUILTIN_XT[e4__B_STORE],
@@ -209,7 +209,7 @@ static void e4__builtin_VALUE(struct e4__task *task, void *user)
 static const void *e4__builtin_ZERO_GREATER[] = {
     e4__execute_threaded,
     NULL,
-    &e4__BUILTIN_XT[e4__B_LITERAL],
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)0,
     &e4__BUILTIN_XT[e4__B_GREATER_THAN],
     &e4__BUILTIN_XT[e4__B_EXIT],
@@ -219,7 +219,7 @@ static const void *e4__builtin_ZERO_GREATER[] = {
 static const void *e4__builtin_ZERO_NOT_EQUALS[] = {
     e4__execute_threaded,
     NULL,
-    &e4__BUILTIN_XT[e4__B_LITERAL],
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)0,
     &e4__BUILTIN_XT[e4__B_NOT_EQUALS],
     &e4__BUILTIN_XT[e4__B_EXIT],

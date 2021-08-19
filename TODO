@@ -33,19 +33,17 @@ Compilation
 - [DONE] Implement  BEGIN, UNTIL, AGAIN, WHILE, and REPEAT.
 - [DONE] Implement DO, ?DO, LOOP, LOOP+, and LEAVE.
 - [DONE] Implement I, J, and UNLOOP.
+- [DONE] Rename LITERAL to LIT_CELL and DLITERAL to LIT_DOES.
+- Implement LITERAL correctly.
 - Implement 2DUP, 2DROP, 2OVER, 2SWAP. Update builtins to use these
   words where appropriate.
 - Implement some system +LOOP word that executes LOOP/LOOP+ execution
-  semantics to save RAM space?
+  semantics to save RAM space? This can be done using the same
+  return stack manipulation techniques used for words like R@ and J.
+- Implement marker using LIT_MARKER system builtin.
 - Add conditional structure words CASE OF ENDCASE ENDOF etc.
 - Add POSTPONE and IMMEDIATE words.
 - Consider adding a COMPILE-ONLY/RESTRICT word.
-- Add compile time semantics to LITERAL. This may require actually
-  adding another word, LIT, that takes the place of LITERAL's current
-  non-standard behavior, since the current LITERAL needs to be
-  executable in IMMEDIATE words. It would probably be worth renaming
-  DLITERAL to DLIT, DOES_LIT, or something along those lines as part
-  of this change.
 - Implement AHEAD?
 - Check for nested compilation everywhere relevant.
 - Implement decompilation (ie. SEE). This only needs to work for words
@@ -67,10 +65,10 @@ Compilation
   based on token. Aside from this, the only thing that needs to be done
   is look up a word in *reverse* based on its XT, and display that if
   it is present. If it isn't, we can assume it's a literal and just
-  include it. Alternatively, we can understand LITERAL and other key
+  include it. Alternatively, we can understand LIT_CELL and other key
   words as look ahead words and not include them. Or, on the other
   hand, we could just naively display the internal representation and
-  not worry about things like THEN and LITERAL. This is the easiest
+  not worry about things like THEN and LIT_CELL. This is the easiest
   solution and is probably a perfectly reasonable place to start.
 
 General Builtins
@@ -149,7 +147,7 @@ Kernel
 - Consider adding an e4__stack_rclear API and using where appropriate.
 - Consider adding some kind of NO_INTERPRET or INTERNAL flag for words
   that can never be used correctly (whether interpreting or compiling)
-  from a non-system context (for instance, BRANCH, BRANCH0, and LITERAL
+  from a non-system context (for instance, BRANCH, BRANCH0, and LIT_*
   as currently implemented). Making words that need to have some effect
   compile only and immediate then checking whether compiling as a hack
   is not sufficient because those words may be called from a word
@@ -157,7 +155,9 @@ Kernel
   (such as [LIT]), which risky, could be handy. With such a word, it
   would be possible to write things like : SKIP BRANCH [LIT] 1 ; (which
   itself is also more risky than useful, although that doesn't mean
-  there could be no reasonable application).
+  there could be no reasonable application). As an alternative, these
+  words could be given some kind of "hidden" flag so that it isn't
+  possible to look them up.
 - Refactor code that takes the size of the execute_token structure and
   subtracts the size of the data field when allocating to take the size
   of an execute_tuple structure instead?

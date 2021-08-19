@@ -127,7 +127,7 @@ static void e4__builtin_C_STORE(struct e4__task *task, void *user)
 static const void *e4__builtin_CELLS[] = {
     e4__execute_threaded,
     NULL,
-    &e4__BUILTIN_XT[e4__B_LITERAL],
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)sizeof(e4__cell),
     &e4__BUILTIN_XT[e4__B_STAR],
     &e4__BUILTIN_XT[e4__B_EXIT],
@@ -137,7 +137,7 @@ static const void *e4__builtin_CELLS[] = {
 static const void *e4__builtin_CELL_PLUS[] = {
     e4__execute_threaded,
     NULL,
-    &e4__BUILTIN_XT[e4__B_LITERAL],
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)sizeof(e4__cell),
     &e4__BUILTIN_XT[e4__B_PLUS],
     &e4__BUILTIN_XT[e4__B_EXIT],
@@ -147,7 +147,7 @@ static const void *e4__builtin_CELL_PLUS[] = {
 static const void *e4__builtin_CHARS[] = {
     e4__execute_threaded,
     NULL,
-    &e4__BUILTIN_XT[e4__B_LITERAL],
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)sizeof(e4__u8),
     &e4__BUILTIN_XT[e4__B_STAR],
     &e4__BUILTIN_XT[e4__B_EXIT],
@@ -157,7 +157,7 @@ static const void *e4__builtin_CHARS[] = {
 static const void *e4__builtin_CHAR_PLUS[] = {
     e4__execute_threaded,
     NULL,
-    &e4__BUILTIN_XT[e4__B_LITERAL],
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)sizeof(e4__u8),
     &e4__BUILTIN_XT[e4__B_PLUS],
     &e4__BUILTIN_XT[e4__B_EXIT],
@@ -223,7 +223,7 @@ static void e4__builtin_CREATE(struct e4__task *task, void *user)
 static const void *e4__builtin_DECIMAL[] = {
     e4__execute_threaded,
     NULL,
-    &e4__BUILTIN_XT[e4__B_LITERAL],
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)10,
     &e4__BUILTIN_XT[e4__B_BASE],
     &e4__BUILTIN_XT[e4__B_STORE],
@@ -266,7 +266,7 @@ static void e4__builtin_DOES(struct e4__task *task, void *user)
        these interpretation semantics are achieved via a different
        mechanism from the compiled run-time semantics. */
     if (e4__task_compiling(task))
-        e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_DLITERAL]);
+        e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_LIT_DOES]);
     else if (task->dict->flags & e4__F_BUILTIN)
         /* Invalid attempt to mutate a builtin. */
         e4__exception_throw(task, e4__E_INVBUILTINMUT);
@@ -452,7 +452,7 @@ static void e4__builtin_LESS_THAN(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_LITERAL(struct e4__task *task, void *user)
+static void e4__builtin_LIT_CELL(struct e4__task *task, void *user)
 {
     /* Since we're manipulating rp directly rather than calling
        e4__execute_ret, ensure that we aren't going to underflow. */
@@ -470,10 +470,10 @@ static const void *e4__builtin_LOOP[] = {
     NULL,
     /* FIXME: Use COMPILE, or actually correctly implemented LITERAL
        instead here. */
-    &e4__BUILTIN_XT[e4__B_LITERAL],
-    &e4__BUILTIN_XT[e4__B_LITERAL],
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
     &e4__BUILTIN_XT[e4__B_COMMA],
-    &e4__BUILTIN_XT[e4__B_LITERAL],
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)1,
     &e4__BUILTIN_XT[e4__B_COMMA],
     &e4__BUILTIN_XT[e4__B_PLUS_LOOP],
@@ -563,7 +563,7 @@ static void e4__builtin_NEGATE(struct e4__task *task, void *user)
 static const void *e4__builtin_ONE_MINUS[] = {
     e4__execute_threaded,
     NULL,
-    &e4__BUILTIN_XT[e4__B_LITERAL],
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)1,
     &e4__BUILTIN_XT[e4__B_MINUS],
     &e4__BUILTIN_XT[e4__B_EXIT],
@@ -573,7 +573,7 @@ static const void *e4__builtin_ONE_MINUS[] = {
 static const void *e4__builtin_ONE_PLUS[] = {
     e4__execute_threaded,
     NULL,
-    &e4__BUILTIN_XT[e4__B_LITERAL],
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)1,
     &e4__BUILTIN_XT[e4__B_PLUS],
     &e4__BUILTIN_XT[e4__B_EXIT],
@@ -604,7 +604,7 @@ static void e4__builtin_OVER(struct e4__task *task, void *user)
 static const void *e4__builtin_PAREN[] = {
     e4__execute_threaded,
     NULL,
-    &e4__BUILTIN_XT[e4__B_LITERAL],
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)((e4__usize)')'),
     &e4__BUILTIN_XT[e4__B_WORD],
     &e4__BUILTIN_XT[e4__B_DROP],
@@ -915,7 +915,7 @@ static void e4__builtin_TO_R(struct e4__task *task, void *user)
 static const void *e4__builtin_TWO_SLASH[] = {
     e4__execute_threaded,
     NULL,
-    &e4__BUILTIN_XT[e4__B_LITERAL],
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)1,
     &e4__BUILTIN_XT[e4__B_RSHIFT],
     &e4__BUILTIN_XT[e4__B_EXIT],
@@ -925,7 +925,7 @@ static const void *e4__builtin_TWO_SLASH[] = {
 static const void *e4__builtin_TWO_STAR[] = {
     e4__execute_threaded,
     NULL,
-    &e4__BUILTIN_XT[e4__B_LITERAL],
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)1,
     &e4__BUILTIN_XT[e4__B_LSHIFT],
     &e4__BUILTIN_XT[e4__B_EXIT],
@@ -1049,7 +1049,7 @@ static void e4__builtin_WORD(struct e4__task *task, void *user)
 static const void *e4__builtin_ZERO_EQUALS[] = {
     e4__execute_threaded,
     NULL,
-    &e4__BUILTIN_XT[e4__B_LITERAL],
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)0,
     &e4__BUILTIN_XT[e4__B_EQUALS],
     &e4__BUILTIN_XT[e4__B_EXIT],
@@ -1059,7 +1059,7 @@ static const void *e4__builtin_ZERO_EQUALS[] = {
 static const void *e4__builtin_ZERO_LESS[] = {
     e4__execute_threaded,
     NULL,
-    &e4__BUILTIN_XT[e4__B_LITERAL],
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)0,
     &e4__BUILTIN_XT[e4__B_LESS_THAN],
     &e4__BUILTIN_XT[e4__B_EXIT],

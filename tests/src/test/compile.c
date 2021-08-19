@@ -222,9 +222,9 @@ static void e4t__test_compile_linear(void)
     e4t__ASSERT_OK(e4__evaluate(task, ": foo 2 5 + ;", -1));
     e4t__ASSERT((header = e4__dict_lookup(task, "foo", 3)));
     e4t__ASSERT_EQ(header->xt->code, e4__execute_threaded);
-    e4t__ASSERT_EQ(header->xt->data[0], &e4__BUILTIN_XT[e4__B_LITERAL]);
+    e4t__ASSERT_EQ(header->xt->data[0], &e4__BUILTIN_XT[e4__B_LIT_CELL]);
     e4t__ASSERT_EQ(header->xt->data[1], 2);
-    e4t__ASSERT_EQ(header->xt->data[2], &e4__BUILTIN_XT[e4__B_LITERAL]);
+    e4t__ASSERT_EQ(header->xt->data[2], &e4__BUILTIN_XT[e4__B_LIT_CELL]);
     e4t__ASSERT_EQ(header->xt->data[3], 5);
     e4t__ASSERT_EQ(header->xt->data[4], &e4__BUILTIN_XT[e4__B_PLUS]);
     e4t__ASSERT_EQ(header->xt->data[5], &e4__BUILTIN_XT[e4__B_EXIT]);
