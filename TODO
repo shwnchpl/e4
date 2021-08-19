@@ -43,8 +43,106 @@ Compilation
 - Add conditional structure words CASE OF ENDCASE ENDOF etc.
 - Add POSTPONE and IMMEDIATE words.
 - Consider adding a COMPILE-ONLY/RESTRICT word.
-- Implement AHEAD?
 - Check for nested compilation everywhere relevant.
+
+General Builtins
+----------------
+- [DONE] Implement core builtin logic/comparison words: = < > 0< 0= AND
+  INVERT NEGATE OR XOR.
+- [DONE] Implement *.
+- [DONE] Implement /, MOD, /MOD.
+- [DONE] Implement U<.
+- [DONE] Add macro handling for implementing some builtins as threaded
+  code and refactor those builtins to be  implemented in threaded code.
+- [DONE] Throw division by zero exceptions where necessary.
+- [DONE] Refactor builtin XT table to not include unused data field.
+- [DONE] Implement core extension logic/comparison words: 0<> 0> <> U>.
+- [DONE] Implement ( and \.
+- [DONE] Implement 1+, 1-, 2*, 2/, LSHIFT, and RSHIFT.
+- [DONE] Implement CELL+, CHAR+, and CHARS.
+- [DONE] Implement ALIGN and ALIGNED.
+- [DONE] Implement C@, C,, and C!.
+- [DONE] Implement >R, R>, R@.
+- [DONE] Implement MIN and MAX.
+- [DONE] Implement HEX and DECIMAL.
+- [DONE] Add support for "pun" builtins (builtins that simply execute
+  another builtin, potentially with different flags). Update the BEGIN
+  implementation in this way (as compiletime immediate HERE).
+- Implement NIP and PICK.
+- Implement 2DUP, 2DROP, 2OVER, 2SWAP. Update builtins to use these
+  words where appropriate.
+- Implement 2>R, 2R>, and 2R@.
+- Implement COUNT, TYPE, .", and some sort of STRING_LIT builtin.
+- Implement UNUSED.
+- Implement S", S\", and C". These words should use transient memory
+  (possibly just HERE) during runtime, but during compile time they
+  should compile a string directly into the definition as appropriate.
+  This can be achieved by including some word STRING (similar to LIT)
+  in the thread that pushes the subsequent counted string onto the
+  stack as appropriate and advances the instruction pointer. The
+  string should be compiled directly into the definition *with* end
+  padding to align.
+- Implement EVALUATE (builtin)
+- Implement THROW and CATCH builtins.
+- Make IMMEDIATE/COMPONLY flag specification order consistent in
+  builtin declarations.
+
+Kernel
+------
+- [DONE] Throw exceptions in the event of return stack corruption.
+- [DONE] Ensure tr0 always has a coherent value, especially across
+  exceptions. To make tr0 always have a coherent value, it will be
+  necessary to at least set it to r0 on task initialization and preserve
+  its value across exceptions.
+- Add e4__task_interrupt API. This API can be called from a signal
+  handler or an ISR (as long as the e4__task is *known* not to be
+  running) and it sets a flag in the task that will throw an
+  e4__E_INTERRUPTED exception from threaded_execute as soon as
+  possible. This can be used by REPLs as a way of handling SIGINT
+  etc. Once this is implemented, test it out in the REPL. Consider
+  how to implement this so that it doesn't behave oddly when waiting
+  for input. One idea is that execution depth could be counted in
+  e4__thread_execute (possibly nice to have for other reasons as
+  well) and the flag could be set only in cases when that value
+  is non-zero, although this would have the unfortunate side effect
+  of needing to track yet another thing across exceptions.
+- Add asserts that execute_tuple and execute_token field order lines
+  up correctly.
+- Handle dictionary overflows and other overflows. Especially
+  dictionary overflow.
+- Consider improving exception printing (ie. printing exception name
+  along with number).
+
+REPL
+----
+- [DONE] Add tab-completion to the repl.
+- Implement a custom signal handler or custom signal handlers so that
+  it's possible to handle SIGINT and call e4__task_interrupt, once
+  it has been implemented. Signal handlers will need to take
+  appropriate action to keep libedit happy as well (in particular, it
+  is necessary to call el_resize upon receipt of SIGWINCH).
+
+Testing
+-------
+- [DONE] Figure out some way to cover return stack corruption in tests.
+- Cover user IO errors in tests (ie. user provided IO handler returns
+  non-zero).
+- Add tests to ensure that compile time coherence tracking (with tr0)
+  behaves correctly when exceptions are disabled, including in cases
+  when e4__execute_ret are called when there is nothing on the return
+  stack.
+- Cover the fact that ip is set to NULL after an exception.
+- Cover return stack underflow in the event of a direct call to
+  e4__execute_ret.
+- Cover tr0 coherence (with and without exceptions enabled) in tests.
+  This will be easier to fully cover once exceptions are enabled.
+
+
+Version 0.3
+===========
+
+Compilation
+-----------
 - Implement decompilation (ie. SEE). This only needs to work for words
   defined with execute_threaded to start; everything else can just
   display "builtin." The key way that this can be achieved is by
@@ -70,133 +168,35 @@ Compilation
   not worry about things like THEN and LIT_CELL. This is the easiest
   solution and is probably a perfectly reasonable place to start.
 
-General Builtins
-----------------
-- [DONE] Implement core builtin logic/comparison words: = < > 0< 0= AND
-  INVERT NEGATE OR XOR.
-- [DONE] Implement *.
-- [DONE] Implement /, MOD, /MOD.
-- [DONE] Implement U<.
-- [DONE] Add macro handling for implementing some builtins as threaded
-  code and refactor those builtins to be  implemented in threaded code.
-- [DONE] Throw division by zero exceptions where necessary.
-- [DONE] Refactor builtin XT table to not include unused data field.
-- [DONE] Implement core extension logic/comparison words: 0<> 0> <> U>.
-- [DONE] Implement ( and \.
-- [DONE] Implement 1+, 1-, 2*, 2/, LSHIFT, and RSHIFT.
-- [DONE] Implement CELL+, CHAR+, and CHARS.
-- [DONE] Implement ALIGN and ALIGNED.
-- [DONE] Implement C@, C,, and C!.
-- [DONE] Implement >R, R>, R@.
-- [DONE] Implement MIN and MAX.
-- [DONE] Implement HEX and DECIMAL.
-- [DONE] Add support for "pun" builtins (builtins that simply execute
-  another builtin, potentially with different flags). Update the BEGIN
-  implementation in this way (as compiletime immediate HERE).
-- Implement NIP.
-- Implement 2DUP, 2DROP, 2OVER, 2SWAP. Update builtins to use these
-  words where appropriate.
-- Implement COUNT, TYPE, .", and some sort of STRING_LIT builtin.
-- Implement UNUSED.
-- Implement S", S\", and C". These words should use transient memory
-  (possibly just HERE) during runtime, but during compile time they
-  should compile a string directly into the definition as appropriate.
-  This can be achieved by including some word STRING (similar to LIT)
-  in the thread that pushes the subsequent counted string onto the
-  stack as appropriate and advances the instruction pointer. The
-  string should be compiled directly into the definition *with* end
-  padding to align.
-- Implement EVALUATE (builtin)
-- Implement THROW and CATCH builtins.
-- Make IMMEDIATE/COMPONLY flag specification order consistent in
-  builtin declarations.
-
 General IO
 ----------
 - Implement pictured numeric output.
 
 Kernel
 ------
-- [DONE] Throw exceptions in the event of return stack corruption.
-- Handle dictionary overflows and other overflows. Especially
-  dictionary overflow.
-- Add e4__task_interrupt API. This API can be called from a signal
-  handler or an ISR (as long as the e4__task is *known* not to be
-  running) and it sets a flag in the task that will throw an
-  e4__E_INTERRUPTED exception from threaded_execute as soon as
-  possible. This can be used by REPLs as a way of handling SIGINT
-  etc. Once this is implemented, test it out in the REPL. Consider
-  how to implement this so that it doesn't behave oddly when waiting
-  for input. One idea is that execution depth could be counted in
-  e4__thread_execute (possibly nice to have for other reasons as
-  well) and the flag could be set only in cases when that value
-  is non-zero, although this would have the unfortunate side effect
-  of needing to track yet another thing across exceptions.
-- Throw address alignment exceptions (-23) where appropriate?
 - Add support for double cell numbers (including arithmetic, the text
   interpreter extension for numbers of the format XXXX. as outlined in
   section 8.3.1 of the standard, etc.).
-- [DONE] Ensure tr0 always has a coherent value, especially across
-  exceptions. To make tr0 always have a coherent value, it will be
-  necessary to at least set it to r0 on task initialization and preserve
-  its value across exceptions.
 - Update words meant to support double width numbers that are currently
   implemented without any such support. This includes >NUMBER.
 - Add more two's complement utility macros as needed and use them where
   appropriate.
-- Consider improving exception printing (ie. printing exception name
-  along with number).
-- Consider adding an e4__stack_rclear API and using where appropriate.
-- Consider adding some kind of NO_INTERPRET or INTERNAL flag for words
-  that can never be used correctly (whether interpreting or compiling)
-  from a non-system context (for instance, BRANCH, BRANCH0, and LIT_*
-  as currently implemented). Making words that need to have some effect
-  compile only and immediate then checking whether compiling as a hack
-  is not sufficient because those words may be called from a word
-  marked IMMEDIATE. Alternatively, some other word to bake in addresses
-  (such as [LIT]), which risky, could be handy. With such a word, it
-  would be possible to write things like : SKIP BRANCH [LIT] 1 ; (which
-  itself is also more risky than useful, although that doesn't mean
-  there could be no reasonable application). As an alternative, these
-  words could be given some kind of "hidden" flag so that it isn't
-  possible to look them up.
-- Refactor code that takes the size of the execute_token structure and
-  subtracts the size of the data field when allocating to take the size
-  of an execute_tuple structure instead?
 
 REPL
 ----
-- [DONE] Add tab-completion to the repl.
 - Source ~/.e4-editrc to allow for e4 specific input overrides. For
   example, tab completion on tab could be disabled by macro binding
   the tab key to two or four spaces.
-- Implement a custom signal handler or custom signal handlers so that
-  it's possible to handle SIGINT and call e4__task_interrupt, once
-  it has been implemented. Signal handlers will need to take
-  appropriate action to keep libedit happy as well (in particular, it
-  is necessary to call el_resize upon receipt of SIGWINCH).
-
-
-Testing
--------
-- [DONE] Figure out some way to cover return stack corruption in tests.
-- Cover user IO errors in tests (ie. user provided IO handler returns
-  non-zero).
-- Add tests to ensure that compile time coherence tracking (with tr0)
-  behaves correctly when exceptions are disabled, including in cases
-  when e4__execute_ret are called when there is nothing on the return
-  stack.
-- Cover the fact that ip is set to NULL after an exception.
-- Cover return stack underflow in the event of a direct call to
-  e4__execute_ret.
-- Cover tr0 coherence (with and without exceptions enabled) in tests.
-  This will be easier to fully cover once exceptions are enabled.
 
 
 Version 0.9
 ===========
 
 (things to have done prior to 1.0)
+
+Compilation
+-----------
+- Implement AHEAD?
 
 Documentation
 -------------
@@ -211,6 +211,23 @@ Kernel
   and the appropriate hooks to the REPL.
 - Consider making return stack coherence tracking optional at compile-
   time to allow for RAM savings.
+- Throw address alignment exceptions (-23) where appropriate? On one
+  hand, this could be a nice way to avoid performance issues. On the
+  other hand, on some systems unaligned access is fine.
+- Consider adding an e4__stack_rclear API and using where appropriate.
+- Consider adding some kind of NO_INTERPRET or INTERNAL flag for words
+  that can never be used correctly (whether interpreting or compiling)
+  from a non-system context (for instance, BRANCH, BRANCH0, and LIT_*
+  as currently implemented). Making words that need to have some effect
+  compile only and immediate then checking whether compiling as a hack
+  is not sufficient because those words may be called from a word
+  marked IMMEDIATE. Alternatively, some other word to bake in addresses
+  (such as [LIT]), which risky, could be handy. With such a word, it
+  would be possible to write things like : SKIP BRANCH [LIT] 1 ; (which
+  itself is also more risky than useful, although that doesn't mean
+  there could be no reasonable application). As an alternative, these
+  words could be given some kind of "hidden" flag so that it isn't
+  possible to look them up.
 
 General Builtins
 ----------------
@@ -228,3 +245,14 @@ Transfer Station
 ================
 
 (won't do lists; cleared after each release)
+
+Kernel
+------
+- Add more two's complement utility macros as needed and use them where
+  appropriate.
+    -- There doesn't appear to be any need for more two's complement
+       macros.
+- Refactor code that takes the size of the execute_token structure and
+  subtracts the size of the data field when allocating to take the size
+  of an execute_tuple structure instead?
+    -- No real reason to do this.
