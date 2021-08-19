@@ -465,6 +465,15 @@ static void e4__builtin_LIT_CELL(struct e4__task *task, void *user)
     /* e4__execute_ret intentionally omitted. */
 }
 
+static void e4__builtin_LITERAL(struct e4__task *task, void *user)
+{
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+
+    e4__compile_literal(task, e4__stack_pop(task));
+
+    e4__execute_ret(task);
+}
+
 static const void *e4__builtin_LOOP[] = {
     e4__execute_threaded,
     NULL,

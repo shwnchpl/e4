@@ -232,6 +232,18 @@ static void e4t__test_compile_linear(void)
     e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
 }
 
+static void e4t__test_compile_literal(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo", -1));
+    e4__stack_push(task, (e4__cell)2);
+    e4t__ASSERT_OK(e4__evaluate(task, "literal 3 + ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+}
+
 static void e4t__test_compile_noname(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -417,6 +429,7 @@ void e4t__test_compile(void)
     e4t__test_compile_does();
     e4t__test_compile_failure();
     e4t__test_compile_linear();
+    e4t__test_compile_literal();
     e4t__test_compile_noname();
     e4t__test_compile_recursive();
     e4t__test_compile_do_loop();

@@ -34,7 +34,8 @@ Compilation
 - [DONE] Implement DO, ?DO, LOOP, LOOP+, and LEAVE.
 - [DONE] Implement I, J, and UNLOOP.
 - [DONE] Rename LITERAL to LIT_CELL and DLITERAL to LIT_DOES.
-- Implement LITERAL correctly.
+- [DONE] Implement LITERAL.
+- Implement [ and ].
 - Implement 2DUP, 2DROP, 2OVER, 2SWAP. Update builtins to use these
   words where appropriate.
 - Implement some system +LOOP word that executes LOOP/LOOP+ execution
