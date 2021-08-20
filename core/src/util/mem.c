@@ -77,6 +77,91 @@ const struct e4__dict_header* e4__mem_dict_suggest(
     return NULL;
 }
 
+/* XXX: Scratch must be at least two bytes wide. */
+const char* e4__mem_strnescape(const char **str, e4__usize *len,
+        e4__usize *chunk_len, char *scratch)
+{
+    const char *begin = *str;
+
+    if (!*len)
+        return NULL;
+
+    *chunk_len = 0;
+
+    if (*begin == '\\') {
+        /* Parse escaped chunk. Ambiguous conditions are treated as
+           literal strings. */
+
+        *chunk_len = 1;
+
+        if (*len < 2)
+            goto parse_normal;
+
+        switch (begin[1]) {
+            case 'a': *scratch = '\a'; break;
+            case 'b': *scratch = '\b'; break;
+            case 'e': *scratch = 27; break;
+            case 'f': *scratch = '\f'; break;
+            case 'l': *scratch = '\n'; break;
+            case 'n': *scratch = '\n'; break;
+            case 'q': /* fall through */
+            case '"': *scratch = '"'; break;
+            case 'r': *scratch = '\r'; break;
+            case 't': *scratch = '\t'; break;
+            case 'v': *scratch = '\v'; break;
+            case 'z': *scratch = '\0'; break;
+            case '\\': *scratch = '\\'; break;
+            case 'm':
+                scratch[0] = '\r';
+                scratch[1] = '\n';
+                *chunk_len = 2;
+                break;
+            case 'x': {
+                char l, r;
+
+                if (*len < 4)
+                    goto parse_normal;
+
+                l = tolower(begin[2]);
+                r = tolower(begin[3]);
+
+                if (!((l >= '0' && l <= '9') || ((l >= 'a' && l <= 'f'))) ||
+                        !((r >= '0' && r <= '9') || ((r >= 'a' && r <= 'f'))))
+                    goto parse_normal;
+
+                l = l <= '9' ? l - '0' : l - 'a' + 10;
+                r = r <= '9' ? r - '0' : r - 'a' + 10;
+
+                *scratch = l * 16 + r;
+
+                *str += 2;
+                *len -= 2;
+
+                break;
+            }
+            default:
+                /* Ambiguous condition. Treat as literal. */
+                goto parse_normal;
+        }
+
+        *len -= 2;
+        *str += 2;
+
+        return scratch;
+    }
+
+parse_normal:
+
+    /* Parse normal chunk. */
+    while (*chunk_len < *len && begin[*chunk_len] != '\\')
+        ++*chunk_len;
+
+    *len -= *chunk_len;
+    *str += *chunk_len;
+
+    return begin;
+}
+
 int e4__mem_strncasecmp(const char *left, const char *right, e4__usize n)
 {
     while (n-- > 0 && tolower(*left++) == tolower(*right++))

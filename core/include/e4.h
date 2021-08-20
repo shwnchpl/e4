@@ -442,6 +442,8 @@ const struct e4__dict_header* e4__mem_dict_lookup(
         const struct e4__dict_header *dict, const char *name, e4__u8 nbytes);
 const struct e4__dict_header* e4__mem_dict_suggest(
         const struct e4__dict_header *dict, const char *prefix, e4__u8 pbytes);
+const char* e4__mem_strnescape(const char **str, e4__usize *len,
+        e4__usize *chunk_len, char *scratch);
 int e4__mem_strncasecmp(const char *left, const char *right, e4__usize n);
 e4__usize e4__mem_number(const char *buf, e4__usize sz, e4__u8 base,
         e4__u8 flags, e4__usize *out);

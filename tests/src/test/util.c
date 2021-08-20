@@ -196,6 +196,62 @@ static void e4t__test_util_wordparse(void)
     #undef _p
 }
 
+static void e4t__test_util_strnescape(void)
+{
+    static const char *escaped_str = "foo\\abar\\b some more \\e\\f\\l"
+        "and still more\\mand\\nmore\\q\\r\\tso long\\v\\z\\\"\\\\\\xf3"
+        "\\p\\xr9\\";
+    char buf[2];
+    e4__usize chunk_len;
+    const char *cursor = escaped_str;
+    e4__usize len = strlen(cursor);
+    const char *chunk;
+
+    #define _expect_chunk(s)    \
+        do {    \
+            chunk = e4__mem_strnescape(&cursor, &len, &chunk_len, buf); \
+            e4t__ASSERT(chunk); \
+            e4t__ASSERT_EQ(chunk_len, sizeof(s) - 1);   \
+            e4t__ASSERT(!e4__mem_strncasecmp(chunk, s, sizeof(s) - 1)); \
+        } while (0)
+
+    _expect_chunk("foo");
+    _expect_chunk("\a");
+    _expect_chunk("bar");
+    _expect_chunk("\b");
+    _expect_chunk(" some more ");
+    _expect_chunk("\033");
+    _expect_chunk("\f");
+    _expect_chunk("\n");
+    _expect_chunk("and still more");
+    _expect_chunk("\r\n");
+    _expect_chunk("and");
+    _expect_chunk("\n");
+    _expect_chunk("more");
+    _expect_chunk("\"");
+    _expect_chunk("\r");
+    _expect_chunk("\t");
+    _expect_chunk("so long");
+    _expect_chunk("\v");
+    _expect_chunk("\0");
+    _expect_chunk("\"");
+    _expect_chunk("\\");
+    _expect_chunk("\xf3");
+    _expect_chunk("\\p");
+    _expect_chunk("\\xr9");
+    _expect_chunk("\\");
+
+    chunk = e4__mem_strnescape(&cursor, &len, &chunk_len, buf);
+    e4t__ASSERT_EQ(len, 0);
+    e4t__ASSERT_EQ(chunk, NULL);
+
+    chunk = e4__mem_strnescape(&cursor, &len, &chunk_len, buf);
+    e4t__ASSERT_EQ(len, 0);
+    e4t__ASSERT_EQ(chunk, NULL);
+
+    #undef _expect_chunk
+}
+
 void e4t__test_util(void)
 {
     e4t__test_util_math();
@@ -203,4 +259,5 @@ void e4t__test_util(void)
     e4t__test_util_numformat();
     e4t__test_util_numparse();
     e4t__test_util_wordparse();
+    e4t__test_util_strnescape();
 }
