@@ -38,8 +38,7 @@
 
 #define _e4__BUILTIN_LOOKAHEAD(t, w, l) \
     do {    \
-        e4__builtin_exec(t, e4__B_WORD, (e4__usize)' ');    \
-        w = (const char *)e4__stack_pop(t); \
+        w = e4__io_word(task, ' '); \
         if (!(l = (e4__u8)*w++)) {  \
             e4__exception_throw(t, e4__E_ZLNAME);   \
             e4__execute_ret(t);  \
