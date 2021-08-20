@@ -71,18 +71,16 @@ General Builtins
 - [DONE] Implement 2>R, 2R>, and 2R@.
 - [DONE] Use 2DUP, 2DROP, etc. where appropriate (in builtin
   definitons).
-- Implement COUNT, TYPE, .".
+- [DONE] Implement COUNT and TYPE.
+- Implement C", S", and ." (compile time semantics only) using LIT_STR
+  and LIT_CSTR along with padding to compile strings directly into
+  definitions.
 - Implement ABS.
 - Implement FILL.
 - Implement UNUSED.
-- Implement S", S\", and C". These words should use transient memory
-  (possibly just HERE) during runtime, but during compile time they
-  should compile a string directly into the definition as appropriate.
-  This can be achieved by including some word STRING (similar to LIT)
-  in the thread that pushes the subsequent counted string onto the
-  stack as appropriate and advances the instruction pointer. The
-  string should be compiled directly into the definition *with* end
-  padding to align.
+- Implement .", S", and C" run time semantics. These words should use
+  the designated transient memory buffers as necessary during runtime.
+- Implement S\".
 - Consider whether PARSE (or some e4__io_parse API) should be used for
   words like ." and S" to remove the 255 character length limitation
   imposed by using WORD.

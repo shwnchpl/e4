@@ -26,6 +26,7 @@
     _e4__BUILTIN_PROC_N(COLON, ":") \
     _e4__BUILTIN_PROC_N(COMMA, ",") \
     _e4__BUILTIN_PROC(CONSTANT) \
+    _e4__BUILTIN_THUNK(COUNT)   \
     _e4__BUILTIN_PROC(CR)   \
     _e4__BUILTIN_PROC(CREATE)   \
     _e4__BUILTIN_THUNK(DECIMAL) \
@@ -93,6 +94,7 @@
     _e4__BUILTIN_THUNK_N(TWO_STAR, "2*")    \
     _e4__BUILTIN_THUNK_N(TWO_STORE, "2!")   \
     _e4__BUILTIN_THUNK_N(TWO_SWAP, "2SWAP") \
+    _e4__BUILTIN_PROC(TYPE) \
     _e4__BUILTIN_PROC_N(U_DOT, "U.")  \
     _e4__BUILTIN_PROC_N(U_LESS_THAN, "U<")  \
     _e4__BUILTIN_PROC_F(UNLOOP, e4__F_COMPONLY) \

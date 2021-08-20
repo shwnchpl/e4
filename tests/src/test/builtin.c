@@ -249,7 +249,7 @@ static void e4t__test_builtin_immediate(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 55);
 }
 
-/* Covers . ? CR BASE EMIT PAD U. WORDS */
+/* Covers . ? CR BASE COUNT EMIT PAD TYPE U. WORDS */
 static void e4t__test_builtin_io(void)
 {
     /* XXX: Parts of this test only work correctly on a 64 bit
@@ -308,6 +308,18 @@ static void e4t__test_builtin_io(void)
     e4t__ASSERT_EQ(e4__stack_depth(task), 2);
     e4t__ASSERT_EQ(e4__stack_pop(task), 10);
     e4t__ASSERT_EQ(e4__stack_pop(task), 16);
+
+    /* Test COUNT and TYPE. */
+    e4__stack_push(task, (e4__cell)"hack the planet");
+    e4t__ASSERT_OK(e4__evaluate(task, "15 type", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "hack the planet");
+
+    e4__stack_push(task, (e4__cell)"\031I know you play the game.");
+    e4t__ASSERT_OK(e4__evaluate(task, "count 2dup type", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 25);
+    e4t__ASSERT_EQ(*((char *)e4__stack_pop(task)), 'I');
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "I know you play the game.");
 }
 
 /* Covers = < > <> 0< 0> 0<> 0= AND INVERT NEGATE OR U< U> XOR */

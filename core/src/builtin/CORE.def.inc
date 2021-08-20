@@ -198,6 +198,17 @@ static void e4__builtin_CONSTANT(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static const void *e4__builtin_COUNT[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_DUP],
+    &e4__BUILTIN_XT[e4__B_CHAR_PLUS],
+    &e4__BUILTIN_XT[e4__B_SWAP],
+    &e4__BUILTIN_XT[e4__B_C_FETCH],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
 static void e4__builtin_CR(struct e4__task *task, void *user)
 {
     e4__usize io_res;
@@ -1010,6 +1021,22 @@ static const void *e4__builtin_TWO_SWAP[] = {
     &e4__BUILTIN_XT[e4__B_EXIT],
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
+
+static void e4__builtin_TYPE(struct e4__task *task, void *user)
+{
+    register e4__cell addr, u;
+    register e4__usize io_res;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    u = e4__stack_pop(task);
+    addr = e4__stack_pop(task);
+
+    if ((io_res = e4__io_type(task, (const char *)addr, (e4__usize)u)))
+        e4__exception_throw(task, io_res);
+
+    e4__execute_ret(task);
+}
 
 static void e4__builtin_U_DOT(struct e4__task *task, void *user)
 {
