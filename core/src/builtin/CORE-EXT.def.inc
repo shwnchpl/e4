@@ -185,6 +185,22 @@ static void e4__builtin_ROLL(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_S_BACKSLASH_QUOTE(struct e4__task *task, void *user)
+{
+    const char *str;
+    register e4__usize len;
+
+    len = e4__io_parse(task, '"', e4__F_IGNORE_ESC, &str);
+
+    if (e4__task_compiling(task)) {
+        e4__compile_estr(task, str, len);
+    }
+
+    /* FIXME: Handle runtime semantics. */
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_TO(struct e4__task *task, void *user)
 {
     register const char *word;

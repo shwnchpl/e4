@@ -62,6 +62,27 @@ void e4__compile_cstr(struct e4__task *task, const char *str, e4__u8 len)
     task->here = (e4__cell)e4__mem_aligned((e4__usize)task->here + len + 1);
 }
 
+void e4__compile_estr(struct e4__task *task, const char *str, e4__usize len)
+{
+    const char *chunk;
+    e4__usize chunk_len;
+    char scratch[2];
+    char *buffer = (char *)(task->here + 2);
+
+    /* Copy the string to the correct position *first*, since we may be
+       about to write over it. */
+    while ((chunk = e4__mem_strnescape(&str, &len, &chunk_len, scratch))) {
+        memmove(buffer, chunk, chunk_len);
+        buffer += chunk_len;
+    }
+
+    len = buffer - (const char *)(task->here + 2);
+
+    e4__DEREF(task->here++) = (e4__cell)&e4__BUILTIN_XT[e4__B_LIT_STR];
+    e4__DEREF(task->here++) = (e4__cell)len;
+    task->here = (e4__cell)e4__mem_aligned((e4__usize)task->here + len);
+}
+
 e4__usize e4__compile_finish(struct e4__task *task)
 {
     /* Resume compilation if it has been suspended. If it hasn't, this

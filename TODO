@@ -75,7 +75,7 @@ General Builtins
 - [DONE] Implement C", S", and ." (compile time semantics only).
 - [DONE] Implement C", S", and ." compile time semantics in terms of
   e4__io_parse.
-- Implement S\" compile time semantics.
+- [DONE] Implement S\" compile time semantics.
 - Implement .( and ." run time semantics.
 - Implement S\", S", S\", and C" run time semantics. These words should
   use the designated transient memory buffers as necessary during

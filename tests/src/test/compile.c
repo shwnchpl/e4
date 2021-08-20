@@ -316,6 +316,8 @@ static void e4t__test_compile_string(void)
             ": string-foo s\" Some normal string.\" ;", -1));
     e4t__ASSERT_OK(e4__evaluate(task,
             ": printed-foo .\" Some printed string.\" ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": escaped-foo s\\\" Some escaped string.\" ;", -1));
 
     /* Test that the results of that compilation are as expected. */
     e4t__ASSERT_OK(e4__evaluate(task, "counted-foo", -1));
@@ -333,12 +335,19 @@ static void e4t__test_compile_string(void)
     e4t__ASSERT_OK(e4__evaluate(task, "printed-foo", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "Some printed string.");
 
+    e4t__ASSERT_OK(e4__evaluate(task, "escaped-foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 20);
+    str = (const char *)e4__stack_pop(task);
+    e4t__ASSERT(!e4__mem_strncasecmp(str, "Some escaped string.", 20));
+
     /* Test that zero length strings behave correctly. */
     e4t__ASSERT_OK(e4__evaluate(task, "forget counted-foo", -1));
 
     e4t__ASSERT_OK(e4__evaluate(task, ": foo c\" \" ;", -1));
     e4t__ASSERT_OK(e4__evaluate(task, ": bar s\" \" ;", -1));
     e4t__ASSERT_OK(e4__evaluate(task, ": bas .\" \" ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, ": quux s\\\" \" ;", -1));
 
     e4t__ASSERT_OK(e4__evaluate(task, "foo count", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 2);
@@ -352,6 +361,22 @@ static void e4t__test_compile_string(void)
 
     e4t__ASSERT_OK(e4__evaluate(task, "bas", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "");
+
+    e4t__ASSERT_OK(e4__evaluate(task, "quux", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4__stack_clear(task);
+
+    /* Test that escaped strings are escaped correctly. */
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": escaped-str s\\\" This is an \\\"escaped\\\" string\\r\\n"
+            "\\x4F\\x48 YEAH!\" ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "escaped-str", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 37);
+    str = (const char *)e4__stack_pop(task);
+    e4t__ASSERT(!e4__mem_strncasecmp(str,
+            "This is an \"escaped\" string\r\nOH YEAH!", 37));
 }
 
 static void e4t__test_compile_suspendresume(void)

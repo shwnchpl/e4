@@ -287,6 +287,7 @@ enum e4__builtin_id {
     e4__B_QUESTION_DO,
     e4__B_REFILL,
     e4__B_ROLL,
+    e4__B_S_BACKSLASH_QUOTE,
     e4__B_TO,
     e4__B_TRUE,
     e4__B_TUCK,
@@ -367,6 +368,7 @@ void e4__compile_cancel(struct e4__task *task);
 void e4__compile_cell(struct e4__task *task, e4__cell cell);
 void e4__compile_char(struct e4__task *task, e4__cell cell);
 void e4__compile_cstr(struct e4__task *task, const char *str, e4__u8 len);
+void e4__compile_estr(struct e4__task *task, const char *str, e4__usize len);
 e4__usize e4__compile_finish(struct e4__task *task);
 void e4__compile_literal(struct e4__task *task, e4__cell num);
 void e4__compile_resume(struct e4__task *task);
