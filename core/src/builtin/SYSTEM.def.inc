@@ -40,6 +40,18 @@ static void e4__builtin_CLEAR(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_LIT_CELL(struct e4__task *task, void *user)
+{
+    /* Since we're manipulating rp directly rather than calling
+       e4__execute_ret, ensure that we aren't going to underflow. */
+    _e4__BUILTIN_EXPECT_RDEPTH(task, 1);
+
+    e4__stack_push(task, e4__DEREF2(++task->rp));
+    task->ip = e4__DEREF(task->rp) + 1;
+
+    /* e4__execute_ret intentionally omitted. */
+}
+
 static void e4__builtin_LIT_DOES(struct e4__task *task, void *user)
 {
     e4__usize res;
