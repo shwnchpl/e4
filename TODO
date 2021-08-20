@@ -37,6 +37,7 @@ Compilation
 - [DONE] Implement LITERAL.
 - [DONE] Implement [ and ].
 - [DONE] Implement MARKER.
+- [DONE] Implement LIT_CSTR and LIT_STR.
 - Add POSTPONE and IMMEDIATE words.
 - Consider adding a COMPILE-ONLY/RESTRICT word.
 - Check for nested compilation everywhere relevant.
@@ -70,7 +71,7 @@ General Builtins
 - [DONE] Implement 2>R, 2R>, and 2R@.
 - [DONE] Use 2DUP, 2DROP, etc. where appropriate (in builtin
   definitons).
-- Implement COUNT, TYPE, .", and some sort of STRING_LIT builtin.
+- Implement COUNT, TYPE, .".
 - Implement ABS.
 - Implement FILL.
 - Implement UNUSED.
@@ -82,6 +83,9 @@ General Builtins
   stack as appropriate and advances the instruction pointer. The
   string should be compiled directly into the definition *with* end
   padding to align.
+- Consider whether PARSE (or some e4__io_parse API) should be used for
+  words like ." and S" to remove the 255 character length limitation
+  imposed by using WORD.
 - Implement EVALUATE (builtin)
 - Implement THROW and CATCH builtins.
 - Make IMMEDIATE/COMPONLY flag specification order consistent in

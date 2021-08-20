@@ -297,7 +297,9 @@ enum e4__builtin_id {
     e4__B_BRANCH0,
     e4__B_CLEAR,
     e4__B_LIT_CELL,
+    e4__B_LIT_CSTR,
     e4__B_LIT_DOES,
+    e4__B_LIT_STR,
     e4__B_SENTINEL,
 
     /* TOOLS words */

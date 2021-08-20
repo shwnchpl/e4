@@ -52,6 +52,32 @@ static void e4__builtin_LIT_CELL(struct e4__task *task, void *user)
     /* e4__execute_ret intentionally omitted. */
 }
 
+static void e4__builtin_LIT_CSTR(struct e4__task *task, void *user)
+{
+    register e4__usize len;
+    register e4__cell str;
+
+    /* Since we're manipulating rp directly rather than calling
+       e4__execute_ret, ensure that we aren't going to underflow. */
+    _e4__BUILTIN_EXPECT_RDEPTH(task, 1);
+
+    str = e4__DEREF(++task->rp);
+    len = (e4__usize)*((char *)str) + 1;
+
+    /* Advance ip beyond the count and the string. This is similar
+       to BRANCH, but the length of the string is in characters rather
+       than cells so we need to account for that and align. */
+    task->ip = str + (len / sizeof(e4__cell));
+    if (len % sizeof(e4__cell))
+        ++task->ip;
+
+    /* With that out of the way, push the address of the beginning
+       of the string and the length of the string onto the stack. */
+    e4__stack_push(task, str);
+
+    /* e4__execute_ret intentionally omitted. */
+}
+
 static void e4__builtin_LIT_DOES(struct e4__task *task, void *user)
 {
     e4__usize res;
@@ -82,6 +108,33 @@ static void e4__builtin_LIT_DOES(struct e4__task *task, void *user)
        return as we would have at the end of threaded_execute of the
        word containing LIT_DOES. */
     task->ip = (e4__cell)_e4__BUILTIN_RETURN_THUNK;
+
+    /* e4__execute_ret intentionally omitted. */
+}
+
+static void e4__builtin_LIT_STR(struct e4__task *task, void *user)
+{
+    register e4__usize len;
+    register e4__cell str;
+
+    /* Since we're manipulating rp directly rather than calling
+       e4__execute_ret, ensure that we aren't going to underflow. */
+    _e4__BUILTIN_EXPECT_RDEPTH(task, 1);
+
+    len = (e4__usize)e4__DEREF2(++task->rp);
+    str = e4__DEREF(task->rp) + 1;
+
+    /* Advance ip beyond the string. This is similar to BRANCH, but
+       the length of the string is in characters rather than cells
+       so we need to account for that and align. */
+    task->ip = str + (len / sizeof(e4__cell));
+    if (len % sizeof(e4__cell))
+        ++task->ip;
+
+    /* With that out of the way, push the address of the beginning
+       of the string and the length of the string onto the stack. */
+    e4__stack_push(task, str);
+    e4__stack_push(task, (e4__cell)len);
 
     /* e4__execute_ret intentionally omitted. */
 }

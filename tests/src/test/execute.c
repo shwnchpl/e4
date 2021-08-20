@@ -1,6 +1,8 @@
 #include "e4.h"
 #include "../e4t.h" /* FIXME: Add this to an include path? */
 
+#include <string.h>
+
 static void e4t__test_execute_branch(void)
 {
     static const void *branch_skip[] = {
@@ -248,6 +250,58 @@ static void e4t__test_execute_nested(void)
     e4t__ASSERT_EQ(e4__stack_depth(task), 0);
 }
 
+/* Covers string literals. */
+static void e4t__test_execute_string(void)
+{
+    /* XXX: Parts of this test only work correctly on a 64 bit
+       system. */
+
+    static const char *hello = "'ello guv'nor";
+    static const char *minimum = "\030rice and beans, at least";
+    struct e4__task *task = e4t__transient_task();
+    const void *push_hello5[] = {
+        e4__execute_threaded,
+        NULL,
+        &e4__BUILTIN_XT[e4__B_LIT_STR],
+        (void *)13,
+        NULL, /* padding */
+        NULL, /* padding */
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
+        (void *)5,
+        &e4__BUILTIN_XT[e4__B_EXIT],
+        &e4__BUILTIN_XT[e4__B_SENTINEL]
+    };
+    const void *push_minimum7[] = {
+        e4__execute_threaded,
+        NULL,
+        &e4__BUILTIN_XT[e4__B_LIT_CSTR],
+        NULL, /* padding */
+        NULL, /* padding */
+        NULL, /* padding */
+        NULL, /* padding */
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
+        (void *)7,
+        &e4__BUILTIN_XT[e4__B_EXIT],
+        &e4__BUILTIN_XT[e4__B_SENTINEL]
+    };
+
+    /* Test that a regular string works as expected. */
+    memcpy(&push_hello5[4], hello, 13);
+    e4__execute(task, push_hello5);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 3);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 13);
+    e4t__ASSERT(!e4__mem_strncasecmp((const char *)e4__stack_pop(task),
+            hello, 13));
+
+    /* Test that a counted string works as expected. */
+    memcpy(&push_minimum7[3], minimum, 25);
+    e4__execute(task, push_minimum7);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 7);
+    e4t__ASSERT(!memcmp(e4__stack_pop(task), minimum, 25));
+}
+
 static void e4t__test_execute_userfunc_setter(struct e4__task *task,
         void *user)
 {
@@ -281,5 +335,6 @@ void e4t__test_execute(void)
     e4t__test_execute_defer();
     e4t__test_execute_does();
     e4t__test_execute_nested();
+    e4t__test_execute_string();
     e4t__test_execute_userfunc();
 }
