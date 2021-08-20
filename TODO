@@ -73,15 +73,16 @@ General Builtins
   definitons).
 - [DONE] Implement COUNT and TYPE.
 - [DONE] Implement C", S", and ." (compile time semantics only).
+- [DONE] Implement C", S", and ." compile time semantics in terms of
+  e4__io_parse.
+- Implement S\" compile time semantics.
+- Implement .( and ." run time semantics.
+- Implement S\", S", S\", and C" run time semantics. These words should
+  use the designated transient memory buffers as necessary during
+  runtime.
 - Implement ABS.
 - Implement FILL.
 - Implement UNUSED.
-- Implement .", S", and C" run time semantics. These words should use
-  the designated transient memory buffers as necessary during runtime.
-- Implement S\".
-- Consider whether PARSE (or some e4__io_parse API) should be used for
-  words like ." and S" to remove the 255 character length limitation
-  imposed by using WORD.
 - Implement EVALUATE (builtin)
 - Implement THROW and CATCH builtins.
 - Make IMMEDIATE/COMPONLY flag specification order consistent in

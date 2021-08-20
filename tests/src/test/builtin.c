@@ -1146,6 +1146,16 @@ static void e4t__test_builtin_stackmanip(void)
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 30 40 10 20 ");
 }
 
+/* Covers .( ." C" S" S\" run time semantics */
+static void e4t__test_builtin_string(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* FIXME: Add run time string semantic tests here. */
+
+    (void)task;
+}
+
 /* Covers BASE HERE PAD */
 static void e4t__test_builtin_uservars(void)
 {
@@ -1182,5 +1192,6 @@ void e4t__test_builtin(void)
     e4t__test_builtin_parseword();
     e4t__test_builtin_rstackmanip();
     e4t__test_builtin_stackmanip();
+    e4t__test_builtin_string();
     e4t__test_builtin_uservars();
 }

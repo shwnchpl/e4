@@ -332,6 +332,26 @@ static void e4t__test_compile_string(void)
 
     e4t__ASSERT_OK(e4__evaluate(task, "printed-foo", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "Some printed string.");
+
+    /* Test that zero length strings behave correctly. */
+    e4t__ASSERT_OK(e4__evaluate(task, "forget counted-foo", -1));
+
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo c\" \" ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, ": bar s\" \" ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, ": bas .\" \" ;", -1));
+
+    e4t__ASSERT_OK(e4__evaluate(task, "foo count", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4__stack_clear(task);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "bar", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4__stack_clear(task);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "bas", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "");
 }
 
 static void e4t__test_compile_suspendresume(void)
