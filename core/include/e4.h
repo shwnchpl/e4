@@ -428,6 +428,8 @@ void e4__execute_variable(struct e4__task *task, void *user);
 /* io.c functions */
 e4__usize e4__io_accept(struct e4__task *task, char *buf, e4__usize *n);
 e4__usize e4__io_key(struct e4__task *task, void *buf);
+e4__usize e4__io_parse(struct e4__task *task, char delim, e4__usize flags,
+        const char **out);
 e4__usize e4__io_refill(struct e4__task *task, e4__usize *bf);
 e4__usize e4__io_type(struct e4__task *task, const char *buf, e4__usize n);
 char* e4__io_word(struct e4__task *task, char delim);

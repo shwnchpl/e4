@@ -160,6 +160,7 @@ static void e4t__test_kernel_io(void)
     struct e4__task *task = e4t__transient_task();
     struct e4__io_func io_func = {0,};
     const char *word;
+    e4__usize len;
 
     /* FIXME: Add more IO tests. */
 
@@ -192,6 +193,30 @@ static void e4t__test_kernel_io(void)
 
     e4t__ASSERT((word = e4__io_word(task, ' ')));
     e4t__ASSERT_EQ(*word++, 0);
+
+    /* Test the e4__io_parse API. */
+    e4t__term_ibuf_feed("  first s\" \"\"foo bar\\\" bas\" quux", -1);
+    e4__io_refill(task, NULL);
+
+    len = e4__io_parse(task, ' ', e4__F_SKIP_LEADING, &word);
+    e4t__ASSERT_EQ(len, 5);
+    e4t__ASSERT(!e4__mem_strncasecmp(word, "first", 5));
+
+    len = e4__io_parse(task, ' ', e4__F_SKIP_LEADING, &word);
+    e4t__ASSERT_EQ(len, 2);
+    e4t__ASSERT(!e4__mem_strncasecmp(word, "s\"", 2));
+
+    len = e4__io_parse(task, '"', 0, &word);
+    e4t__ASSERT_EQ(len, 0);
+
+    len = e4__io_parse(task, '"', e4__F_SKIP_LEADING | e4__F_IGNORE_ESC,
+            &word);
+    e4t__ASSERT_EQ(len, 13);
+    e4t__ASSERT(!e4__mem_strncasecmp(word, "foo bar\\\" bas", 13));
+
+    len = e4__io_parse(task, ' ', e4__F_SKIP_LEADING, &word);
+    e4t__ASSERT_EQ(len, 4);
+    e4t__ASSERT(!e4__mem_strncasecmp(word, "quux", 4));
 }
 
 static e4__usize e4t__test_kernel_quit_accept(void *user, char *buf,
