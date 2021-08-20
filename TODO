@@ -37,10 +37,6 @@ Compilation
 - [DONE] Implement LITERAL.
 - [DONE] Implement [ and ].
 - [DONE] Implement MARKER.
-- Implement some system +LOOP word that executes LOOP/LOOP+ execution
-  semantics to save RAM space? This can be done using the same
-  return stack manipulation techniques used for words like R@ and J.
-- Add conditional structure words CASE OF ENDCASE ENDOF etc.
 - Add POSTPONE and IMMEDIATE words.
 - Consider adding a COMPILE-ONLY/RESTRICT word.
 - Check for nested compilation everywhere relevant.
@@ -72,8 +68,11 @@ General Builtins
 - [DONE] Implement 2DUP, 2DROP, 2OVER, 2SWAP.
 - [DONE] Implement 2!, 2@, and +!.
 - [DONE] Implement 2>R, 2R>, and 2R@.
-- Use 2DUP, 2DROP, etc. where appropriate (in builtin definitons).
+- [DONE] Use 2DUP, 2DROP, etc. where appropriate (in builtin
+  definitons).
 - Implement COUNT, TYPE, .", and some sort of STRING_LIT builtin.
+- Implement ABS.
+- Implement FILL.
 - Implement UNUSED.
 - Implement S", S\", and C". These words should use transient memory
   (possibly just HERE) during runtime, but during compile time they
@@ -144,6 +143,7 @@ Version 0.3
 
 Compilation
 -----------
+- Add conditional structure words CASE OF ENDCASE ENDOF etc.
 - Implement decompilation (ie. SEE). This only needs to work for words
   defined with execute_threaded to start; everything else can just
   display "builtin." The key way that this can be achieved is by
@@ -198,6 +198,9 @@ Version 0.9
 Compilation
 -----------
 - Implement AHEAD?
+- Implement some system +LOOP word that executes LOOP/LOOP+ execution
+  semantics to save RAM space? This can be done using the same
+  return stack manipulation techniques used for words like R@ and J.
 
 Documentation
 -------------

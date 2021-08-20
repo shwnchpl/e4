@@ -148,12 +148,8 @@ static void e4__builtin_PICK(struct e4__task *task, void *user)
 
 static void e4__builtin_QUESTION_DO(struct e4__task *task, void *user)
 {
-    /* FIXME: Use 2DUP once available. */
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_OVER]);
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_OVER]);
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_SWAP]);
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TO_R]);
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TO_R]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TWO_DUP]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TWO_TO_R]);
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_EQUALS]);
 
     e4__stack_push(task, task->here);

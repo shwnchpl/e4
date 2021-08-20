@@ -464,7 +464,6 @@ static void e4__builtin_LIT_CELL(struct e4__task *task, void *user)
        e4__execute_ret, ensure that we aren't going to underflow. */
     _e4__BUILTIN_EXPECT_RDEPTH(task, 1);
 
-    /* FIXME: Add compilation semantics for this word. */
     e4__stack_push(task, e4__DEREF2(++task->rp));
     task->ip = e4__DEREF(task->rp) + 1;
 
@@ -483,14 +482,9 @@ static void e4__builtin_LITERAL(struct e4__task *task, void *user)
 static const void *e4__builtin_LOOP[] = {
     e4__execute_threaded,
     NULL,
-    /* FIXME: Use COMPILE, or actually correctly implemented LITERAL
-       instead here. */
-    &e4__BUILTIN_XT[e4__B_LIT_CELL],
-    &e4__BUILTIN_XT[e4__B_LIT_CELL],
-    &e4__BUILTIN_XT[e4__B_COMMA],
     &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)1,
-    &e4__BUILTIN_XT[e4__B_COMMA],
+    &e4__BUILTIN_XT[e4__B_LITERAL],
     &e4__BUILTIN_XT[e4__B_PLUS_LOOP],
     &e4__BUILTIN_XT[e4__B_EXIT],
     &e4__BUILTIN_XT[e4__B_SENTINEL]
@@ -646,15 +640,14 @@ static void e4__builtin_PLUS_LOOP(struct e4__task *task, void *user)
 
     _e4__BUILTIN_EXPECT_REF(task, 1);
 
-    /* FIXME: Replace with 2DUP, and 2DROP when available? */
+    /* FIXME: Consider replacing with some META_LOOP word to decrease
+       the size of copmiled code? */
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_R_FROM]);
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_PLUS]);
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_R_FROM]);
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_OVER]);
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_OVER]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TWO_DUP]);
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TO_R]);
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TO_R]);
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_SWAP]);
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_EQUALS]);
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_BRANCH]);
 
@@ -669,10 +662,7 @@ static void e4__builtin_PLUS_LOOP(struct e4__task *task, void *user)
         ++ref;
     }
 
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_R_FROM]);
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_R_FROM]);
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_DROP]);
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_DROP]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_UNLOOP]);
 
     e4__execute_ret(task);
 
