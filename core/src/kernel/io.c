@@ -31,6 +31,8 @@ e4__usize e4__io_refill(struct e4__task *task, e4__usize *bf)
         return e4__E_OK;
     }
 
+    task->io_src.in = 0;
+
     /* Attempt to read the entire buffer. */
     task->io_src.length = task->io_src.sz;
     io_res = e4__io_accept(task, (char *)task->io_src.buffer,

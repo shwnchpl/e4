@@ -159,6 +159,7 @@ static void e4t__test_kernel_io(void)
 {
     struct e4__task *task = e4t__transient_task();
     struct e4__io_func io_func = {0,};
+    const char *word;
 
     /* FIXME: Add more IO tests. */
 
@@ -170,6 +171,27 @@ static void e4t__test_kernel_io(void)
     e4t__ASSERT_EQ(e4__io_key(task, NULL), e4__E_UNSUPPORTED);
     e4t__ASSERT_EQ(e4__io_accept(task, NULL, 0), e4__E_UNSUPPORTED);
     e4t__ASSERT_EQ(e4__io_type(task, NULL, 0), e4__E_UNSUPPORTED);
+
+    task = e4t__transient_task();
+
+    /* Test the e4__io_word API. */
+    e4t__term_ibuf_feed("parse      some  words  ", -1);
+    e4__io_refill(task, NULL);
+
+    e4t__ASSERT((word = e4__io_word(task, ' ')));
+    e4t__ASSERT_EQ(*word++, 5);
+    e4t__ASSERT(!e4__mem_strncasecmp(word, "parse", 5));
+
+    e4t__ASSERT((word = e4__io_word(task, ' ')));
+    e4t__ASSERT_EQ(*word++, 4);
+    e4t__ASSERT(!e4__mem_strncasecmp(word, "some", 4));
+
+    e4t__ASSERT((word = e4__io_word(task, ' ')));
+    e4t__ASSERT_EQ(*word++, 5);
+    e4t__ASSERT(!e4__mem_strncasecmp(word, "words", 4));
+
+    e4t__ASSERT((word = e4__io_word(task, ' ')));
+    e4t__ASSERT_EQ(*word++, 0);
 }
 
 static e4__usize e4t__test_kernel_quit_accept(void *user, char *buf,
