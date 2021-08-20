@@ -172,8 +172,16 @@ e4__usize e4__mem_parse(const char *buf, char delim, e4__usize sz,
     /* FIXME: Consider wrapping the end on newline behavior around some
        kind of flag. */
     length = 0;
-    while (sz && *buf != delim && *buf != '\n')
+    while (sz && *buf != delim && *buf != '\n') {
         ++buf, --sz, ++length;
+
+        /* XXX: For the purposes of this implementation, only single
+           characters may be escaped and any character may be escaped.
+           \ may not be used for any other purpose, including as
+           delimiter, in such strings. */
+        if ((flags & e4__F_IGNORE_ESC) && sz && buf[-1] == '\\')
+            ++buf, --sz, ++length;
+    }
 
     return length;
 }

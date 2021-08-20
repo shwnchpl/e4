@@ -187,6 +187,12 @@ static void e4t__test_util_wordparse(void)
     len = _p("  foo.bar", ' ', 0);
     e4t__ASSERT_EQ(len, 0);
 
+    e4t__ASSERT_EQ((len = _p("foo\\\"bar\" bas", '"', 0)), 4);
+    e4t__ASSERT(!e4__mem_strncasecmp(word, "foo\\\"", len));
+
+    e4t__ASSERT_EQ((len = _p("foo\\\"bar\" bas", '"', e4__F_IGNORE_ESC)), 8);
+    e4t__ASSERT(!e4__mem_strncasecmp(word, "foo\\\"bar", len));
+
     #undef _p
 }
 

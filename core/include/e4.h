@@ -153,6 +153,7 @@ struct e4__io_func {
 
 /* flag constants - word parsing */
 #define e4__F_SKIP_LEADING  (0x01)
+#define e4__F_IGNORE_ESC    (0x02)
 
 /* boolean flags */
 #define e4__BF_TRUE         ((e4__usize)-1)
