@@ -72,9 +72,7 @@ General Builtins
 - [DONE] Use 2DUP, 2DROP, etc. where appropriate (in builtin
   definitons).
 - [DONE] Implement COUNT and TYPE.
-- Implement C", S", and ." (compile time semantics only) using LIT_STR
-  and LIT_CSTR along with padding to compile strings directly into
-  definitions.
+- [DONE] Implement C", S", and ." (compile time semantics only).
 - Implement ABS.
 - Implement FILL.
 - Implement UNUSED.

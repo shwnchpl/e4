@@ -18,6 +18,7 @@
            e4__F_IMMEDIATE | e4__F_COMPONLY)   \
     _e4__BUILTIN_PROC_N(C_COMMA, "C,")  \
     _e4__BUILTIN_PROC_N(C_FETCH, "C@")  \
+    _e4__BUILTIN_PROC_NF(C_QUOTE, "C\"", e4__F_IMMEDIATE)   \
     _e4__BUILTIN_PROC_N(C_STORE, "C!")  \
     _e4__BUILTIN_THUNK(CELLS)   \
     _e4__BUILTIN_THUNK_N(CELL_PLUS, "CELL+")    \
@@ -34,6 +35,7 @@
     _e4__BUILTIN_PROC_F(DO, e4__F_COMPONLY | e4__F_IMMEDIATE)   \
     _e4__BUILTIN_PROC_NF(DOES, "DOES>", e4__F_IMMEDIATE)    \
     _e4__BUILTIN_PROC_N(DOT, ".")    \
+    _e4__BUILTIN_PROC_NF(DOT_QUOTE, ".\"", e4__F_IMMEDIATE) \
     _e4__BUILTIN_PROC(DROP) \
     _e4__BUILTIN_PROC(DUP)  \
     _e4__BUILTIN_PROC_F(ELSE, e4__F_COMPONLY | e4__F_IMMEDIATE) \
@@ -75,6 +77,7 @@
     _e4__BUILTIN_PROC_NF(RIGHT_BRACKET, "]", e4__F_IMMEDIATE)   \
     _e4__BUILTIN_PROC(ROT)  \
     _e4__BUILTIN_PROC(RSHIFT)   \
+    _e4__BUILTIN_PROC_NF(S_QUOTE, "S\"", e4__F_IMMEDIATE)   \
     _e4__BUILTIN_PROC_NF(SEMICOLON, ";", e4__F_IMMEDIATE | e4__F_COMPONLY)  \
     _e4__BUILTIN_THUNK_N(SLASH, "/")    \
     _e4__BUILTIN_PROC_N(SLASH_MOD, "/MOD") \

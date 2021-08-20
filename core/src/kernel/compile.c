@@ -1,6 +1,8 @@
 #include "e4.h"
 #include "e4-internal.h"
 
+#include <string.h>
+
 #define _e4__COMP_ANONYMOUS  ( 4 )
 
 void e4__compile_cancel(struct e4__task *task)
@@ -48,6 +50,16 @@ void e4__compile_char(struct e4__task *task, e4__cell cell)
     register e4__u8 *c = (e4__u8 *)task->here;
     *c++ = (e4__u8)((e4__usize)cell & 0xff);
     task->here = (e4__cell)c;
+}
+
+void e4__compile_cstr(struct e4__task *task, const char *str, e4__u8 len)
+{
+    /* Copy the string to the correct position *first*, since we may be
+       about to write over it. */
+    memmove(((e4__u8 *)(task->here + 1)) + 1, str, len);
+    e4__DEREF(task->here++) = (e4__cell)&e4__BUILTIN_XT[e4__B_LIT_CSTR];
+    *((e4__u8 *)task->here) = len;
+    task->here = (e4__cell)e4__mem_aligned((e4__usize)task->here + len + 1);
 }
 
 e4__usize e4__compile_finish(struct e4__task *task)
@@ -123,6 +135,16 @@ void e4__compile_start(struct e4__task *task, struct e4__execute_token *xt,
     task->compile.s0 = task->sp;
     task->compile.here0 = task->here;
     task->compile.xt = xt;
+}
+
+void e4__compile_str(struct e4__task *task, const char *str, e4__usize len)
+{
+    /* Copy the string to the correct position *first*, since we may be
+       about to write over it. */
+    memmove(task->here + 2, str, len);
+    e4__DEREF(task->here++) = (e4__cell)&e4__BUILTIN_XT[e4__B_LIT_STR];
+    e4__DEREF(task->here++) = (e4__cell)len;
+    task->here = (e4__cell)e4__mem_aligned((e4__usize)task->here + len);
 }
 
 void e4__compile_suspend(struct e4__task *task)

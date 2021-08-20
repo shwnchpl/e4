@@ -178,6 +178,7 @@ enum e4__builtin_id {
     e4__B_BRACKET_TICK,
     e4__B_C_COMMA,
     e4__B_C_FETCH,
+    e4__B_C_QUOTE,
     e4__B_C_STORE,
     e4__B_CELLS,
     e4__B_CELL_PLUS,
@@ -194,6 +195,7 @@ enum e4__builtin_id {
     e4__B_DO,
     e4__B_DOES,
     e4__B_DOT,
+    e4__B_DOT_QUOTE,
     e4__B_DROP,
     e4__B_DUP,
     e4__B_ELSE,
@@ -235,6 +237,7 @@ enum e4__builtin_id {
     e4__B_RIGHT_BRACKET,
     e4__B_ROT,
     e4__B_RSHIFT,
+    e4__B_S_QUOTE,
     e4__B_SEMICOLON,
     e4__B_SLASH,
     e4__B_SLASH_MOD,
@@ -362,11 +365,13 @@ void e4__builtin_exec_(e4__usize count, /* struct e4__task *task, */
 void e4__compile_cancel(struct e4__task *task);
 void e4__compile_cell(struct e4__task *task, e4__cell cell);
 void e4__compile_char(struct e4__task *task, e4__cell cell);
+void e4__compile_cstr(struct e4__task *task, const char *str, e4__u8 len);
 e4__usize e4__compile_finish(struct e4__task *task);
 void e4__compile_literal(struct e4__task *task, e4__cell num);
 void e4__compile_resume(struct e4__task *task);
 void e4__compile_start(struct e4__task *task, struct e4__execute_token *xt,
         e4__usize mode);
+void e4__compile_str(struct e4__task *task, const char *str, e4__usize len);
 void e4__compile_suspend(struct e4__task *task);
 
 /* dict.c functions */

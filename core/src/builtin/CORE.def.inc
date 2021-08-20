@@ -111,6 +111,23 @@ static void e4__builtin_C_FETCH(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_C_QUOTE(struct e4__task *task, void *user)
+{
+    register const char *str;
+    register e4__u8 len;
+
+    str = e4__io_word(task, '"');
+    len = (e4__u8)*str++;
+
+    if (e4__task_compiling(task)) {
+        e4__compile_cstr(task, str, len);
+    }
+
+    /* FIXME: Handle runtime semantics. */
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_C_STORE(struct e4__task *task, void *user)
 {
     register e4__u8 *c, v;
@@ -308,6 +325,24 @@ static void e4__builtin_DOT(struct e4__task *task, void *user)
 
     if ((io_res = e4__io_type(task, num, len)))
         e4__exception_throw(task, io_res);
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_DOT_QUOTE(struct e4__task *task, void *user)
+{
+    register const char *str;
+    register e4__usize len;
+
+    str = e4__io_word(task, '"');
+    len = (e4__usize)*str++;
+
+    if (e4__task_compiling(task)) {
+        e4__compile_str(task, str, len);
+        e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TYPE]);
+    }
+
+    /* FIXME: Handle runtime semantics. */
 
     e4__execute_ret(task);
 }
@@ -759,6 +794,23 @@ static void e4__builtin_REPEAT(struct e4__task *task, void *user)
 
     ref = e4__stack_pop(task);
     e4__DEREF(ref) = (e4__cell)(task->here - ref);
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_S_QUOTE(struct e4__task *task, void *user)
+{
+    register const char *str;
+    register e4__usize len;
+
+    str = e4__io_word(task, '"');
+    len = (e4__usize)*str++;
+
+    if (e4__task_compiling(task)) {
+        e4__compile_str(task, str, len);
+    }
+
+    /* FIXME: Handle runtime semantics. */
 
     e4__execute_ret(task);
 }

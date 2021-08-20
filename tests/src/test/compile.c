@@ -301,6 +301,39 @@ static void e4t__test_compile_recursive(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 120);
 }
 
+/* Covers ." C" S" compile time semantics */
+static void e4t__test_compile_string(void)
+{
+    struct e4__task *task = e4t__transient_task();
+    const char *str;
+
+    e4t__term_obuf_consume();
+
+    /* Test that string compilation is possible. */
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": counted-foo c\" Some counted string.\" ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": string-foo s\" Some normal string.\" ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": printed-foo .\" Some printed string.\" ;", -1));
+
+    /* Test that the results of that compilation are as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task, "counted-foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    str = (const char *)e4__stack_pop(task);
+    e4t__ASSERT_EQ(*str++, 20);
+    e4t__ASSERT(!e4__mem_strncasecmp(str, "Some counted string.", 20));
+
+    e4t__ASSERT_OK(e4__evaluate(task, "string-foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 19);
+    str = (const char *)e4__stack_pop(task);
+    e4t__ASSERT(!e4__mem_strncasecmp(str, "Some normal string.", 19));
+
+    e4t__ASSERT_OK(e4__evaluate(task, "printed-foo", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "Some printed string.");
+}
+
 static void e4t__test_compile_suspendresume(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -512,6 +545,7 @@ void e4t__test_compile(void)
     e4t__test_compile_noname();
     e4t__test_compile_recursive();
     e4t__test_compile_suspendresume();
+    e4t__test_compile_string();
     e4t__test_compile_do_loop();
     e4t__test_compile_while_loop();
 }
