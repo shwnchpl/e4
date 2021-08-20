@@ -46,6 +46,23 @@ static void e4__builtin_DOT_S(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_DUMP(struct e4__task *task, void *user)
+{
+    register e4__cell addr;
+    register e4__usize len;
+    register e4__usize io_res;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    len = (e4__usize)e4__stack_pop(task);
+    addr = e4__stack_pop(task);
+
+    if ((io_res = e4__io_dump(task, addr, len)))
+        e4__exception_throw(task, io_res);
+
+    e4__execute_ret(task);
+}
+
 static const void *e4__builtin_QUESTION[] = {
     e4__execute_threaded,
     NULL,

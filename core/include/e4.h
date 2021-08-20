@@ -311,6 +311,7 @@ enum e4__builtin_id {
 
     /* TOOLS words */
     e4__B_DOT_S,
+    e4__B_DUMP,
     e4__B_QUESTION,
     e4__B_WORDS,
 
@@ -429,6 +430,7 @@ void e4__execute_variable(struct e4__task *task, void *user);
 
 /* io.c functions */
 e4__usize e4__io_accept(struct e4__task *task, char *buf, e4__usize *n);
+e4__usize e4__io_dump(struct e4__task *task, e4__cell p, e4__usize len);
 e4__usize e4__io_key(struct e4__task *task, void *buf);
 e4__usize e4__io_parse(struct e4__task *task, char delim, e4__usize flags,
         const char **out);
@@ -446,6 +448,7 @@ const struct e4__dict_header* e4__mem_dict_lookup(
         const struct e4__dict_header *dict, const char *name, e4__u8 nbytes);
 const struct e4__dict_header* e4__mem_dict_suggest(
         const struct e4__dict_header *dict, const char *prefix, e4__u8 pbytes);
+e4__usize e4__mem_dump(const char **p, e4__usize *len, char *buffer);
 const char* e4__mem_strnescape(const char **str, e4__usize *len,
         e4__usize *chunk_len, char *scratch);
 int e4__mem_strncasecmp(const char *left, const char *right, e4__usize n);

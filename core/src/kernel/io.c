@@ -11,6 +11,21 @@ e4__usize e4__io_accept(struct e4__task *task, char *buf, e4__usize *n)
     return task->io_func.accept(task->io_func.user, buf, n);
 }
 
+e4__usize e4__io_dump(struct e4__task *task, e4__cell p, e4__usize len)
+{
+    const char *buf = (const char *)p;
+    e4__usize io_res;
+
+    while (len) {
+        const e4__usize line_len = e4__mem_dump(&buf, &len,
+                (char *)task->here);
+        if ((io_res = e4__io_type(task, (const char *)task->here, line_len)))
+            return io_res;
+    }
+
+    return e4__E_OK;
+}
+
 e4__usize e4__io_key(struct e4__task *task, void *buf)
 {
     if (!task->io_func.key)

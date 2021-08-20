@@ -76,6 +76,7 @@ General Builtins
 - [DONE] Implement C", S", and ." compile time semantics in terms of
   e4__io_parse.
 - [DONE] Implement S\" compile time semantics.
+- [DONE] Implement the DUMP builtin.
 - Implement .( and ." run time semantics.
 - Implement S\", S", S\", and C" run time semantics. These words should
   use the designated transient memory buffers as necessary during
@@ -137,6 +138,9 @@ Testing
   e4__execute_ret.
 - Cover tr0 coherence (with and without exceptions enabled) in tests.
   This will be easier to fully cover once exceptions are enabled.
+- Cover the DUMP builtin, the e4__io_dump API, and the e4__mem_dump
+  utility. This will be a little bit of a pain but it shouldn't be
+  too bad.
 
 
 Version 0.3

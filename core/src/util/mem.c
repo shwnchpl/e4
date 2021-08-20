@@ -77,6 +77,78 @@ const struct e4__dict_header* e4__mem_dict_suggest(
     return NULL;
 }
 
+e4__usize e4__mem_dump(const char **p, e4__usize *len, char *buffer)
+{
+    /* For the purposes of this function, aligned to 8 bytes is
+       aligned. */
+    register const char *cursor = (const char *)(((e4__usize)*p / 8) * 8);
+    register const char *line_end = cursor + 16;
+    register const char *p_end = *p + *len;
+    register e4__u8 offset = 15;
+    register e4__usize v = (e4__usize)cursor;
+    char digit;
+
+    /* Format address. */
+    do {
+        digit = v % 16;
+        buffer[offset] = digit < 10 ? '0' + digit : 'a' + digit - 10;
+        v /= 16;
+    } while (offset-- > 0);
+
+    offset = 16;
+
+    buffer[offset++] = ' ';
+    buffer[offset++] = ' ';
+
+    while (cursor < line_end) {
+        if (!((e4__usize)cursor % 8))
+            buffer[offset++] = ' ';
+
+        if (cursor < *p || cursor >= p_end) {
+            buffer[offset++] = '?';
+            buffer[offset++] = '?';
+        } else {
+            v = *cursor;
+            digit = v % 16;
+            buffer[offset + 1] = digit < 10 ? '0' + digit : 'a' + digit - 10;
+
+            v /= 16;
+            digit = v % 16;
+            buffer[offset] = digit < 10 ? '0' + digit : 'a' + digit - 10;
+
+            offset += 2;
+        }
+
+        if ((e4__usize)cursor % 2)
+            buffer[offset++] = ' ';
+
+        ++cursor;
+    }
+
+    buffer[offset++] = ' ';
+    buffer[offset++] = ' ';
+
+    cursor -= 16;
+
+    while (cursor < line_end) {
+        if (cursor < *p || cursor >= p_end || *cursor < 0x20 ||
+                *cursor > 0x7e)
+            buffer[offset++] = '.';
+        else
+            buffer[offset++] = *cursor;
+
+        ++cursor;
+    }
+
+    buffer[offset++] = '\n';
+
+    cursor = (e4__usize)cursor > (e4__usize)p_end ? p_end : cursor;
+    *len -= cursor - *p;
+    *p = cursor;
+
+    return offset;
+}
+
 /* XXX: Scratch must be at least two bytes wide. */
 const char* e4__mem_strnescape(const char **str, e4__usize *len,
         e4__usize *chunk_len, char *scratch)
