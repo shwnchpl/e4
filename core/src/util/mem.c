@@ -77,6 +77,8 @@ const struct e4__dict_header* e4__mem_dict_suggest(
     return NULL;
 }
 
+/* XXX: Buffer must be able to store at least 80 characters. Specifying
+   size is not an option. */
 e4__usize e4__mem_dump(const char **p, e4__usize *len, char *buffer)
 {
     /* For the purposes of this function, aligned to 8 bytes is

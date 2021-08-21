@@ -127,6 +127,8 @@ REPL
 Testing
 -------
 - [DONE] Figure out some way to cover return stack corruption in tests.
+- [DONE] Cover the DUMP builtin, the e4__io_dump API, and the
+  e4__mem_dump utility.
 - Cover user IO errors in tests (ie. user provided IO handler returns
   non-zero).
 - Add tests to ensure that compile time coherence tracking (with tr0)
@@ -138,9 +140,6 @@ Testing
   e4__execute_ret.
 - Cover tr0 coherence (with and without exceptions enabled) in tests.
   This will be easier to fully cover once exceptions are enabled.
-- Cover the DUMP builtin, the e4__io_dump API, and the e4__mem_dump
-  utility. This will be a little bit of a pain but it shouldn't be
-  too bad.
 
 
 Version 0.3

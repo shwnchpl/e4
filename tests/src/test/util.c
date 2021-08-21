@@ -163,6 +163,58 @@ static void e4t__test_util_mem_dict(void)
     #undef _d
 }
 
+static void e4t__test_util_mem_dump(void)
+{
+    /* XXX: Parts of this test only work correctly on a 64 bit system
+       where unsigned long long values have 8 bit alignment. */
+
+    static const char *test_str =
+            "test \x88\x99\xaa string with some \x01 \x02 \x03 data";
+
+    const char *cursor;
+    e4__usize wrote_sz;
+    unsigned long long buffer[8];
+    char line[80] = {0,};
+    char expected_line[3][80] = {0,};
+    char *unaligned_buf = ((char *)buffer) + 3;
+    e4__usize remaining = strlen(test_str);
+
+    #define _f  "%016llx   "
+    sprintf(expected_line[0],
+            _f "???? ??74 6573 7420  8899 aa20 7374 7269   ...test ... stri\n",
+            (unsigned long long)&buffer[0]);
+    sprintf(expected_line[1],
+            _f "6e67 2077 6974 6820  736f 6d65 2001 2002   ng with some . .\n",
+            (unsigned long long)&buffer[2]);
+    sprintf(expected_line[2],
+            _f "2003 2064 6174 61??  ???? ???? ???? ????    . data.........\n",
+            (unsigned long long)&buffer[4]);
+    #undef _f
+
+    /* XXX: It would violate strict aliasing rules if we ever looked at
+       buffer again after modifying it using unaligned_buf. So long as
+       we don't do that, everything should be fine. */
+    memcpy(unaligned_buf, test_str, remaining);
+    cursor = unaligned_buf;
+
+    e4t__ASSERT_EQ(remaining, 36);
+
+    wrote_sz = e4__mem_dump(&cursor, &remaining, line);
+    e4t__ASSERT_EQ(wrote_sz, 79);
+    e4t__ASSERT_EQ(remaining, 23);
+    e4t__ASSERT_MATCH(line, expected_line[0]);
+
+    wrote_sz = e4__mem_dump(&cursor, &remaining, line);
+    e4t__ASSERT_EQ(wrote_sz, 79);
+    e4t__ASSERT_EQ(remaining, 7);
+    e4t__ASSERT_MATCH(line, expected_line[1]);
+
+    wrote_sz = e4__mem_dump(&cursor, &remaining, line);
+    e4t__ASSERT_EQ(wrote_sz, 79);
+    e4t__ASSERT_EQ(remaining, 0);
+    e4t__ASSERT_MATCH(line, expected_line[2]);
+}
+
 static void e4t__test_util_wordparse(void)
 {
     const char *word;
@@ -256,6 +308,7 @@ void e4t__test_util(void)
 {
     e4t__test_util_math();
     e4t__test_util_mem_dict();
+    e4t__test_util_mem_dump();
     e4t__test_util_numformat();
     e4t__test_util_numparse();
     e4t__test_util_wordparse();
