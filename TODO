@@ -78,7 +78,7 @@ General Builtins
 - [DONE] Implement S\" compile time semantics.
 - [DONE] Implement the DUMP builtin.
 - Implement .( and ." run time semantics.
-- Implement S\", S", S\", and C" run time semantics. These words should
+- Implement S", S\", and C" run time semantics. These words should
   use the designated transient memory buffers as necessary during
   runtime.
 - Implement ABS.
@@ -173,6 +173,26 @@ Compilation
   not worry about things like THEN and LIT_CELL. This is the easiest
   solution and is probably a perfectly reasonable place to start.
 
+General Builtins
+----------------
+- Implement the PAGE builtin using escape sequences. The following
+  implementation works:
+        : page s\" \e[2J\e[0;0H" type ;
+- Implement the AT-XY builtin using pictured numeric output and escape
+  the ASCII cursor position escape sequence \033[<L>;<C>H. The
+  following implementation works:
+        : at-xy
+            s>d rot s>d
+            <#
+                'H' hold
+                #s 2drop
+                ';' hold
+                #s
+                '[' hold
+                27 hold
+            #> type
+            ;
+
 General IO
 ----------
 - Implement pictured numeric output.
@@ -217,6 +237,8 @@ Kernel
 - Consider adding optional IO handlers to allow for supporting the
   FILE wordset. If this is done, also add FILE related builtins
   and the appropriate hooks to the REPL.
+- Consider adding builtin POSIX handlers for file IO that can be
+  enabled/disabled (off by default) at compile time.
 - Consider making return stack coherence tracking optional at compile-
   time to allow for RAM savings.
 - Throw address alignment exceptions (-23) where appropriate? On one
