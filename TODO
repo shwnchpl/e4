@@ -9,13 +9,6 @@ Repo Maintenance
 
 Build
 -----
-- Make it possible to specify e4__DISABLE_EXTENSIONS (or some other
-  similar macro) to build the smallest version of e4 possible. This
-  can include the exceptions word set and some words from the tools
-  word set, but should include no core extensions or any functions
-  that are only used by core extensions.
-- Create a REPL build that uses an e4__DISABLE_EXTENSIONS build to
-  ensure that e4 always builds correctly in this mode.
 - Attempt to set up an AVR build (or some other 8-16 bit target build)
   to determine ROM size in that environment. (Preliminary size optimized
   builds seem to be at around 21K when targeting the ATMega328p).
@@ -23,6 +16,15 @@ Build
 
 Version 0.2
 ===========
+
+Build
+-----
+- [DONE] Add preprocessor controls for disabling various wordsets to
+  produce a minimal build.
+- [DONE] Create a special Make target that tests building various
+  build configurations to ensure they call build properly and there
+  are no erroneous interdependencies between wordsets.
+- Fix as many pedantic errors as possible.
 
 Compilation
 -----------

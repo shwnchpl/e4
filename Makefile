@@ -25,7 +25,7 @@ TESTS_SRCS := $(shell find $(TESTS_SRC_DIRS) -name *.c)
 TESTS_OBJS := $(TESTS_SRCS:%=$(BUILD_DIR)/%.o)
 TESTS_DEPS := $(TESTS_OBJS:.o=.d)
 
-CFLAGS := -Wall -std=c89 -Os -MMD -MP
+CFLAGS := -Wall -Werror -std=c89 -Os -MMD -MP
 REPL_LDFLAGS := -ledit
 TESTS_LDFLAGS := -L$(BUILD_DIR) -le4
 
@@ -60,8 +60,10 @@ longest-lines:
 tags: clean
 	ctags -R .
 
+include tests/build-test/build-test.mk
+
 # Actual targets.
-# XXX: Require objects to build separately before generating
+## XXX: Require objects to build separately before generating
 # an amalgamated header. It should always be possible to *not*
 # use the amalgamation.
 $(TARGET_AMALGAM): $(CORE_OBJS)
@@ -74,7 +76,7 @@ $(TARGET_LIB): $(CORE_OBJS)
 	$(AR) rcs $@ $(CORE_OBJS)
 
 $(TARGET_REPL): $(REPL_OBJS) $(TARGET_AMALGAM)
-	$(CC) $(TARGET_AMALGAM) $(REPL_OBJS) $(REPL_LDFLAGS) -o $@
+	$(CC) $(CFLAGS) $(TARGET_AMALGAM) $(REPL_OBJS) $(REPL_LDFLAGS) -o $@
 
 $(TARGET_TESTS): $(TESTS_OBJS) $(TARGET_LIB)
 	$(CC) $(TESTS_OBJS) $(TESTS_LDFLAGS) -o $@

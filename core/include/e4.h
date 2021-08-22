@@ -1,8 +1,16 @@
 #ifndef e4_H_
 #define e4_H_
 
+/**************************************************
+ *                  e4 version
+ *************************************************/
+
 #define e4__VERSION_NUMBER      1000
 #define e4__VERSION_STRING      "0.1.0"
+
+/**************************************************
+ *               e4 configuration
+ *************************************************/
 
 #if defined(e4__LOAD_CONFIG)
     /* To inject configuration into e4, provide the e4__USIZE_DEFINED
@@ -12,11 +20,40 @@
     #include "e4-config.h"
 #endif
 
-#include <stdlib.h>
+#if !defined(e4__BUILD_EVERYTHING) && !defined(e4__BUILD_DEFAULT) && \
+        !defined(e4__BUILD_MINIMAL)
+    #define e4__BUILD_DEFAULT
+#endif
+
+#if defined(e4__BUILD_EVERYTHING)
+    #define e4__INCLUDE_CORE_EXT
+    #define e4__INCLUDE_TOOLS
+    #define e4__INCLUDE_TOOLS_EXT
+#elif defined(e4__BUILD_DEFAULT)
+    /* XXX: For now, this is the same as everything, but that likely
+       will not always be the case. */
+    #define e4__INCLUDE_CORE_EXT
+    #define e4__INCLUDE_TOOLS
+    #define e4__INCLUDE_TOOLS_EXT
+#endif
+
+#if defined(e4__EXCLUDE_CORE_EXT) && defined(e4__INCLUDE_CORE_EXT)
+    #undef e4__INCLUDE_CORE_EXT
+#endif
+
+#if defined(e4__EXCLUDE_TOOLS) && defined(e4__INCLUDE_TOOLS)
+    #undef e4__INCLUDE_TOOLS
+#endif
+
+#if defined(e4__EXCLUDE_TOOLS_EXT) && defined(e4__INCLUDE_TOOLS_EXT)
+    #undef e4__INCLUDE_TOOLS_EXT
+#endif
 
 /**************************************************
  *               e4 public C API
  *************************************************/
+
+#include <stdlib.h>
 
 /* e4 types */
 typedef void** e4__cell;
@@ -270,35 +307,6 @@ enum e4__builtin_id {
     e4__B_ZERO_EQUALS,
     e4__B_ZERO_LESS,
 
-    /* CORE EXT words */
-    e4__B_AGAIN,
-    e4__B_BACKSLASH,
-    e4__B_COLON_NONAME,
-    e4__B_DEFER,
-    e4__B_DEFER_FETCH,
-    e4__B_DEFER_STORE,
-    e4__B_FALSE,
-    e4__B_HEX,
-    e4__B_MARKER,
-    e4__B_NIP,
-    e4__B_NOT_EQUALS,
-    e4__B_PAD,
-    e4__B_PICK,
-    e4__B_QUESTION_DO,
-    e4__B_REFILL,
-    e4__B_ROLL,
-    e4__B_S_BACKSLASH_QUOTE,
-    e4__B_TO,
-    e4__B_TRUE,
-    e4__B_TUCK,
-    e4__B_TWO_R_FETCH,
-    e4__B_TWO_R_FROM,
-    e4__B_TWO_TO_R,
-    e4__B_U_GREATER_THAN,
-    e4__B_VALUE,
-    e4__B_ZERO_GREATER,
-    e4__B_ZERO_NOT_EQUALS,
-
     /* SYSTEM words */
     e4__B_BRANCH,
     e4__B_BRANCH0,
@@ -309,15 +317,56 @@ enum e4__builtin_id {
     e4__B_LIT_STR,
     e4__B_SENTINEL,
 
-    /* TOOLS words */
-    e4__B_DOT_S,
-    e4__B_DUMP,
-    e4__B_QUESTION,
-    e4__B_WORDS,
+    #if defined(e4__INCLUDE_CORE_EXT)
 
-    /* TOOLS EXT words */
-    e4__B_BYE,
-    e4__B_FORGET,
+        /* CORE EXT words */
+        e4__B_AGAIN,
+        e4__B_BACKSLASH,
+        e4__B_COLON_NONAME,
+        e4__B_DEFER,
+        e4__B_DEFER_FETCH,
+        e4__B_DEFER_STORE,
+        e4__B_FALSE,
+        e4__B_HEX,
+        e4__B_MARKER,
+        e4__B_NIP,
+        e4__B_NOT_EQUALS,
+        e4__B_PAD,
+        e4__B_PICK,
+        e4__B_QUESTION_DO,
+        e4__B_REFILL,
+        e4__B_ROLL,
+        e4__B_S_BACKSLASH_QUOTE,
+        e4__B_TO,
+        e4__B_TRUE,
+        e4__B_TUCK,
+        e4__B_TWO_R_FETCH,
+        e4__B_TWO_R_FROM,
+        e4__B_TWO_TO_R,
+        e4__B_U_GREATER_THAN,
+        e4__B_VALUE,
+        e4__B_ZERO_GREATER,
+        e4__B_ZERO_NOT_EQUALS,
+
+    #endif /* defined(e4__INCLUDE_CORE_EXT) */
+
+    #if defined(e4__INCLUDE_TOOLS)
+
+        /* TOOLS words */
+        e4__B_DOT_S,
+        e4__B_DUMP,
+        e4__B_QUESTION,
+        e4__B_WORDS,
+
+    #endif /* defined(e4__INCLUDE_TOOLS) */
+
+    #if defined(e4__INCLUDE_TOOLS_EXT)
+
+        /* TOOLS EXT words */
+        e4__B_BYE,
+        e4__B_FORGET,
+
+    #endif
 
     e4__BUILTIN_COUNT
 };

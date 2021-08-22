@@ -48,13 +48,18 @@
 
 /* builtin dictionary definitions */
 
-/* FIXME: Make some of these conditional here and elsewhere in this
-   file. */
 #include "CORE.decl.inc"
-#include "CORE-EXT.decl.inc"
 #include "SYSTEM.decl.inc"
-#include "TOOLS.decl.inc"
-#include "TOOLS-EXT.decl.inc"
+
+#if defined(e4__INCLUDE_CORE_EXT)
+    #include "CORE-EXT.decl.inc"
+#endif
+#if defined(e4__INCLUDE_TOOLS)
+    #include "TOOLS.decl.inc"
+#endif
+#if defined(e4__INCLUDE_TOOLS_EXT)
+    #include "TOOLS-EXT.decl.inc"
+#endif
 
 #define _e4__BUILTIN_PROC(w)    \
     _e4__BUILTIN_PROC_NF(w, #w, 0)
@@ -105,10 +110,17 @@
 #define _e4__BUILTIN_USERVAR(w)
 
 _e4__BUILTIN_CORE_DECL();
-_e4__BUILTIN_CORE_EXT_DECL();
 _e4__BUILTIN_SYSTEM_DECL();
-_e4__BUILTIN_TOOLS_DECL();
-_e4__BUILTIN_TOOLS_EXT_DECL();
+
+#if defined(e4__INCLUDE_CORE_EXT)
+    _e4__BUILTIN_CORE_EXT_DECL();
+#endif
+#if defined(e4__INCLUDE_TOOLS)
+    _e4__BUILTIN_TOOLS_DECL();
+#endif
+#if defined(e4__INCLUDE_TOOLS_EXT)
+    _e4__BUILTIN_TOOLS_EXT_DECL();
+#endif
 
 #undef _e4__BUILTIN_USERVAR
 #undef _e4__BUILTIN_CONSTANT
@@ -147,10 +159,17 @@ _e4__BUILTIN_TOOLS_EXT_DECL();
 const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT] =
 {
     _e4__BUILTIN_CORE_DECL()
-    _e4__BUILTIN_CORE_EXT_DECL()
     _e4__BUILTIN_SYSTEM_DECL()
-    _e4__BUILTIN_TOOLS_DECL()
-    _e4__BUILTIN_TOOLS_EXT_DECL()
+
+    #if defined(e4__INCLUDE_CORE_EXT)
+        _e4__BUILTIN_CORE_EXT_DECL()
+    #endif
+    #if defined(e4__INCLUDE_TOOLS)
+        _e4__BUILTIN_TOOLS_DECL()
+    #endif
+    #if defined(e4__INCLUDE_TOOLS_EXT)
+        _e4__BUILTIN_TOOLS_EXT_DECL()
+    #endif
 };
 
 #undef _e4__BUILTIN_USERVAR
@@ -180,10 +199,17 @@ const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT] =
 const struct e4__execute_tuple e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
 {
     _e4__BUILTIN_CORE_DECL()
-    _e4__BUILTIN_CORE_EXT_DECL()
     _e4__BUILTIN_SYSTEM_DECL()
-    _e4__BUILTIN_TOOLS_DECL()
-    _e4__BUILTIN_TOOLS_EXT_DECL()
+
+    #if defined(e4__INCLUDE_CORE_EXT)
+        _e4__BUILTIN_CORE_EXT_DECL()
+    #endif
+    #if defined(e4__INCLUDE_TOOLS)
+        _e4__BUILTIN_TOOLS_DECL()
+    #endif
+    #if defined(e4__INCLUDE_TOOLS_EXT)
+        _e4__BUILTIN_TOOLS_EXT_DECL()
+    #endif
 };
 
 #undef _e4__BUILTIN_USERVAR
@@ -206,8 +232,8 @@ const struct e4__execute_tuple e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
 
 #undef _e4__BUILTIN_TOOLS_EXT_DECL
 #undef _e4__BUILTIN_TOOLS_DECL
-#undef _e4__BUILTIN_SYSTEM_DECL
 #undef _e4__BUILTIN_CORE_EXT_DECL
+#undef _e4__BUILTIN_SYSTEM_DECL
 #undef _e4__BUILTIN_CORE_DECL
 
 static const void *_e4__BUILTIN_RETURN_THUNK[] =
@@ -251,7 +277,14 @@ void e4__builtin_exec_(e4__usize count, /* struct e4__task *task, */
 /* builtin implementations */
 
 #include "CORE.def.inc"
-#include "CORE-EXT.def.inc"
 #include "SYSTEM.def.inc"
-#include "TOOLS.def.inc"
-#include "TOOLS-EXT.def.inc"
+
+#if defined(e4__INCLUDE_CORE_EXT)
+    #include "CORE-EXT.def.inc"
+#endif
+#if defined(e4__INCLUDE_TOOLS)
+    #include "TOOLS.def.inc"
+#endif
+#if defined(e4__INCLUDE_TOOLS_EXT)
+    #include "TOOLS-EXT.def.inc"
+#endif
