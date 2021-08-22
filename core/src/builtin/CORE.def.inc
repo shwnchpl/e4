@@ -344,9 +344,11 @@ static void e4__builtin_DOT_QUOTE(struct e4__task *task, void *user)
     if (e4__task_compiling(task)) {
         e4__compile_str(task, str, len);
         e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TYPE]);
+    } else {
+        register const e4__usize io_res = e4__io_type(task, str, len);
+        if (io_res)
+            e4__exception_throw(task, io_res);
     }
-
-    /* FIXME: Handle runtime semantics. */
 
     e4__execute_ret(task);
 }

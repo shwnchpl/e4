@@ -84,6 +84,20 @@ static void e4__builtin_DEFER_STORE(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_DOT_PAREN(struct e4__task *task, void *user)
+{
+    const char *str;
+    register e4__usize len;
+    register e4__usize io_res;
+
+    len = e4__io_parse(task, ')', 0, &str);
+    if ((io_res = e4__io_type(task, str, len)))
+        e4__exception_throw(task, io_res);
+
+    e4__execute_ret(task);
+
+}
+
 static const void *e4__builtin_HEX[] = {
     e4__execute_threaded,
     NULL,

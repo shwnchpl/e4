@@ -79,12 +79,12 @@ General Builtins
   e4__io_parse.
 - [DONE] Implement S\" compile time semantics.
 - [DONE] Implement the DUMP builtin.
-- Implement .( and ." run time semantics.
+- [DONE] Implement .( and ." run time semantics.
 - Implement S", S\", and C" run time semantics. These words should
   use the designated transient memory buffers as necessary during
   runtime.
 - Implement ABS.
-- Implement FILL.
+- Implement FILL, ERASE, and MOVE builtins.
 - Implement UNUSED.
 - Implement EVALUATE (builtin)
 - Implement THROW and CATCH builtins.

@@ -326,6 +326,7 @@ enum e4__builtin_id {
         e4__B_DEFER,
         e4__B_DEFER_FETCH,
         e4__B_DEFER_STORE,
+        e4__B_DOT_PAREN,
         e4__B_FALSE,
         e4__B_HEX,
         e4__B_MARKER,
