@@ -80,13 +80,13 @@ General Builtins
 - [DONE] Implement S\" compile time semantics.
 - [DONE] Implement the DUMP builtin.
 - [DONE] Implement .( and ." run time semantics.
+- [DONE] Make IMMEDIATE/COMPONLY flag specification order consistent in
+  builtin declarations.
 - Implement ABS.
 - Implement FILL, ERASE, and MOVE builtins.
 - Implement UNUSED.
 - Implement EVALUATE (builtin)
 - Implement THROW and CATCH builtins.
-- Make IMMEDIATE/COMPONLY flag specification order consistent in
-  builtin declarations.
 
 Kernel
 ------
