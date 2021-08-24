@@ -508,7 +508,7 @@ static void e4t__test_builtin_logic(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
 }
 
-/* Covers + - . / 1+ 1- 2* 2/ /MOD LSHIFT MAX MIN MOD RSHIFT U. */
+/* Covers + - . / 1+ 1- 2* 2/ /MOD ABS LSHIFT MAX MIN MOD RSHIFT U. */
 static void e4t__test_builtin_math(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -747,6 +747,14 @@ static void e4t__test_builtin_math(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 0);
     e4t__ASSERT_OK(_e("5 50 MIN"));
     e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+
+    /* Test that ABS works as expected. */
+    e4t__ASSERT_OK(_e("-234 abs"));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 234);
+    e4t__ASSERT_OK(_e("234 abs"));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 234);
+    e4t__ASSERT_OK(_e("0 abs"));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
 
     #undef _e
 }

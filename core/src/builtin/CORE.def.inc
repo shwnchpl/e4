@@ -26,6 +26,18 @@ static void e4__builtin_ABORT(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static const void *e4__builtin_ABS[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_DUP],
+    &e4__BUILTIN_XT[e4__B_ZERO_LESS],
+    &e4__BUILTIN_XT[e4__B_BRANCH0],
+    (void *)2,
+    &e4__BUILTIN_XT[e4__B_NEGATE],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
 static const void *e4__builtin_ALIGN[] = {
     e4__execute_threaded,
     NULL,

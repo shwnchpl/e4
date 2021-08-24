@@ -206,6 +206,7 @@ struct e4__io_func {
 enum e4__builtin_id {
     /* CORE words */
     e4__B_ABORT = 0,
+    e4__B_ABS,
     e4__B_ALIGN,
     e4__B_ALIGNED,
     e4__B_ALLOT,

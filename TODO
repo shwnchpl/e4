@@ -82,8 +82,9 @@ General Builtins
 - [DONE] Implement .( and ." run time semantics.
 - [DONE] Make IMMEDIATE/COMPONLY flag specification order consistent in
   builtin declarations.
-- Implement ABS.
+- [DONE] Implement ABS.
 - Implement FILL, ERASE, and MOVE builtins.
+- Implement BUFFER: builtin.
 - Implement UNUSED.
 - Implement EVALUATE (builtin)
 - Implement THROW and CATCH builtins.
