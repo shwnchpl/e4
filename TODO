@@ -41,7 +41,7 @@ Compilation
 - [DONE] Implement MARKER.
 - [DONE] Implement LIT_CSTR and LIT_STR.
 - [DONE] Add POSTPONE and IMMEDIATE words.
-- Consider adding a COMPILE-ONLY/RESTRICT word.
+- [DONE] Add restruct keyword.
 - Check for nested compilation everywhere relevant.
 
 General Builtins

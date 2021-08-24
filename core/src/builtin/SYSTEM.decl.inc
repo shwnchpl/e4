@@ -13,6 +13,7 @@
     _e4__BUILTIN_PROC_F(LIT_CSTR, e4__F_COMPONLY)   \
     _e4__BUILTIN_PROC_F(LIT_DOES, e4__F_COMPONLY)   \
     _e4__BUILTIN_PROC_F(LIT_STR, e4__F_COMPONLY)    \
+    _e4__BUILTIN_PROC(RESTRICT) \
     _e4__BUILTIN_PROC_F(SENTINEL, e4__F_IMMEDIATE)
 
 /* vim: set ft=c: */

@@ -139,6 +139,16 @@ static void e4__builtin_LIT_STR(struct e4__task *task, void *user)
     /* e4__execute_ret intentionally omitted. */
 }
 
+static void e4__builtin_RESTRICT(struct e4__task *task, void *user)
+{
+    if (task->dict->flags & e4__F_BUILTIN)
+        e4__exception_throw(task, e4__E_INVBUILTINMUT);
+    else
+        task->dict->flags |= e4__F_COMPONLY;
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_SENTINEL(struct e4__task *task, void *user)
 {
     /* XXX: This function's sole purpose is to act as a unique

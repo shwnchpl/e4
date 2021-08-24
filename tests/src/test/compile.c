@@ -321,6 +321,18 @@ static void e4t__test_compile_pponeimmed(void)
     e4t__ASSERT_OK(e4__evaluate(task, "0 is-zero?", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+
+    /* Test that the RESTRICT word will not modify a builtin. */
+    task = e4t__transient_task();
+    e4t__ASSERT_EQ(e4__evaluate(task, "restrict", -1), e4__E_INVBUILTINMUT);
+
+    /* Test that the RESTRICT word makes a word compile only. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": minus - ; restrict", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "10 5 minus", -1), e4__E_COMPONLYWORD);
+    e4t__ASSERT_OK(e4__evaluate(task, ": bas 10 5 minus ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "bas", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
 }
 
 static void e4t__test_compile_recursive(void)
