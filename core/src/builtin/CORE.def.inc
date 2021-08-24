@@ -457,6 +457,16 @@ static void e4__builtin_IF(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_IMMEDIATE(struct e4__task *task, void *user)
+{
+    if (task->dict->flags & e4__F_BUILTIN)
+        e4__exception_throw(task, e4__E_INVBUILTINMUT);
+    else
+        task->dict->flags |= e4__F_IMMEDIATE;
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_INVERT(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
@@ -647,6 +657,24 @@ static void e4__builtin_OVER(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
     e4__stack_over(task);
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_POSTPONE(struct e4__task *task, void *user)
+{
+    register const char *word;
+    register e4__u8 len;
+    register const struct e4__dict_header *header;
+
+    _e4__BUILTIN_LOOKAHEAD(task, word, len);
+
+    if (!(header = e4__dict_lookup(task, word, len))) {
+        e4__exception_throw(task, e4__E_UNDEFWORD);
+        e4__execute_ret(task);
+    }
+
+    e4__compile_cell(task, (e4__cell)header->xt);
+
     e4__execute_ret(task);
 }
 

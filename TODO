@@ -40,7 +40,7 @@ Compilation
 - [DONE] Implement [ and ].
 - [DONE] Implement MARKER.
 - [DONE] Implement LIT_CSTR and LIT_STR.
-- Add POSTPONE and IMMEDIATE words.
+- [DONE] Add POSTPONE and IMMEDIATE words.
 - Consider adding a COMPILE-ONLY/RESTRICT word.
 - Check for nested compilation everywhere relevant.
 
@@ -143,6 +143,11 @@ Testing
 
 Version 0.3
 ===========
+
+Build
+-----
+- Split system required words and optional system specific extension
+  words into different modules (SYSTEM and SYSTEM-EXIT?).
 
 Compilation
 -----------

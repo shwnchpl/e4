@@ -276,6 +276,53 @@ static void e4t__test_compile_noname(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 7);
 }
 
+static void e4t__test_compile_pponeimmed(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* Test that IMMEDIATE on a builtin doesn't work. */
+    e4t__ASSERT_EQ(e4__evaluate(task, "immediate", -1), e4__E_INVBUILTINMUT);
+
+    /* Test that IMMEDIATE causes a word to execute at compile time. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo 2 ; immediate", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, ": bar foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_peek(task), 2);
+    e4t__ASSERT_OK(e4__evaluate(task, "literal ; bar", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_peek(task), 2);
+
+    /* Test that POSTPONE on an undefined word throws an exception. */
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo postpone not-a-word", -1),
+            e4__E_UNDEFWORD);
+    e4__stack_clear(task);
+    e4__compile_cancel(task);
+
+    /* Test that POSTPONE compiles the xt of a word, immediate
+       or not. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": // postpone \\ ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "5 // 1 2 3 4", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+
+    e4t__ASSERT_OK(e4__evaluate(task, ": plus postpone + ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "5 10 plus", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 15);
+
+    /* Test that POSTPONE and IMMEDIATE play nicely together. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": endif postpone then ; immediate",
+            -1));
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": is-zero? 0= if true else false endif ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "5 is-zero?", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+    e4t__ASSERT_OK(e4__evaluate(task, "0 is-zero?", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+}
+
 static void e4t__test_compile_recursive(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -588,6 +635,7 @@ void e4t__test_compile(void)
     e4t__test_compile_linear();
     e4t__test_compile_literal();
     e4t__test_compile_noname();
+    e4t__test_compile_pponeimmed();
     e4t__test_compile_recursive();
     e4t__test_compile_suspendresume();
     e4t__test_compile_string();
