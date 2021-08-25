@@ -83,7 +83,7 @@ General Builtins
 - [DONE] Make IMMEDIATE/COMPONLY flag specification order consistent in
   builtin declarations.
 - [DONE] Implement ABS.
-- Implement FILL, ERASE, and MOVE builtins.
+- [DONE] Implement FILL, ERASE, and MOVE builtins.
 - Implement BUFFER: builtin.
 - Implement UNUSED.
 - Implement EVALUATE (builtin)
@@ -114,6 +114,9 @@ Kernel
   dictionary overflow.
 - Consider improving exception printing (ie. printing exception name
   along with number).
+- Ensure memmove is always called with size_t, not e4__usize. It's
+  possible (although unlikely) that these types may not implicitly
+  convert between one another without generating a warning.
 
 REPL
 ----
@@ -123,6 +126,18 @@ REPL
   it has been implemented. Signal handlers will need to take
   appropriate action to keep libedit happy as well (in particular, it
   is necessary to call el_resize upon receipt of SIGWINCH).
+  Alternatively, with respect to SIGINT, simply throw an exception
+  from the signal handler. If something is executing, exceptions are
+  enabled, and this will throw one and return to the prompt. If not,
+  it can fall back to just calling exit. With this, e4__task_interrupt
+  may not even be necessary in the first place. This is all possible
+  because it is safe to longjmp out of signal handlers as long as they
+  aren't nested (ie. a signal handler invoked because of code that
+  was executing in another signal handler). It should be possible to
+  ensure that will never happen and stay within the realm of defined
+  behavior while taking advantage of the existing exception semantic.
+- Catch SIGSEV and raise an exception if possible (and call exit if
+  not).
 
 Testing
 -------

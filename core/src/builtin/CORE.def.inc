@@ -452,6 +452,23 @@ static void e4__builtin_FETCH(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_FILL(struct e4__task *task, void *user)
+{
+    register e4__cell dest;
+    register e4__usize count;
+    register e4__u8 val;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 3);
+
+    val = (e4__u8)(e4__usize)e4__stack_pop(task);
+    count = (e4__usize)e4__stack_pop(task);
+    dest = e4__stack_pop(task);
+
+    memset(dest, val, (size_t)count);
+
+    e4__execute_ret(task);
+}
+
 static const void *e4__builtin_GREATER_THAN[] = {
     e4__execute_threaded,
     NULL,
@@ -620,6 +637,22 @@ static const void *e4__builtin_MOD[] = {
     &e4__BUILTIN_XT[e4__B_EXIT],
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
+
+static void e4__builtin_MOVE(struct e4__task *task, void *user)
+{
+    register e4__cell src, dest;
+    register e4__usize count;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 3);
+
+    count = (e4__usize)e4__stack_pop(task);
+    dest = e4__stack_pop(task);
+    src = e4__stack_pop(task);
+
+    memmove(dest, src, (size_t)count);
+
+    e4__execute_ret(task);
+}
 
 static void e4__builtin_NEGATE(struct e4__task *task, void *user)
 {

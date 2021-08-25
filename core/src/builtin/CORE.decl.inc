@@ -45,6 +45,7 @@
     _e4__BUILTIN_PROC(EXECUTE)  \
     _e4__BUILTIN_PROC_F(EXIT, e4__F_COMPONLY)   \
     _e4__BUILTIN_PROC_N(FETCH, "@") \
+    _e4__BUILTIN_PROC(FILL) \
     _e4__BUILTIN_THUNK_N(GREATER_THAN, ">") \
     _e4__BUILTIN_USERVAR(HERE)  \
     _e4__BUILTIN_ALIAS_F(I, R_FETCH, e4__F_COMPONLY)    \
@@ -62,6 +63,7 @@
     _e4__BUILTIN_PROC(MIN)  \
     _e4__BUILTIN_PROC_N(MINUS, "-") \
     _e4__BUILTIN_THUNK(MOD) \
+    _e4__BUILTIN_PROC(MOVE) \
     _e4__BUILTIN_PROC(NEGATE)   \
     _e4__BUILTIN_THUNK_N(ONE_MINUS, "1-")   \
     _e4__BUILTIN_THUNK_N(ONE_PLUS, "1+")    \

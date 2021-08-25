@@ -759,11 +759,13 @@ static void e4t__test_builtin_math(void)
     #undef _e
 }
 
-/* Covers @ ! +! 2@ 2! ALIGN ALIGNED ALLOT C, C@ C! CELLS HERE */
+/* Covers @ ! +! 2@ 2! ALIGN ALIGNED ALLOT C, C@ C! CELLS CREATE
+   ERASE FILL HERE MOVE */
 static void e4t__test_builtin_memmanip(void)
 {
-    struct e4__task *task = e4t__transient_task();
     e4__usize slot, here0, here1;
+    char *mem;
+    struct e4__task *task = e4t__transient_task();
 
     /* XXX: Parts of this test only work correctly on a little endian
        64 bit system. */
@@ -904,6 +906,43 @@ static void e4t__test_builtin_memmanip(void)
     e4t__ASSERT_OK(e4__evaluate(task, "foo @", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), 250);
+
+    /* Test ERASE and FILL. */
+    #define _c(m)   \
+        do {    \
+            int i;  \
+            for (i = 0; i < 10; ++i)    \
+                m[i] = i;   \
+        } while (0)
+
+    e4t__ASSERT_OK(e4__evaluate(task, "create foo 10 chars allot foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    mem = (char *)e4__stack_pop(task);
+    _c(mem);
+    e4t__ASSERT_OK(e4__evaluate(task, "foo 5 chars erase", -1));
+    e4t__ASSERT(!memcmp(mem, "\0\0\0\0\0\x05\x06\x07\x08\x09", 10));
+    e4t__ASSERT_OK(e4__evaluate(task, "foo 3 chars 'f' fill", -1));
+    e4t__ASSERT(!memcmp(mem, "fff\0\0\x05\x06\x07\x08\x09", 10));
+
+    /* Test MOVE with no overlap, overlap on either side, and complete
+       overlap (ie. identical source and destination). */
+    _c(mem);
+    e4t__ASSERT_OK(e4__evaluate(task, "foo 5 chars + foo 5 chars move", -1));
+    e4t__ASSERT(!memcmp(mem, "\x05\x06\x07\x08\x09\x05\x06\x07\x08\x09", 10));
+
+    _c(mem);
+    e4t__ASSERT_OK(e4__evaluate(task, "foo 3 chars + foo 5 chars move", -1));
+    e4t__ASSERT(!memcmp(mem, "\x03\x04\x05\x06\x07\x05\x06\x07\x08\x09", 10));
+
+    _c(mem);
+    e4t__ASSERT_OK(e4__evaluate(task, "foo foo 3 chars + 5 chars move", -1));
+    e4t__ASSERT(!memcmp(mem, "\x00\x01\x02\x00\x01\x02\x03\x04\x08\x09", 10));
+
+    _c(mem);
+    e4t__ASSERT_OK(e4__evaluate(task, "foo foo 10 chars move", -1));
+    e4t__ASSERT(!memcmp(mem, "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09", 10));
+
+    #undef _c
 }
 
 /* Covers >NUMBER and BASE uservar */
@@ -1205,16 +1244,6 @@ static void e4t__test_builtin_stackmanip(void)
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 30 40 10 20 ");
 }
 
-/* Covers .( ." C" S" S\" run time semantics */
-static void e4t__test_builtin_string(void)
-{
-    struct e4__task *task = e4t__transient_task();
-
-    /* FIXME: Add run time string semantic tests here. */
-
-    (void)task;
-}
-
 /* Covers BASE HERE PAD */
 static void e4t__test_builtin_uservars(void)
 {
@@ -1252,6 +1281,5 @@ void e4t__test_builtin(void)
     e4t__test_builtin_parseword();
     e4t__test_builtin_rstackmanip();
     e4t__test_builtin_stackmanip();
-    e4t__test_builtin_string();
     e4t__test_builtin_uservars();
 }

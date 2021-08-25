@@ -95,8 +95,17 @@ static void e4__builtin_DOT_PAREN(struct e4__task *task, void *user)
         e4__exception_throw(task, io_res);
 
     e4__execute_ret(task);
-
 }
+
+static const void *e4__builtin_ERASE[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
+    (void *)0,
+    &e4__BUILTIN_XT[e4__B_FILL],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
 
 static const void *e4__builtin_HEX[] = {
     e4__execute_threaded,
