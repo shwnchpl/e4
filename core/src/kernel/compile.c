@@ -162,7 +162,7 @@ void e4__compile_str(struct e4__task *task, const char *str, e4__usize len)
 {
     /* Copy the string to the correct position *first*, since we may be
        about to write over it. */
-    memmove(task->here + 2, str, len);
+    memmove(task->here + 2, str, (size_t)len);
     e4__DEREF(task->here++) = (e4__cell)&e4__BUILTIN_XT[e4__B_LIT_STR];
     e4__DEREF(task->here++) = (e4__cell)len;
     task->here = (e4__cell)e4__mem_aligned((e4__usize)task->here + len);

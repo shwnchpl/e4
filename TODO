@@ -100,8 +100,9 @@ Kernel
   its value across exceptions.
 - [DONE] Add asserts that execute_tuple and execute_token field order
   lines up correctly.
-- Handle dictionary overflows and other overflows. Especially
-  dictionary overflow.
+- [DONE] Ensure memmove is always called with size_t, not e4__usize.
+  It's possible (although unlikely) that these types may not implicitly
+  convert between one another without generating a warning.
 - Consider improving exception printing (ie. printing exception name
   along with number).
 - Thunk into exceptions when evaluating REFILL in QUIT. Cover this
