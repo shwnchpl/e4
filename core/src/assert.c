@@ -93,3 +93,5 @@ e4__ASSERT(&((struct e4__task *)NULL)->here ==
 e4__ASSERT(&((struct e4__task *)NULL)->pad == &((e4__cell *)NULL)[e4__UV_PAD]);
 e4__ASSERT(&((struct e4__task *)NULL)->base_ptr ==
         &((e4__cell *)NULL)[e4__UV_BASE]);
+e4__ASSERT((e4__cell)&((struct e4__task *)NULL)->io_src.sid ==
+        (e4__cell)&((e4__cell *)NULL)[e4__UV_SOURCE_ID]);

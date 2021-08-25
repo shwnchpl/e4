@@ -97,6 +97,9 @@
 #define _e4__BUILTIN_ALIAS_F(w, t, f)   \
     _e4__BUILTIN_ALIAS_NF(w, t, #w, f)
 
+#define _e4__BUILTIN_USERVAR(w) \
+    _e4__BUILTIN_USERVAR_N(w, #w)
+
 /* Declare builtin functions. */
 #define _e4__BUILTIN_PROC_FIRST(w)  _e4__BUILTIN_PROC(w)
 #define _e4__BUILTIN_PROC_NF(w, n, f)   \
@@ -107,7 +110,7 @@
 #define _e4__BUILTIN_ALIAS_NF(w, t, n, f)
 
 #define _e4__BUILTIN_CONSTANT(w, c)
-#define _e4__BUILTIN_USERVAR(w)
+#define _e4__BUILTIN_USERVAR_N(w, n)
 
 _e4__BUILTIN_CORE_DECL();
 _e4__BUILTIN_SYSTEM_DECL();
@@ -122,7 +125,7 @@ _e4__BUILTIN_SYSTEM_DECL();
     _e4__BUILTIN_TOOLS_EXT_DECL();
 #endif
 
-#undef _e4__BUILTIN_USERVAR
+#undef _e4__BUILTIN_USERVAR_N
 #undef _e4__BUILTIN_CONSTANT
 #undef _e4__BUILTIN_ALIAS_NF
 #undef _e4__BUILTIN_PUN_NF
@@ -153,8 +156,8 @@ _e4__BUILTIN_SYSTEM_DECL();
     _e4__BUILTIN_PROC_NF(w, n, f)
 #define _e4__BUILTIN_CONSTANT(w, c) \
     _e4__BUILTIN_PROC_F(w, e4__F_CONSTANT)
-#define _e4__BUILTIN_USERVAR(w) \
-    _e4__BUILTIN_PROC(w)
+#define _e4__BUILTIN_USERVAR_N(w, n)    \
+    _e4__BUILTIN_PROC_N(w, n)
 
 const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT] =
 {
@@ -172,7 +175,7 @@ const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT] =
     #endif
 };
 
-#undef _e4__BUILTIN_USERVAR
+#undef _e4__BUILTIN_USERVAR_N
 #undef _e4__BUILTIN_CONSTANT
 #undef _e4__BUILTIN_ALIAS_NF
 #undef _e4__BUILTIN_PUN_NF
@@ -193,7 +196,7 @@ const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT] =
     {e4__builtin_##t, NULL},
 #define _e4__BUILTIN_CONSTANT(w, c) \
     {e4__execute_userval, (void *)((e4__usize)(c))},
-#define _e4__BUILTIN_USERVAR(w) \
+#define _e4__BUILTIN_USERVAR_N(w, n)    \
     {e4__execute_uservar, (void *)((e4__usize)(e4__UV_##w))},
 
 const struct e4__execute_tuple e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
@@ -212,13 +215,17 @@ const struct e4__execute_tuple e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
     #endif
 };
 
-#undef _e4__BUILTIN_USERVAR
+#undef _e4__BUILTIN_USERVAR_N
 #undef _e4__BUILTIN_CONSTANT
 #undef _e4__BUILTIN_ALIAS_NF
 #undef _e4__BUILTIN_PUN_NF
 #undef _e4__BUILTIN_THUNK_NF
 #undef _e4__BUILTIN_PROC_NF
 #undef _e4__BUILTIN_PROC_FIRST
+#undef _e4__BUILTIN_USERVAR
+#undef _e4__BUILTIN_ALIAS_F
+#undef _e4__BUILTIN_ALIAS_N
+#undef _e4__BUILTIN_ALIAS
 #undef _e4__BUILTIN_PUN_F
 #undef _e4__BUILTIN_PUN_N
 #undef _e4__BUILTIN_PUN

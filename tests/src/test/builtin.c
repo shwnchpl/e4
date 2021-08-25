@@ -177,6 +177,26 @@ static void e4t__test_builtin_does(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 158);
 }
 
+/* Covers EVALUATE S" SOURCE-ID */
+static void e4t__test_builtin_evaluate(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* Test that calling EVALUATE evaluates provided strings. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": define-foo s\" : foo 2 2 + ;\" ;",
+            -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "define-foo evaluate", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+
+    /* Test that SOURCE-ID is set correctly when evaluating. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo s\" source-id\" ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "foo evaluate", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__SID_STR);
+}
+
 /* Covers ABORT */
 static void e4t__test_builtin_exceptions(void)
 {
@@ -1280,7 +1300,7 @@ static void e4t__test_builtin_stackmanip(void)
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 30 40 10 20 ");
 }
 
-/* Covers BASE HERE PAD */
+/* Covers BASE HERE PAD SOURCE-ID */
 static void e4t__test_builtin_uservars(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -1296,6 +1316,10 @@ static void e4t__test_builtin_uservars(void)
     e4t__ASSERT_OK(e4__evaluate(task, "pad", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__task_uservar(task, e4__UV_PAD));
+
+    e4t__ASSERT_OK(e4__evaluate(task, "source-id", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__SID_STR);
 }
 
 void e4t__test_builtin(void)
@@ -1305,6 +1329,7 @@ void e4t__test_builtin(void)
     e4t__test_builtin_data();
     e4t__test_builtin_defer();
     e4t__test_builtin_does();
+    e4t__test_builtin_evaluate();
     e4t__test_builtin_exceptions();
     e4t__test_builtin_forget();
     e4t__test_builtin_immediate();

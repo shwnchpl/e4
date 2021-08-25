@@ -421,6 +421,25 @@ static void e4__builtin_EQUALS(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_EVALUATE(struct e4__task *task, void *user)
+{
+    register e4__usize len;
+    register const char *str;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    len = (e4__usize)e4__stack_pop(task);
+    str = (const char *)(e4__cell)e4__stack_pop(task);
+
+    /* No need to worry about the return value from this. If exceptions
+       are enabled, they'll be thrown from beneath evaluate and caught
+       by whatever handler is installed above us. If exceptions aren't
+       enabled, there's nothing for us to do anyhow. */
+    e4__evaluate(task, str, len);
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_EXECUTE(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);

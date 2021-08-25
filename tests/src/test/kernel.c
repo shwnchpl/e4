@@ -379,6 +379,12 @@ static e4__usize e4t__test_kernel_quit_accept(void *user, char *buf,
             e4t__ASSERT_MATCH(e4t__term_obuf_consume(), " EXCEPTION: -13\n");
             e4t__ASSERT(!e4__task_compiling(test_data->task));
             e4t__ASSERT_EQ(e4__stack_depth(test_data->task), 0);
+            /* Test that SOURCE-ID contains UID. */
+            _m("source-id");
+            break;
+        case 7:
+            e4t__ASSERT_EQ(e4__stack_depth(test_data->task), 1);
+            e4t__ASSERT_EQ(e4__stack_pop(test_data->task), e4__SID_UID);
             _m("bye");
             break;
         default:

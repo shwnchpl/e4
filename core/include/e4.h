@@ -201,6 +201,7 @@ struct e4__io_func {
 #define e4__UV_HERE         (0)
 #define e4__UV_PAD          (1)
 #define e4__UV_BASE         (8)
+#define e4__UV_SOURCE_ID    (10)
 
 /* builtin constants */
 enum e4__builtin_id {
@@ -240,6 +241,7 @@ enum e4__builtin_id {
     e4__B_ELSE,
     e4__B_EMIT,
     e4__B_EQUALS,
+    e4__B_EVALUATE,
     e4__B_EXECUTE,
     e4__B_EXIT,
     e4__B_FETCH,
@@ -346,6 +348,7 @@ enum e4__builtin_id {
         e4__B_REFILL,
         e4__B_ROLL,
         e4__B_S_BACKSLASH_QUOTE,
+        e4__B_SOURCE_ID,
         e4__B_TO,
         e4__B_TRUE,
         e4__B_TUCK,

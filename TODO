@@ -86,7 +86,7 @@ General Builtins
 - [DONE] Implement FILL, ERASE, and MOVE builtins.
 - [DONE] Implement BUFFER: builtin.
 - [DONE] Implement UNUSED builtin.
-- Implement EVALUATE and SOURCE-ID builtins.
+- [DONE] Implement EVALUATE and SOURCE-ID builtins.
 - Implement THROW and CATCH builtins.
 
 Kernel
@@ -212,6 +212,10 @@ General Builtins
                 27 hold
             #> type
             ;
+- Consider adding _NF variants to USERVAR declaration macros, defining
+  e4__UV_BEGIN, and simply defining BEGIN as its own uservar rather
+  than in terms of HERE using PUN macros. Consider also removing pun
+  macros.
 
 General IO
 ----------
