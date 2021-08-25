@@ -137,12 +137,12 @@ Testing
   e4__mem_dump utility.
 - [DONE] Cover user IO errors in tests (ie. user provided IO handler
   returns non-zero or IO handler is missing).
-- Add tests to ensure that compile time coherence tracking (with tr0)
+- [DONE] Cover return stack underflow in the event of a direct call to
+  e4__execute_ret whether exceptions are enabled or not.
+- Add tests to ensure that return stack coherence tracking (with tr0)
   behaves correctly when exceptions are disabled, including in cases
   when e4__execute_ret are called when there is nothing on the return
   stack.
-- Cover return stack underflow in the event of a direct call to
-  e4__execute_ret.
 - Cover tr0 coherence (with exceptions enabled) in tests. This can be
   done using THROW and CATCH along with r> and >r.
 

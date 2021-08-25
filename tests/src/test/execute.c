@@ -3,6 +3,66 @@
 
 #include <string.h>
 
+static void e4t__test_execute_badret_nret(struct e4__task *task,
+        void *user);
+
+static void e4t__test_execute_badret(void)
+{
+    struct e4__execute_tuple nret_xt = {
+        e4t__test_execute_badret_nret,
+        (void *)2
+    };
+    const void *bad_ret[] = {
+        e4__execute_threaded,
+        NULL,
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
+        (void *)5,
+        &nret_xt,
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
+        (void *)10,
+        &e4__BUILTIN_XT[e4__B_EXIT],
+        &e4__BUILTIN_XT[e4__B_SENTINEL]
+    };
+
+    struct e4__task *task = e4t__transient_task();
+
+    /* Check that returning twice "aborts" and doesn't end up reaching
+       the 10 literal. */
+    e4__execute(task, bad_ret);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+
+    /* Check that over-returning many many times has the same
+       behavior. */
+    nret_xt.user = (void *)100;
+    e4__execute(task, bad_ret);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+
+    /* Check that this works correctly when exceptions are enabled as
+       well. */
+    e4__dict_entry(task, "badret2", 7, 0, e4t__test_execute_badret_nret,
+            (void *)2);
+    e4__dict_entry(task, "badret100", 9, 0, e4t__test_execute_badret_nret,
+            (void *)100);
+
+    e4t__ASSERT_EQ(e4__evaluate(task, "badret2", -1), e4__E_RSTKUNDERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, "badret100", -1), e4__E_RSTKUNDERFLOW);
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo badret2 ;", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "foo", -1), e4__E_RSTKUNDERFLOW);
+    e4t__ASSERT_OK(e4__evaluate(task, ": bar badret100 ;", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "bar", -1), e4__E_RSTKUNDERFLOW);
+}
+
+static void e4t__test_execute_badret_nret(struct e4__task *task,
+        void *user)
+{
+    e4__usize i;
+
+    for (i = 0; i < (e4__usize)e4__DEREF(user); ++i)
+        e4__execute_ret(task);
+}
+
 static void e4t__test_execute_branch(void)
 {
     static const void *branch_skip[] = {
@@ -330,6 +390,7 @@ static void e4t__test_execute_userfunc(void)
 
 void e4t__test_execute(void)
 {
+    e4t__test_execute_badret();
     e4t__test_execute_branch();
     e4t__test_execute_data();
     e4t__test_execute_defer();
