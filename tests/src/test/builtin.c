@@ -382,7 +382,6 @@ static void e4t__test_builtin_io(void)
     e4t__ASSERT_OK(e4__evaluate(task,
             ": foo .( Right out of the gate!) 2 2 + ;", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "Right out of the gate!");
-
 }
 
 /* Covers DUMP */
@@ -422,6 +421,35 @@ static void e4t__test_builtin_io_dump(void)
     #undef _f
 
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), expected);
+}
+
+/* Covers . .( ." .S CR DUMP EMIT KEY TYPE U. WORDS */
+static void e4t__test_builtin_io_error(void)
+{
+    struct e4__task *task = e4t__transient_task();
+    struct e4__io_func io_func = {0,};
+
+    /* Clear all test related IO handlers. */
+    e4__task_io_init(task, &io_func);
+
+    /* Test that all words that can raise IO errors do so when
+       no IO handler is available. */
+    e4t__ASSERT_EQ(e4__evaluate(task, "1337 .", -1), e4__E_UNSUPPORTED);
+    e4t__ASSERT_EQ(e4__evaluate(task, ".( Hello, World!)", -1),
+            e4__E_UNSUPPORTED);
+    e4t__ASSERT_EQ(e4__evaluate(task, ".\" Hello again, World!\"", -1),
+            e4__E_UNSUPPORTED);
+    e4t__ASSERT_EQ(e4__evaluate(task, ".s", -1), e4__E_UNSUPPORTED);
+    e4t__ASSERT_EQ(e4__evaluate(task, "cr", -1), e4__E_UNSUPPORTED);
+    e4t__ASSERT_EQ(e4__evaluate(task, "here 5 cells dump", -1),
+            e4__E_UNSUPPORTED);
+    e4t__ASSERT_EQ(e4__evaluate(task, "51 emit", -1), e4__E_UNSUPPORTED);
+    e4t__ASSERT_EQ(e4__evaluate(task, "key", -1), e4__E_UNSUPPORTED);
+    e4__stack_push(task, (e4__cell)"Just some junk.");
+    e4__stack_push(task, (e4__cell)10);
+    e4t__ASSERT_EQ(e4__evaluate(task, "type", -1), e4__E_UNSUPPORTED);
+    e4t__ASSERT_EQ(e4__evaluate(task, "5 u.", -1), e4__E_UNSUPPORTED);
+    e4t__ASSERT_EQ(e4__evaluate(task, "words", -1), e4__E_UNSUPPORTED);
 }
 
 /* Covers = < > <> 0< 0> 0<> 0= AND INVERT NEGATE OR U< U> XOR */
@@ -1366,6 +1394,7 @@ void e4t__test_builtin(void)
     e4t__test_builtin_immediate();
     e4t__test_builtin_io();
     e4t__test_builtin_io_dump();
+    e4t__test_builtin_io_error();
     e4t__test_builtin_logic();
     e4t__test_builtin_math();
     e4t__test_builtin_memmanip();

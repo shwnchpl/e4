@@ -397,12 +397,14 @@ static void e4__builtin_ELSE(struct e4__task *task, void *user)
 
 static void e4__builtin_EMIT(struct e4__task *task, void *user)
 {
+    register e4__usize io_res;
     char c;
 
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
 
     c = (char)(e4__usize)e4__stack_pop(task);
-    e4__io_type(task, &c, 1);
+    if ((io_res = e4__io_type(task, &c, 1)))
+        e4__exception_throw(task, io_res);
 
     e4__execute_ret(task);
 }

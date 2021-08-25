@@ -162,8 +162,6 @@ static void e4t__test_kernel_io(void)
     const char *word;
     e4__usize len;
 
-    /* FIXME: Add more IO tests. */
-
     /* Clear all test related IO handlers. */
     e4__task_io_init(task, &io_func);
 

@@ -135,8 +135,8 @@ Testing
 - [DONE] Figure out some way to cover return stack corruption in tests.
 - [DONE] Cover the DUMP builtin, the e4__io_dump API, and the
   e4__mem_dump utility.
-- Cover user IO errors in tests (ie. user provided IO handler returns
-  non-zero).
+- [DONE] Cover user IO errors in tests (ie. user provided IO handler
+  returns non-zero or IO handler is missing).
 - Add tests to ensure that compile time coherence tracking (with tr0)
   behaves correctly when exceptions are disabled, including in cases
   when e4__execute_ret are called when there is nothing on the return
