@@ -26,6 +26,15 @@ static const void *e4__builtin_BACKSLASH[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
+static const void *e4__builtin_BUFFER_COLON[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_CREATE],
+    &e4__BUILTIN_XT[e4__B_ALLOT],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
 static void e4__builtin_COLON_NONAME(struct e4__task *task, void *user)
 {
     register struct e4__execute_token *xt =

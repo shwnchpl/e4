@@ -759,7 +759,7 @@ static void e4t__test_builtin_math(void)
     #undef _e
 }
 
-/* Covers @ ! +! 2@ 2! ALIGN ALIGNED ALLOT C, C@ C! CELLS CREATE
+/* Covers @ ! +! 2@ 2! ALIGN ALIGNED ALLOT BUFFER: C, C@ C! CELLS CREATE
    ERASE FILL HERE MOVE */
 static void e4t__test_builtin_memmanip(void)
 {
@@ -833,7 +833,7 @@ static void e4t__test_builtin_memmanip(void)
     e4t__ASSERT_OK(e4__evaluate(task, "here", -1));
     e4t__ASSERT(!((e4__usize)e4__stack_pop(task) % sizeof(e4__cell)));
     e4t__ASSERT_OK(e4__evaluate(task, "3 allot here", -1));
-    here0= (e4__usize)e4__stack_pop(task);
+    here0 = (e4__usize)e4__stack_pop(task);
     e4t__ASSERT(here0 % sizeof(e4__cell));
     e4t__ASSERT_OK(e4__evaluate(task, "align here", -1));
     here1 = (e4__usize)e4__stack_pop(task);
@@ -943,6 +943,15 @@ static void e4t__test_builtin_memmanip(void)
     e4t__ASSERT(!memcmp(mem, "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09", 10));
 
     #undef _c
+
+    /* Test that BUFFER: works as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task, "create foo here forget foo", -1));
+    here0 = (e4__usize)e4__stack_pop(task);
+    e4t__ASSERT_OK(e4__evaluate(task, "10 cells buffer: foo here foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), here0);
+    here1 = (e4__usize)e4__stack_pop(task);
+    e4t__ASSERT_EQ(here1 - here0, e4__mem_cells(10));
 }
 
 /* Covers >NUMBER and BASE uservar */

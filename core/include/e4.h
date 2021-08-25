@@ -328,6 +328,7 @@ enum e4__builtin_id {
         /* CORE EXT words */
         e4__B_AGAIN,
         e4__B_BACKSLASH,
+        e4__B_BUFFER_COLON,
         e4__B_COLON_NONAME,
         e4__B_DEFER,
         e4__B_DEFER_FETCH,

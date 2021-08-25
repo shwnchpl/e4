@@ -84,9 +84,9 @@ General Builtins
   builtin declarations.
 - [DONE] Implement ABS.
 - [DONE] Implement FILL, ERASE, and MOVE builtins.
-- Implement BUFFER: builtin.
-- Implement UNUSED.
-- Implement EVALUATE (builtin)
+- [DONE] Implement BUFFER: builtin.
+- Implement UNUSED builtin.
+- Implement EVALUATE and SOURCE-ID builtins.
 - Implement THROW and CATCH builtins.
 
 Kernel
