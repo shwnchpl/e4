@@ -26,7 +26,7 @@ e4__usize e4__io_dump(struct e4__task *task, e4__cell p, e4__usize len)
     return e4__E_OK;
 }
 
-e4__usize e4__io_key(struct e4__task *task, void *buf)
+e4__usize e4__io_key(struct e4__task *task, char *buf)
 {
     if (!task->io_func.key)
         return e4__E_UNSUPPORTED;

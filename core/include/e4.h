@@ -253,6 +253,7 @@ enum e4__builtin_id {
     e4__B_IMMEDIATE,
     e4__B_INVERT,
     e4__B_J,
+    e4__B_KEY,
     e4__B_LEAVE,
     e4__B_LEFT_BRACKET,
     e4__B_LESS_THAN,
@@ -493,7 +494,7 @@ void e4__execute_variable(struct e4__task *task, void *user);
 /* io.c functions */
 e4__usize e4__io_accept(struct e4__task *task, char *buf, e4__usize *n);
 e4__usize e4__io_dump(struct e4__task *task, e4__cell p, e4__usize len);
-e4__usize e4__io_key(struct e4__task *task, void *buf);
+e4__usize e4__io_key(struct e4__task *task, char *buf);
 e4__usize e4__io_parse(struct e4__task *task, char delim, e4__usize flags,
         const char **out);
 e4__usize e4__io_refill(struct e4__task *task, e4__usize *bf);

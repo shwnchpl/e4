@@ -175,6 +175,9 @@ static void e4t__test_kernel_io(void)
 
     task = e4t__transient_task();
 
+    /* XXX: e4__io_accept, e4__io_type, and e4__io_key APIs are covered
+       in term.c. */
+
     /* Test the e4__io_word API. */
     e4t__term_ibuf_feed("parse      some  words  ", -1);
     e4__io_refill(task, NULL);
@@ -254,8 +257,10 @@ static void e4t__test_kernel_io_dump(void)
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), expected);
 }
 
+
 static e4__usize e4t__test_kernel_quit_accept(void *user, char *buf,
         e4__usize *n);
+static e4__usize e4t__test_kernel_quit_key(void *user, char *b);
 
 struct e4t__test_kernel_quit_data {
     struct e4__task *task;
@@ -320,7 +325,8 @@ static void e4t__test_kernel_quit(void)
     };
     struct e4__io_func iof = {
         &test_data,
-        (void *)e4t__test_kernel_quit_accept,
+        e4t__test_kernel_quit_accept,
+        e4t__test_kernel_quit_key,
     };
 
     /* Hack. Normally this kind of thing isn't safe unless you know
@@ -385,6 +391,12 @@ static e4__usize e4t__test_kernel_quit_accept(void *user, char *buf,
         case 7:
             e4t__ASSERT_EQ(e4__stack_depth(test_data->task), 1);
             e4t__ASSERT_EQ(e4__stack_pop(test_data->task), e4__SID_UID);
+            /* Test the KEY builtin. */
+            _m("key");
+            break;
+        case 8:
+            e4t__ASSERT_EQ(e4__stack_depth(test_data->task), 1);
+            e4t__ASSERT_EQ(e4__stack_pop(test_data->task), 'f');
             _m("bye");
             break;
         default:
@@ -397,6 +409,12 @@ static e4__usize e4t__test_kernel_quit_accept(void *user, char *buf,
 
     #undef _m
 
+    return e4__E_OK;
+}
+
+static e4__usize e4t__test_kernel_quit_key(void *user, char *b)
+{
+    *b = 'f';
     return e4__E_OK;
 }
 

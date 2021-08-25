@@ -87,7 +87,9 @@ General Builtins
 - [DONE] Implement BUFFER: builtin.
 - [DONE] Implement UNUSED builtin.
 - [DONE] Implement EVALUATE and SOURCE-ID builtins.
+- [DONE] Implement the KEY builtin.
 - Implement THROW and CATCH builtins.
+- Implement ?DUP, CHAR, [CHAR], SPACE, and SPACES.
 
 Kernel
 ------

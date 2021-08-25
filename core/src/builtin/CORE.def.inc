@@ -244,7 +244,7 @@ static const void *e4__builtin_COUNT[] = {
 
 static void e4__builtin_CR(struct e4__task *task, void *user)
 {
-    e4__usize io_res;
+    register e4__usize io_res;
 
     /* FIXME: Should this actually output \r\n? */
     if ((io_res = e4__io_type(task, "\n", 1)))
@@ -534,6 +534,19 @@ static void e4__builtin_J(struct e4__task *task, void *user)
     e4__stack_push(task, task->rp[3]);
 
     /* e4__execute_ret intentionally omitted. */
+}
+
+static void e4__builtin_KEY(struct e4__task *task, void *user)
+{
+    register e4__usize io_res;
+    char k;
+
+    if ((io_res = e4__io_key(task, &k)))
+        e4__exception_throw(task, io_res);
+
+    e4__stack_push(task, (e4__cell)(e4__usize)k);
+
+    e4__execute_ret(task);
 }
 
 static void e4__builtin_LEAVE(struct e4__task *task, void *user)
