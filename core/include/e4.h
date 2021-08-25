@@ -170,8 +170,8 @@ struct e4__io_func {
 /* error constants - system */
 #define e4__E_FAILURE       (-256)
 #define e4__E_BYE           (-257)
-#define e4__E_BUG           (-257)
-#define e4__E_INVBUILTINMUT (-258)
+#define e4__E_BUG           (-258)
+#define e4__E_INVBUILTINMUT (-259)
 
 /* flag constants - dictionary entry */
 #define e4__F_IMMEDIATE     (0x01)
