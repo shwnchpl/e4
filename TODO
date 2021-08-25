@@ -113,6 +113,7 @@ Kernel
 REPL
 ----
 - [DONE] Add tab-completion to the repl.
+- [DONE] Simply return e4__E_BYE exception when EOF is encountered.
 - Implement a custom signal handler or custom signal handlers so that
   it's possible to handle SIGINT and throw the appropriate exception.
   If an exception cannot be thrown, in SIGNIT, the fallback should be
@@ -128,7 +129,6 @@ REPL
   receipt of SIGWINCH).
 - Catch SIGSEV and raise an exception if possible (and call exit if
   not).
-- Simply throw the BYE exception when EOF is encountered.
 
 Testing
 -------

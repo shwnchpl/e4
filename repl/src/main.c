@@ -95,9 +95,10 @@ static e4__usize repl_accept(void *user, char *buf, e4__usize *n)
         num = *n;
 
     if (buf == NULL || num == 0) {
-        memcpy(buf, "quit", 4);
-        *n = 4;
-        el_push(rd->el, "bye\n");
+        /* Simply display a newline and return e4__E_BYE, which should
+           tear everything down gracefully. */
+        putchar('\n');
+        return e4__E_BYE;
     } else {
         memcpy(buf, ebuf, num);
         *n = num;
