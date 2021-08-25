@@ -54,6 +54,9 @@
 #if defined(e4__INCLUDE_CORE_EXT)
     #include "CORE-EXT.decl.inc"
 #endif
+#if defined(e4__INCLUDE_EXCEPTION)
+    #include "EXCEPTION.decl.inc"
+#endif
 #if defined(e4__INCLUDE_TOOLS)
     #include "TOOLS.decl.inc"
 #endif
@@ -118,6 +121,9 @@ _e4__BUILTIN_SYSTEM_DECL();
 #if defined(e4__INCLUDE_CORE_EXT)
     _e4__BUILTIN_CORE_EXT_DECL();
 #endif
+#if defined(e4__INCLUDE_EXCEPTION)
+    _e4__BUILTIN_EXCEPTION_DECL();
+#endif
 #if defined(e4__INCLUDE_TOOLS)
     _e4__BUILTIN_TOOLS_DECL();
 #endif
@@ -167,6 +173,9 @@ const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT] =
     #if defined(e4__INCLUDE_CORE_EXT)
         _e4__BUILTIN_CORE_EXT_DECL()
     #endif
+    #if defined(e4__INCLUDE_EXCEPTION)
+        _e4__BUILTIN_EXCEPTION_DECL()
+    #endif
     #if defined(e4__INCLUDE_TOOLS)
         _e4__BUILTIN_TOOLS_DECL()
     #endif
@@ -206,6 +215,9 @@ const struct e4__execute_tuple e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
 
     #if defined(e4__INCLUDE_CORE_EXT)
         _e4__BUILTIN_CORE_EXT_DECL()
+    #endif
+    #if defined(e4__INCLUDE_EXCEPTION)
+        _e4__BUILTIN_EXCEPTION_DECL()
     #endif
     #if defined(e4__INCLUDE_TOOLS)
         _e4__BUILTIN_TOOLS_DECL()
@@ -288,6 +300,9 @@ void e4__builtin_exec_(e4__usize count, /* struct e4__task *task, */
 
 #if defined(e4__INCLUDE_CORE_EXT)
     #include "CORE-EXT.def.inc"
+#endif
+#if defined(e4__INCLUDE_EXCEPTION)
+    #include "EXCEPTION.def.inc"
 #endif
 #if defined(e4__INCLUDE_TOOLS)
     #include "TOOLS.def.inc"

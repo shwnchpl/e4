@@ -197,15 +197,46 @@ static void e4t__test_builtin_evaluate(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__SID_STR);
 }
 
-/* Covers ABORT */
+/* Covers ABORT BYE CATCH THROW QUIT */
 static void e4t__test_builtin_exceptions(void)
 {
     struct e4__task *task = e4t__transient_task();
 
-    /* FIXME: Add more builtin exception related tests as more
-       exception related words are added. */
+    /* XXX: Detailed stack and return stack preservation semantics are
+       covered by e4t__test_kernel_exceptions in kernel.c. */
 
+    /* Test that ABORT throws e4__E_ABORT. */
     e4t__ASSERT_EQ(e4__evaluate(task, "abort", -1), e4__E_ABORT);
+
+    /* Test that QUIT throws e4__E_QUIT. */
+    e4t__ASSERT_EQ(e4__evaluate(task, "quit", -1), e4__E_QUIT);
+
+    /* Test that BYE throws e4__E_BYE. */
+    e4t__ASSERT_EQ(e4__evaluate(task, "bye", -1), e4__E_BYE);
+
+    /* Test that it's possible to throw an arbitrary exception using
+       the THROW builtin. */
+    e4t__ASSERT_EQ(e4__evaluate(task, "1133469 throw", -1), 1133469);
+
+    /* Test that it's possible to catch exceptions other than QUIT and
+       BYE using the CATCH builtin. */
+    e4t__ASSERT_OK(e4__evaluate(task, "' abort catch", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__USIZE_NEGATE(1));
+
+    e4t__ASSERT_OK(e4__evaluate(task, ":noname 3456 throw ; catch", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 3456);
+
+    e4t__ASSERT_EQ(e4__evaluate(task, "' quit catch", -1), e4__E_QUIT);
+    e4t__ASSERT_EQ(e4__evaluate(task, "' bye catch", -1), e4__E_BYE);
+
+    /* Test that when nothing goes wrong, e4__E_OK is placed on top
+       of the stack. */
+    e4t__ASSERT_OK(e4__evaluate(task, ":noname 5 ; catch", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__E_OK);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
 }
 
 /* Covers FORGET, MARKER and look-ahead idiom (which uses builtin

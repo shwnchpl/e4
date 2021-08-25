@@ -2,7 +2,7 @@
 #include "e4-internal.h"
 
 /* FIXME: Rename user to something sane here and in e4__execute. */
-e4__usize e4__exception_catch(struct e4__task * task, void *user)
+e4__usize e4__exception_catch(struct e4__task *task, void *user)
 {
     register const e4__cell saved_sp = task->sp;
     register const e4__cell saved_rp = task->rp;

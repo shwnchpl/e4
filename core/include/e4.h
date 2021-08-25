@@ -27,18 +27,24 @@
 
 #if defined(e4__BUILD_EVERYTHING)
     #define e4__INCLUDE_CORE_EXT
+    #define e4__INCLUDE_EXCEPTION
     #define e4__INCLUDE_TOOLS
     #define e4__INCLUDE_TOOLS_EXT
 #elif defined(e4__BUILD_DEFAULT)
     /* XXX: For now, this is the same as everything, but that likely
        will not always be the case. */
     #define e4__INCLUDE_CORE_EXT
+    #define e4__INCLUDE_EXCEPTION
     #define e4__INCLUDE_TOOLS
     #define e4__INCLUDE_TOOLS_EXT
 #endif
 
 #if defined(e4__EXCLUDE_CORE_EXT) && defined(e4__INCLUDE_CORE_EXT)
     #undef e4__INCLUDE_CORE_EXT
+#endif
+
+#if defined(e4__EXCLUDE_EXCEPTION) && defined(e4__INCLUDE_EXCEPTION)
+    #undef e4__INCLUDE_EXCEPTION
 #endif
 
 #if defined(e4__EXCLUDE_TOOLS) && defined(e4__INCLUDE_TOOLS)
@@ -363,6 +369,14 @@ enum e4__builtin_id {
         e4__B_ZERO_NOT_EQUALS,
 
     #endif /* defined(e4__INCLUDE_CORE_EXT) */
+
+    #if defined(e4__INCLUDE_EXCEPTION)
+
+        /* EXCEPTION words */
+        e4__B_CATCH,
+        e4__B_THROW,
+
+    #endif /* defined(e4__INCLUDE_EXCEPTION) */
 
     #if defined(e4__INCLUDE_TOOLS)
 

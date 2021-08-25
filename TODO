@@ -88,7 +88,7 @@ General Builtins
 - [DONE] Implement UNUSED builtin.
 - [DONE] Implement EVALUATE and SOURCE-ID builtins.
 - [DONE] Implement the KEY builtin.
-- Implement THROW and CATCH builtins.
+- [DONE] Implement THROW and CATCH builtins.
 - Implement ?DUP, CHAR, [CHAR], SPACE, and SPACES.
 
 Kernel
@@ -218,6 +218,7 @@ General Builtins
   e4__UV_BEGIN, and simply defining BEGIN as its own uservar rather
   than in terms of HERE using PUN macros. Consider also removing pun
   macros.
+- Implement the ENVIRONMENT? builtin.
 
 General IO
 ----------
@@ -257,6 +258,10 @@ Documentation
 - Document all implementation-defined behavior as per Forth 2012 4.1.1.
 - Document all ambiguous condition handling as per Forth 2012 4.1.2.
 - Provide other system documentation as per by Forth 2012 4.1.3.
+- Document the fact that excluding the exception wordlist does not
+  actually disable exceptions. Even with the exceptions wordlist
+  excluded, exceptions are still used internally; it's just that the
+  CATCH and THROW builtin words are not available.
 
 Kernel
 ------
