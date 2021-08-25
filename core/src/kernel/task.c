@@ -3,6 +3,26 @@
 
 #include <string.h>
 
+/* XXX: It is the responsibility of the caller to ensure that HERE
+   stays aligned, either by reserving appropriate sizes to maintain
+   alignment or by only allowing HERE to stay unaligned very
+   temporarily.
+
+   The appropriate way to call this function is almost always one of
+   the following:
+
+        e4__task_allot(task, e4__mem_cells(n))
+        e4__task_allot(task, e4__mem_aligned(n)) */
+e4__cell e4__task_allot(struct e4__task *task, e4__usize sz)
+{
+    /* FIXME: Actually fail and throw an exception on dictionary
+       overflow, then add some allot_unchecked API to fill this
+       usecase. If exceptions are off, perhaps return NULL? */
+    register const e4__cell old_here = task->here;
+    task->here = (e4__cell)((e4__u8 *)task->here + sz);
+    return old_here;
+}
+
 e4__bool e4__task_compiling(struct e4__task *task)
 {
     return !!task->compile.state;
@@ -75,6 +95,16 @@ void e4__task_io_init(struct e4__task *task, struct e4__io_func *io_func)
 void e4__task_io_get(struct e4__task *task, struct e4__io_func *io_func)
 {
     *io_func = task->io_func;
+}
+
+e4__usize e4__task_unused(struct e4__task *task)
+{
+    /* XXX: Dictionary overflows should be prevented from happening
+       elsewhere, but in the event that the dictionary *has* overflowed
+       into PAD, report that there is no space available. */
+    return (e4__usize)task->pad > (e4__usize)task->here ?
+            (e4__usize)(task->pad - task->here) * sizeof(e4__cell) :
+            0;
 }
 
 e4__cell e4__task_uservar(struct e4__task *task, e4__usize offset)

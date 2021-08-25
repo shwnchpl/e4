@@ -262,6 +262,54 @@ struct e4t__test_kernel_quit_data {
     e4__usize step;
 };
 
+static void e4t__test_kernel_mem(void)
+{
+    struct e4__task *task = e4t__transient_task();
+    e4__cell here;
+    e4__usize unused;
+
+    /* Test that allocating returns old here and that allocating
+       nothing simply returns here and changes nothing. */
+    here = e4__task_uservar(task, e4__UV_HERE);
+    e4t__ASSERT_EQ(e4__task_allot(task, e4__mem_cells(1)), here);
+    here = e4__task_uservar(task, e4__UV_HERE);
+    e4t__ASSERT_EQ(e4__task_allot(task, e4__mem_cells(0)), here);
+    e4t__ASSERT_EQ(e4__task_uservar(task, e4__UV_HERE), here);
+
+    /* Test that unused changes as expected when allocating. */
+    unused = e4__task_unused(task);
+    e4__task_allot(task, e4__mem_cells(1));
+    e4t__ASSERT_EQ(e4__task_unused(task), unused - e4__mem_cells(1));
+
+    /* Test that allocating all unused memory leaves none. */
+    e4__task_allot(task, e4__task_unused(task));
+    e4t__ASSERT_EQ(e4__task_unused(task), 0);
+
+    /* Test that unallocating with negation is possible. */
+    here = e4__task_allot(task, e4__USIZE_NEGATE(unused));
+    e4t__ASSERT_EQ(e4__task_unused(task), unused);
+
+    /* Test that allocating everything runs into PAD. */
+    e4t__ASSERT_EQ(here, e4__task_uservar(task, e4__UV_PAD));
+
+    /* Test that unused reports zero whenever HERE is greater than
+       PAD. */
+    e4t__ASSERT((e4__usize)e4__task_uservar(task, e4__UV_HERE) <
+            (e4__usize)e4__task_uservar(task, e4__UV_PAD));
+    e4__task_allot(task, e4__task_unused(task) + e4__mem_cells(2));
+    e4t__ASSERT((e4__usize)e4__task_uservar(task, e4__UV_HERE) >
+            (e4__usize)e4__task_uservar(task, e4__UV_PAD));
+    e4t__ASSERT_EQ(e4__task_unused(task), 0);
+
+    e4__task_allot(task, e4__USIZE_NEGATE(e4__mem_cells(1)));
+    e4t__ASSERT_EQ(e4__task_unused(task), 0);
+    e4__task_allot(task, e4__USIZE_NEGATE(e4__mem_cells(1)));
+    e4t__ASSERT_EQ(e4__task_unused(task), 0);
+
+    e4__task_allot(task, e4__USIZE_NEGATE(e4__mem_cells(1)));
+    e4t__ASSERT_EQ(e4__task_unused(task), e4__mem_cells(1));
+}
+
 static void e4t__test_kernel_quit(void)
 {
     struct e4__io_func old_iof;
@@ -389,6 +437,7 @@ void e4t__test_kernel(void)
     e4t__test_kernel_evaluate();
     e4t__test_kernel_io();
     e4t__test_kernel_io_dump();
+    e4t__test_kernel_mem();
     e4t__test_kernel_quit();
     e4t__test_kernel_stack();
 }

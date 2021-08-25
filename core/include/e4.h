@@ -523,10 +523,12 @@ e4__usize e4__num_sdiv(e4__usize n, e4__usize d);
 e4__usize e4__num_smod(e4__usize n, e4__usize d);
 
 /* task.c functions */
+e4__cell e4__task_allot(struct e4__task *task, e4__usize sz);
 e4__bool e4__task_compiling(struct e4__task *task);
 struct e4__task* e4__task_create(void *buffer, e4__usize sz);
 void e4__task_io_init(struct e4__task *task, struct e4__io_func *io);
 void e4__task_io_get(struct e4__task *task, struct e4__io_func *io);
+e4__usize e4__task_unused(struct e4__task *task);
 e4__cell e4__task_uservar(struct e4__task *task, e4__usize offset);
 
 #endif /* e4_H_ */

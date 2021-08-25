@@ -64,8 +64,7 @@ static void e4__builtin_ALIGNED(struct e4__task *task, void *user)
 static void e4__builtin_ALLOT(struct e4__task *task, void *user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
-    task->here = (e4__cell)((e4__u8 *)task->here +
-            (e4__usize)e4__stack_pop(task));
+    e4__task_allot(task, (e4__usize)e4__stack_pop(task));
     e4__execute_ret(task);
 }
 
