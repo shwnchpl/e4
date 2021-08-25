@@ -98,18 +98,6 @@ Kernel
   exceptions. To make tr0 always have a coherent value, it will be
   necessary to at least set it to r0 on task initialization and preserve
   its value across exceptions.
-- Add e4__task_interrupt API. This API can be called from a signal
-  handler or an ISR (as long as the e4__task is *known* not to be
-  running) and it sets a flag in the task that will throw an
-  e4__E_INTERRUPTED exception from threaded_execute as soon as
-  possible. This can be used by REPLs as a way of handling SIGINT
-  etc. Once this is implemented, test it out in the REPL. Consider
-  how to implement this so that it doesn't behave oddly when waiting
-  for input. One idea is that execution depth could be counted in
-  e4__thread_execute (possibly nice to have for other reasons as
-  well) and the flag could be set only in cases when that value
-  is non-zero, although this would have the unfortunate side effect
-  of needing to track yet another thing across exceptions.
 - Add asserts that execute_tuple and execute_token field order lines
   up correctly.
 - Handle dictionary overflows and other overflows. Especially
@@ -119,27 +107,28 @@ Kernel
 - Ensure memmove is always called with size_t, not e4__usize. It's
   possible (although unlikely) that these types may not implicitly
   convert between one another without generating a warning.
+- Thunk into exceptions when evaluating REFILL in QUIT. Cover this
+  in tests.
 
 REPL
 ----
 - [DONE] Add tab-completion to the repl.
 - Implement a custom signal handler or custom signal handlers so that
-  it's possible to handle SIGINT and call e4__task_interrupt, once
-  it has been implemented. Signal handlers will need to take
-  appropriate action to keep libedit happy as well (in particular, it
-  is necessary to call el_resize upon receipt of SIGWINCH).
-  Alternatively, with respect to SIGINT, simply throw an exception
-  from the signal handler. If something is executing, exceptions are
-  enabled, and this will throw one and return to the prompt. If not,
-  it can fall back to just calling exit. With this, e4__task_interrupt
-  may not even be necessary in the first place. This is all possible
-  because it is safe to longjmp out of signal handlers as long as they
-  aren't nested (ie. a signal handler invoked because of code that
-  was executing in another signal handler). It should be possible to
-  ensure that will never happen and stay within the realm of defined
-  behavior while taking advantage of the existing exception semantic.
+  it's possible to handle SIGINT and throw the appropriate exception.
+  If an exception cannot be thrown, in SIGNIT, the fallback should be
+  to simply call exit with an appropriate exit status (OK?) directly.
+  This is all possible because it is safe to longjmp out of signal
+  handlers as long as they aren't nested (ie. a signal handler invoked
+  because of code that was executing in another signal handler). It
+  should be possible to ensure that will never happen and stay within
+  the realm of defined behavior while taking advantage of the existing
+  exception semantic.
+  Signal handlers will need to take appropriate action to keep libedit
+  happy as well (in particular, it is necessary to call el_resize upon
+  receipt of SIGWINCH).
 - Catch SIGSEV and raise an exception if possible (and call exit if
   not).
+- Simply throw the BYE exception when EOF is encountered.
 
 Testing
 -------
@@ -152,11 +141,10 @@ Testing
   behaves correctly when exceptions are disabled, including in cases
   when e4__execute_ret are called when there is nothing on the return
   stack.
-- Cover the fact that ip is set to NULL after an exception.
 - Cover return stack underflow in the event of a direct call to
   e4__execute_ret.
-- Cover tr0 coherence (with and without exceptions enabled) in tests.
-  This will be easier to fully cover once exceptions are enabled.
+- Cover tr0 coherence (with exceptions enabled) in tests. This can be
+  done using THROW and CATCH along with r> and >r.
 
 
 Version 0.3
@@ -328,3 +316,27 @@ Kernel
   subtracts the size of the data field when allocating to take the size
   of an execute_tuple structure instead?
     -- No real reason to do this.
+- Add e4__task_interrupt API. This API can be called from a signal
+  handler or an ISR (as long as the e4__task is *known* not to be
+  running) and it sets a flag in the task that will throw an
+  e4__E_INTERRUPTED exception from threaded_execute as soon as
+  possible. This can be used by REPLs as a way of handling SIGINT
+  etc. Once this is implemented, test it out in the REPL. Consider
+  how to implement this so that it doesn't behave oddly when waiting
+  for input. One idea is that execution depth could be counted in
+  e4__thread_execute (possibly nice to have for other reasons as
+  well) and the flag could be set only in cases when that value
+  is non-zero, although this would have the unfortunate side effect
+  of needing to track yet another thing across exceptions.
+    -- As it turns out, this isn't actually needed for anything, and
+       it's not the cleanest thing, so avoiding it is the best course
+       of action.
+
+Testing
+-------
+- Cover the fact that ip is set to NULL after an exception.
+    -- This is an implementation detail. If everything "works," it
+       doesn't really matter what IP is set to after an exception.
+       It just ends up getting reset at the relevant execute_ret
+       call or becoming irrelevant because evaluation/execution is
+       complete anyhow.

@@ -160,6 +160,12 @@ void e4__evaluate_quit(struct e4__task *task)
         task->io_src.length = 0;
         task->io_src.sz = task->tib_sz;
 
+        /* FIXME: Thunk into exceptions being enabled for this call to
+           refill. The easiest way to do this may be by extending
+           e4__builtin_excute to enable exceptions and return an error
+           code. This will allow REPL implementations to raise
+           exceptions while e4 is blocked waiting for input within
+           the quit loop, which may be desirable in many scenarios. */
         res = e4__io_refill(task, NULL);
         res = res ? res : e4__evaluate_internal(task);
         switch (res) {
