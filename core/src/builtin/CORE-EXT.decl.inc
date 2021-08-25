@@ -34,6 +34,7 @@
     _e4__BUILTIN_PROC_N(TWO_R_FROM, "2R>")  \
     _e4__BUILTIN_PROC_N(TWO_TO_R, "2>R")    \
     _e4__BUILTIN_THUNK_N(U_GREATER_THAN, "U>")  \
+    _e4__BUILTIN_PROC(UNUSED)   \
     _e4__BUILTIN_PROC(VALUE)    \
     _e4__BUILTIN_THUNK_N(ZERO_GREATER, "0>")  \
     _e4__BUILTIN_THUNK_N(ZERO_NOT_EQUALS, "0<>")

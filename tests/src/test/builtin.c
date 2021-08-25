@@ -952,6 +952,33 @@ static void e4t__test_builtin_memmanip(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), here0);
     here1 = (e4__usize)e4__stack_pop(task);
     e4t__ASSERT_EQ(here1 - here0, e4__mem_cells(10));
+
+    /* Test that UNUSED returns the number of unused address units of
+       zero if there are none. */
+    task = e4t__transient_task();
+    e4t__ASSERT_OK(e4__evaluate(task, "unused", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0x978);
+    e4t__ASSERT_OK(e4__evaluate(task, "unused allot unused", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    /* Calling ALLOT with a positive number should now raise an
+       exception, so directly call the appropriate kernel API
+       instead. */
+    e4__task_allot(task, e4__mem_cells(1));
+
+    e4t__ASSERT_OK(e4__evaluate(task, "unused", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_OK(e4__evaluate(task, "-1 cells allot", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "unused", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_OK(e4__evaluate(task, "-1 cells allot", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "unused", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__mem_cells(1));
 }
 
 /* Covers >NUMBER and BASE uservar */

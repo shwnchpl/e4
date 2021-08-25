@@ -85,7 +85,7 @@ General Builtins
 - [DONE] Implement ABS.
 - [DONE] Implement FILL, ERASE, and MOVE builtins.
 - [DONE] Implement BUFFER: builtin.
-- Implement UNUSED builtin.
+- [DONE] Implement UNUSED builtin.
 - Implement EVALUATE and SOURCE-ID builtins.
 - Implement THROW and CATCH builtins.
 

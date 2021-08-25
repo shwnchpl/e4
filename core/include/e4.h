@@ -353,6 +353,7 @@ enum e4__builtin_id {
         e4__B_TWO_R_FROM,
         e4__B_TWO_TO_R,
         e4__B_U_GREATER_THAN,
+        e4__B_UNUSED,
         e4__B_VALUE,
         e4__B_ZERO_GREATER,
         e4__B_ZERO_NOT_EQUALS,
