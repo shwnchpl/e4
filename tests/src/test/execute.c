@@ -368,6 +368,72 @@ static void e4t__test_execute_userfunc_setter(struct e4__task *task,
     **((e4__usize **)user) = 207;
 }
 
+static void e4t__test_execute_tr0coherent(void)
+{
+    struct e4__task *task = e4t__transient_task();
+    static const void *corrupt_rstack_push[] = {
+        e4__execute_threaded,
+        NULL,
+        &e4__BUILTIN_XT[e4__B_LIT_STR],
+        (void *)13,
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
+        (void *)5,
+        &e4__BUILTIN_XT[e4__B_TO_R],
+        &e4__BUILTIN_XT[e4__B_TO_R],
+        &e4__BUILTIN_XT[e4__B_EXIT],
+        &e4__BUILTIN_XT[e4__B_SENTINEL]
+    };
+    static const void *corrupt_rstack_pop[] = {
+        e4__execute_threaded,
+        NULL,
+        &e4__BUILTIN_XT[e4__B_R_FROM],
+        &e4__BUILTIN_XT[e4__B_R_FROM],
+        &e4__BUILTIN_XT[e4__B_EXIT],
+        &e4__BUILTIN_XT[e4__B_SENTINEL]
+    };
+
+    /* Test that return stack depth limits are preserved across
+       exceptions. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo 1 >r throw 50 ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": should-pass-helper 1 2 >r >r ['] foo catch r> r> 2drop drop ;",
+            -1));
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": should-fail1-helper 1 2 >r >r ['] foo catch r> r> r> "
+            "2drop 2drop ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": should-fail2-helper 1 2 >r >r ['] foo catch r> 2drop ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": should-pass 3 >r should-pass-helper r> drop ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": should-fail1 3 >r should-fail1-helper abort ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": should-fail2 3 >r should-fail2-helper abort ;", -1));
+
+    e4t__ASSERT_OK(e4__evaluate(task, "should-pass", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "should-fail1", -1),
+            e4__E_RSTKUNDERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, "should-fail2", -1),
+            e4__E_RSTKIMBALANCE);
+
+    /* Test that tr0 is reset correctly even when exceptions are
+       disabled. Manually overwriting a return address with a garbage
+       value would still cause a failure, but if this works then at the
+       very least there is a chance to recover. In practice, there is
+       likely no reason why this would ever come up. */
+    e4t__ASSERT_EQ(e4__stack_rdepth(task), 0);
+    e4__stack_rpush(task, (void *)50);
+    e4__execute(task, corrupt_rstack_push);
+    e4t__ASSERT_EQ(e4__stack_rdepth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_rpop(task), 50);
+
+    e4t__ASSERT_EQ(e4__stack_rdepth(task), 0);
+    e4__stack_rpush(task, (void *)50);
+    e4__execute(task, corrupt_rstack_pop);
+    e4t__ASSERT_EQ(e4__stack_rdepth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_rpop(task), 50);
+}
+
 /* Covers user functions. */
 static void e4t__test_execute_userfunc(void)
 {
@@ -397,5 +463,6 @@ void e4t__test_execute(void)
     e4t__test_execute_does();
     e4t__test_execute_nested();
     e4t__test_execute_string();
+    e4t__test_execute_tr0coherent();
     e4t__test_execute_userfunc();
 }
