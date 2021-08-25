@@ -84,6 +84,13 @@ e4__ASSERT(e4__NARGS(1, 2, 3, 4, 5, 6, 7, 8) == 8);
 e4__ASSERT(e4__NARGS(1, 2, 3, 4, 5, 6, 7, 8, 9) == 9);
 e4__ASSERT(e4__NARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10) == 10);
 
+/* Ensure that e4__execute_tuple and e4__execute_token fields line up
+   correctly. */
+e4__ASSERT(&((struct e4__execute_token *)NULL)->code ==
+        &((struct e4__execute_tuple *)NULL)->code);
+e4__ASSERT(&((struct e4__execute_token *)NULL)->user ==
+        &((struct e4__execute_tuple *)NULL)->user);
+
 /* The hack used to access user table variables requires that fields in
    the task struct are aligned at e4__cell width. */
 /* FIXME: Add asserts for all fields accessed this way once field

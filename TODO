@@ -98,15 +98,12 @@ Kernel
   exceptions. To make tr0 always have a coherent value, it will be
   necessary to at least set it to r0 on task initialization and preserve
   its value across exceptions.
-- Add asserts that execute_tuple and execute_token field order lines
-  up correctly.
+- [DONE] Add asserts that execute_tuple and execute_token field order
+  lines up correctly.
 - Handle dictionary overflows and other overflows. Especially
   dictionary overflow.
 - Consider improving exception printing (ie. printing exception name
   along with number).
-- Ensure memmove is always called with size_t, not e4__usize. It's
-  possible (although unlikely) that these types may not implicitly
-  convert between one another without generating a warning.
 - Thunk into exceptions when evaluating REFILL in QUIT. Cover this
   in tests.
 
@@ -219,6 +216,7 @@ Kernel
   implemented without any such support. This includes >NUMBER.
 - Add more two's complement utility macros as needed and use them where
   appropriate.
+- Handle dictionary overflows and other overflows.
 
 REPL
 ----
