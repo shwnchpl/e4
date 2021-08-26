@@ -31,6 +31,68 @@ char* e4__num_format(e4__usize n, e4__u8 base, e4__u8 flags, char *buf,
     return buf;
 }
 
+const char* e4__num_format_exception(e4__usize e, e4__usize *len)
+{
+    #define _return_with_len(s) \
+        do {    \
+            if (len)    \
+                *len = sizeof(s) - 1;   \
+            return s;   \
+        } while (0)
+
+    switch (e) {
+        /* error constants - standard */
+        case e4__E_OK:
+            _return_with_len("ok");
+        case e4__E_ABORT:
+            _return_with_len("abort");
+        case e4__E_STKUNDERFLOW:
+            _return_with_len("stack underflow");
+        case e4__E_RSTKUNDERFLOW:
+            _return_with_len("return stack underflow");
+        case e4__E_DIVBYZERO:
+            _return_with_len("division by zero");
+        case e4__E_UNDEFWORD:
+            _return_with_len("undefined word");
+        case e4__E_COMPONLYWORD:
+            _return_with_len("interpreting a compile-only word");
+        case e4__E_INVFORGET:
+            _return_with_len("invalid forget");
+        case e4__E_ZLNAME:
+            _return_with_len("attempt to use zero-length string as a name");
+        case e4__E_UNSUPPORTED:
+            _return_with_len("unsupported operation");
+        case e4__E_CSMISMATCH:
+            _return_with_len("control structure mismatch");
+        case e4__E_RSTKIMBALANCE:
+            _return_with_len("return stack imbalance");
+        case e4__E_NESTEDCOMPILE:
+            _return_with_len("compiler nesting");
+        case e4__E_INVNAMEARG:
+            _return_with_len("invalid name argument");
+        case e4__E_QUIT:
+            _return_with_len("quit");
+
+        /* error constants - system */
+        case e4__E_FAILURE:
+            _return_with_len("generic failure");
+        case e4__E_BYE:
+            _return_with_len("bye");
+        case e4__E_BUG:
+            _return_with_len("system bug");
+        case e4__E_INVBUILTINMUT:
+            _return_with_len("attempt to mutate builtin");
+
+        /* unknown */
+        default:
+            break;
+    }
+
+    _return_with_len("unknown");
+
+    #undef _return_with_len
+}
+
 e4__usize e4__num_sdiv(e4__usize n, e4__usize d)
 {
     register e4__bool negate = 0;

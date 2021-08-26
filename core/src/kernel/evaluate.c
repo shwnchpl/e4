@@ -180,22 +180,29 @@ void e4__evaluate_quit(struct e4__task *task)
                 running = 0;
                 break;
             default: {
-                /* FIXME: Improve this handling once better string
-                   formatting is available. */
-                register e4__usize len;
+                e4__usize len;
                 register char *buf = (char *)task->here;
-                register char *num;
+                register const char *str;
 
                 /* XXX: An uncaught exception clears the stack and
                    cancels any in-progress compilation. */
                 e4__stack_clear(task);
                 e4__compile_cancel(task);
 
+                /* FIXME: Improve this handling once better string
+                   formatting is available with pictured numeric output. */
                 e4__io_type(task, " EXCEPTION: ", 12);
-                num = e4__num_format(res, task->base, e4__F_SIGNED, buf, 130);
-                len = &buf[130] - num;
-                num[len++] = '\n';
-                e4__io_type(task, num, len);
+
+                str = e4__num_format_exception(res, &len);
+                e4__io_type(task, str, len);
+
+                str = e4__num_format(res, task->base, e4__F_SIGNED, buf, 130);
+                *((char *)--str) = '(';
+                *((char *)--str) = ' ';
+                len = &buf[130] - str + 2;
+                buf[130] = ')';
+                buf[131] = '\n';
+                e4__io_type(task, str, len);
              }
         }
     }

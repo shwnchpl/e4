@@ -365,7 +365,7 @@ static e4__usize e4t__test_kernel_quit_accept(void *user, char *buf,
             break;
         case 3:
             e4t__ASSERT_MATCH(e4t__term_obuf_consume(),
-                    "<5> 17 1 2 3 4  EXCEPTION: -13\n");
+                    "<5> 17 1 2 3 4  EXCEPTION: undefined word (-13)\n");
             e4t__ASSERT_EQ(e4__stack_depth(test_data->task), 0);
             _m(": foo");
             break;
@@ -380,7 +380,8 @@ static e4__usize e4t__test_kernel_quit_accept(void *user, char *buf,
             _m(": foo to absolutely-nothing-at-all");
             break;
         case 6:
-            e4t__ASSERT_MATCH(e4t__term_obuf_consume(), " EXCEPTION: -13\n");
+            e4t__ASSERT_MATCH(e4t__term_obuf_consume(),
+                    " EXCEPTION: undefined word (-13)\n");
             e4t__ASSERT(!e4__task_compiling(test_data->task));
             e4t__ASSERT_EQ(e4__stack_depth(test_data->task), 0);
             /* Test that SOURCE-ID contains UID. */
