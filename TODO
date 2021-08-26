@@ -105,8 +105,8 @@ Kernel
   convert between one another without generating a warning.
 - [DONE] Print exception description along with number.
 - [DONE] Thunk into e4__builtin_exec and return error code.
-- Thunk into exceptions when evaluating REFILL in QUIT. Cover this
-  in tests.
+- [DONE] Thunk into exceptions when evaluating REFILL in QUIT. Cover
+  this in tests.
 
 REPL
 ----
@@ -221,6 +221,18 @@ Kernel
 - Improve exception printing implementation and other hackish printing
   implementations (such as the . builtin etc.) by using pictured
   numeric output instead?
+- Consider whether it might be possible to wrap the main quit loop in
+  some kind of exception context (somehow?) to get around the race
+  conditon created by using multiple different exception contexts
+  within that loop. It's unclear exactly how this would look since
+  the quit loop relies on certain exceptions percolating all the way
+  up, so for it to itself run in an exception context some considerable
+  refactoring might be necessary. This is important because on embedded
+  systems, or even in a repl where a signal can be caught, it may be
+  desirable to throw an exception when quit, as currently implemented,
+  is not in an interrupt context. This *may* not be an issue (failure
+  to actually throw is always something an API client can work around),
+  but it probably isn't entirely desirable.
 
 REPL
 ----

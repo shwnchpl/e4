@@ -8,8 +8,6 @@ struct e4__evaluate_thunk {
     void *padding;
 };
 
-static void e4__evaluate_wrapper(struct e4__task *task, void *user);
-
 static void e4__evaluate_compile(struct e4__task *task, const char *word,
         e4__u8 len)
 {
@@ -66,13 +64,15 @@ static void e4__evaluate_interpret(struct e4__task *task, const char *word,
     e4__exception_throw(task, e4__E_UNDEFWORD);
 }
 
+static void e4__evaluate_wrapper(struct e4__task *task, void *user);
+
 static e4__usize e4__evaluate_internal(struct e4__task *task)
 {
 
     if (!task->exception_valid) {
         /* If there's nothing currently catching exceptions, catch and
            return them here. */
-        struct e4__evaluate_thunk thunk = {
+        static const struct e4__evaluate_thunk thunk = {
             e4__evaluate_wrapper,
             NULL
         };
@@ -99,6 +99,37 @@ static e4__usize e4__evaluate_internal(struct e4__task *task)
     }
 
     return e4__E_OK;
+}
+
+static void e4__evaluate_refill_wrapper(struct e4__task *task, void *user);
+
+static e4__usize e4__evaluate_refill(struct e4__task *task)
+{
+    if (!task->exception_valid) {
+        static const struct e4__evaluate_thunk thunk = {
+            e4__evaluate_refill_wrapper,
+            NULL
+        };
+
+        return e4__exception_catch(task, (struct e4__execute_token *)&thunk);
+    }
+
+    /* Based on the context we're calling this from, this should
+       *really* never happen, but if it somehow does, just execute
+       refill. */
+    e4__evaluate_refill_wrapper(task, NULL);
+
+    return e4__E_OK;
+}
+
+static void e4__evaluate_refill_wrapper(struct e4__task *task, void *user)
+{
+    register e4__usize io_res;
+
+    if ((io_res = e4__io_refill(task, NULL)))
+        e4__exception_throw(task, io_res);
+
+    e4__execute_ret(task);
 }
 
 static void e4__evaluate_wrapper(struct e4__task *task, void *user)
@@ -166,7 +197,7 @@ void e4__evaluate_quit(struct e4__task *task)
            code. This will allow REPL implementations to raise
            exceptions while e4 is blocked waiting for input within
            the quit loop, which may be desirable in many scenarios. */
-        res = e4__io_refill(task, NULL);
+        res = e4__evaluate_refill(task);
         res = res ? res : e4__evaluate_internal(task);
         switch (res) {
             case e4__E_OK:
