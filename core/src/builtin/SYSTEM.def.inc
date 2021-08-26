@@ -80,7 +80,7 @@ static void e4__builtin_LIT_CSTR(struct e4__task *task, void *user)
 
 static void e4__builtin_LIT_DOES(struct e4__task *task, void *user)
 {
-    e4__usize res;
+    register e4__usize res;
 
     if (task->dict->flags & e4__F_BUILTIN) {
         e4__exception_throw(task, e4__E_INVBUILTINMUT);
@@ -88,7 +88,11 @@ static void e4__builtin_LIT_DOES(struct e4__task *task, void *user)
         return;
     }
 
-    e4__compile_start(task, task->dict->xt, e4__COMP_DOES);
+    if ((res = e4__compile_start(task, task->dict->xt, e4__COMP_DOES))) {
+        /* Looks like we're already compiling. Bail out. */
+        e4__exception_throw(task, res);
+        e4__execute_ret(task);
+    }
 
     /* Return from this function. */
     e4__execute_ret(task);

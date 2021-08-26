@@ -42,7 +42,7 @@ Compilation
 - [DONE] Implement LIT_CSTR and LIT_STR.
 - [DONE] Add POSTPONE and IMMEDIATE words.
 - [DONE] Add restruct keyword.
-- Check for nested compilation everywhere relevant.
+- [DONE] Check for nested compilation everywhere relevant.
 
 General Builtins
 ----------------

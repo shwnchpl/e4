@@ -171,7 +171,7 @@ void e4__evaluate_quit(struct e4__task *task)
         switch (res) {
             case e4__E_OK:
                 /* FIXME: Use CR here instead for newline? */
-                if (!task->compile.state)
+                if (!e4__task_compiling(task))
                     e4__io_type(task, " ok\n", 4);
                 /* fall through */
             case e4__E_QUIT:

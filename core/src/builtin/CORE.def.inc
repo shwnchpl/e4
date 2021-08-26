@@ -201,11 +201,13 @@ static void e4__builtin_COLON(struct e4__task *task, void *user)
 {
     register const char *word;
     register e4__u8 len;
+    register e4__usize res;
 
     _e4__BUILTIN_LOOKAHEAD(task, word, len);
 
     e4__dict_entry(task, word, len, e4__F_COMPILING, NULL, NULL);
-    e4__compile_start(task, task->dict->xt, e4__COMP_COLON);
+    if ((res = e4__compile_start(task, task->dict->xt, e4__COMP_COLON)))
+        e4__exception_throw(task, res);
 
     e4__execute_ret(task);
 }
@@ -299,6 +301,8 @@ static void e4__builtin_DO(struct e4__task *task, void *user)
 
 static void e4__builtin_DOES(struct e4__task *task, void *user)
 {
+    register e4__usize res;
+
     /* XXX: Section 6.1.1250 of the standard specifies that DOES> has
        undefined interpretation semantics but specifies that its
        compilation semantics are simply to copy its run-time semantics
@@ -314,8 +318,11 @@ static void e4__builtin_DOES(struct e4__task *task, void *user)
     else if (task->dict->flags & e4__F_BUILTIN)
         /* Invalid attempt to mutate a builtin. */
         e4__exception_throw(task, e4__E_INVBUILTINMUT);
-    else
-        e4__compile_start(task, task->dict->xt, e4__COMP_DOES);
+    else if ((res = e4__compile_start(task, task->dict->xt, e4__COMP_DOES))) {
+        /* XXX: This should never happen. We've already checked that
+           we're not compiling. */
+        e4__exception_throw(task, res);
+    }
 
     e4__execute_ret(task);
 }
@@ -861,7 +868,11 @@ static void e4__builtin_R_FROM(struct e4__task *task, void *user)
 
 static void e4__builtin_RIGHT_BRACKET(struct e4__task *task, void *user)
 {
-    e4__compile_resume(task);
+    register e4__usize res;
+
+    if ((res = e4__compile_resume(task)))
+        e4__exception_throw(task, res);
+
     e4__execute_ret(task);
 }
 

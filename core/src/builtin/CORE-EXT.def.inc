@@ -40,6 +40,7 @@ static void e4__builtin_COLON_NONAME(struct e4__task *task, void *user)
     register struct e4__execute_token *xt =
             (struct e4__execute_token *)task->here;
     register e4__usize unaligned;
+    register e4__usize res;
 
     task->here = (e4__cell)((e4__u8 *)task->here + sizeof(*xt) -
             sizeof(xt->data));
@@ -51,7 +52,8 @@ static void e4__builtin_COLON_NONAME(struct e4__task *task, void *user)
         task->here = (e4__cell)((e4__u8 *)task->here + sizeof(e4__cell)
                 - unaligned);
 
-    e4__compile_start(task, xt, e4__COMP_NONAME);
+    if ((res = e4__compile_start(task, xt, e4__COMP_NONAME)))
+        e4__exception_throw(task, res);
 
     e4__execute_ret(task);
 }

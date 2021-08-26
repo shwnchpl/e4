@@ -170,6 +170,7 @@ struct e4__io_func {
 #define e4__E_UNSUPPORTED   (-21)
 #define e4__E_CSMISMATCH    (-22)
 #define e4__E_RSTKIMBALANCE (-25)
+#define e4__E_NESTEDCOMPILE (-29)
 #define e4__E_INVNAMEARG    (-32)
 #define e4__E_QUIT          (-56)
 
@@ -449,9 +450,9 @@ void e4__compile_cstr(struct e4__task *task, const char *str, e4__u8 len);
 void e4__compile_estr(struct e4__task *task, const char *str, e4__usize len);
 e4__usize e4__compile_finish(struct e4__task *task);
 void e4__compile_literal(struct e4__task *task, e4__cell num);
-void e4__compile_resume(struct e4__task *task);
-void e4__compile_start(struct e4__task *task, struct e4__execute_token *xt,
-        e4__usize mode);
+e4__usize e4__compile_resume(struct e4__task *task);
+e4__usize e4__compile_start(struct e4__task *task,
+        struct e4__execute_token *xt, e4__usize mode);
 void e4__compile_str(struct e4__task *task, const char *str, e4__usize len);
 void e4__compile_suspend(struct e4__task *task);
 

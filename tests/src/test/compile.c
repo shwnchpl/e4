@@ -265,6 +265,40 @@ static void e4t__test_compile_literal(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 5);
 }
 
+static void e4t__test_compile_nested(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* Test that attempting to initiate/resume compilation when already
+       compiling throws the appropriate exception. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": immed-: : ; immediate", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, ": immed-:noname :noname ; immediate",
+            -1));
+    e4t__ASSERT_OK(e4__evaluate(task, ": immed-] ] ; immediate", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, ": immed-lit_does lit_does ; immediate",
+            -1));
+
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo immed-: bar", -1),
+            e4__E_NESTEDCOMPILE);
+    e4__stack_clear(task);
+    e4__compile_cancel(task);
+
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo immed-:noname", -1),
+            e4__E_NESTEDCOMPILE);
+    e4__stack_clear(task);
+    e4__compile_cancel(task);
+
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo immed-]", -1),
+            e4__E_NESTEDCOMPILE);
+    e4__stack_clear(task);
+    e4__compile_cancel(task);
+
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo immed-lit_does", -1),
+            e4__E_NESTEDCOMPILE);
+    e4__stack_clear(task);
+    e4__compile_cancel(task);
+}
+
 static void e4t__test_compile_noname(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -646,6 +680,7 @@ void e4t__test_compile(void)
     e4t__test_compile_failure();
     e4t__test_compile_linear();
     e4t__test_compile_literal();
+    e4t__test_compile_nested();
     e4t__test_compile_noname();
     e4t__test_compile_pponeimmed();
     e4t__test_compile_recursive();

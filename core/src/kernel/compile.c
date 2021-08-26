@@ -125,26 +125,21 @@ void e4__compile_literal(struct e4__task *task, e4__cell lit)
     e4__DEREF(task->here++) = lit;
 }
 
-void e4__compile_resume(struct e4__task *task)
+e4__usize e4__compile_resume(struct e4__task *task)
 {
     if (task->compile.state)
-        return;
+        return e4__E_NESTEDCOMPILE;
+
     task->compile.state = task->compile.sus_state ? task->compile.sus_state :
             _e4__COMP_ANONYMOUS;
     task->compile.sus_state = 0;
+
+    return e4__E_OK;
 }
 
-void e4__compile_start(struct e4__task *task, struct e4__execute_token *xt,
-        e4__usize mode)
+e4__usize e4__compile_start(struct e4__task *task,
+        struct e4__execute_token *xt, e4__usize mode)
 {
-    /* FIXME: Check for nested compilation and throw an error. This can
-       happen if we're either already compiling (and this is being
-       executed via some immediate word). */
-
-    /* XXX: We do not catch and handle errors that result from beginning
-       compiling (or ALLOTing in in general, for that matter) when
-       compilation is suspended. */
-
     /* XXX: The whole point of setting the appropriate fields in XT at
        the end of the compilation process is that ideally a poorly
        constructed DOES> shouldn't destroy an existing dictionary
@@ -152,10 +147,23 @@ void e4__compile_start(struct e4__task *task, struct e4__execute_token *xt,
        execution token, we *could* get by with just a mode parameter,
        but then we wouldn't be able to reset HERE correctly in the
        event of a :NONAME compilation failure. */
+
+    /* XXX: We do not catch and handle errors that result from beginning
+       compiling (or ALLOTing in in general, for that matter) when
+       compilation is suspended. */
+
+    /* Check for nested compilation and return an error. This can happen
+       if we're either already compiling (and this is being executed via
+       some immediate word). */
+    if (task->compile.state)
+        return e4__E_NESTEDCOMPILE;
+
     task->compile.state = mode;
     task->compile.s0 = task->sp;
     task->compile.here0 = task->here;
     task->compile.xt = xt;
+
+    return e4__E_OK;
 }
 
 void e4__compile_str(struct e4__task *task, const char *str, e4__usize len)
