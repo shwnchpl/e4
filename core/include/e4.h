@@ -439,7 +439,7 @@ enum e4__builtin_id {
 /* FIXME: Should the header table even be exposed here? */
 extern const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT];
 extern const struct e4__execute_tuple e4__BUILTIN_XT[e4__BUILTIN_COUNT];
-void e4__builtin_exec_(e4__usize count, /* struct e4__task *task, */
+e4__usize e4__builtin_exec_(e4__usize count, /* struct e4__task *task, */
         /* enum e4__builtin_id id, */ ...);
 
 /* compile.c functions */

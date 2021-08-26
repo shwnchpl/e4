@@ -3,6 +3,21 @@
 
 #include <string.h>
 
+static void e4t__test_kernel_builtin_exec(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* e4__builtin_exec should behave correctly in non-exceptional
+       cases. */
+    e4t__ASSERT_OK(e4__builtin_exec(task, e4__B_PLUS, 2, 3));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+
+    /* Test that exceptions are correctly captured and returned by
+       e4__builtin_exec. */
+    e4t__ASSERT_EQ(e4__builtin_exec(task, e4__B_DUP), e4__E_STKUNDERFLOW);
+}
+
 static void e4t__test_kernel_dict(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -455,6 +470,7 @@ static void e4t__test_kernel_stack(void)
 void e4t__test_kernel(void)
 {
     /* FIXME: Add uservar tests. */
+    e4t__test_kernel_builtin_exec();
     e4t__test_kernel_dict();
     e4t__test_kernel_exceptions();
     e4t__test_kernel_evaluate();

@@ -104,6 +104,7 @@ Kernel
   It's possible (although unlikely) that these types may not implicitly
   convert between one another without generating a warning.
 - [DONE] Print exception description along with number.
+- [DONE] Thunk into e4__builtin_exec and return error code.
 - Thunk into exceptions when evaluating REFILL in QUIT. Cover this
   in tests.
 

@@ -268,7 +268,7 @@ static const void *_e4__BUILTIN_RETURN_THUNK[] =
    stack as cells. These arguments should be explicitly cast
    to either e4__cell or e4__usize if they are not already one
    of those types. */
-void e4__builtin_exec_(e4__usize count, /* struct e4__task *task, */
+e4__usize e4__builtin_exec_(e4__usize count, /* struct e4__task *task, */
         /* enum e4__builtin_id id, */ ...)
 {
     va_list ap;
@@ -276,7 +276,7 @@ void e4__builtin_exec_(e4__usize count, /* struct e4__task *task, */
     register unsigned id;
 
     if (count < 2)
-        return;
+        return e4__E_BUG;
 
     va_start(ap, count);
 
@@ -289,8 +289,17 @@ void e4__builtin_exec_(e4__usize count, /* struct e4__task *task, */
 
     va_end(ap);
 
-    e4__stack_rpush(task, NULL);
-    e4__BUILTIN_XT[id].code(task, NULL);
+    /* If exceptions aren't enabled, run the builtin with them enabled
+       and return any errors that are caught in this way. */
+    if (!task->exception_valid)
+        return e4__exception_catch(task, (void *)&e4__BUILTIN_XT[id]);
+
+    /* If exceptions are enabled, simply execute the builtin. If we
+       make it back here we know we can return okay. If we don't, the
+       exception has already been thrown for us. */
+    e4__execute(task, (void *)&e4__BUILTIN_XT[id]);
+
+    return e4__E_OK;
 }
 
 /* builtin implementations */
