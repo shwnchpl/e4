@@ -112,21 +112,12 @@ REPL
 ----
 - [DONE] Add tab-completion to the repl.
 - [DONE] Simply return e4__E_BYE exception when EOF is encountered.
-- Implement a custom signal handler or custom signal handlers so that
-  it's possible to handle SIGINT and throw the appropriate exception.
-  If an exception cannot be thrown, in SIGNIT, the fallback should be
-  to simply call exit with an appropriate exit status (OK?) directly.
-  This is all possible because it is safe to longjmp out of signal
-  handlers as long as they aren't nested (ie. a signal handler invoked
-  because of code that was executing in another signal handler). It
-  should be possible to ensure that will never happen and stay within
-  the realm of defined behavior while taking advantage of the existing
-  exception semantic.
-  Signal handlers will need to take appropriate action to keep libedit
-  happy as well (in particular, it is necessary to call el_resize upon
-  receipt of SIGWINCH).
-- Catch SIGSEV and raise an exception if possible (and call exit if
-  not).
+- [DONE] Implement a custom signal handler for SIGINT and SIGSEGV.
+  that raises the appropriate exception when encountered.
+- Split REPL source into multiple files. (For instance, one file for
+  auto-completion related logic, one file for signal handling related
+  logic/init/uninit/etc., one file for e4 IO handlers, main.c, and
+  a header file to tie it all together).
 
 Testing
 -------

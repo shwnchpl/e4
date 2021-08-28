@@ -50,6 +50,8 @@ const char* e4__num_format_exception(e4__usize e, e4__usize *len)
             _return_with_len("stack underflow");
         case e4__E_RSTKUNDERFLOW:
             _return_with_len("return stack underflow");
+        case e4__E_INVMEMADDR:
+            _return_with_len("invalid memory address");
         case e4__E_DIVBYZERO:
             _return_with_len("division by zero");
         case e4__E_UNDEFWORD:
@@ -66,6 +68,8 @@ const char* e4__num_format_exception(e4__usize e, e4__usize *len)
             _return_with_len("control structure mismatch");
         case e4__E_RSTKIMBALANCE:
             _return_with_len("return stack imbalance");
+        case e4__E_USERINTERRUPT:
+            _return_with_len("user interrupt");
         case e4__E_NESTEDCOMPILE:
             _return_with_len("compiler nesting");
         case e4__E_INVNAMEARG:
