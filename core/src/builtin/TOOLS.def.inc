@@ -5,7 +5,7 @@
    file and it is *not* designed to work correctly in any other
    context. */
 
-static void e4__builtin_DOT_S(struct e4__task *task, void *user)
+static void e4__builtin_DOT_S(struct e4__task *task, e4__cell user)
 {
     register e4__cell s = task->s0;
     register e4__usize n = e4__stack_depth(task);
@@ -46,7 +46,7 @@ static void e4__builtin_DOT_S(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_DUMP(struct e4__task *task, void *user)
+static void e4__builtin_DUMP(struct e4__task *task, e4__cell user)
 {
     register e4__cell addr;
     register e4__usize len;
@@ -72,7 +72,7 @@ static const void *e4__builtin_QUESTION[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL],
 };
 
-static void e4__builtin_WORDS(struct e4__task *task, void *user)
+static void e4__builtin_WORDS(struct e4__task *task, e4__cell user)
 {
     struct e4__dict_header *e = task->dict;
     register e4__usize io_res = e4__E_OK;

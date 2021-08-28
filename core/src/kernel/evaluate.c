@@ -64,7 +64,7 @@ static void e4__evaluate_interpret(struct e4__task *task, const char *word,
     e4__exception_throw(task, e4__E_UNDEFWORD);
 }
 
-static void e4__evaluate_wrapper(struct e4__task *task, void *user);
+static void e4__evaluate_wrapper(struct e4__task *task, e4__cell user);
 
 static e4__usize e4__evaluate_internal(struct e4__task *task)
 {
@@ -101,7 +101,7 @@ static e4__usize e4__evaluate_internal(struct e4__task *task)
     return e4__E_OK;
 }
 
-static void e4__evaluate_refill_wrapper(struct e4__task *task, void *user);
+static void e4__evaluate_refill_wrapper(struct e4__task *task, e4__cell user);
 
 static e4__usize e4__evaluate_refill(struct e4__task *task)
 {
@@ -122,7 +122,7 @@ static e4__usize e4__evaluate_refill(struct e4__task *task)
     return e4__E_OK;
 }
 
-static void e4__evaluate_refill_wrapper(struct e4__task *task, void *user)
+static void e4__evaluate_refill_wrapper(struct e4__task *task, e4__cell user)
 {
     register e4__usize io_res;
 
@@ -132,7 +132,7 @@ static void e4__evaluate_refill_wrapper(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__evaluate_wrapper(struct e4__task *task, void *user)
+static void e4__evaluate_wrapper(struct e4__task *task, e4__cell user)
 {
     e4__evaluate_internal(task);
     e4__execute_ret(task);

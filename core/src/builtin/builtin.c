@@ -106,7 +106,7 @@
 /* Declare builtin functions. */
 #define _e4__BUILTIN_PROC_FIRST(w)  _e4__BUILTIN_PROC(w)
 #define _e4__BUILTIN_PROC_NF(w, n, f)   \
-    static void e4__builtin_##w(struct e4__task *task, void *user);
+    static void e4__builtin_##w(struct e4__task *task, e4__cell user);
 #define _e4__BUILTIN_THUNK_NF(w, n, f)  \
     static const void *e4__builtin_##w[];
 #define _e4__BUILTIN_PUN_NF(w, t, n, f)

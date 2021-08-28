@@ -73,7 +73,8 @@ static void e4t__test_kernel_dict(void)
     #undef _d
 }
 
-static void e4t__test_kernel_exceptions_da(struct e4__task *task, void *user);
+static void e4t__test_kernel_exceptions_da(struct e4__task *task,
+        e4__cell user);
 
 static void e4t__test_kernel_exceptions(void)
 {
@@ -115,7 +116,8 @@ static void e4t__test_kernel_exceptions(void)
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 2 3 ");
 }
 
-static void e4t__test_kernel_exceptions_da(struct e4__task *task, void *user)
+static void e4t__test_kernel_exceptions_da(struct e4__task *task,
+        e4__cell user)
 {
     const e4__usize ex = (e4__usize)e4__DEREF(user);
 

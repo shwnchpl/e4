@@ -4,7 +4,7 @@
 #include <string.h>
 
 static void e4t__test_execute_badret_nret(struct e4__task *task,
-        void *user);
+        e4__cell user);
 
 static void e4t__test_execute_badret(void)
 {
@@ -55,7 +55,7 @@ static void e4t__test_execute_badret(void)
 }
 
 static void e4t__test_execute_badret_nret(struct e4__task *task,
-        void *user)
+        e4__cell user)
 {
     e4__usize i;
 
@@ -363,7 +363,7 @@ static void e4t__test_execute_string(void)
 }
 
 static void e4t__test_execute_userfunc_setter(struct e4__task *task,
-        void *user)
+        e4__cell user)
 {
     **((e4__usize **)user) = 207;
 }

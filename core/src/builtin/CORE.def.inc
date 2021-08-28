@@ -5,7 +5,7 @@
    file and it is *not* designed to work correctly in any other
    context. */
 
-static void e4__builtin_ABORT(struct e4__task *task, void *user)
+static void e4__builtin_ABORT(struct e4__task *task, e4__cell user)
 {
     register int i;
 
@@ -51,7 +51,7 @@ static const void *e4__builtin_ALIGN[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
-static void e4__builtin_ALIGNED(struct e4__task *task, void *user)
+static void e4__builtin_ALIGNED(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
 
@@ -61,14 +61,14 @@ static void e4__builtin_ALIGNED(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_ALLOT(struct e4__task *task, void *user)
+static void e4__builtin_ALLOT(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
     e4__task_allot(task, (e4__usize)e4__stack_pop(task));
     e4__execute_ret(task);
 }
 
-static void e4__builtin_AND(struct e4__task *task, void *user)
+static void e4__builtin_AND(struct e4__task *task, e4__cell user)
 {
     register e4__usize l, r;
 
@@ -82,7 +82,7 @@ static void e4__builtin_AND(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_BRACKET_TICK(struct e4__task *task, void *user)
+static void e4__builtin_BRACKET_TICK(struct e4__task *task, e4__cell user)
 {
     const register e4__usize depth = e4__stack_depth(task);
 
@@ -103,14 +103,14 @@ static void e4__builtin_BRACKET_TICK(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_C_COMMA(struct e4__task *task, void *user)
+static void e4__builtin_C_COMMA(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
     e4__compile_char(task, e4__stack_pop(task));
     e4__execute_ret(task);
 }
 
-static void e4__builtin_C_FETCH(struct e4__task *task, void *user)
+static void e4__builtin_C_FETCH(struct e4__task *task, e4__cell user)
 {
     register e4__u8 *c;
 
@@ -122,7 +122,7 @@ static void e4__builtin_C_FETCH(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_C_QUOTE(struct e4__task *task, void *user)
+static void e4__builtin_C_QUOTE(struct e4__task *task, e4__cell user)
 {
     const char *str;
     register e4__usize len;
@@ -144,7 +144,7 @@ static void e4__builtin_C_QUOTE(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_C_STORE(struct e4__task *task, void *user)
+static void e4__builtin_C_STORE(struct e4__task *task, e4__cell user)
 {
     register e4__u8 *c, v;
 
@@ -197,7 +197,7 @@ static const void *e4__builtin_CHAR_PLUS[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
-static void e4__builtin_COLON(struct e4__task *task, void *user)
+static void e4__builtin_COLON(struct e4__task *task, e4__cell user)
 {
     register const char *word;
     register e4__u8 len;
@@ -212,14 +212,14 @@ static void e4__builtin_COLON(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_COMMA(struct e4__task *task, void *user)
+static void e4__builtin_COMMA(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
     e4__compile_cell(task, e4__stack_pop(task));
     e4__execute_ret(task);
 }
 
-static void e4__builtin_CONSTANT(struct e4__task *task, void *user)
+static void e4__builtin_CONSTANT(struct e4__task *task, e4__cell user)
 {
     register const char *word;
     register e4__u8 len;
@@ -244,7 +244,7 @@ static const void *e4__builtin_COUNT[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
-static void e4__builtin_CR(struct e4__task *task, void *user)
+static void e4__builtin_CR(struct e4__task *task, e4__cell user)
 {
     register e4__usize io_res;
 
@@ -255,7 +255,7 @@ static void e4__builtin_CR(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_CREATE(struct e4__task *task, void *user)
+static void e4__builtin_CREATE(struct e4__task *task, e4__cell user)
 {
     register const char *word;
     register e4__u8 len;
@@ -277,13 +277,13 @@ static const void *e4__builtin_DECIMAL[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
-static void e4__builtin_DEPTH(struct e4__task *task, void *user)
+static void e4__builtin_DEPTH(struct e4__task *task, e4__cell user)
 {
     e4__stack_push(task, (e4__cell)e4__stack_depth(task));
     e4__execute_ret(task);
 }
 
-static void e4__builtin_DO(struct e4__task *task, void *user)
+static void e4__builtin_DO(struct e4__task *task, e4__cell user)
 {
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_SWAP]);
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TO_R]);
@@ -299,7 +299,7 @@ static void e4__builtin_DO(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_DOES(struct e4__task *task, void *user)
+static void e4__builtin_DOES(struct e4__task *task, e4__cell user)
 {
     register e4__usize res;
 
@@ -327,7 +327,7 @@ static void e4__builtin_DOES(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_DOT(struct e4__task *task, void *user)
+static void e4__builtin_DOT(struct e4__task *task, e4__cell user)
 {
     /* FIXME: Once pictured numeric output has been implemented, use
        that instead of this implementation. */
@@ -352,7 +352,7 @@ static void e4__builtin_DOT(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_DOT_QUOTE(struct e4__task *task, void *user)
+static void e4__builtin_DOT_QUOTE(struct e4__task *task, e4__cell user)
 {
     const char *str;
     register e4__usize len;
@@ -371,21 +371,21 @@ static void e4__builtin_DOT_QUOTE(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_DROP(struct e4__task *task, void *user)
+static void e4__builtin_DROP(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
     e4__stack_drop(task);
     e4__execute_ret(task);
 }
 
-static void e4__builtin_DUP(struct e4__task *task, void *user)
+static void e4__builtin_DUP(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
     e4__stack_dup(task);
     e4__execute_ret(task);
 }
 
-static void e4__builtin_ELSE(struct e4__task *task, void *user)
+static void e4__builtin_ELSE(struct e4__task *task, e4__cell user)
 {
     register e4__cell ref;
 
@@ -402,7 +402,7 @@ static void e4__builtin_ELSE(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_EMIT(struct e4__task *task, void *user)
+static void e4__builtin_EMIT(struct e4__task *task, e4__cell user)
 {
     register e4__usize io_res;
     char c;
@@ -416,7 +416,7 @@ static void e4__builtin_EMIT(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_EQUALS(struct e4__task *task, void *user)
+static void e4__builtin_EQUALS(struct e4__task *task, e4__cell user)
 {
     register e4__usize l, r;
 
@@ -430,7 +430,7 @@ static void e4__builtin_EQUALS(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_EVALUATE(struct e4__task *task, void *user)
+static void e4__builtin_EVALUATE(struct e4__task *task, e4__cell user)
 {
     register e4__usize len;
     register const char *str;
@@ -449,14 +449,14 @@ static void e4__builtin_EVALUATE(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_EXECUTE(struct e4__task *task, void *user)
+static void e4__builtin_EXECUTE(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
     e4__execute(task, e4__stack_pop(task));
     e4__execute_ret(task);
 }
 
-static void e4__builtin_EXIT(struct e4__task *task, void *user)
+static void e4__builtin_EXIT(struct e4__task *task, e4__cell user)
 {
     /* XXX: This function doesn't actually do anything. It's address
        is simply understood by the threaded interpreter to indicate
@@ -472,14 +472,14 @@ static void e4__builtin_EXIT(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_FETCH(struct e4__task *task, void *user)
+static void e4__builtin_FETCH(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
     e4__stack_push(task, e4__DEREF(e4__stack_pop(task)));
     e4__execute_ret(task);
 }
 
-static void e4__builtin_FILL(struct e4__task *task, void *user)
+static void e4__builtin_FILL(struct e4__task *task, e4__cell user)
 {
     register e4__cell dest;
     register e4__usize count;
@@ -505,7 +505,7 @@ static const void *e4__builtin_GREATER_THAN[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
-static void e4__builtin_IF(struct e4__task *task, void *user)
+static void e4__builtin_IF(struct e4__task *task, e4__cell user)
 {
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_BRANCH0]);
     e4__stack_push(task, task->here++);
@@ -513,7 +513,7 @@ static void e4__builtin_IF(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_IMMEDIATE(struct e4__task *task, void *user)
+static void e4__builtin_IMMEDIATE(struct e4__task *task, e4__cell user)
 {
     if (task->dict->flags & e4__F_BUILTIN)
         e4__exception_throw(task, e4__E_INVBUILTINMUT);
@@ -523,7 +523,7 @@ static void e4__builtin_IMMEDIATE(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_INVERT(struct e4__task *task, void *user)
+static void e4__builtin_INVERT(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
 
@@ -532,7 +532,7 @@ static void e4__builtin_INVERT(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_J(struct e4__task *task, void *user)
+static void e4__builtin_J(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_RDEPTH(task, 5);
 
@@ -545,7 +545,7 @@ static void e4__builtin_J(struct e4__task *task, void *user)
     /* e4__execute_ret intentionally omitted. */
 }
 
-static void e4__builtin_KEY(struct e4__task *task, void *user)
+static void e4__builtin_KEY(struct e4__task *task, e4__cell user)
 {
     register e4__usize io_res;
     char k;
@@ -558,7 +558,7 @@ static void e4__builtin_KEY(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_LEAVE(struct e4__task *task, void *user)
+static void e4__builtin_LEAVE(struct e4__task *task, e4__cell user)
 {
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_BRANCH]);
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_SENTINEL]);
@@ -566,13 +566,13 @@ static void e4__builtin_LEAVE(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_LEFT_BRACKET(struct e4__task *task, void *user)
+static void e4__builtin_LEFT_BRACKET(struct e4__task *task, e4__cell user)
 {
     e4__compile_suspend(task);
     e4__execute_ret(task);
 }
 
-static void e4__builtin_LESS_THAN(struct e4__task *task, void *user)
+static void e4__builtin_LESS_THAN(struct e4__task *task, e4__cell user)
 {
     register e4__usize l, r;
     register e4__bool f;
@@ -589,7 +589,7 @@ static void e4__builtin_LESS_THAN(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_LITERAL(struct e4__task *task, void *user)
+static void e4__builtin_LITERAL(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
 
@@ -609,7 +609,7 @@ static const void *e4__builtin_LOOP[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
-static void e4__builtin_LSHIFT(struct e4__task *task, void *user)
+static void e4__builtin_LSHIFT(struct e4__task *task, e4__cell user)
 {
     register e4__usize l, r;
 
@@ -622,7 +622,7 @@ static void e4__builtin_LSHIFT(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_MAX(struct e4__task *task, void *user)
+static void e4__builtin_MAX(struct e4__task *task, e4__cell user)
 {
     register e4__usize l, r;
     register e4__bool f;
@@ -639,7 +639,7 @@ static void e4__builtin_MAX(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_MIN(struct e4__task *task, void *user)
+static void e4__builtin_MIN(struct e4__task *task, e4__cell user)
 {
     register e4__usize l, r;
     register e4__bool f;
@@ -656,7 +656,7 @@ static void e4__builtin_MIN(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_MINUS(struct e4__task *task, void *user)
+static void e4__builtin_MINUS(struct e4__task *task, e4__cell user)
 {
     register e4__usize l, r;
 
@@ -678,7 +678,7 @@ static const void *e4__builtin_MOD[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
-static void e4__builtin_MOVE(struct e4__task *task, void *user)
+static void e4__builtin_MOVE(struct e4__task *task, e4__cell user)
 {
     register e4__cell src, dest;
     register e4__usize count;
@@ -694,7 +694,7 @@ static void e4__builtin_MOVE(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_NEGATE(struct e4__task *task, void *user)
+static void e4__builtin_NEGATE(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
 
@@ -724,7 +724,7 @@ static const void *e4__builtin_ONE_PLUS[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
-static void e4__builtin_OR(struct e4__task *task, void *user)
+static void e4__builtin_OR(struct e4__task *task, e4__cell user)
 {
     register e4__usize l, r;
 
@@ -738,14 +738,14 @@ static void e4__builtin_OR(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_OVER(struct e4__task *task, void *user)
+static void e4__builtin_OVER(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
     e4__stack_over(task);
     e4__execute_ret(task);
 }
 
-static void e4__builtin_POSTPONE(struct e4__task *task, void *user)
+static void e4__builtin_POSTPONE(struct e4__task *task, e4__cell user)
 {
     register const char *word;
     register e4__u8 len;
@@ -774,7 +774,7 @@ static const void *e4__builtin_PAREN[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
-static void e4__builtin_PLUS(struct e4__task *task, void *user)
+static void e4__builtin_PLUS(struct e4__task *task, e4__cell user)
 {
     register e4__usize l, r;
 
@@ -787,7 +787,7 @@ static void e4__builtin_PLUS(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_PLUS_LOOP(struct e4__task *task, void *user)
+static void e4__builtin_PLUS_LOOP(struct e4__task *task, e4__cell user)
 {
     register e4__cell ref;
 
@@ -834,13 +834,13 @@ static const void *e4__builtin_PLUS_STORE[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
-static void e4__builtin_QUIT(struct e4__task *task, void *user)
+static void e4__builtin_QUIT(struct e4__task *task, e4__cell user)
 {
     e4__evaluate_quit(task);
     e4__execute_ret(task);
 }
 
-static void e4__builtin_R_FETCH(struct e4__task *task, void *user)
+static void e4__builtin_R_FETCH(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_RDEPTH(task, 2);
 
@@ -853,7 +853,7 @@ static void e4__builtin_R_FETCH(struct e4__task *task, void *user)
     /* e4__execute_ret intentionally omitted. */
 }
 
-static void e4__builtin_R_FROM(struct e4__task *task, void *user)
+static void e4__builtin_R_FROM(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_RDEPTH(task, 2);
 
@@ -866,7 +866,7 @@ static void e4__builtin_R_FROM(struct e4__task *task, void *user)
     /* e4__execute_ret intentionally omitted. */
 }
 
-static void e4__builtin_RIGHT_BRACKET(struct e4__task *task, void *user)
+static void e4__builtin_RIGHT_BRACKET(struct e4__task *task, e4__cell user)
 {
     register e4__usize res;
 
@@ -876,14 +876,14 @@ static void e4__builtin_RIGHT_BRACKET(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_ROT(struct e4__task *task, void *user)
+static void e4__builtin_ROT(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 3);
     e4__stack_rot(task);
     e4__execute_ret(task);
 }
 
-static void e4__builtin_RSHIFT(struct e4__task *task, void *user)
+static void e4__builtin_RSHIFT(struct e4__task *task, e4__cell user)
 {
     register e4__usize l, r;
 
@@ -896,7 +896,7 @@ static void e4__builtin_RSHIFT(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_RECURSE(struct e4__task *task, void *user)
+static void e4__builtin_RECURSE(struct e4__task *task, e4__cell user)
 {
     /* XXX: Ambiguous behavior--in a DOES> clause that exists within
        a colon definition, RECURSE refers to the function being defined
@@ -906,7 +906,7 @@ static void e4__builtin_RECURSE(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_REPEAT(struct e4__task *task, void *user)
+static void e4__builtin_REPEAT(struct e4__task *task, e4__cell user)
 {
     register e4__cell ref;
 
@@ -921,7 +921,7 @@ static void e4__builtin_REPEAT(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_S_QUOTE(struct e4__task *task, void *user)
+static void e4__builtin_S_QUOTE(struct e4__task *task, e4__cell user)
 {
     const char *str;
     register e4__usize len;
@@ -937,7 +937,7 @@ static void e4__builtin_S_QUOTE(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_SEMICOLON(struct e4__task *task, void *user)
+static void e4__builtin_SEMICOLON(struct e4__task *task, e4__cell user)
 {
     e4__usize res;
 
@@ -957,7 +957,7 @@ static const void *e4__builtin_SLASH[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
-static void e4__builtin_SLASH_MOD(struct e4__task *task, void *user)
+static void e4__builtin_SLASH_MOD(struct e4__task *task, e4__cell user)
 {
     register e4__usize n, d;
 
@@ -983,7 +983,7 @@ static void e4__builtin_SLASH_MOD(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_STAR(struct e4__task *task, void *user)
+static void e4__builtin_STAR(struct e4__task *task, e4__cell user)
 {
     register e4__usize l, r;
 
@@ -1006,21 +1006,21 @@ static void e4__builtin_STAR(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_STORE(struct e4__task *task, void *user)
+static void e4__builtin_STORE(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
     e4__DEREF(e4__stack_pop(task)) = e4__stack_pop(task);
     e4__execute_ret(task);
 }
 
-static void e4__builtin_SWAP(struct e4__task *task, void *user)
+static void e4__builtin_SWAP(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
     e4__stack_swap(task);
     e4__execute_ret(task);
 }
 
-static void e4__builtin_THEN(struct e4__task *task, void *user)
+static void e4__builtin_THEN(struct e4__task *task, e4__cell user)
 {
     register e4__cell ref;
 
@@ -1032,7 +1032,7 @@ static void e4__builtin_THEN(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_TICK(struct e4__task *task, void *user)
+static void e4__builtin_TICK(struct e4__task *task, e4__cell user)
 {
     register const char *word;
     register e4__u8 len;
@@ -1050,7 +1050,7 @@ static void e4__builtin_TICK(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_TO_BODY(struct e4__task *task, void *user)
+static void e4__builtin_TO_BODY(struct e4__task *task, e4__cell user)
 {
     register struct e4__execute_token *tok;
 
@@ -1062,7 +1062,7 @@ static void e4__builtin_TO_BODY(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_TO_NUMBER(struct e4__task *task, void *user)
+static void e4__builtin_TO_NUMBER(struct e4__task *task, e4__cell user)
 {
     register e4__usize initial;
     register const char *buf;
@@ -1096,7 +1096,7 @@ static void e4__builtin_TO_NUMBER(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_TO_R(struct e4__task *task, void *user)
+static void e4__builtin_TO_R(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
 
@@ -1196,7 +1196,7 @@ static const void *e4__builtin_TWO_SWAP[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
-static void e4__builtin_TYPE(struct e4__task *task, void *user)
+static void e4__builtin_TYPE(struct e4__task *task, e4__cell user)
 {
     register e4__cell addr, u;
     register e4__usize io_res;
@@ -1212,7 +1212,7 @@ static void e4__builtin_TYPE(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_U_DOT(struct e4__task *task, void *user)
+static void e4__builtin_U_DOT(struct e4__task *task, e4__cell user)
 {
     /* FIXME: Once pictured numeric output has been implemented, use
        that instead of this implementation. */
@@ -1237,7 +1237,7 @@ static void e4__builtin_U_DOT(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_U_LESS_THAN(struct e4__task *task, void *user)
+static void e4__builtin_U_LESS_THAN(struct e4__task *task, e4__cell user)
 {
     register e4__usize l, r;
 
@@ -1251,7 +1251,7 @@ static void e4__builtin_U_LESS_THAN(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_UNLOOP(struct e4__task *task, void *user)
+static void e4__builtin_UNLOOP(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_RDEPTH(task, 3);
 
@@ -1266,7 +1266,7 @@ static void e4__builtin_UNLOOP(struct e4__task *task, void *user)
     /* e4__execute_ret intentionally omitted. */
 }
 
-static void e4__builtin_UNTIL(struct e4__task *task, void *user)
+static void e4__builtin_UNTIL(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_REF(task, 1);
 
@@ -1276,7 +1276,7 @@ static void e4__builtin_UNTIL(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_VARIABLE(struct e4__task *task, void *user)
+static void e4__builtin_VARIABLE(struct e4__task *task, e4__cell user)
 {
     register const char *word;
     register e4__u8 len;
@@ -1298,7 +1298,7 @@ static const void *e4__builtin_WHILE[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
-static void e4__builtin_XOR(struct e4__task *task, void *user)
+static void e4__builtin_XOR(struct e4__task *task, e4__cell user)
 {
     register e4__usize l, r;
 
@@ -1312,7 +1312,7 @@ static void e4__builtin_XOR(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_WORD(struct e4__task *task, void *user)
+static void e4__builtin_WORD(struct e4__task *task, e4__cell user)
 {
     register char delim;
 

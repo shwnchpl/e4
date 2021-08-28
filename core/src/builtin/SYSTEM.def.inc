@@ -5,7 +5,7 @@
    file and it is *not* designed to work correctly in any other
    context. */
 
-static void e4__builtin_BRANCH(struct e4__task *task, void *user)
+static void e4__builtin_BRANCH(struct e4__task *task, e4__cell user)
 {
     register e4__usize offset;
 
@@ -19,7 +19,7 @@ static void e4__builtin_BRANCH(struct e4__task *task, void *user)
     /* e4__execute_ret intentionally omitted. */
 }
 
-static void e4__builtin_BRANCH0(struct e4__task *task, void *user)
+static void e4__builtin_BRANCH0(struct e4__task *task, e4__cell user)
 {
     register e4__usize offset;
 
@@ -34,13 +34,13 @@ static void e4__builtin_BRANCH0(struct e4__task *task, void *user)
     /* e4__execute_ret intentionally omitted. */
 }
 
-static void e4__builtin_CLEAR(struct e4__task *task, void *user)
+static void e4__builtin_CLEAR(struct e4__task *task, e4__cell user)
 {
     e4__stack_clear(task);
     e4__execute_ret(task);
 }
 
-static void e4__builtin_LIT_CELL(struct e4__task *task, void *user)
+static void e4__builtin_LIT_CELL(struct e4__task *task, e4__cell user)
 {
     /* Since we're manipulating rp directly rather than calling
        e4__execute_ret, ensure that we aren't going to underflow. */
@@ -52,7 +52,7 @@ static void e4__builtin_LIT_CELL(struct e4__task *task, void *user)
     /* e4__execute_ret intentionally omitted. */
 }
 
-static void e4__builtin_LIT_CSTR(struct e4__task *task, void *user)
+static void e4__builtin_LIT_CSTR(struct e4__task *task, e4__cell user)
 {
     register e4__usize len;
     register e4__cell str;
@@ -78,7 +78,7 @@ static void e4__builtin_LIT_CSTR(struct e4__task *task, void *user)
     /* e4__execute_ret intentionally omitted. */
 }
 
-static void e4__builtin_LIT_DOES(struct e4__task *task, void *user)
+static void e4__builtin_LIT_DOES(struct e4__task *task, e4__cell user)
 {
     register e4__usize res;
 
@@ -116,7 +116,7 @@ static void e4__builtin_LIT_DOES(struct e4__task *task, void *user)
     /* e4__execute_ret intentionally omitted. */
 }
 
-static void e4__builtin_LIT_STR(struct e4__task *task, void *user)
+static void e4__builtin_LIT_STR(struct e4__task *task, e4__cell user)
 {
     register e4__usize len;
     register e4__cell str;
@@ -143,7 +143,7 @@ static void e4__builtin_LIT_STR(struct e4__task *task, void *user)
     /* e4__execute_ret intentionally omitted. */
 }
 
-static void e4__builtin_RESTRICT(struct e4__task *task, void *user)
+static void e4__builtin_RESTRICT(struct e4__task *task, e4__cell user)
 {
     if (task->dict->flags & e4__F_BUILTIN)
         e4__exception_throw(task, e4__E_INVBUILTINMUT);
@@ -153,7 +153,7 @@ static void e4__builtin_RESTRICT(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_SENTINEL(struct e4__task *task, void *user)
+static void e4__builtin_SENTINEL(struct e4__task *task, e4__cell user)
 {
     /* XXX: This function's sole purpose is to act as a unique
        identifier. The standard guarantees that this is okay, as any

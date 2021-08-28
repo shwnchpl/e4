@@ -1,26 +1,30 @@
 #include "e4.h"
 #include "e4-internal.h"
 
-/* FIXME: Rename user to something more reasonable? */
-
-void e4__execute(struct e4__task *task, void *user)
+/* XXX: Although e4__execute does expect a pointer to something that
+   resembles an execute token or execute tuple, really whatever is
+   passed must only appear to be an execute tuple when accessed in
+   that way. To indicate the extent to which this is a supported
+   operation, the type of xt is void * rather than struct execute_token
+   *, struct execute_tuple *, or anything other restrictive type that
+   would require a cast. */
+void e4__execute(struct e4__task *task, void *xt)
 {
     register const e4__bool ip_valid = task->ip != NULL;
-    void **code = user;
-    e4__code_ptr entry = *code;
+    struct e4__execute_tuple *xtup = xt;
 
     /* If the instruction pointer is currently NULL, simply return
        to NULL. */
     e4__DEREF(task->rp--) = ip_valid ? task->ip + 1 : NULL;
 
-    entry(task, code + 1);
+    xtup->code(task, &xtup->user);
 
     /* If ip was NULL, restore it to NULL. */
     if (!ip_valid)
         task->ip = NULL;
 }
 
-void e4__execute_deferthunk(struct e4__task *task, void *user)
+void e4__execute_deferthunk(struct e4__task *task, e4__cell user)
 {
     /* Execute whatever execution token is pointed to by the
        user pointer. */
@@ -28,7 +32,7 @@ void e4__execute_deferthunk(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-void e4__execute_doesthunk(struct e4__task *task, void *user)
+void e4__execute_doesthunk(struct e4__task *task, e4__cell user)
 {
     /* Push the address of the data pointer onto the stack then
        branch to the address in user. */
@@ -36,7 +40,7 @@ void e4__execute_doesthunk(struct e4__task *task, void *user)
     e4__execute_threaded(task, e4__DEREF(user) - 1);
 }
 
-void e4__execute_marker(struct e4__task *task, void *user)
+void e4__execute_marker(struct e4__task *task, e4__cell user)
 {
     const struct e4__dict_header *header =
             (struct e4__dict_header *)e4__DEREF(user);
@@ -82,7 +86,7 @@ void e4__execute_ret(struct e4__task *task)
     task->ip = e4__stack_rpop(task);
 }
 
-void e4__execute_threaded(struct e4__task *task, void *user)
+void e4__execute_threaded(struct e4__task *task, e4__cell user)
 {
     register int depth = 1;
 
@@ -135,28 +139,28 @@ void e4__execute_threaded(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-void e4__execute_userval(struct e4__task *task, void *user)
+void e4__execute_userval(struct e4__task *task, e4__cell user)
 {
     register const e4__cell val = e4__DEREF(user);
     e4__stack_push(task, val);
     e4__execute_ret(task);
 }
 
-void e4__execute_uservar(struct e4__task *task, void *user)
+void e4__execute_uservar(struct e4__task *task, e4__cell user)
 {
     register const e4__cell uv_offset = e4__DEREF(user);
     e4__stack_push(task, e4__task_uservar(task, (e4__usize)uv_offset));
     e4__execute_ret(task);
 }
 
-void e4__execute_value(struct e4__task *task, void *user)
+void e4__execute_value(struct e4__task *task, e4__cell user)
 {
-    e4__stack_push(task, e4__DEREF((e4__cell)user + 1));
+    e4__stack_push(task, e4__DEREF(user + 1));
     e4__execute_ret(task);
 }
 
-void e4__execute_variable(struct e4__task *task, void *user)
+void e4__execute_variable(struct e4__task *task, e4__cell user)
 {
-    e4__stack_push(task, (e4__cell)user + 1);
+    e4__stack_push(task, user + 1);
     e4__execute_ret(task);
 }

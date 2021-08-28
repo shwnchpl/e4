@@ -5,7 +5,7 @@
    file and it is *not* designed to work correctly in any other
    context. */
 
-static void e4__builtin_CATCH(struct e4__task *task, void *user)
+static void e4__builtin_CATCH(struct e4__task *task, e4__cell user)
 {
     register e4__usize ex;
 
@@ -17,7 +17,7 @@ static void e4__builtin_CATCH(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_THROW(struct e4__task *task, void *user)
+static void e4__builtin_THROW(struct e4__task *task, e4__cell user)
 {
     register e4__usize ex;
 

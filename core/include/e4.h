@@ -124,7 +124,7 @@ typedef unsigned char e4__u8;
 
 struct e4__task;
 
-typedef void (*e4__code_ptr)(struct e4__task *, void *);
+typedef void (*e4__code_ptr)(struct e4__task *, e4__cell user);
 
 struct e4__dict_header {
     struct e4__dict_header *link;
@@ -491,20 +491,20 @@ e4__usize e4__evaluate(struct e4__task *task, const char *buf, e4__usize sz);
 void e4__evaluate_quit(struct e4__task *task);
 
 /* exception.c functions */
-e4__usize e4__exception_catch(struct e4__task *task, void *user);
+e4__usize e4__exception_catch(struct e4__task *task, void *xt);
 void e4__exception_throw(struct e4__task *task, e4__usize e);
 
 /* execute.c functions */
-void e4__execute(struct e4__task *task, void *user);
-void e4__execute_deferthunk(struct e4__task *task, void *user);
-void e4__execute_doesthunk(struct e4__task *task, void *user);
-void e4__execute_marker(struct e4__task *task, void *user);
+void e4__execute(struct e4__task *task, void *xt);
+void e4__execute_deferthunk(struct e4__task *task, e4__cell user);
+void e4__execute_doesthunk(struct e4__task *task, e4__cell user);
+void e4__execute_marker(struct e4__task *task, e4__cell user);
 void e4__execute_ret(struct e4__task *task);
-void e4__execute_threaded(struct e4__task *task, void *user);
-void e4__execute_userval(struct e4__task *task, void *user);
-void e4__execute_uservar(struct e4__task *task, void *user);
-void e4__execute_value(struct e4__task *task, void *user);
-void e4__execute_variable(struct e4__task *task, void *user);
+void e4__execute_threaded(struct e4__task *task, e4__cell user);
+void e4__execute_userval(struct e4__task *task, e4__cell user);
+void e4__execute_uservar(struct e4__task *task, e4__cell user);
+void e4__execute_value(struct e4__task *task, e4__cell user);
+void e4__execute_variable(struct e4__task *task, e4__cell user);
 
 /* io.c functions */
 e4__usize e4__io_accept(struct e4__task *task, char *buf, e4__usize *n);

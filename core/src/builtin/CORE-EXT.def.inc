@@ -5,7 +5,7 @@
    file and it is *not* designed to work correctly in any other
    context. */
 
-static void e4__builtin_AGAIN(struct e4__task *task, void *user)
+static void e4__builtin_AGAIN(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_REF(task, 1);
 
@@ -35,7 +35,7 @@ static const void *e4__builtin_BUFFER_COLON[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
-static void e4__builtin_COLON_NONAME(struct e4__task *task, void *user)
+static void e4__builtin_COLON_NONAME(struct e4__task *task, e4__cell user)
 {
     register struct e4__execute_token *xt =
             (struct e4__execute_token *)task->here;
@@ -58,7 +58,7 @@ static void e4__builtin_COLON_NONAME(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_DEFER(struct e4__task *task, void *user)
+static void e4__builtin_DEFER(struct e4__task *task, e4__cell user)
 {
     register const char *word;
     register e4__u8 len;
@@ -71,7 +71,7 @@ static void e4__builtin_DEFER(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_DEFER_FETCH(struct e4__task *task, void *user)
+static void e4__builtin_DEFER_FETCH(struct e4__task *task, e4__cell user)
 {
     struct e4__execute_token *xt;
 
@@ -83,7 +83,7 @@ static void e4__builtin_DEFER_FETCH(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_DEFER_STORE(struct e4__task *task, void *user)
+static void e4__builtin_DEFER_STORE(struct e4__task *task, e4__cell user)
 {
     struct e4__execute_token *xt;
 
@@ -95,7 +95,7 @@ static void e4__builtin_DEFER_STORE(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_DOT_PAREN(struct e4__task *task, void *user)
+static void e4__builtin_DOT_PAREN(struct e4__task *task, e4__cell user)
 {
     const char *str;
     register e4__usize len;
@@ -129,7 +129,7 @@ static const void *e4__builtin_HEX[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
-static void e4__builtin_MARKER(struct e4__task *task, void *user)
+static void e4__builtin_MARKER(struct e4__task *task, e4__cell user)
 {
     register const char *word;
     register e4__u8 len;
@@ -172,7 +172,7 @@ static const void *e4__builtin_NOT_EQUALS[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
-static void e4__builtin_PICK(struct e4__task *task, void *user)
+static void e4__builtin_PICK(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
     _e4__BUILTIN_EXPECT_DEPTH(task, (e4__usize)e4__stack_peek(task) + 2);
@@ -180,7 +180,7 @@ static void e4__builtin_PICK(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_QUESTION_DO(struct e4__task *task, void *user)
+static void e4__builtin_QUESTION_DO(struct e4__task *task, e4__cell user)
 {
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TWO_DUP]);
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TWO_TO_R]);
@@ -195,7 +195,7 @@ static void e4__builtin_QUESTION_DO(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_REFILL(struct e4__task *task, void *user)
+static void e4__builtin_REFILL(struct e4__task *task, e4__cell user)
 {
     register e4__usize io_res;
     e4__usize bf;
@@ -211,7 +211,7 @@ static void e4__builtin_REFILL(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_ROLL(struct e4__task *task, void *user)
+static void e4__builtin_ROLL(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
     _e4__BUILTIN_EXPECT_DEPTH(task, (e4__usize)e4__stack_peek(task) + 2);
@@ -219,7 +219,7 @@ static void e4__builtin_ROLL(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_S_BACKSLASH_QUOTE(struct e4__task *task, void *user)
+static void e4__builtin_S_BACKSLASH_QUOTE(struct e4__task *task, e4__cell user)
 {
     const char *str;
     register e4__usize len;
@@ -235,7 +235,7 @@ static void e4__builtin_S_BACKSLASH_QUOTE(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_TO(struct e4__task *task, void *user)
+static void e4__builtin_TO(struct e4__task *task, e4__cell user)
 {
     register const char *word;
     register e4__u8 len;
@@ -269,14 +269,14 @@ static void e4__builtin_TO(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_TUCK(struct e4__task *task, void *user)
+static void e4__builtin_TUCK(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
     e4__stack_tuck(task);
     e4__execute_ret(task);
 }
 
-static void e4__builtin_TWO_R_FETCH(struct e4__task *task, void *user)
+static void e4__builtin_TWO_R_FETCH(struct e4__task *task, e4__cell user)
 {
     register e4__cell l, r;
 
@@ -298,7 +298,7 @@ static void e4__builtin_TWO_R_FETCH(struct e4__task *task, void *user)
     /* e4__execute_ret intentionally omitted. */
 }
 
-static void e4__builtin_TWO_R_FROM(struct e4__task *task, void *user)
+static void e4__builtin_TWO_R_FROM(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_RDEPTH(task, 3);
 
@@ -313,7 +313,7 @@ static void e4__builtin_TWO_R_FROM(struct e4__task *task, void *user)
     /* e4__execute_ret intentionally omitted. */
 }
 
-static void e4__builtin_TWO_TO_R(struct e4__task *task, void *user)
+static void e4__builtin_TWO_TO_R(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
 
@@ -337,13 +337,13 @@ static const void *e4__builtin_U_GREATER_THAN[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
-static void e4__builtin_UNUSED(struct e4__task *task, void *user)
+static void e4__builtin_UNUSED(struct e4__task *task, e4__cell user)
 {
     e4__stack_push(task, (e4__cell)e4__task_unused(task));
     e4__execute_ret(task);
 }
 
-static void e4__builtin_VALUE(struct e4__task *task, void *user)
+static void e4__builtin_VALUE(struct e4__task *task, e4__cell user)
 {
     register const char *word;
     register e4__u8 len;

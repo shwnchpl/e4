@@ -5,7 +5,7 @@
    file and it is *not* designed to work correctly in any other
    context. */
 
-static void e4__builtin_BYE(struct e4__task *task, void *user)
+static void e4__builtin_BYE(struct e4__task *task, e4__cell user)
 {
     e4__exception_throw(task, e4__E_BYE);
 
@@ -13,7 +13,7 @@ static void e4__builtin_BYE(struct e4__task *task, void *user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_FORGET(struct e4__task *task, void *user)
+static void e4__builtin_FORGET(struct e4__task *task, e4__cell user)
 {
     register const char *word;
     register e4__u8 len;
