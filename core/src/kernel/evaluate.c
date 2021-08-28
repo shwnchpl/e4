@@ -69,7 +69,7 @@ static void e4__evaluate_wrapper(struct e4__task *task, e4__cell user);
 static e4__usize e4__evaluate_internal(struct e4__task *task)
 {
 
-    if (!task->exception_valid) {
+    if (!task->exception.valid) {
         /* If there's nothing currently catching exceptions, catch and
            return them here. */
         static const struct e4__evaluate_thunk thunk = {
@@ -105,7 +105,7 @@ static void e4__evaluate_refill_wrapper(struct e4__task *task, e4__cell user);
 
 static e4__usize e4__evaluate_refill(struct e4__task *task)
 {
-    if (!task->exception_valid) {
+    if (!task->exception.valid) {
         static const struct e4__evaluate_thunk thunk = {
             e4__evaluate_refill_wrapper,
             NULL

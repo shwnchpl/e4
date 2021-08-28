@@ -291,7 +291,7 @@ e4__usize e4__builtin_exec_(e4__usize count, /* struct e4__task *task, */
 
     /* If exceptions aren't enabled, run the builtin with them enabled
        and return any errors that are caught in this way. */
-    if (!task->exception_valid)
+    if (!task->exception.valid)
         return e4__exception_catch(task, (void *)&e4__BUILTIN_XT[id]);
 
     /* If exceptions are enabled, simply execute the builtin. If we

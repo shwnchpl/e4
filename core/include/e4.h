@@ -493,6 +493,8 @@ void e4__evaluate_quit(struct e4__task *task);
 /* exception.c functions */
 e4__usize e4__exception_catch(struct e4__task *task, void *xt);
 void e4__exception_throw(struct e4__task *task, e4__usize e);
+void e4__exception_throw_then(struct e4__task *task, e4__usize e,
+        e4__code_ptr then, void *user);
 
 /* execute.c functions */
 void e4__execute(struct e4__task *task, void *xt);

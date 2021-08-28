@@ -27,7 +27,16 @@ struct e4__compile_state
 
 struct e4__exception_ctx
 {
-    jmp_buf ctx;
+    jmp_buf buf;
+};
+
+struct e4__exception_state
+{
+    struct e4__exception_ctx ctx;
+    e4__bool valid;
+    e4__usize code;
+    e4__code_ptr then;
+    void *user;
 };
 
 struct e4__task
@@ -75,9 +84,7 @@ struct e4__task
     e4__usize base; /* Initialize to 10. */
     struct e4__dict_header *dict;
     struct e4__io_func io_func;
-    e4__bool exception_valid;
-    e4__usize exception_code;
-    struct e4__exception_ctx exception;
+    struct e4__exception_state exception;
 };
 
 #endif /* e4_INTERNAL_H_ */

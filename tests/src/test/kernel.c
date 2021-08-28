@@ -75,6 +75,12 @@ static void e4t__test_kernel_dict(void)
 
 static void e4t__test_kernel_exceptions_da(struct e4__task *task,
         e4__cell user);
+static void e4t__test_kernel_exceptions_throw10then(struct e4__task *task,
+        e4__cell user);
+static void e4t__test_kernel_exceptions_push(struct e4__task *task,
+        e4__cell user);
+static void e4t__test_kernel_exceptions_throw50(struct e4__task *task,
+        e4__cell user);
 
 static void e4t__test_kernel_exceptions(void)
 {
@@ -114,6 +120,21 @@ static void e4t__test_kernel_exceptions(void)
     e4t__ASSERT_EQ(e4__evaluate(task, "4 dropbye", -1), e4__E_BYE);
     e4t__ASSERT_OK(e4__evaluate(task, ".s clear", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<3> 1 2 3 ");
+
+    /* Test throwing with a then-callback. */
+    e4__dict_entry(task, "throw10then-push5", 17, 0,
+            e4t__test_kernel_exceptions_throw10then,
+            (void *)e4t__test_kernel_exceptions_push);
+    e4t__ASSERT_EQ(e4__evaluate(task, "throw10then-push5", -1), 10);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+
+    /* Test throwing an exception from a then-callback. */
+    e4__dict_entry(task, "throw10then-throw50", 19, 0,
+            e4t__test_kernel_exceptions_throw10then,
+            (void *)e4t__test_kernel_exceptions_throw50);
+    e4t__ASSERT_EQ(e4__evaluate(task, "throw10then-throw50", -1), 10);
+    e4t__ASSERT_EQ(e4__evaluate(task, "' throw10then-throw50 catch", -1), 50);
 }
 
 static void e4t__test_kernel_exceptions_da(struct e4__task *task,
@@ -141,6 +162,28 @@ static void e4t__test_kernel_exceptions_da(struct e4__task *task,
 
     /* This should be unreachable. */
     e4__execute_ret(task);
+}
+
+static void e4t__test_kernel_exceptions_throw10then(struct e4__task *task,
+        e4__cell user)
+{
+    e4__exception_throw_then(task, 10, (e4__code_ptr)e4__DEREF(user),
+            (void *)5);
+
+    /* This should be unreachable. */
+    e4__execute_ret(task);
+}
+
+static void e4t__test_kernel_exceptions_push(struct e4__task *task,
+        e4__cell user)
+{
+    e4__stack_push(task, e4__DEREF(user));
+}
+
+static void e4t__test_kernel_exceptions_throw50(struct e4__task *task,
+        e4__cell user)
+{
+    e4__exception_throw(task, 50);
 }
 
 static void e4t__test_kernel_evaluate(void)
