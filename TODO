@@ -41,7 +41,7 @@ Compilation
 - [DONE] Implement MARKER.
 - [DONE] Implement LIT_CSTR and LIT_STR.
 - [DONE] Add POSTPONE and IMMEDIATE words.
-- [DONE] Add restruct keyword.
+- [DONE] Add restrict keyword.
 - [DONE] Check for nested compilation everywhere relevant.
 
 General Builtins
@@ -89,7 +89,7 @@ General Builtins
 - [DONE] Implement EVALUATE and SOURCE-ID builtins.
 - [DONE] Implement the KEY builtin.
 - [DONE] Implement THROW and CATCH builtins.
-- Implement ?DUP, CHAR, [CHAR], SPACE, and SPACES.
+- [DONE] Implement ?DUP, CHAR, [CHAR], SPACE, and SPACES.
 
 Kernel
 ------
@@ -114,10 +114,6 @@ REPL
 - [DONE] Simply return e4__E_BYE exception when EOF is encountered.
 - [DONE] Implement a custom signal handler for SIGINT and SIGSEGV.
   that raises the appropriate exception when encountered.
-- Split REPL source into multiple files. (For instance, one file for
-  auto-completion related logic, one file for signal handling related
-  logic/init/uninit/etc., one file for e4 IO handlers, main.c, and
-  a header file to tie it all together).
 
 Testing
 -------
@@ -298,6 +294,13 @@ General Builtins
   dedicated. As such, this should almost certianly live behind some
   compiler flag (perhaps the file word set compiler flag?) and it is
   decidedly not a high priority.
+
+REPL
+----
+- Split REPL source into multiple files? (For instance, one file for
+  auto-completion related logic, one file for signal handling related
+  logic/init/uninit/etc., one file for e4 IO handlers, main.c, and
+  a header file to tie it all together).
 
 Testing
 -------

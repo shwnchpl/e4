@@ -82,26 +82,23 @@ static void e4__builtin_AND(struct e4__task *task, e4__cell user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_BRACKET_TICK(struct e4__task *task, e4__cell user)
-{
-    const register e4__usize depth = e4__stack_depth(task);
+static const void *e4__builtin_BRACKET_CHAR[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_CHAR],
+    &e4__BUILTIN_XT[e4__B_LITERAL],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
 
-    /* Call interpretation time tick. */
-    e4__builtin_exec(task, e4__B_TICK);
-
-    if (e4__stack_depth(task) != depth + 1) {
-        /* TICK failed and exceptions are disabled. Nothing we can do
-           here but just return. */
-        e4__execute_ret(task);
-        return;
-    }
-
-    /* Compile xt from the top of the stack into the current
-       function. */
-    e4__compile_literal(task, e4__stack_pop(task));
-
-    e4__execute_ret(task);
-}
+static const void *e4__builtin_BRACKET_TICK[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_TICK],
+    &e4__BUILTIN_XT[e4__B_LITERAL],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
 
 static void e4__builtin_C_COMMA(struct e4__task *task, e4__cell user)
 {
@@ -177,15 +174,22 @@ static const void *e4__builtin_CELL_PLUS[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
-static const void *e4__builtin_CHARS[] = {
-    e4__execute_threaded,
-    NULL,
-    &e4__BUILTIN_XT[e4__B_LIT_CELL],
-    (void *)sizeof(e4__u8),
-    &e4__BUILTIN_XT[e4__B_STAR],
-    &e4__BUILTIN_XT[e4__B_EXIT],
-    &e4__BUILTIN_XT[e4__B_SENTINEL]
-};
+static void e4__builtin_CHAR(struct e4__task *task, e4__cell user)
+{
+    register const char *word;
+    register e4__u8 len;
+
+    /* XXX: This will throw e4__E_ZLNAME on if there is no next word in
+       the input buffer from which to take the first character. This
+       is a slightly odd exception to throw, but the standard currently
+       does not specify what should be done in this scenario (or even
+       that it is an ambiguous conditon). */
+    _e4__BUILTIN_LOOKAHEAD(task, word, len);
+
+    e4__stack_push(task, (e4__cell)(e4__usize)word[0]);
+
+    e4__execute_ret(task);
+}
 
 static const void *e4__builtin_CHAR_PLUS[] = {
     e4__execute_threaded,
@@ -193,6 +197,16 @@ static const void *e4__builtin_CHAR_PLUS[] = {
     &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)sizeof(e4__u8),
     &e4__BUILTIN_XT[e4__B_PLUS],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
+static const void *e4__builtin_CHARS[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
+    (void *)sizeof(e4__u8),
+    &e4__BUILTIN_XT[e4__B_STAR],
     &e4__BUILTIN_XT[e4__B_EXIT],
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
@@ -834,6 +848,17 @@ static const void *e4__builtin_PLUS_STORE[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
+static const void *e4__builtin_QUESTION_DUP[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_DUP],
+    &e4__BUILTIN_XT[e4__B_BRANCH0],
+    (void *)2,
+    &e4__BUILTIN_XT[e4__B_DUP],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
 static void e4__builtin_QUIT(struct e4__task *task, e4__cell user)
 {
     e4__evaluate_quit(task);
@@ -982,6 +1007,33 @@ static void e4__builtin_SLASH_MOD(struct e4__task *task, e4__cell user)
 
     e4__execute_ret(task);
 }
+
+static const void *e4__builtin_SPACE[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_BL],
+    &e4__BUILTIN_XT[e4__B_EMIT],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
+static const void *e4__builtin_SPACES[] = {
+    e4__execute_threaded,
+    NULL,
+    &e4__BUILTIN_XT[e4__B_DUP],
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
+    (void *)0,
+    &e4__BUILTIN_XT[e4__B_GREATER_THAN],
+    &e4__BUILTIN_XT[e4__B_BRANCH0],
+    (void *)5,
+    &e4__BUILTIN_XT[e4__B_SPACE],
+    &e4__BUILTIN_XT[e4__B_ONE_MINUS],
+    &e4__BUILTIN_XT[e4__B_BRANCH],
+    (void *)e4__USIZE_NEGATE(9),
+    &e4__BUILTIN_XT[e4__B_DROP],
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
 
 static void e4__builtin_STAR(struct e4__task *task, e4__cell user)
 {

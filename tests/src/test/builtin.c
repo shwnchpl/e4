@@ -302,7 +302,7 @@ static void e4t__test_builtin_immediate(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 55);
 }
 
-/* Covers . ? ." .( CR BASE COUNT EMIT PAD TYPE U. WORDS */
+/* Covers . ? ." .( CR BASE COUNT EMIT PAD SPACE SPACES TYPE U. WORDS */
 static void e4t__test_builtin_io(void)
 {
     /* XXX: Parts of this test only work correctly on a 64 bit
@@ -382,6 +382,12 @@ static void e4t__test_builtin_io(void)
     e4t__ASSERT_OK(e4__evaluate(task,
             ": foo .( Right out of the gate!) 2 2 + ;", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "Right out of the gate!");
+
+    /* Test that SPACE and SPACES work as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task, "space", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), " ");
+    e4t__ASSERT_OK(e4__evaluate(task, "5 spaces", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "     ");
 }
 
 /* Covers DUMP */
@@ -1140,7 +1146,7 @@ static void e4t__test_builtin_parsenum(void)
     #undef _push
 }
 
-/* Covers REFILL WORD */
+/* Covers [CHAR] CHAR REFILL WORD */
 static void e4t__test_builtin_parseword(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -1179,6 +1185,29 @@ static void e4t__test_builtin_parseword(void)
     res = (char *)e4__stack_pop(task);
     len = *res++;
     e4t__ASSERT_EQ(len, 0);
+
+    /* Test that [CHAR] and CHAR work as expected. */
+    e4t__ASSERT_EQ(e4__evaluate(task, "char", -1), e4__E_ZLNAME);
+    e4t__ASSERT_OK(e4__evaluate(task, "char f", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 'f');
+    e4t__ASSERT_OK(e4__evaluate(task, "char bar", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 'b');
+
+
+    e4t__ASSERT_EQ(e4__evaluate(task, "[char]", -1), e4__E_COMPONLYWORD);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo [char]", -1), e4__E_ZLNAME);
+    e4__compile_cancel(task);
+    e4__stack_clear(task);
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo [char] b ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, ": bar [char] quux ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 'b');
+    e4t__ASSERT_OK(e4__evaluate(task, "bar", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 'q');
 }
 
 /* Covers >R 2>R 2R> 2R@ R> R@ */
@@ -1272,8 +1301,8 @@ static void e4t__test_builtin_rstackmanip(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 5);
 }
 
-/* Covers CLEAR .S 2DROP 2DUP 2OVER 2SWAP DROP DUP OVER NIP PICK ROT
-   SWAP TUCK ROLL QUIT */
+/* Covers .S 2DROP ?DUP 2DUP 2OVER 2SWAP CLEAR DROP DUP OVER NIP PICK
+   ROT SWAP TUCK ROLL QUIT */
 static void e4t__test_builtin_stackmanip(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -1357,6 +1386,15 @@ static void e4t__test_builtin_stackmanip(void)
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<6> 10 20 30 40 10 20 ");
     e4t__ASSERT_OK(e4__evaluate(task, "10 20 30 40 2swap .s clear", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<4> 30 40 10 20 ");
+
+    /* Test that ?DUP behaves as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task, "0 ?dup", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_OK(e4__evaluate(task, "5 ?dup", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
 }
 
 /* Covers BASE HERE PAD SOURCE-ID */
