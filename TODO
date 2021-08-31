@@ -24,7 +24,6 @@ Build
 - [DONE] Create a special Make target that tests building various
   build configurations to ensure they call build properly and there
   are no erroneous interdependencies between wordsets.
-- Fix as many pedantic errors as possible.
 
 Compilation
 -----------
@@ -137,6 +136,22 @@ Build
 -----
 - Split system required words and optional system specific extension
   words into different modules (SYSTEM and SYSTEM-EXIT?).
+- Fix as many pedantic errors as possible. There are three major issues
+  currently. The first is the use of variadic macros which were only
+  introduced in C99. The second is the casting between function
+  pointers and void pointers. Based upon our compiler time assertions,
+  the later of these two issues is definitely okay whenver this build
+  actually works, it's just a mtter of getting the compiler to be quiet
+  about it in pedantic mode, which is to say, actually complying with
+  the standard in some capacity. The variadic macro issue may require
+  more sigificant refactoring to fully resolve. The third issue is
+  minor but equally frustrating. ANSI standard C doesn't allow forward
+  declarations of static arrays with unspecified size. Changing all
+  thunks to be extern fixes this issue, although there may still be
+  a better way. Interestingly enough, two of these errors are related
+  to thunks. Originally this was intended to be solved as part of 0.2,
+  but for now it's being pushed to 0.3 because an elegant solution may
+  be possible yet.
 
 Compilation
 -----------
