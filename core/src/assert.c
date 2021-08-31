@@ -70,7 +70,7 @@ e4__ASSERT(sizeof(e4__cell) == sizeof(e4__usize));
 /* Ensure that e4__VERSION_NUMBER is a proper integral semantic version
    number with 3 base-10 digits for minor and patch numbers and that
    e4__VERSION_NUMBER has not been updated carelessly or erroneously. */
-e4__ASSERT(e4__VERSION_NUMBER == (0 * 100000 + 1 * 1000 + 0 * 1));
+e4__ASSERT(e4__VERSION_NUMBER == (0 * 100000 + 2 * 1000 + 0 * 1));
 
 /* Ensure the e4__NARGS macro works correctly across its target domain. */
 e4__ASSERT(e4__NARGS(1) == 1);
