@@ -13,18 +13,18 @@ static void e4t__test_execute_badret(void)
         (void *)2
     };
     const void *bad_ret[] = {
-        e4__execute_threaded,
+        (void *)(e4__usize)e4__execute_threaded,
         NULL,
         &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)5,
-        &nret_xt,
+        NULL,
         &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)10,
         &e4__BUILTIN_XT[e4__B_EXIT],
         &e4__BUILTIN_XT[e4__B_SENTINEL]
     };
-
     struct e4__task *task = e4t__transient_task();
+    bad_ret[4] = &nret_xt;
 
     /* Check that returning twice "aborts" and doesn't end up reaching
        the 10 literal. */
@@ -66,7 +66,7 @@ static void e4t__test_execute_badret_nret(struct e4__task *task,
 static void e4t__test_execute_branch(void)
 {
     static const void *branch_skip[] = {
-        e4__execute_threaded,
+        (void *)(e4__usize)e4__execute_threaded,
         NULL,
         &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)1,
@@ -82,7 +82,7 @@ static void e4t__test_execute_branch(void)
         &e4__BUILTIN_XT[e4__B_SENTINEL]
     };
     static const void *branch_conditional[] = {
-        e4__execute_threaded,
+        (void *)(e4__usize)e4__execute_threaded,
         NULL,
         &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)1,
@@ -100,7 +100,7 @@ static void e4t__test_execute_branch(void)
         &e4__BUILTIN_XT[e4__B_SENTINEL]
     };
     static const void *branch_negative[] = {
-        e4__execute_threaded,
+        (void *)(e4__usize)e4__execute_threaded,
         NULL,
         &e4__BUILTIN_XT[e4__B_BRANCH],
         (void *)6,
@@ -142,21 +142,21 @@ static void e4t__test_execute_branch(void)
 static void e4t__test_execute_data(void)
 {
     static const void *constant_77[] = {
-        e4__execute_value,
+        (void *)(e4__usize)e4__execute_value,
         NULL,
         (void *)77
     };
     static const void *variable_33[] = {
-        e4__execute_variable,
+        (void *)(e4__usize)e4__execute_variable,
         NULL,
         (void *)33
     };
     static const void *uservar_base[] = {
-        e4__execute_uservar,
+        (void *)(e4__usize)e4__execute_uservar,
         (void *)e4__UV_BASE
     };
     static const void *userval_c[] = {
-        e4__execute_userval,
+        (void *)(e4__usize)e4__execute_userval,
         (void *)((e4__usize)'c')
     };
     struct e4__task *task = e4t__transient_task();
@@ -183,7 +183,7 @@ static void e4t__test_execute_data(void)
 static void e4t__test_execute_defer(void)
 {
     static const void *yield_5[] = {
-        e4__execute_threaded,
+        (void *)(e4__usize)e4__execute_threaded,
         NULL,
         &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)3,
@@ -194,7 +194,7 @@ static void e4t__test_execute_defer(void)
         &e4__BUILTIN_XT[e4__B_SENTINEL]
     };
     static const void *yield_16[] = {
-        e4__execute_threaded,
+        (void *)(e4__usize)e4__execute_threaded,
         NULL,
         &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)10,
@@ -205,7 +205,7 @@ static void e4t__test_execute_defer(void)
         &e4__BUILTIN_XT[e4__B_SENTINEL]
     };
     void *defer_num[] = {
-        e4__execute_deferthunk,
+        (void *)(e4__usize)e4__execute_deferthunk,
         (void *)yield_5
     };
     struct e4__task *task = e4t__transient_task();
@@ -224,7 +224,7 @@ static void e4t__test_execute_defer(void)
 static void e4t__test_execute_does(void)
 {
     void *addtwo_const[] = {
-        e4__execute_doesthunk,
+        (void *)(e4__usize)e4__execute_doesthunk,
         NULL,
         (void *)10,
         (void *)&e4__BUILTIN_XT[e4__B_FETCH],
@@ -251,7 +251,7 @@ static void e4t__test_execute_does(void)
 static void e4t__test_execute_nested(void)
 {
     static const void *push_12345[] = {
-        e4__execute_threaded,
+        (void *)(e4__usize)e4__execute_threaded,
         NULL,
         &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)0x12345,
@@ -259,7 +259,7 @@ static void e4t__test_execute_nested(void)
         &e4__BUILTIN_XT[e4__B_SENTINEL]
     };
     static const void *push_abcde[] = {
-        e4__execute_threaded,
+        (void *)(e4__usize)e4__execute_threaded,
         NULL,
         &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)0xabcde,
@@ -267,7 +267,7 @@ static void e4t__test_execute_nested(void)
         &e4__BUILTIN_XT[e4__B_SENTINEL]
     };
     static const void *push_77777[] = {
-        e4__execute_threaded,
+        (void *)(e4__usize)e4__execute_threaded,
         NULL,
         &e4__BUILTIN_XT[e4__B_LIT_CELL],
         (void *)0x77777,
@@ -275,7 +275,7 @@ static void e4t__test_execute_nested(void)
         &e4__BUILTIN_XT[e4__B_SENTINEL]
     };
     static const void *push_seq_exit[] = {
-        e4__execute_threaded,
+        (void *)(e4__usize)e4__execute_threaded,
         NULL,
         push_77777,
         push_abcde,
@@ -285,7 +285,7 @@ static void e4t__test_execute_nested(void)
         &e4__BUILTIN_XT[e4__B_SENTINEL]
     };
     static const void *push_seq_abort[] = {
-        e4__execute_threaded,
+        (void *)(e4__usize)e4__execute_threaded,
         NULL,
         push_77777,
         push_abcde,
@@ -320,7 +320,7 @@ static void e4t__test_execute_string(void)
     static const char *minimum = "\030rice and beans, at least";
     struct e4__task *task = e4t__transient_task();
     const void *push_hello5[] = {
-        e4__execute_threaded,
+        (void *)(e4__usize)e4__execute_threaded,
         NULL,
         &e4__BUILTIN_XT[e4__B_LIT_STR],
         (void *)13,
@@ -332,7 +332,7 @@ static void e4t__test_execute_string(void)
         &e4__BUILTIN_XT[e4__B_SENTINEL]
     };
     const void *push_minimum7[] = {
-        e4__execute_threaded,
+        (void *)(e4__usize)e4__execute_threaded,
         NULL,
         &e4__BUILTIN_XT[e4__B_LIT_CSTR],
         NULL, /* padding */
@@ -372,7 +372,7 @@ static void e4t__test_execute_tr0coherent(void)
 {
     struct e4__task *task = e4t__transient_task();
     static const void *corrupt_rstack_push[] = {
-        e4__execute_threaded,
+        (void *)(e4__usize)e4__execute_threaded,
         NULL,
         &e4__BUILTIN_XT[e4__B_LIT_STR],
         (void *)13,
@@ -384,7 +384,7 @@ static void e4t__test_execute_tr0coherent(void)
         &e4__BUILTIN_XT[e4__B_SENTINEL]
     };
     static const void *corrupt_rstack_pop[] = {
-        e4__execute_threaded,
+        (void *)(e4__usize)e4__execute_threaded,
         NULL,
         &e4__BUILTIN_XT[e4__B_R_FROM],
         &e4__BUILTIN_XT[e4__B_R_FROM],
@@ -438,7 +438,7 @@ static void e4t__test_execute_tr0coherent(void)
 static void e4t__test_execute_userfunc(void)
 {
     void *set_var[] = {
-        e4t__test_execute_userfunc_setter,
+        (void *)(e4__usize)e4t__test_execute_userfunc_setter,
         NULL
     };
     struct e4__task *task = e4t__transient_task();

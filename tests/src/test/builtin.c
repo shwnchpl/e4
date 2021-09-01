@@ -394,13 +394,13 @@ static void e4t__test_builtin_io(void)
 static void e4t__test_builtin_io_dump(void)
 {
     /* XXX: Parts of this test only work correctly on a 64 bit system
-       where unsigned long long values have 8 bit alignment. */
+       where unsigned long values have 8 bit alignment. */
 
     static const char *test_str =
             "test \x88\x99\xaa string with some \x01 \x02 \x03 data";
 
     char expected[240] = {0,};
-    unsigned long long buffer[8];
+    unsigned long buffer[8];
     struct e4__task *task = e4t__transient_task();
     char *unaligned_buf = ((char *)buffer) + 3;
     e4__usize len = strlen(test_str);
@@ -416,14 +416,14 @@ static void e4t__test_builtin_io_dump(void)
     e4__stack_push(task, (e4__cell)len);
     e4t__ASSERT_OK(e4__evaluate(task, "dump", -1));
 
-    #define _f  "%016llx   "
+    #define _f  "%016lx   "
     sprintf(expected,
             _f "???? ??74 6573 7420  8899 aa20 7374 7269   ...test ... stri\n"
             _f "6e67 2077 6974 6820  736f 6d65 2001 2002   ng with some . .\n"
             _f "2003 2064 6174 61??  ???? ???? ???? ????    . data.........\n",
-            (unsigned long long)&buffer[0],
-            (unsigned long long)&buffer[2],
-            (unsigned long long)&buffer[4]);
+            (unsigned long)&buffer[0],
+            (unsigned long)&buffer[2],
+            (unsigned long)&buffer[4]);
     #undef _f
 
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), expected);

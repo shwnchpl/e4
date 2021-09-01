@@ -51,7 +51,7 @@ static void e4t__test_util_math(void)
 static void e4t__test_util_mem_dict(void)
 {
     char buf[4096] = {0,};
-    void *here = buf;
+    char *here = buf;
     e4__usize wrote;
     struct e4__dict_header *dict = NULL;
     const struct e4__dict_header *last;
@@ -60,19 +60,19 @@ static void e4t__test_util_mem_dict(void)
         do {    \
             wrote = e4__mem_dict_entry(here, dict, s, sizeof(s) - 1, 0, c,  \
                     NULL);  \
-            dict = here;    \
+            dict = (struct e4__dict_header *)here;  \
             here += wrote;  \
         } while (0)
     #define _l(s)   e4__mem_dict_lookup(dict, s, sizeof(s) - 1)
     #define _s(d, p)    e4__mem_dict_suggest(d, p, sizeof(p) - 1)
 
     /* Test basic lookup. */
-    _d("first-entry", (void *)0xabcde);
+    _d("first-entry", (e4__code_ptr)0xabcde);
     e4t__ASSERT_EQ(_l("first-entry"), dict);
     e4t__ASSERT_EQ(_l("first-entry")->xt->code, 0xabcde);
     e4t__ASSERT_EQ((e4__usize)here % sizeof(e4__cell), 0);
 
-    _d("second-entry", (void *)0x12345);
+    _d("second-entry", (e4__code_ptr)0x12345);
     e4t__ASSERT_EQ(_l("second-entry"), dict);
     e4t__ASSERT_EQ(_l("second-entry")->xt->code, 0x12345);
 
@@ -83,9 +83,9 @@ static void e4t__test_util_mem_dict(void)
     e4t__ASSERT_EQ((e4__usize)_l("not-present"), (e4__usize)NULL);
 
     /* Test prefix suggestion. */
-    _d("prefix-first", (void *)0x11111);
-    _d("prefix-second", (void *)0x22222);
-    _d("prefix-third", (void *)0x33333);
+    _d("prefix-first", (e4__code_ptr)0x11111);
+    _d("prefix-second", (e4__code_ptr)0x22222);
+    _d("prefix-third", (e4__code_ptr)0x33333);
 
     e4t__ASSERT((last = _s(dict, "prefix")));
     e4t__ASSERT_EQ(last->xt->code, 0x33333);
@@ -103,29 +103,29 @@ static void e4t__test_util_mem_dict(void)
 static void e4t__test_util_mem_dump(void)
 {
     /* XXX: Parts of this test only work correctly on a 64 bit system
-       where unsigned long long values have 8 bit alignment. */
+       where unsigned long values have 8 bit alignment. */
 
     static const char *test_str =
             "test \x88\x99\xaa string with some \x01 \x02 \x03 data";
 
     const char *cursor;
     e4__usize wrote_sz;
-    unsigned long long buffer[8];
+    unsigned long buffer[8];
     char line[80] = {0,};
     char expected_line[3][80] = {0,};
     char *unaligned_buf = ((char *)buffer) + 3;
     e4__usize remaining = strlen(test_str);
 
-    #define _f  "%016llx   "
+    #define _f  "%016lx   "
     sprintf(expected_line[0],
             _f "???? ??74 6573 7420  8899 aa20 7374 7269   ...test ... stri\n",
-            (unsigned long long)&buffer[0]);
+            (unsigned long)&buffer[0]);
     sprintf(expected_line[1],
             _f "6e67 2077 6974 6820  736f 6d65 2001 2002   ng with some . .\n",
-            (unsigned long long)&buffer[2]);
+            (unsigned long)&buffer[2]);
     sprintf(expected_line[2],
             _f "2003 2064 6174 61??  ???? ???? ???? ????    . data.........\n",
-            (unsigned long long)&buffer[4]);
+            (unsigned long)&buffer[4]);
     #undef _f
 
     /* XXX: It would violate strict aliasing rules if we ever looked at

@@ -29,11 +29,11 @@ static void e4t__test_kernel_dict(void)
     #define _f(s)       e4__dict_forget(task, s, sizeof(s) - 1)
 
     /* Simply insertion and lookup. */
-    _d("first-entry", (void *)0xabcde);
+    _d("first-entry", (e4__code_ptr)0xabcde);
     e4t__ASSERT(_l("first-entry"));
     e4t__ASSERT_EQ(_l("first-entry")->xt->code, 0xabcde);
 
-    _d("second-entry", (void *)0x12345);
+    _d("second-entry", (e4__code_ptr)0x12345);
     e4t__ASSERT(_l("second-entry"));
     e4t__ASSERT_EQ(_l("second-entry")->xt->code, 0x12345);
 
@@ -53,9 +53,9 @@ static void e4t__test_kernel_dict(void)
     e4t__ASSERT_EQ(_l("second-entry"), NULL);
 
     /* Prefix suggestion functions correctly. */
-    _d("prefix73-first", (void *)0x11111);
-    _d("prefix73-second", (void *)0x22222);
-    _d("prefix73-third", (void *)0x33333);
+    _d("prefix73-first", (e4__code_ptr)0x11111);
+    _d("prefix73-second", (e4__code_ptr)0x22222);
+    _d("prefix73-third", (e4__code_ptr)0x33333);
 
     e4t__ASSERT((sug = _s(NULL, "prefix73")));
     e4t__ASSERT_EQ(sug->xt->code, 0x33333);
@@ -124,7 +124,7 @@ static void e4t__test_kernel_exceptions(void)
     /* Test throwing with a then-callback. */
     e4__dict_entry(task, "throw10then-push5", 17, 0,
             e4t__test_kernel_exceptions_throw10then,
-            (void *)e4t__test_kernel_exceptions_push);
+            (void *)(e4__usize)e4t__test_kernel_exceptions_push);
     e4t__ASSERT_EQ(e4__evaluate(task, "throw10then-push5", -1), 10);
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), 5);
@@ -132,7 +132,7 @@ static void e4t__test_kernel_exceptions(void)
     /* Test throwing an exception from a then-callback. */
     e4__dict_entry(task, "throw10then-throw50", 19, 0,
             e4t__test_kernel_exceptions_throw10then,
-            (void *)e4t__test_kernel_exceptions_throw50);
+            (void *)(e4__usize)e4t__test_kernel_exceptions_throw50);
     e4t__ASSERT_EQ(e4__evaluate(task, "throw10then-throw50", -1), 10);
     e4t__ASSERT_EQ(e4__evaluate(task, "' throw10then-throw50 catch", -1), 50);
 }
@@ -147,8 +147,9 @@ static void e4t__test_kernel_exceptions_da(struct e4__task *task,
            function. */
         struct e4__execute_token xt = {
             e4t__test_kernel_exceptions_da,
-            (e4__cell)e4__USIZE_NEGATE(ex),
+            NULL,
         };
+        xt.user = (e4__cell)e4__USIZE_NEGATE(ex);
         e4__exception_catch(task, &xt);
         e4__execute_ret(task);
         return;
@@ -167,7 +168,8 @@ static void e4t__test_kernel_exceptions_da(struct e4__task *task,
 static void e4t__test_kernel_exceptions_throw10then(struct e4__task *task,
         e4__cell user)
 {
-    e4__exception_throw_then(task, 10, (e4__code_ptr)e4__DEREF(user),
+    e4__exception_throw_then(task, 10,
+            (e4__code_ptr)(e4__usize)e4__DEREF(user),
             (void *)5);
 
     /* This should be unreachable. */
@@ -289,7 +291,7 @@ static void e4t__test_kernel_io_dump(void)
             "test \x88\x99\xaa string with some \x01 \x02 \x03 data";
 
     char expected[240] = {0,};
-    unsigned long long buffer[8];
+    unsigned long buffer[8];
     struct e4__task *task = e4t__transient_task();
     char *unaligned_buf = ((char *)buffer) + 3;
     e4__usize len = strlen(test_str);
@@ -302,14 +304,14 @@ static void e4t__test_kernel_io_dump(void)
     e4t__term_obuf_consume();
     e4t__ASSERT_OK(e4__io_dump(task, (e4__cell)unaligned_buf, len));
 
-    #define _f  "%016llx   "
+    #define _f  "%016lx   "
     sprintf(expected,
             _f "???? ??74 6573 7420  8899 aa20 7374 7269   ...test ... stri\n"
             _f "6e67 2077 6974 6820  736f 6d65 2001 2002   ng with some . .\n"
             _f "2003 2064 6174 61??  ???? ???? ???? ????    . data.........\n",
-            (unsigned long long)&buffer[0],
-            (unsigned long long)&buffer[2],
-            (unsigned long long)&buffer[4]);
+            (unsigned long)&buffer[0],
+            (unsigned long)&buffer[2],
+            (unsigned long)&buffer[4]);
     #undef _f
 
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), expected);
@@ -377,15 +379,14 @@ static void e4t__test_kernel_quit(void)
 {
     struct e4__io_func old_iof;
     struct e4__task *task = e4t__transient_task();
-    struct e4t__test_kernel_quit_data test_data = {
-        task,
-        0
-    };
+    struct e4t__test_kernel_quit_data test_data = {0};
     struct e4__io_func iof = {
-        &test_data,
+        NULL,
         e4t__test_kernel_quit_accept,
         e4t__test_kernel_quit_key,
     };
+    test_data.task = task;
+    iof.user = &test_data;
 
     /* Hack. Normally this kind of thing isn't safe unless you know
        the old handlers will be using their user pointer the same as
