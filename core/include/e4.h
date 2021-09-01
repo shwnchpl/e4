@@ -5,8 +5,8 @@
  *                  e4 version
  *************************************************/
 
-#define e4__VERSION_NUMBER      2000
-#define e4__VERSION_STRING      "0.2.0"
+#define e4__VERSION_NUMBER      2001
+#define e4__VERSION_STRING      "0.2.1"
 
 /**************************************************
  *               e4 configuration
