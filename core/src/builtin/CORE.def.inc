@@ -1018,8 +1018,13 @@ static void e4__builtin_STAR(struct e4__task *task, e4__cell user)
 
 static void e4__builtin_STORE(struct e4__task *task, e4__cell user)
 {
+    register e4__cell c;
+
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
-    e4__DEREF(e4__stack_pop(task)) = e4__stack_pop(task);
+
+    c = e4__stack_pop(task);
+    e4__DEREF(c) = e4__stack_pop(task);
+
     e4__execute_ret(task);
 }
 
