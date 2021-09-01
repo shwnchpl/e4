@@ -1159,28 +1159,32 @@ static void e4t__test_builtin_parseword(void)
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
 
-    e4__builtin_exec(task, e4__B_WORD, ' ');
+    e4__stack_push(task, (e4__cell)(e4__usize)' ');
+    e4__builtin_exec(task, e4__B_WORD);
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     res = (char *)e4__stack_pop(task);
     len = *res++;
     e4t__ASSERT_EQ(len, 5);
     e4t__ASSERT(!e4__mem_strncasecmp(res, "first", len));
 
-    e4__builtin_exec(task, e4__B_WORD, ' ');
+    e4__stack_push(task, (e4__cell)(e4__usize)' ');
+    e4__builtin_exec(task, e4__B_WORD);
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     res = (char *)e4__stack_pop(task);
     len = *res++;
     e4t__ASSERT_EQ(len, 6);
     e4t__ASSERT(!e4__mem_strncasecmp(res, "second", len));
 
-    e4__builtin_exec(task, e4__B_WORD, ' ');
+    e4__stack_push(task, (e4__cell)(e4__usize)' ');
+    e4__builtin_exec(task, e4__B_WORD);
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     res = (char *)e4__stack_pop(task);
     len = *res++;
     e4t__ASSERT_EQ(len, 5);
     e4t__ASSERT(!e4__mem_strncasecmp(res, "third", len));
 
-    e4__builtin_exec(task, e4__B_WORD, ' ');
+    e4__stack_push(task, (e4__cell)(e4__usize)' ');
+    e4__builtin_exec(task, e4__B_WORD);
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     res = (char *)e4__stack_pop(task);
     len = *res++;

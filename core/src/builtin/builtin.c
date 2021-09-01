@@ -1,7 +1,6 @@
 #include "e4.h"
 #include "../kernel/e4-internal.h"
 
-#include <stdarg.h>
 #include <string.h>
 
 /* utility macros */
@@ -244,33 +243,8 @@ const struct e4__execute_tuple e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
 
 /* builtin utilities */
 
-/* task and id are mandatory, otherwise this function simply does
-   nothing. Executes the builtin corresponding to id on the
-   specified task after pushing any remaining arguments onto the
-   stack as cells. These arguments should be explicitly cast
-   to either e4__cell or e4__usize if they are not already one
-   of those types. */
-e4__usize e4__builtin_exec_(e4__usize count, /* struct e4__task *task, */
-        /* enum e4__builtin_id id, */ ...)
+e4__usize e4__builtin_exec(struct e4__task *task, enum e4__builtin_id id)
 {
-    va_list ap;
-    register struct e4__task *task;
-    register unsigned id;
-
-    if (count < 2)
-        return e4__E_BUG;
-
-    va_start(ap, count);
-
-    task = va_arg(ap, struct e4__task *);
-    id = va_arg(ap, unsigned);
-    count -= 2;
-
-    while (count--)
-        e4__stack_push(task, va_arg(ap, e4__cell));
-
-    va_end(ap);
-
     /* If exceptions aren't enabled, run the builtin with them enabled
        and return any errors that are caught in this way. */
     if (!task->exception.valid)

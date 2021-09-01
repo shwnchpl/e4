@@ -431,23 +431,11 @@ enum e4__builtin_id {
 #define e4__USIZE_IS_NEGATIVE(u)    (u > ((e4__usize)-1 >> 1))
 #define e4__USIZE_NEGATE(u)         (((u) ^ (e4__usize)-1) + 1)
 
-/* XXX: e4__NARGS is *only* correct in cases where N is greater than
-   0 and less than 11. It should not be used in where correct outside
-   this domain is necessary. */
-#define e4__NARGS0(_1, _2, _3, _4, _5, _6, _7, _8, _9, n, ...) (n)
-#define e4__NARGS(...)  e4__NARGS0(__VA_ARGS__, 9, 8, 7, 6, 5, 4, 3, 2, 1)
-
-/* Convenience wrapper around e4__builtin_wrap_. Takes up to 8 stack
-   arguments, which is far more than any builtin actually uses. */
-#define e4__builtin_exec(...)   \
-    e4__builtin_exec_(e4__NARGS(__VA_ARGS__), __VA_ARGS__)
-
 /* builtin declarations */
 /* FIXME: Should the header table even be exposed here? */
 extern const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT];
 extern const struct e4__execute_tuple e4__BUILTIN_XT[e4__BUILTIN_COUNT];
-e4__usize e4__builtin_exec_(e4__usize count, /* struct e4__task *task, */
-        /* enum e4__builtin_id id, */ ...);
+e4__usize e4__builtin_exec(struct e4__task *task, enum e4__builtin_id id);
 
 /* compile.c functions */
 void e4__compile_cancel(struct e4__task *task);

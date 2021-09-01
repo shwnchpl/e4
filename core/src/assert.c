@@ -73,18 +73,6 @@ e4__ASSERT(sizeof(e4__cell) == sizeof(e4__usize));
    e4__VERSION_NUMBER has not been updated carelessly or erroneously. */
 e4__ASSERT(e4__VERSION_NUMBER == (0 * 100000 + 2 * 1000 + 0 * 1));
 
-/* Ensure the e4__NARGS macro works correctly across its target domain. */
-e4__ASSERT(e4__NARGS(1) == 1);
-e4__ASSERT(e4__NARGS(1, 2) == 2);
-e4__ASSERT(e4__NARGS(1, 2, 3) == 3);
-e4__ASSERT(e4__NARGS(1, 2, 3, 4) == 4);
-e4__ASSERT(e4__NARGS(1, 2, 3, 4, 5) == 5);
-e4__ASSERT(e4__NARGS(1, 2, 3, 4, 5, 6) == 6);
-e4__ASSERT(e4__NARGS(1, 2, 3, 4, 5, 6, 7) == 7);
-e4__ASSERT(e4__NARGS(1, 2, 3, 4, 5, 6, 7, 8) == 8);
-e4__ASSERT(e4__NARGS(1, 2, 3, 4, 5, 6, 7, 8, 9) == 9);
-e4__ASSERT(e4__NARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10) == 10);
-
 /* Ensure that e4__execute_tuple and e4__execute_token fields line up
    correctly. */
 e4__ASSERT(offsetof(struct e4__execute_token, code) ==

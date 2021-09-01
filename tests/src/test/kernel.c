@@ -9,7 +9,9 @@ static void e4t__test_kernel_builtin_exec(void)
 
     /* e4__builtin_exec should behave correctly in non-exceptional
        cases. */
-    e4t__ASSERT_OK(e4__builtin_exec(task, e4__B_PLUS, 2, 3));
+    e4__stack_push(task, (e4__cell)2);
+    e4__stack_push(task, (e4__cell)3);
+    e4t__ASSERT_OK(e4__builtin_exec(task, e4__B_PLUS));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), 5);
 
