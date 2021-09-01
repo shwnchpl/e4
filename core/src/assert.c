@@ -1,6 +1,7 @@
 #include "e4.h"
 #include "kernel/e4-internal.h"
 
+#include <stddef.h>
 #include <stdlib.h>
 
 /* C89 does not require that function pointers and void pointers be
@@ -86,19 +87,18 @@ e4__ASSERT(e4__NARGS(1, 2, 3, 4, 5, 6, 7, 8, 9, 10) == 10);
 
 /* Ensure that e4__execute_tuple and e4__execute_token fields line up
    correctly. */
-e4__ASSERT(&((struct e4__execute_token *)NULL)->code ==
-        &((struct e4__execute_tuple *)NULL)->code);
-e4__ASSERT(&((struct e4__execute_token *)NULL)->user ==
-        &((struct e4__execute_tuple *)NULL)->user);
+e4__ASSERT(offsetof(struct e4__execute_token, code) ==
+        offsetof(struct e4__execute_tuple, code));
+e4__ASSERT(offsetof(struct e4__execute_token, user) ==
+        offsetof(struct e4__execute_tuple, user));
 
 /* The hack used to access user table variables requires that fields in
    the task struct are aligned at e4__cell width. */
 /* FIXME: Add asserts for all fields accessed this way once field
    offset IDs are defined. */
-e4__ASSERT(&((struct e4__task *)NULL)->here ==
-        &((e4__cell *)NULL)[e4__UV_HERE]);
-e4__ASSERT(&((struct e4__task *)NULL)->pad == &((e4__cell *)NULL)[e4__UV_PAD]);
-e4__ASSERT(&((struct e4__task *)NULL)->base_ptr ==
-        &((e4__cell *)NULL)[e4__UV_BASE]);
-e4__ASSERT((e4__cell)&((struct e4__task *)NULL)->io_src.sid ==
-        (e4__cell)&((e4__cell *)NULL)[e4__UV_SOURCE_ID]);
+e4__ASSERT(offsetof(struct e4__task, here) == sizeof(e4__cell) * e4__UV_HERE);
+e4__ASSERT(offsetof(struct e4__task, pad) == sizeof(e4__cell) * e4__UV_PAD);
+e4__ASSERT(offsetof(struct e4__task, base_ptr) ==
+        sizeof(e4__cell) * e4__UV_BASE);
+e4__ASSERT(offsetof(struct e4__task, io_src.sid) ==
+        sizeof(e4__cell) * e4__UV_SOURCE_ID);
