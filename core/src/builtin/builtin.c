@@ -46,6 +46,29 @@
         }   \
     } while (0)
 
+static const void *_e4__BUILTIN_RETURN_THUNK[] =
+{
+    &e4__BUILTIN_XT[e4__B_EXIT]
+};
+
+/* builtin implementations */
+
+#include "CORE.def.inc"
+#include "SYSTEM.def.inc"
+
+#if defined(e4__INCLUDE_CORE_EXT)
+    #include "CORE-EXT.def.inc"
+#endif
+#if defined(e4__INCLUDE_EXCEPTION)
+    #include "EXCEPTION.def.inc"
+#endif
+#if defined(e4__INCLUDE_TOOLS)
+    #include "TOOLS.def.inc"
+#endif
+#if defined(e4__INCLUDE_TOOLS_EXT)
+    #include "TOOLS-EXT.def.inc"
+#endif
+
 /* builtin dictionary definitions */
 
 #include "CORE.decl.inc"
@@ -102,42 +125,6 @@
 
 #define _e4__BUILTIN_USERVAR(w) \
     _e4__BUILTIN_USERVAR_N(w, #w)
-
-/* Declare builtin functions. */
-#define _e4__BUILTIN_PROC_FIRST(w)  _e4__BUILTIN_PROC(w)
-#define _e4__BUILTIN_PROC_NF(w, n, f)   \
-    static void e4__builtin_##w(struct e4__task *task, e4__cell user);
-#define _e4__BUILTIN_THUNK_NF(w, n, f)  \
-    static const void *e4__builtin_##w[];
-#define _e4__BUILTIN_PUN_NF(w, t, n, f)
-#define _e4__BUILTIN_ALIAS_NF(w, t, n, f)
-
-#define _e4__BUILTIN_CONSTANT(w, c)
-#define _e4__BUILTIN_USERVAR_N(w, n)
-
-_e4__BUILTIN_CORE_DECL();
-_e4__BUILTIN_SYSTEM_DECL();
-
-#if defined(e4__INCLUDE_CORE_EXT)
-    _e4__BUILTIN_CORE_EXT_DECL();
-#endif
-#if defined(e4__INCLUDE_EXCEPTION)
-    _e4__BUILTIN_EXCEPTION_DECL();
-#endif
-#if defined(e4__INCLUDE_TOOLS)
-    _e4__BUILTIN_TOOLS_DECL();
-#endif
-#if defined(e4__INCLUDE_TOOLS_EXT)
-    _e4__BUILTIN_TOOLS_EXT_DECL();
-#endif
-
-#undef _e4__BUILTIN_USERVAR_N
-#undef _e4__BUILTIN_CONSTANT
-#undef _e4__BUILTIN_ALIAS_NF
-#undef _e4__BUILTIN_PUN_NF
-#undef _e4__BUILTIN_THUNK_NF
-#undef _e4__BUILTIN_PROC_NF
-#undef _e4__BUILTIN_PROC_FIRST
 
 /* Define builtin header table. */
 #define _e4__BUILTIN_PROC_HEADER(w, link, n, f) \
@@ -255,11 +242,6 @@ const struct e4__execute_tuple e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
 #undef _e4__BUILTIN_SYSTEM_DECL
 #undef _e4__BUILTIN_CORE_DECL
 
-static const void *_e4__BUILTIN_RETURN_THUNK[] =
-{
-    &e4__BUILTIN_XT[e4__B_EXIT]
-};
-
 /* builtin utilities */
 
 /* task and id are mandatory, otherwise this function simply does
@@ -301,21 +283,3 @@ e4__usize e4__builtin_exec_(e4__usize count, /* struct e4__task *task, */
 
     return e4__E_OK;
 }
-
-/* builtin implementations */
-
-#include "CORE.def.inc"
-#include "SYSTEM.def.inc"
-
-#if defined(e4__INCLUDE_CORE_EXT)
-    #include "CORE-EXT.def.inc"
-#endif
-#if defined(e4__INCLUDE_EXCEPTION)
-    #include "EXCEPTION.def.inc"
-#endif
-#if defined(e4__INCLUDE_TOOLS)
-    #include "TOOLS.def.inc"
-#endif
-#if defined(e4__INCLUDE_TOOLS_EXT)
-    #include "TOOLS-EXT.def.inc"
-#endif
