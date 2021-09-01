@@ -25,7 +25,7 @@ TESTS_SRCS := $(shell find $(TESTS_SRC_DIRS) -name *.c)
 TESTS_OBJS := $(TESTS_SRCS:%=$(BUILD_DIR)/%.o)
 TESTS_DEPS := $(TESTS_OBJS:.o=.d)
 
-CFLAGS := -Wall -Werror -std=c89 -Os -MMD -MP
+CFLAGS := -Wall -Wpedantic -Werror -std=c89 -Os -MMD -MP
 REPL_LDFLAGS := -ledit
 TESTS_LDFLAGS := -L$(BUILD_DIR) -le4
 
