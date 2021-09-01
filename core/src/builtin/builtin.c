@@ -185,7 +185,7 @@ const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT] =
 #define _e4__BUILTIN_PROC_NF(w, n, f)   \
     {e4__builtin_##w, NULL},
 #define _e4__BUILTIN_THUNK_NF(w, n, f)  \
-    {e4__execute_deferthunk, e4__builtin_##w},
+    {e4__execute_threadedthunk, e4__builtin_##w},
 #define _e4__BUILTIN_PUN_NF(w, t, n, f) \
     {e4__execute_deferthunk, (void *)&e4__BUILTIN_XT[e4__B_##t]},
 #define _e4__BUILTIN_ALIAS_NF(w, t, n, f)   \

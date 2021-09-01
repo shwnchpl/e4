@@ -368,6 +368,27 @@ static void e4t__test_execute_userfunc_setter(struct e4__task *task,
     **((e4__usize **)user) = 207;
 }
 
+static void e4t__test_execute_threadedthunk(void)
+{
+    void *twoplusthree[] = {
+        (void *)(e4__usize)e4__execute_threadedthunk,
+        NULL,
+        (void *)&e4__BUILTIN_XT[e4__B_LIT_CELL],
+        (void *)2,
+        (void *)&e4__BUILTIN_XT[e4__B_LIT_CELL],
+        (void *)3,
+        (void *)&e4__BUILTIN_XT[e4__B_PLUS],
+        (void *)&e4__BUILTIN_XT[e4__B_EXIT],
+        (void *)&e4__BUILTIN_XT[e4__B_SENTINEL]
+    };
+    struct e4__task *task = e4t__transient_task();
+    twoplusthree[1] = &twoplusthree[2];
+
+    e4__execute(task, twoplusthree);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+}
+
 static void e4t__test_execute_tr0coherent(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -463,6 +484,7 @@ void e4t__test_execute(void)
     e4t__test_execute_does();
     e4t__test_execute_nested();
     e4t__test_execute_string();
+    e4t__test_execute_threadedthunk();
     e4t__test_execute_tr0coherent();
     e4t__test_execute_userfunc();
 }

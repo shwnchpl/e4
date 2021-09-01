@@ -64,8 +64,6 @@ static void e4__builtin_DUMP(struct e4__task *task, e4__cell user)
 }
 
 static const void *e4__builtin_QUESTION[] = {
-    e4__execute_threaded,
-    NULL,
     &e4__BUILTIN_XT[e4__B_FETCH],
     &e4__BUILTIN_XT[e4__B_DOT],
     &e4__BUILTIN_XT[e4__B_EXIT],

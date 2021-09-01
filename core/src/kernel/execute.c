@@ -99,7 +99,8 @@ void e4__execute_threaded(struct e4__task *task, e4__cell user)
        coherence tracking to save RAM. */
 
     while (depth) {
-        if (e4__DEREF2(task->ip) == (e4__cell)e4__execute_threaded) {
+        if (e4__DEREF2(task->ip) ==
+                (e4__cell)(e4__usize)e4__execute_threaded) {
             depth += 1;
 
             /* Stash expected thread base return pointer for this
@@ -137,6 +138,12 @@ void e4__execute_threaded(struct e4__task *task, e4__cell user)
 
     task->tr0 = e4__stack_rpop(task);
     e4__execute_ret(task);
+}
+
+void e4__execute_threadedthunk(struct e4__task *task, e4__cell user)
+{
+    /* Branch to the address in user. */
+    e4__execute_threaded(task, e4__DEREF(user) - 1);
 }
 
 void e4__execute_userval(struct e4__task *task, e4__cell user)

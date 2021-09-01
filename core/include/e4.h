@@ -510,6 +510,7 @@ void e4__execute_doesthunk(struct e4__task *task, e4__cell user);
 void e4__execute_marker(struct e4__task *task, e4__cell user);
 void e4__execute_ret(struct e4__task *task);
 void e4__execute_threaded(struct e4__task *task, e4__cell user);
+void e4__execute_threadedthunk(struct e4__task *task, e4__cell user);
 void e4__execute_userval(struct e4__task *task, e4__cell user);
 void e4__execute_uservar(struct e4__task *task, e4__cell user);
 void e4__execute_value(struct e4__task *task, e4__cell user);

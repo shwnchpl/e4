@@ -16,8 +16,6 @@ static void e4__builtin_AGAIN(struct e4__task *task, e4__cell user)
 }
 
 static const void *e4__builtin_BACKSLASH[] = {
-    e4__execute_threaded,
-    NULL,
     &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)((e4__usize)'\n'),
     &e4__BUILTIN_XT[e4__B_WORD],
@@ -27,8 +25,6 @@ static const void *e4__builtin_BACKSLASH[] = {
 };
 
 static const void *e4__builtin_BUFFER_COLON[] = {
-    e4__execute_threaded,
-    NULL,
     &e4__BUILTIN_XT[e4__B_CREATE],
     &e4__BUILTIN_XT[e4__B_ALLOT],
     &e4__BUILTIN_XT[e4__B_EXIT],
@@ -109,8 +105,6 @@ static void e4__builtin_DOT_PAREN(struct e4__task *task, e4__cell user)
 }
 
 static const void *e4__builtin_ERASE[] = {
-    e4__execute_threaded,
-    NULL,
     &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)0,
     &e4__BUILTIN_XT[e4__B_FILL],
@@ -119,8 +113,6 @@ static const void *e4__builtin_ERASE[] = {
 };
 
 static const void *e4__builtin_HEX[] = {
-    e4__execute_threaded,
-    NULL,
     &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)16,
     &e4__BUILTIN_XT[e4__B_BASE],
@@ -155,8 +147,6 @@ static void e4__builtin_MARKER(struct e4__task *task, e4__cell user)
 }
 
 static const void *e4__builtin_NIP[] = {
-    e4__execute_threaded,
-    NULL,
     &e4__BUILTIN_XT[e4__B_SWAP],
     &e4__BUILTIN_XT[e4__B_DROP],
     &e4__BUILTIN_XT[e4__B_EXIT],
@@ -164,8 +154,6 @@ static const void *e4__builtin_NIP[] = {
 };
 
 static const void *e4__builtin_NOT_EQUALS[] = {
-    e4__execute_threaded,
-    NULL,
     &e4__BUILTIN_XT[e4__B_EQUALS],
     &e4__BUILTIN_XT[e4__B_INVERT],
     &e4__BUILTIN_XT[e4__B_EXIT],
@@ -329,8 +317,6 @@ static void e4__builtin_TWO_TO_R(struct e4__task *task, e4__cell user)
 }
 
 static const void *e4__builtin_U_GREATER_THAN[] = {
-    e4__execute_threaded,
-    NULL,
     &e4__BUILTIN_XT[e4__B_SWAP],
     &e4__BUILTIN_XT[e4__B_U_LESS_THAN],
     &e4__BUILTIN_XT[e4__B_EXIT],
@@ -358,8 +344,6 @@ static void e4__builtin_VALUE(struct e4__task *task, e4__cell user)
 }
 
 static const void *e4__builtin_ZERO_GREATER[] = {
-    e4__execute_threaded,
-    NULL,
     &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)0,
     &e4__BUILTIN_XT[e4__B_GREATER_THAN],
@@ -368,8 +352,6 @@ static const void *e4__builtin_ZERO_GREATER[] = {
 };
 
 static const void *e4__builtin_ZERO_NOT_EQUALS[] = {
-    e4__execute_threaded,
-    NULL,
     &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)0,
     &e4__BUILTIN_XT[e4__B_NOT_EQUALS],
