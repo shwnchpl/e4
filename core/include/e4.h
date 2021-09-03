@@ -119,6 +119,8 @@ typedef void** e4__cell;
     #endif
 #endif
 
+#define e4__USIZE_BIT   (sizeof(e4__usize) * CHAR_BIT)
+
 typedef unsigned char e4__bool;
 typedef unsigned char e4__u8;
 
@@ -199,7 +201,7 @@ struct e4__io_func {
 #define e4__F_BASE_PREFIX   (0x02)
 #define e4__F_CHAR_LITERAL  (0x04)
 
-/* flag constants - numeric formatting */
+/* flag constants - numeric formatting and arithmetic */
 #define e4__F_SIGNED        (0x01)
 
 /* flag constants - word parsing */
@@ -544,6 +546,7 @@ e4__usize e4__num_digit(e4__usize u, e4__u8 base, char *d);
 char* e4__num_format(e4__usize n, e4__u8 base, e4__u8 flags, char *buf,
         e4__usize sz);
 const char* e4__num_format_exception(e4__usize e, e4__usize *len);
+struct e4__double e4__num_mul(e4__usize l, e4__usize r, e4__u8 flags);
 e4__usize e4__num_sdiv(e4__usize n, e4__usize d);
 e4__usize e4__num_smod(e4__usize n, e4__usize d);
 struct e4__double e4__num_todouble(e4__usize u);

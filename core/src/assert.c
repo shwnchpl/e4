@@ -68,6 +68,13 @@ e4__ASSERT(sizeof(void *) == sizeof(e4__cell));
    this code and instruct them to update this comment. */
 e4__ASSERT(sizeof(e4__cell) == sizeof(e4__usize));
 
+/* Alright, one last thing. e4__USIZE_BIT *must* be a multiple of two.
+   If it isn't, our long math will not work correctly. If everything
+   else so far as been true, it is *deeply* unlikely that this will
+   not be the case. If it isn't though, unfortunately we can't come
+   out to play. */
+e4__ASSERT(e4__USIZE_BIT % 2 == 0);
+
 /* Ensure that e4__VERSION_NUMBER is a proper integral semantic version
    number with 3 base-10 digits for minor and patch numbers and that
    e4__VERSION_NUMBER has not been updated carelessly or erroneously. */

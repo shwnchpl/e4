@@ -105,6 +105,63 @@ const char* e4__num_format_exception(e4__usize e, e4__usize *len)
     #undef _return_with_len
 }
 
+struct e4__double e4__num_mul(e4__usize l, e4__usize r, e4__u8 flags)
+{
+    /* Flags includes e4__F_SIGNED. */
+    register struct e4__double prod = {0};
+    register e4__bool negate = 0;
+    register e4__usize lh, ll, rh, rl, p0, p1, p2, c0, c1, c2, s0;
+
+    #define _e4__U_LMASK    (((e4__usize)-1) >> (e4__USIZE_BIT >> 1))
+    #define _e4__U_MMASK    (((e4__usize)-1) << (e4__USIZE_BIT >> 1))
+    #define _e4__U_LSH(u)   ((u) & _e4__U_LMASK)
+    #define _e4__U_MSH(u)   (((u) & _e4__U_MMASK) >> (e4__USIZE_BIT >> 1))
+    #define _e4__U(m, l)    \
+        (((m) << (e4__USIZE_BIT >> 1) & _e4__U_MMASK) | (l & _e4__U_LMASK))
+    #define _e4__U_SPLIT(u, h, l)   \
+        h = _e4__U_MSH(u), l = _e4__U_LSH(u)
+
+    if (flags & e4__F_SIGNED) {
+        if (e4__USIZE_IS_NEGATIVE(l)) {
+            l = e4__USIZE_NEGATE(l);
+            negate = !negate;
+        }
+
+        if (e4__USIZE_IS_NEGATIVE(r)) {
+            r = e4__USIZE_NEGATE(r);
+            negate = !negate;
+        }
+    }
+
+    /* Perform the basic multiplication algorithm. */
+    _e4__U_SPLIT(l, lh, ll);
+    _e4__U_SPLIT(r, rh, rl);
+
+    _e4__U_SPLIT(ll * rl, c0, p0);
+    _e4__U_SPLIT(ll * rh + c0, c1, p1);
+    _e4__U_SPLIT(lh * rl, c2, p2);
+
+    s0 = _e4__U(p1, p0);
+
+    prod.low = s0 + _e4__U(p2, 0);
+    prod.high = c1 + c2 + lh * rh + (prod.low < s0);
+
+    if (negate) {
+        prod.high ^= (e4__usize)-1;
+        prod.low ^= (e4__usize)-1;
+        prod.high += !++prod.low;
+    }
+
+    #undef _e4__U_SPLIT
+    #undef _e4__U
+    #undef _e4__U_MSH
+    #undef _e4__U_LSH
+    #undef _e4__U_MMASK
+    #undef _e4__U_LMASK
+
+    return prod;
+}
+
 e4__usize e4__num_sdiv(e4__usize n, e4__usize d)
 {
     register e4__bool negate = 0;

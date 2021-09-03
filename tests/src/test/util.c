@@ -12,6 +12,35 @@ static void e4t__test_util_doublemath(void)
     e4t__ASSERT_DEQ(e4__num_todouble(1), e4__num_double(1, 0));
     e4t__ASSERT_DEQ(e4__num_todouble(-1), e4__num_double(-1, -1));
     e4t__ASSERT_DEQ(e4__num_todouble(-2), e4__num_double(-2, -1));
+
+    /* Test e4__num_mul. */
+    e4t__ASSERT_DEQ(e4__num_mul(0, 0, 0), e4__num_double(0, 0));
+    e4t__ASSERT_DEQ(e4__num_mul(1, 0, 0), e4__num_double(0, 0));
+    e4t__ASSERT_DEQ(e4__num_mul(0, 1, 0), e4__num_double(0, 0));
+    e4t__ASSERT_DEQ(e4__num_mul(0, 0, e4__F_SIGNED), e4__num_double(0, 0));
+    e4t__ASSERT_DEQ(e4__num_mul(1, 0, e4__F_SIGNED), e4__num_double(0, 0));
+    e4t__ASSERT_DEQ(e4__num_mul(0, 1, e4__F_SIGNED), e4__num_double(0, 0));
+
+    e4t__ASSERT_DEQ(e4__num_mul(1, 1, 0), e4__num_double(1, 0));
+    e4t__ASSERT_DEQ(e4__num_mul(1, 1, e4__F_SIGNED), e4__num_double(1, 0));
+    e4t__ASSERT_DEQ(e4__num_mul(-1, 1, e4__F_SIGNED), e4__num_double(-1, -1));
+    e4t__ASSERT_DEQ(e4__num_mul(-1, -1, e4__F_SIGNED), e4__num_double(1, 0));
+
+    e4t__ASSERT_DEQ(e4__num_mul(1, 5, 0), e4__num_double(5, 0));
+    e4t__ASSERT_DEQ(e4__num_mul(1, 5, e4__F_SIGNED), e4__num_double(5, 0));
+    e4t__ASSERT_DEQ(e4__num_mul(-1, 5, e4__F_SIGNED), e4__num_double(-5, -1));
+    e4t__ASSERT_DEQ(e4__num_mul(1, -5, e4__F_SIGNED), e4__num_double(-5, -1));
+    e4t__ASSERT_DEQ(e4__num_mul(-1, -5, e4__F_SIGNED), e4__num_double(5, 0));
+
+    e4t__ASSERT_DEQ(e4__num_mul(2, 5, 0), e4__num_double(10, 0));
+    e4t__ASSERT_DEQ(e4__num_mul(2, 5, e4__F_SIGNED), e4__num_double(10, 0));
+    e4t__ASSERT_DEQ(e4__num_mul(-2, 5, e4__F_SIGNED), e4__num_double(-10, -1));
+    e4t__ASSERT_DEQ(e4__num_mul(2, -5, e4__F_SIGNED), e4__num_double(-10, -1));
+    e4t__ASSERT_DEQ(e4__num_mul(-2, -5, e4__F_SIGNED), e4__num_double(10, 0));
+
+    e4t__ASSERT_DEQ(e4__num_mul(-1, 2, 0), e4__num_double(-2, 1));
+    e4t__ASSERT_DEQ(e4__num_mul(-5, -10, 0), e4__num_double(50, -15));
+    e4t__ASSERT_DEQ(e4__num_mul(-1, -1, 0), e4__num_double(1, -2));
 }
 
 static void e4t__test_util_exceptionformat(void)
