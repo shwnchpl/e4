@@ -1,5 +1,13 @@
 #include "e4.h"
 
+struct e4__double e4__num_double(e4__usize low, e4__usize high)
+{
+    struct e4__double d;
+    d.low = low;
+    d.high = high;
+    return d;
+}
+
 e4__usize e4__num_digit(e4__usize u, e4__u8 base, char *d)
 {
     register const char digit = u % base;
@@ -138,4 +146,12 @@ e4__usize e4__num_smod(e4__usize n, e4__usize d)
         n = e4__USIZE_NEGATE(n);
 
     return n;
+}
+
+struct e4__double e4__num_todouble(e4__usize n)
+{
+    struct e4__double d;
+    d.low = n;
+    d.high = e4__USIZE_IS_NEGATIVE(d.low) ? -1 : 0;
+    return d;
 }

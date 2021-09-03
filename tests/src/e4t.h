@@ -57,6 +57,19 @@
         }   \
     } while (0)
 
+#define e4t__ASSERT_DEQ(e, v)  \
+    do {    \
+        struct e4__double e_ = (e); \
+        struct e4__double v_ = (v); \
+        ++e4t__assert_attemptcount; \
+        if (e_.low != v_.low || e_.high != v_.high) {   \
+            fprintf(stderr, "Assert failed! (" __FILE__ ":%u) - " \
+                    "EXCEPTED: {%ld, %ld}; ACTUAL: {%ld, %ld}\n", __LINE__, \
+                    v_.low, v_.high, e_.low, e_.high);  \
+            ++e4t__assert_failcount;    \
+        }   \
+    } while (0)
+
 /* main.c declarations */
 extern unsigned long e4t__assert_attemptcount;
 extern unsigned long e4t__assert_failcount;

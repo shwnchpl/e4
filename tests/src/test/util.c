@@ -3,6 +3,17 @@
 
 #include <string.h>
 
+static void e4t__test_util_doublemath(void)
+{
+    /* XXX: Some of these tests may only work on a system that
+       represents negative numbers using two's complement. */
+
+    /* Test e4__num_todouble. */
+    e4t__ASSERT_DEQ(e4__num_todouble(1), e4__num_double(1, 0));
+    e4t__ASSERT_DEQ(e4__num_todouble(-1), e4__num_double(-1, -1));
+    e4t__ASSERT_DEQ(e4__num_todouble(-2), e4__num_double(-2, -1));
+}
+
 static void e4t__test_util_exceptionformat(void)
 {
     e4__usize len = 0;
@@ -322,6 +333,7 @@ static void e4t__test_util_strnescape(void)
 
 void e4t__test_util(void)
 {
+    e4t__test_util_doublemath();
     e4t__test_util_exceptionformat();
     e4t__test_util_math();
     e4t__test_util_mem_dict();

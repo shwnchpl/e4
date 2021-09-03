@@ -126,6 +126,11 @@ struct e4__task;
 
 typedef void (*e4__code_ptr)(struct e4__task *, e4__cell user);
 
+struct e4__double {
+    e4__usize low;
+    e4__usize high;
+};
+
 struct e4__dict_header {
     struct e4__dict_header *link;
     struct e4__execute_token *xt;
@@ -534,12 +539,14 @@ e4__usize e4__mem_parse(const char *buf, char delim, e4__usize sz,
         e4__usize flags, const char **length);
 
 /* num.c functions */
+struct e4__double e4__num_double(e4__usize low, e4__usize high);
 e4__usize e4__num_digit(e4__usize u, e4__u8 base, char *d);
 char* e4__num_format(e4__usize n, e4__u8 base, e4__u8 flags, char *buf,
         e4__usize sz);
 const char* e4__num_format_exception(e4__usize e, e4__usize *len);
 e4__usize e4__num_sdiv(e4__usize n, e4__usize d);
 e4__usize e4__num_smod(e4__usize n, e4__usize d);
+struct e4__double e4__num_todouble(e4__usize u);
 
 /* task.c functions */
 e4__cell e4__task_allot(struct e4__task *task, e4__usize sz);

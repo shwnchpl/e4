@@ -21,6 +21,17 @@ Build
 -----
 - Split system required words and optional system specific extension
   words into different modules (SYSTEM and SYSTEM-EXIT?).
+- Consider renaming e4__num to e4__usize and also creating an
+  e4__double prefix for functions taking doubles. This would probably
+  be far more logical than the current system. The current function
+  that doesn't quite fit would be e4__num_double, but that could be
+  moved to e4__double_ or e4__double or something along those lines.
+- Consider actually typedefing e4__double. Normally structs in e4 are
+  not typedefed, although since struct e4__double is relatively small
+  and is always passed/returned by value rather than by reference, it
+  may make sense to simply typedef away the fact that it is a struct
+  in the first place as a special case. I'm currently leaning towards
+  not doing this, but it is still worth consideration.
 
 Compilation
 -----------
