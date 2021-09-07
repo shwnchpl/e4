@@ -51,6 +51,63 @@ struct e4__double e4__num_double(e4__usize low, e4__usize high)
     return d;
 }
 
+e4__usize e4__num_double_div(struct e4__double n, e4__usize d, e4__usize flags,
+        struct e4__double *q, e4__usize *r)
+{
+    register e4__usize res;
+    register e4__bool negate = 0;
+    struct e4__double q_ = {0};
+    e4__usize r_;
+
+    /* Based on Hank Warren's unsigned doubleword division reference
+       implementation in "Hacker's Delight" 2nd Edition (Figure 9-5). */
+
+    /* FIXME: Handle flags. */
+
+    if (flags & e4__F_SIGNED) {
+        if (e4__USIZE_IS_NEGATIVE(n.high)) {
+            n = e4__num_double_negate(n);
+            negate = !negate;
+        }
+
+        if (e4__USIZE_IS_NEGATIVE(d)) {
+            d = e4__USIZE_NEGATE(d);
+            negate = !negate;
+        }
+    }
+
+    if (n.high < d) {
+        if ((res = e4__num_double_ndiv(n, d, 0, &q_.low, &r_)))
+            return res;
+    } else {
+        if ((res = e4__num_double_ndiv(e4__num_double(n.high, 0), d, 0,
+                &q_.high, &r_)))
+            return res;
+        if ((res = e4__num_double_ndiv(e4__num_double(n.low, r_), d, 0,
+                &q_.low, &r_)))
+            return res;
+    }
+
+    /* Signed overflow cannot happen because we are not narrowing. */
+
+    q_ = negate ? e4__num_double_negate(q_) : q_;
+    r_ = negate ? e4__USIZE_NEGATE(r_) : r_;
+
+    if ((flags & e4__F_SIGNED) && (flags & e4__F_FLOORDIV) &&
+            e4__USIZE_IS_NEGATIVE(r_)) {
+        if (!q_.low--)
+            q_.high -= 1;
+        r_ += d;
+    }
+
+    if (q)
+        *q = q_;
+    if (r)
+        *r = r_;
+
+    return e4__E_OK;
+}
+
 e4__usize e4__num_double_ndiv(struct e4__double n, e4__usize d,
         e4__usize flags, e4__usize *q, e4__usize *r)
 {
