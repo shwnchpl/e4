@@ -542,8 +542,9 @@ e4__usize e4__mem_parse(const char *buf, char delim, e4__usize sz,
 
 /* num.c functions */
 e4__usize e4__num_clz(e4__usize u);
-struct e4__double e4__num_double(e4__usize low, e4__usize high);
 e4__usize e4__num_digit(e4__usize u, e4__u8 base, char *d);
+struct e4__double e4__num_double(e4__usize low, e4__usize high);
+struct e4__double e4__num_double_negate(struct e4__double d);
 char* e4__num_format(e4__usize n, e4__u8 base, e4__u8 flags, char *buf,
         e4__usize sz);
 const char* e4__num_format_exception(e4__usize e, e4__usize *len);

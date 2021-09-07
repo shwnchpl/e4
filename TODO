@@ -100,8 +100,10 @@ Kernel
   number is signed (as in M+).
 - Update words meant to support double width numbers that are currently
   implemented without any such support. This includes >NUMBER.
-- Add more two's complement utility macros as needed and use them where
-  appropriate.
+- Combine sdiv and smod utility functions into one function.
+- Note somewhere that all divisions are symmetric by default.
+  Alternatively, consider the benefits of switching to floored division
+  by default.
 - Handle dictionary overflows and other overflows.
 - Improve exception printing implementation and other hackish printing
   implementations (such as the . builtin etc.) by using pictured
@@ -124,6 +126,11 @@ REPL
 - Source ~/.e4-editrc to allow for e4 specific input overrides. For
   example, tab completion on tab could be disabled by macro binding
   the tab key to two or four spaces.
+
+Testing
+-------
+- Split e4t__test_util_doublemath into multiple tests after the num
+  to usize/double split.
 
 
 Version 0.4
@@ -220,3 +227,9 @@ Transfer Station
 ================
 
 (won't do lists; cleared after each release)
+
+Kernel
+------
+- Add more two's complement utility macros as needed and use them where
+  appropriate. -- Wow, this really needs to go away. We have plenty of
+  two's complement utility macros.

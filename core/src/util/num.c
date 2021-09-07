@@ -25,19 +25,27 @@ e4__usize e4__num_clz(e4__usize u)
     return c;
 }
 
-struct e4__double e4__num_double(e4__usize low, e4__usize high)
-{
-    struct e4__double d;
-    d.low = low;
-    d.high = high;
-    return d;
-}
-
 e4__usize e4__num_digit(e4__usize u, e4__u8 base, char *d)
 {
     register const char digit = u % base;
     *d = digit < 10 ? '0' + digit : 'A' + digit - 10;
     return u / base;
+}
+
+struct e4__double e4__num_double(e4__usize low, e4__usize high)
+{
+    register struct e4__double d;
+    d.low = low;
+    d.high = high;
+    return d;
+}
+
+struct e4__double e4__num_double_negate(struct e4__double d)
+{
+    d.high ^= (e4__usize)-1;
+    d.low ^= (e4__usize)-1;
+    d.high += !++d.low;
+    return d;
 }
 
 char* e4__num_format(e4__usize n, e4__u8 base, e4__u8 flags, char *buf,
@@ -172,9 +180,7 @@ struct e4__double e4__num_mul(e4__usize l, e4__usize r, e4__u8 flags)
     prod.high = c1 + c2 + lh * rh + (prod.low < s0);
 
     if (negate) {
-        prod.high ^= (e4__usize)-1;
-        prod.low ^= (e4__usize)-1;
-        prod.high += !++prod.low;
+        prod = e4__num_double_negate(prod);
     }
 
     #undef _e4__U_SPLIT

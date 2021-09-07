@@ -8,10 +8,23 @@ static void e4t__test_util_doublemath(void)
     /* XXX: Some of these tests may only work on a system that
        represents negative numbers using two's complement. */
 
+    /* FIXME: Split this into multiple tests once everything has been
+       renamed. */
+
     /* Test e4__num_todouble. */
     e4t__ASSERT_DEQ(e4__num_todouble(1), e4__num_double(1, 0));
     e4t__ASSERT_DEQ(e4__num_todouble(-1), e4__num_double(-1, -1));
     e4t__ASSERT_DEQ(e4__num_todouble(-2), e4__num_double(-2, -1));
+
+    /* Test e4__num_double_negate. */
+    e4t__ASSERT_DEQ(e4__num_double_negate(e4__num_double(0, 0)),
+            e4__num_double(0, 0));
+    e4t__ASSERT_DEQ(e4__num_double_negate(e4__num_double(1, 0)),
+            e4__num_double(-1, -1));
+    e4t__ASSERT_DEQ(e4__num_double_negate(e4__num_double(5, 0)),
+            e4__num_double(-5, -1));
+    e4t__ASSERT_DEQ(e4__num_double_negate(e4__num_double(79, 351)),
+            e4__num_double(-79, -352));
 
     /* Test e4__num_mul. */
     e4t__ASSERT_DEQ(e4__num_mul(0, 0, 0), e4__num_double(0, 0));
