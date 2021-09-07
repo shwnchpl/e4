@@ -1,5 +1,30 @@
 #include "e4.h"
 
+e4__usize e4__num_clz(e4__usize u)
+{
+    register e4__usize c, m, w;
+
+    /* FIXME: It would be faster to use __builtin_clz where available.
+       If/when there is some way to easily run tests with and without
+       __GNU_C__ defined, consider conditionally using it here. */
+
+    c = 0;
+    w = e4__USIZE_BIT;
+    m = (e4__usize)-1;
+
+    if (!u)
+        return w;
+
+    while ((w >>= 1)) {
+        if (!((m <<= w) & u)) {
+            c += w;
+            u <<= w;
+        }
+    }
+
+    return c;
+}
+
 struct e4__double e4__num_double(e4__usize low, e4__usize high)
 {
     struct e4__double d;

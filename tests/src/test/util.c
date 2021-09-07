@@ -61,6 +61,8 @@ static void e4t__test_util_exceptionformat(void)
 
 static void e4t__test_util_math(void)
 {
+    e4__usize i;
+
     /* XXX: Parts of this test only work correctly on a 64 bit system
        that represents negative numbers using two's complement. */
     e4t__ASSERT_EQ(e4__USIZE_NEGATE((e4__usize)5), -5);
@@ -86,6 +88,10 @@ static void e4t__test_util_math(void)
     e4t__ASSERT_EQ(e4__mem_aligned(7), 8);
     e4t__ASSERT_EQ(e4__mem_aligned(8), 8);
     e4t__ASSERT_EQ(e4__mem_aligned(9), 16);
+
+    e4t__ASSERT_EQ(e4__num_clz(0), e4__USIZE_BIT);
+    for (i = 0; i < e4__USIZE_BIT; ++i)
+        e4t__ASSERT_EQ(e4__num_clz((e4__usize)1 << i), e4__USIZE_BIT - 1 - i);
 }
 
 static void e4t__test_util_mem_dict(void)
