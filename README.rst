@@ -53,3 +53,18 @@ License
 Unless otherwise noted, all source in this directory tree is copyright
 2021 Shawn M. Chapla and is released under the MIT license. For more
 details, please see the LICENSE file.
+
+Acknowledgments
+---------------
+
+Where noted, some of the division implementations used by e4 are based
+upon the reference implementations in Hank Warren's "Hacker's Delight"
+2nd Edition. This code was obtained in digital form from Henry Warren's
+`Hacker's Delight website`_ and is adapted here with Warren's `generous
+permission`_ to "use, copy, and distribute any of the code on [the
+Hacker's Delight] web site, whether modified by you or not," with or
+without attribution. I strongly recommend that anyone considering
+purchasing this book do so. It is a true classic.
+
+.. _Hacker's Delight website: https://web.archive.org/web/20190916060535/hackersdelight.org/
+.. _generous permission: https://web.archive.org/web/20190716204559/http://www.hackersdelight.org/permissions.htm

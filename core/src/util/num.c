@@ -1,5 +1,16 @@
 #include "e4.h"
 
+/* FIXME: Clean these up and move to e4.h during num to usize/double
+   rename. */
+#define _e4__U_LMASK    (((e4__usize)-1) >> (e4__USIZE_BIT >> 1))
+#define _e4__U_MMASK    (((e4__usize)-1) << (e4__USIZE_BIT >> 1))
+#define _e4__U_LSH(u)   ((u) & _e4__U_LMASK)
+#define _e4__U_MSH(u)   (((u) & _e4__U_MMASK) >> (e4__USIZE_BIT >> 1))
+#define _e4__U(m, l)    \
+    (((m) << (e4__USIZE_BIT >> 1) & _e4__U_MMASK) | (l & _e4__U_LMASK))
+#define _e4__U_SPLIT(u, h, l)   \
+    h = _e4__U_MSH(u), l = _e4__U_LSH(u)
+
 e4__usize e4__num_clz(e4__usize u)
 {
     register e4__usize c, m, w;
@@ -38,6 +49,97 @@ struct e4__double e4__num_double(e4__usize low, e4__usize high)
     d.low = low;
     d.high = high;
     return d;
+}
+
+e4__usize e4__num_double_ndiv(struct e4__double n, e4__usize d,
+        e4__usize flags, e4__usize *q, e4__usize *r)
+{
+    const e4__usize base = (e4__usize)1 << (e4__USIZE_BIT >> 1);
+    register e4__usize d1, d0, q1, q0, n32, n21, n10, n1, n0, rem, s, q_, r_;
+    e4__bool negate = 0;
+
+    /* Based on Hank Warren's long unsigned division reference
+       implementation in "Hacker's Delight" 2nd Edition (Figure 9-3). */
+
+    if (!d)
+        return e4__E_DIVBYZERO;
+
+    if (flags & e4__F_SIGNED) {
+        if (e4__USIZE_IS_NEGATIVE(n.high)) {
+            n = e4__num_double_negate(n);
+            negate = !negate;
+        }
+
+        if (e4__USIZE_IS_NEGATIVE(d)) {
+            d = e4__USIZE_NEGATE(d);
+            negate = !negate;
+        }
+    }
+
+    if (n.high >= d)
+        return e4__E_RSLTOUTORANGE;
+
+    s = e4__num_clz(d);
+    d <<= s;
+    _e4__U_SPLIT(d, d1, d0);
+
+    n32 = n.high << s;
+    if (s)
+        n32 |= n.low >> (e4__USIZE_BIT - s);
+    n10 = n.low << s;
+    _e4__U_SPLIT(n10, n1, n0);
+
+    q1 = n32 / d1;
+    rem = n32 % d1;
+
+    while (q1 >= base || q1 * d0 > _e4__U(rem, n1)) {
+        q1 -= 1;
+        rem += d1;
+        if (rem >= base)
+            break;
+    }
+
+    n21 = _e4__U(n32, n1) - q1 * d;
+
+    q0 = n21 / d1;
+    rem = n21 % d1;
+
+    while (q0 >= base || q0 * d0 > _e4__U(rem, n0)) {
+        q0 -= 1;
+        rem += d1;
+        if (rem >= base)
+            break;
+    }
+
+    q_ = _e4__U(q1, q0);
+
+    if (q && (flags & e4__F_SIGNED) && e4__USIZE_IS_NEGATIVE(q_))
+        /* Only check for signed overflow when returning quotient. Since
+           sign overflow on remainder is not possible, if only remainder
+           is being returned, we don't need to care.
+
+           If the sign bit is already set in this case, we are in an
+           overflow. */
+        return e4__E_RSLTOUTORANGE;
+
+    q_ = negate ? e4__USIZE_NEGATE(q_) : q_;
+
+    r_ = (_e4__U(n21, n0) - q0 * d) >> s;
+    if (negate)
+        r_ = e4__USIZE_NEGATE(r_);
+
+    if ((flags & e4__F_SIGNED) && (flags & e4__F_FLOORDIV) &&
+            e4__USIZE_IS_NEGATIVE(r_)) {
+        q_ -= 1;
+        r_ += d >> s;
+    }
+
+    if (q)
+        *q = q_;
+    if (r)
+        *r = r_;
+
+    return e4__E_OK;
 }
 
 struct e4__double e4__num_double_negate(struct e4__double d)
@@ -95,6 +197,8 @@ const char* e4__num_format_exception(e4__usize e, e4__usize *len)
             _return_with_len("invalid memory address");
         case e4__E_DIVBYZERO:
             _return_with_len("division by zero");
+        case e4__E_RSLTOUTORANGE:
+            _return_with_len("result out of range");
         case e4__E_UNDEFWORD:
             _return_with_len("undefined word");
         case e4__E_COMPONLYWORD:
@@ -145,15 +249,6 @@ struct e4__double e4__num_mul(e4__usize l, e4__usize r, e4__u8 flags)
     register e4__bool negate = 0;
     register e4__usize lh, ll, rh, rl, p0, p1, p2, c0, c1, c2, s0;
 
-    #define _e4__U_LMASK    (((e4__usize)-1) >> (e4__USIZE_BIT >> 1))
-    #define _e4__U_MMASK    (((e4__usize)-1) << (e4__USIZE_BIT >> 1))
-    #define _e4__U_LSH(u)   ((u) & _e4__U_LMASK)
-    #define _e4__U_MSH(u)   (((u) & _e4__U_MMASK) >> (e4__USIZE_BIT >> 1))
-    #define _e4__U(m, l)    \
-        (((m) << (e4__USIZE_BIT >> 1) & _e4__U_MMASK) | (l & _e4__U_LMASK))
-    #define _e4__U_SPLIT(u, h, l)   \
-        h = _e4__U_MSH(u), l = _e4__U_LSH(u)
-
     if (flags & e4__F_SIGNED) {
         if (e4__USIZE_IS_NEGATIVE(l)) {
             l = e4__USIZE_NEGATE(l);
@@ -182,13 +277,6 @@ struct e4__double e4__num_mul(e4__usize l, e4__usize r, e4__u8 flags)
     if (negate) {
         prod = e4__num_double_negate(prod);
     }
-
-    #undef _e4__U_SPLIT
-    #undef _e4__U
-    #undef _e4__U_MSH
-    #undef _e4__U_LSH
-    #undef _e4__U_MMASK
-    #undef _e4__U_LMASK
 
     return prod;
 }

@@ -5,6 +5,8 @@
 
 static void e4t__test_util_doublemath(void)
 {
+    e4__usize q, r;
+
     /* XXX: Some of these tests may only work on a system that
        represents negative numbers using two's complement. */
 
@@ -54,6 +56,99 @@ static void e4t__test_util_doublemath(void)
     e4t__ASSERT_DEQ(e4__num_mul(-1, 2, 0), e4__num_double(-2, 1));
     e4t__ASSERT_DEQ(e4__num_mul(-5, -10, 0), e4__num_double(50, -15));
     e4t__ASSERT_DEQ(e4__num_mul(-1, -1, 0), e4__num_double(1, -2));
+
+    /* Test unsigned double cell by cell to cell narrowing division. */
+    e4t__ASSERT_EQ(e4__num_double_ndiv(e4__num_double(0, 0), 0, 0, &q, &r),
+            e4__E_DIVBYZERO);
+    e4t__ASSERT_EQ(e4__num_double_ndiv(e4__num_double(0, 1), 1, 0, &q, &r),
+            e4__E_RSLTOUTORANGE);
+
+    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(0, 0), 5, 0, &q, &r));
+    e4t__ASSERT_EQ(q, 0);
+    e4t__ASSERT_EQ(r, 0);
+
+    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(5, 0), 1, 0, &q, &r));
+    e4t__ASSERT_EQ(q, 5);
+    e4t__ASSERT_EQ(r, 0);
+
+    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(573, 0), 37, 0, &q, &r));
+    e4t__ASSERT_EQ(q, 15);
+    e4t__ASSERT_EQ(r, 18);
+
+    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(0, 1), 2, 0, &q, &r));
+    e4t__ASSERT_EQ(q, (e4__usize)1 << 63);
+    e4t__ASSERT_EQ(r, 0);
+
+    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(5, 1), 8, 0, &q, &r));
+    e4t__ASSERT_EQ(q, (e4__usize)1 << 61);
+    e4t__ASSERT_EQ(r, 5);
+
+    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(0x95440111682f25b6,
+            0x157186c4791), 0xb29430a256d21, 0, &q, &r));
+    e4t__ASSERT_EQ(q, 0x1ebd7510f03cdb);
+    e4t__ASSERT_EQ(r, 0x5e75995a70e7b);
+
+    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(-1, -2), -1, 0, &q, &r));
+    e4t__ASSERT_EQ(q, -1);
+    e4t__ASSERT_EQ(r, -2);
+
+    /* Test signed double cell by cell to cell narrowing division. */
+    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(0, 0), -1,
+            e4__F_SIGNED, &q, &r));
+    e4t__ASSERT_EQ(q, 0);
+    e4t__ASSERT_EQ(r, 0);
+
+    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(-5, -1), 1,
+            e4__F_SIGNED, &q, &r));
+    e4t__ASSERT_EQ(q, -5);
+    e4t__ASSERT_EQ(r, 0);
+
+    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(5, 0), -1,
+            e4__F_SIGNED, &q, &r));
+    e4t__ASSERT_EQ(q, -5);
+    e4t__ASSERT_EQ(r, 0);
+
+    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(-5, -1), -1,
+            e4__F_SIGNED, &q, &r));
+    e4t__ASSERT_EQ(q, 5);
+    e4t__ASSERT_EQ(r, 0);
+
+    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(-5, -1), 2,
+            e4__F_SIGNED, &q, &r));
+    e4t__ASSERT_EQ(q, -2);
+    e4t__ASSERT_EQ(r, -1);
+
+    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(5, 0), -2,
+            e4__F_SIGNED, &q, &r));
+    e4t__ASSERT_EQ(q, -2);
+    e4t__ASSERT_EQ(r, -1);
+
+    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(-5, -1), -2,
+            e4__F_SIGNED, &q, &r));
+    e4t__ASSERT_EQ(q, 2);
+    e4t__ASSERT_EQ(r, 1);
+
+    e4t__ASSERT_EQ(e4__num_double_ndiv(e4__num_double(0, 1), 2,
+            e4__F_SIGNED, &q, &r), e4__E_RSLTOUTORANGE);
+    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(0, 1), 2,
+            e4__F_SIGNED, NULL, &r));
+    e4t__ASSERT_EQ(r, 0);
+
+    /* Test floored double cell by cell to cell narrowing division. */
+    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(-5, -1), 2,
+            e4__F_SIGNED | e4__F_FLOORDIV, &q, &r));
+    e4t__ASSERT_EQ(q, -3);
+    e4t__ASSERT_EQ(r, 1);
+
+    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(5, 0), -2,
+            e4__F_SIGNED | e4__F_FLOORDIV, &q, &r));
+    e4t__ASSERT_EQ(q, -3);
+    e4t__ASSERT_EQ(r, 1);
+
+    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(4, 0), -2,
+            e4__F_SIGNED | e4__F_FLOORDIV, &q, &r));
+    e4t__ASSERT_EQ(q, -2);
+    e4t__ASSERT_EQ(r, 0);
 }
 
 static void e4t__test_util_exceptionformat(void)

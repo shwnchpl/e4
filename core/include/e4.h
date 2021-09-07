@@ -171,6 +171,7 @@ struct e4__io_func {
 #define e4__E_RSTKUNDERFLOW (-6)
 #define e4__E_INVMEMADDR    (-9)
 #define e4__E_DIVBYZERO     (-10)
+#define e4__E_RSLTOUTORANGE (-11)
 #define e4__E_UNDEFWORD     (-13)
 #define e4__E_COMPONLYWORD  (-14)
 #define e4__E_INVFORGET     (-15)
@@ -203,6 +204,7 @@ struct e4__io_func {
 
 /* flag constants - numeric formatting and arithmetic */
 #define e4__F_SIGNED        (0x01)
+#define e4__F_FLOORDIV      (0x02)
 
 /* flag constants - word parsing */
 #define e4__F_SKIP_LEADING  (0x01)
@@ -544,6 +546,8 @@ e4__usize e4__mem_parse(const char *buf, char delim, e4__usize sz,
 e4__usize e4__num_clz(e4__usize u);
 e4__usize e4__num_digit(e4__usize u, e4__u8 base, char *d);
 struct e4__double e4__num_double(e4__usize low, e4__usize high);
+e4__usize e4__num_double_ndiv(struct e4__double n, e4__usize d,
+        e4__usize flags, e4__usize *q, e4__usize *r);
 struct e4__double e4__num_double_negate(struct e4__double d);
 char* e4__num_format(e4__usize n, e4__u8 base, e4__u8 flags, char *buf,
         e4__usize sz);

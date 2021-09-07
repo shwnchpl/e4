@@ -93,8 +93,9 @@ General IO
 Kernel
 ------
 - [DONE] Add support for multiplying into a double cell number.
-- Add support for dividing a double cell number by a single cell
-  number.
+- [DONE] Add support for dividing a double cell number by a single cell
+  number and obtaining a single cell result (needed for FM/MOD and
+  SM/REM).
 - Add support for adding a single cell number to a double cell number
   (which is needed for >NUMBER). It may be assumed that the single cell
   number is signed (as in M+).
