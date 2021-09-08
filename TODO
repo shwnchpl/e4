@@ -91,7 +91,26 @@ General Builtins
 
 General IO
 ----------
-- Implement pictured numeric output.
+- Implement pictured numeric output. This can be done first as a mem
+  utility under a pno namespace, then possibly under the io_pno
+  namespace or even under a dedicated e4__pno namespace. Functions
+  should include:
+    char* e4__mem_pno_digit(char *buf_end, e4__usize len,
+            struct e4__double *d)
+    char* e4__mem_pno_digits(char *buf_end, e4__usize len,
+            struct e4__double *d)
+    char* e4__mem_pno_hold(char *buf_end, e4__usize len, char c)
+    char* e4__mem_pno_holds(char *buf_end, e4__usize len, const char *s,
+            e4__usize s_len)
+  These functions should all return the pointer to the beginning of the
+  buffer after as much as possible of the requested data has been
+  prepended. For the kernel APIs, additionally pno_start and pno_finish
+  (to correspond to <# and #>) can be included. pno_start should set
+  task pno buffer offset to 0. pno_finish should simply return the
+  address of the start of the buffer's contents along with the length
+  of the buffer. Aside from being sufficient to implement builtins,
+  these functions will also greatly simplify numeric formatting through-
+  out e4 in general.
 
 Kernel
 ------
