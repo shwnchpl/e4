@@ -910,6 +910,19 @@ static void e4__builtin_REPEAT(struct e4__task *task, e4__cell user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_S_TO_D(struct e4__task *task, e4__cell user)
+{
+    register struct e4__double d;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+
+    d = e4__usize_todouble((e4__usize)e4__stack_pop(task));
+    e4__stack_push(task, (e4__cell)d.low);
+    e4__stack_push(task, (e4__cell)d.high);
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_S_QUOTE(struct e4__task *task, e4__cell user)
 {
     const char *str;

@@ -304,6 +304,7 @@ enum e4__builtin_id {
     e4__B_RIGHT_BRACKET,
     e4__B_ROT,
     e4__B_RSHIFT,
+    e4__B_S_TO_D,
     e4__B_S_QUOTE,
     e4__B_SEMICOLON,
     e4__B_SLASH,

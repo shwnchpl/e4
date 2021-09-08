@@ -59,9 +59,12 @@ Compilation
 
 General Builtins
 ----------------
-- Implement S>D.
+- [DONE] Implement S>D.
 - Implement FM/MOD and SM/DIV.
-- Implement M* and */MOD.
+- Implement M* and UM*.
+- */ and */MOD.
+- Fix 2* and 2/ implementations. These words are meant to perform
+  arithmetic shifts by one, not simply logical shifts by one.
 - Implement the PAGE builtin using escape sequences. The following
   implementation works:
         : page s\" \e[2J\e[0;0H" type ;
@@ -79,6 +82,7 @@ General Builtins
                 27 hold
             #> type
             ;
+- Implement the STATE.
 - Consider adding _NF variants to USERVAR declaration macros, defining
   e4__UV_BEGIN, and simply defining BEGIN as its own uservar rather
   than in terms of HERE using PUN macros. Consider also removing pun
@@ -157,6 +161,9 @@ Compilation
 - Implement some system +LOOP word that executes LOOP/LOOP+ execution
   semantics to save RAM space? This can be done using the same
   return stack manipulation techniques used for words like R@ and J.
+- Ensure that ] is standards compliant. It seems that it should be, but
+  there is a somewhat confusing note in second 6.1.2250 "STATE" that
+  may require more investigation.
 
 Documentation
 -------------

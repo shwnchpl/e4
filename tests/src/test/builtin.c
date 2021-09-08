@@ -3,6 +3,28 @@
 
 #include <string.h>
 
+/* Covers S>D */
+static void e4t__test_builtin_doublemath(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* Test S>D. */
+    e4t__ASSERT_OK(e4__evaluate(task, "0 s>d", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "57 s>d", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 57);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "-30 s>d", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -30);
+}
+
 /* Covers ( \ */
 static void e4t__test_builtin_comments(void)
 {
@@ -1425,6 +1447,7 @@ static void e4t__test_builtin_uservars(void)
 
 void e4t__test_builtin(void)
 {
+    e4t__test_builtin_doublemath();
     e4t__test_builtin_comments();
     e4t__test_builtin_constants();
     e4t__test_builtin_data();
