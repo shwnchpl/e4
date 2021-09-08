@@ -3,7 +3,7 @@
 
 #include <string.h>
 
-/* Covers FM/MOD SM/DIV S>D */
+/* Covers FM/MOD M* SM/DIV S>D UM* */
 static void e4t__test_builtin_doublemath(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -23,6 +23,32 @@ static void e4t__test_builtin_doublemath(void)
     e4t__ASSERT_EQ(e4__stack_depth(task), 2);
     e4t__ASSERT_EQ(e4__stack_pop(task), -1);
     e4t__ASSERT_EQ(e4__stack_pop(task), -30);
+
+    /* Test M* and UM*. */
+    e4t__ASSERT_OK(e4__evaluate(task, "5 -20 M*", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -100);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "0 20 M*", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "-1 1 rshift 4 M*", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -4);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "-1 2 UM*", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -2);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "-1 -1 UM*", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 1);
 
     /* Test FM/MOD and SM/REM. The utility functions behind these
        builtins are covered more extensively in util.c, so just make

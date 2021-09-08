@@ -61,7 +61,7 @@ General Builtins
 ----------------
 - [DONE] Implement S>D.
 - [DONE] Implement FM/MOD and SM/REM.
-- Implement M* and UM*.
+- [DONE] Implement M* and UM*.
 - Implement */ and */MOD.
 - Fix 2* and 2/ implementations. These words are meant to perform
   arithmetic shifts by one, not simply logical shifts by one.

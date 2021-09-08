@@ -635,6 +635,24 @@ static void e4__builtin_LSHIFT(struct e4__task *task, e4__cell user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_M_STAR(struct e4__task *task, e4__cell user)
+{
+    register e4__usize l, r;
+    register struct e4__double d;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    r = (e4__usize)e4__stack_pop(task);
+    l = (e4__usize)e4__stack_pop(task);
+
+    d = e4__usize_mul(l, r, e4__F_SIGNED);
+
+    e4__stack_push(task, (e4__cell)d.low);
+    e4__stack_push(task, (e4__cell)d.high);
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_MAX(struct e4__task *task, e4__cell user)
 {
     register e4__usize l, r;
@@ -1307,6 +1325,24 @@ static void e4__builtin_U_LESS_THAN(struct e4__task *task, e4__cell user)
     l = (e4__usize)e4__stack_pop(task);
 
     e4__stack_push(task, (e4__cell)(l < r ? e4__BF_TRUE : e4__BF_FALSE));
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_UM_STAR(struct e4__task *task, e4__cell user)
+{
+    register e4__usize l, r;
+    register struct e4__double d;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    r = (e4__usize)e4__stack_pop(task);
+    l = (e4__usize)e4__stack_pop(task);
+
+    d = e4__usize_mul(l, r, 0);
+
+    e4__stack_push(task, (e4__cell)d.low);
+    e4__stack_push(task, (e4__cell)d.high);
 
     e4__execute_ret(task);
 }
