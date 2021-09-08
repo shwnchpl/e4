@@ -946,7 +946,8 @@ static const void *e4__builtin_SLASH[] = {
 
 static void e4__builtin_SLASH_MOD(struct e4__task *task, e4__cell user)
 {
-    register e4__usize n, d;
+    register e4__usize n, d, q;
+    e4__usize r;
 
     /* XXX: Implementation defined behavior--if you're using a C89
        compiler, system division and modulo are either symmetric or
@@ -964,8 +965,9 @@ static void e4__builtin_SLASH_MOD(struct e4__task *task, e4__cell user)
         return;
     }
 
-    e4__stack_push(task, (e4__cell)e4__usize_smod(n, d));
-    e4__stack_push(task, (e4__cell)e4__usize_sdiv(n, d));
+    q = e4__usize_sdiv(n, d, &r);
+    e4__stack_push(task, (e4__cell)r);
+    e4__stack_push(task, (e4__cell)q);
 
     e4__execute_ret(task);
 }

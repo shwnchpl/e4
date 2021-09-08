@@ -59,6 +59,9 @@ Compilation
 
 General Builtins
 ----------------
+- Implement S>D.
+- Implement FM/MOD and SM/DIV.
+- Implement M* and */MOD.
 - Implement the PAGE builtin using escape sequences. The following
   implementation works:
         : page s\" \e[2J\e[0;0H" type ;
@@ -94,12 +97,12 @@ Kernel
   SM/REM).
 - [DONE] Add support for dividing a double cell number by a single cell
   number and obtaining a double cell result (needed for #).
+- [DONE] Combine sdiv and smod utility functions into one function.
 - Add support for adding a single cell number to a double cell number
   (which is needed for >NUMBER). It may be assumed that the single cell
   number is signed (as in M+).
 - Update words meant to support double width numbers that are currently
   implemented without any such support. This includes >NUMBER.
-- Combine sdiv and smod utility functions into one function.
 - Note somewhere that all divisions are symmetric by default.
   Alternatively, consider the benefits of switching to floored division
   by default.

@@ -163,47 +163,29 @@ struct e4__double e4__usize_mul(e4__usize l, e4__usize r, e4__u8 flags)
     return prod;
 }
 
-e4__usize e4__usize_sdiv(e4__usize n, e4__usize d)
+e4__usize e4__usize_sdiv(e4__usize n, e4__usize d, e4__usize *r)
 {
-    register e4__bool negate = 0;
+    register e4__usize q;
+    register e4__bool n_negative = 0;
+    register e4__bool d_negative = 0;
 
-    if (e4__USIZE_IS_NEGATIVE(n)) {
+    if ((n_negative = e4__USIZE_IS_NEGATIVE(n)))
         n = e4__USIZE_NEGATE(n);
-        negate = !negate;
-    }
 
-    if (e4__USIZE_IS_NEGATIVE(d)) {
+    if ((d_negative = e4__USIZE_IS_NEGATIVE(d)))
         d = e4__USIZE_NEGATE(d);
-        negate = !negate;
-    }
 
-    n = n / d;
+    q = n / d;
+    if (r)
+        *r = n % d;
 
-    if (negate)
-        n = e4__USIZE_NEGATE(n);
+    if (n_negative ^ d_negative)
+        q = e4__USIZE_NEGATE(q);
 
-    return n;
-}
+    if (r && n_negative)
+        *r = e4__USIZE_NEGATE(*r);
 
-e4__usize e4__usize_smod(e4__usize n, e4__usize d)
-{
-    register e4__bool negate = 0;
-
-    if (e4__USIZE_IS_NEGATIVE(n)) {
-        n = e4__USIZE_NEGATE(n);
-        negate = 1;
-    }
-
-    if (e4__USIZE_IS_NEGATIVE(d)) {
-        d = e4__USIZE_NEGATE(d);
-    }
-
-    n = n % d;
-
-    if (negate)
-        n = e4__USIZE_NEGATE(n);
-
-    return n;
+    return q;
 }
 
 struct e4__double e4__usize_todouble(e4__usize n)

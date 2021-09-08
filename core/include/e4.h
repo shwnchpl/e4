@@ -576,8 +576,7 @@ char* e4__usize_format(e4__usize n, e4__u8 base, e4__u8 flags, char *buf,
         e4__usize sz);
 const char* e4__usize_format_exception(e4__usize e, e4__usize *len);
 struct e4__double e4__usize_mul(e4__usize l, e4__usize r, e4__u8 flags);
-e4__usize e4__usize_sdiv(e4__usize n, e4__usize d);
-e4__usize e4__usize_smod(e4__usize n, e4__usize d);
+e4__usize e4__usize_sdiv(e4__usize n, e4__usize d, e4__usize *r);
 struct e4__double e4__usize_todouble(e4__usize u);
 
 #endif /* e4_H_ */
