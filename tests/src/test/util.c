@@ -91,12 +91,12 @@ static void e4t__test_util_double_div(void)
     e4t__ASSERT_OK(e4__double_div(e4__double_u(5, 0), -2,
             e4__F_SIGNED, &dq, &r));
     e4t__ASSERT_DEQ(dq, e4__double_u(-2, -1));
-    e4t__ASSERT_EQ(r, -1);
+    e4t__ASSERT_EQ(r, 1);
 
     e4t__ASSERT_OK(e4__double_div(e4__double_u(-5, -1), -2,
             e4__F_SIGNED, &dq, &r));
     e4t__ASSERT_DEQ(dq, e4__double_u(2, 0));
-    e4t__ASSERT_EQ(r, 1);
+    e4t__ASSERT_EQ(r, -1);
 
     e4t__ASSERT_OK(e4__double_div(e4__double_u(0, 1), 2,
             e4__F_SIGNED, &dq, &r));
@@ -112,7 +112,12 @@ static void e4t__test_util_double_div(void)
     e4t__ASSERT_OK(e4__double_div(e4__double_u(5, 0), -2,
             e4__F_SIGNED | e4__F_FLOORDIV, &dq, &r));
     e4t__ASSERT_DEQ(dq, e4__double_u(-3, -1));
-    e4t__ASSERT_EQ(r, 1);
+    e4t__ASSERT_EQ(r, -1);
+
+    e4t__ASSERT_OK(e4__double_div(e4__double_u(-5, -1), -2,
+            e4__F_SIGNED | e4__F_FLOORDIV, &dq, &r));
+    e4t__ASSERT_DEQ(dq, e4__double_u(2, 0));
+    e4t__ASSERT_EQ(r, -1);
 
     e4t__ASSERT_OK(e4__double_div(e4__double_u(4, 0), -2,
             e4__F_SIGNED | e4__F_FLOORDIV, &dq, &r));
@@ -228,12 +233,12 @@ static void e4t__test_util_double_ndiv(void)
     e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(5, 0), -2,
             e4__F_SIGNED, &q, &r));
     e4t__ASSERT_EQ(q, -2);
-    e4t__ASSERT_EQ(r, -1);
+    e4t__ASSERT_EQ(r, 1);
 
     e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(-5, -1), -2,
             e4__F_SIGNED, &q, &r));
     e4t__ASSERT_EQ(q, 2);
-    e4t__ASSERT_EQ(r, 1);
+    e4t__ASSERT_EQ(r, -1);
 
     e4t__ASSERT_EQ(e4__double_ndiv(e4__double_u(0, 1), 2,
             e4__F_SIGNED, &q, &r), e4__E_RSLTOUTORANGE);
@@ -250,7 +255,12 @@ static void e4t__test_util_double_ndiv(void)
     e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(5, 0), -2,
             e4__F_SIGNED | e4__F_FLOORDIV, &q, &r));
     e4t__ASSERT_EQ(q, -3);
-    e4t__ASSERT_EQ(r, 1);
+    e4t__ASSERT_EQ(r, -1);
+
+    e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(-5, -1), -2,
+            e4__F_SIGNED | e4__F_FLOORDIV, &q, &r));
+    e4t__ASSERT_EQ(q, 2);
+    e4t__ASSERT_EQ(r, -1);
 
     e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(4, 0), -2,
             e4__F_SIGNED | e4__F_FLOORDIV, &q, &r));
