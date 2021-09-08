@@ -60,9 +60,9 @@ Compilation
 General Builtins
 ----------------
 - [DONE] Implement S>D.
-- Implement FM/MOD and SM/DIV.
+- [DONE] Implement FM/MOD and SM/REM.
 - Implement M* and UM*.
-- */ and */MOD.
+- Implement */ and */MOD.
 - Fix 2* and 2/ implementations. These words are meant to perform
   arithmetic shifts by one, not simply logical shifts by one.
 - Implement the PAGE builtin using escape sequences. The following

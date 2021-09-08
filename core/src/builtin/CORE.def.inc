@@ -490,6 +490,29 @@ static void e4__builtin_FILL(struct e4__task *task, e4__cell user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_FM_SLASH_MOD(struct e4__task *task, e4__cell user)
+{
+    register e4__usize res, n;
+    register struct e4__double d;
+    e4__usize q, r;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 3);
+
+    n = (e4__usize)e4__stack_pop(task);
+    d.high = (e4__usize)e4__stack_pop(task);
+    d.low = (e4__usize)e4__stack_pop(task);
+
+    if ((res = e4__double_ndiv(d, n, e4__F_SIGNED | e4__F_FLOORDIV, &q, &r))) {
+        e4__exception_throw(task, res);
+        e4__execute_ret(task);
+    }
+
+    e4__stack_push(task, (e4__cell)r);
+    e4__stack_push(task, (e4__cell)q);
+
+    e4__execute_ret(task);
+}
+
 static const void *e4__builtin_GREATER_THAN[] = {
     &e4__BUILTIN_XT[e4__B_SWAP],
     &e4__BUILTIN_XT[e4__B_LESS_THAN],
@@ -979,6 +1002,29 @@ static void e4__builtin_SLASH_MOD(struct e4__task *task, e4__cell user)
     }
 
     q = e4__usize_sdiv(n, d, &r);
+    e4__stack_push(task, (e4__cell)r);
+    e4__stack_push(task, (e4__cell)q);
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_SM_SLASH_REM(struct e4__task *task, e4__cell user)
+{
+    register e4__usize res, n;
+    register struct e4__double d;
+    e4__usize q, r;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 3);
+
+    n = (e4__usize)e4__stack_pop(task);
+    d.high = (e4__usize)e4__stack_pop(task);
+    d.low = (e4__usize)e4__stack_pop(task);
+
+    if ((res = e4__double_ndiv(d, n, e4__F_SIGNED, &q, &r))) {
+        e4__exception_throw(task, res);
+        e4__execute_ret(task);
+    }
+
     e4__stack_push(task, (e4__cell)r);
     e4__stack_push(task, (e4__cell)q);
 
