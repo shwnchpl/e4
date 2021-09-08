@@ -62,7 +62,7 @@ General Builtins
 - [DONE] Implement S>D.
 - [DONE] Implement FM/MOD and SM/REM.
 - [DONE] Implement M* and UM*.
-- Implement */ and */MOD.
+- [DONE] */ and */MOD.
 - Fix 2* and 2/ implementations. These words are meant to perform
   arithmetic shifts by one, not simply logical shifts by one.
 - Implement the PAGE builtin using escape sequences. The following
@@ -137,6 +137,11 @@ Testing
 -------
 - [DONE] Split e4t__test_util_doublemath into multiple tests after the
   num to usize/double split.
+- Consider splitting exceedingly long builtin tests into multiple
+  functions. Current candidates for splitting include doublemath,
+  logic, math, and memmanip in particular.
+- Consider splitting builtin tests into multiple files, possibly even
+  in a builtin/ test directory.
 
 
 Version 0.4

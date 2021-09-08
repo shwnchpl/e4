@@ -315,6 +315,8 @@ enum e4__builtin_id {
     e4__B_SPACE,
     e4__B_SPACES,
     e4__B_STAR,
+    e4__B_STAR_SLASH,
+    e4__B_STAR_SLASH_MOD,
     e4__B_STORE,
     e4__B_SWAP,
     e4__B_THEN,

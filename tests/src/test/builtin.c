@@ -3,7 +3,7 @@
 
 #include <string.h>
 
-/* Covers FM/MOD M* SM/DIV S>D UM* */
+/* Covers *SLASH *SLASH-MOD FM/MOD M* SM/DIV S>D UM* */
 static void e4t__test_builtin_doublemath(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -92,6 +92,193 @@ static void e4t__test_builtin_doublemath(void)
     e4t__ASSERT_EQ(e4__stack_depth(task), 2);
     e4t__ASSERT_EQ(e4__stack_pop(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), -3);
+
+    /* Test *SLASH and *SLASH-MOD. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": max-int -1 1 rshift ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, ": min-int max-int negate 1- ;", -1));
+
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 0 0 */mod", -1), e4__E_DIVBYZERO);
+    e4t__ASSERT_EQ(e4__evaluate(task, "max-int 2 1 */mod", -1),
+            e4__E_RSLTOUTORANGE);
+    e4t__ASSERT_EQ(e4__evaluate(task, "min-int 2 1 */mod", -1),
+            e4__E_RSLTOUTORANGE);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "0 2 1 */mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 1 */mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "2 2 1 */mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "-1 2 1 */mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "-2 2 1 */mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -4);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "0 2 -1 */mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 -1 */mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "2 2 -1 */mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -4);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "-1 2 -1 */mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "-2 2 -1 */mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "2 2 2 */mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "-1 2 -1 */mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "-2 2 -2 */mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "7 2 3 */mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "7 2 -3 */mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -4);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "-7 2 3 */mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -4);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -2);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "-7 2 -3 */mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -2);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "max-int 2 max-int */mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "min-int 2 min-int */mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 0 0 */", -1), e4__E_DIVBYZERO);
+    e4t__ASSERT_EQ(e4__evaluate(task, "max-int 2 1 */", -1),
+            e4__E_RSLTOUTORANGE);
+    e4t__ASSERT_EQ(e4__evaluate(task, "min-int 2 1 */", -1),
+            e4__E_RSLTOUTORANGE);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "0 2 1 */", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 1 */", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "2 2 1 */", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "-1 2 1 */", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -2);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "-2 2 1 */", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -4);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "0 2 -1 */", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "1 2 -1 */", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -2);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "2 2 -1 */", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -4);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "-1 2 -1 */", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "-2 2 -1 */", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "2 2 2 */", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "-1 2 -1 */", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "-2 2 -2 */", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "7 2 3 */", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "7 2 -3 */", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -4);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "-7 2 3 */", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -4);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "-7 2 -3 */", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "max-int 2 max-int */", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "min-int 2 min-int */", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2);
 }
 
 /* Covers ( \ */

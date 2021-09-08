@@ -99,6 +99,8 @@
     _e4__BUILTIN_THUNK(SPACE)   \
     _e4__BUILTIN_THUNK(SPACES)  \
     _e4__BUILTIN_PROC_N(STAR, "*")  \
+    _e4__BUILTIN_PROC_N(STAR_SLASH, "*/")   \
+    _e4__BUILTIN_PROC_N(STAR_SLASH_MOD, "*/MOD")    \
     _e4__BUILTIN_PROC_N(STORE, "!") \
     _e4__BUILTIN_PROC(SWAP) \
     _e4__BUILTIN_PROC_F(THEN, e4__F_COMPONLY | e4__F_IMMEDIATE) \

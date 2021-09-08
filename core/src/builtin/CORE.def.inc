@@ -1107,6 +1107,56 @@ static void e4__builtin_STORE(struct e4__task *task, e4__cell user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_STAR_SLASH(struct e4__task *task, e4__cell user)
+{
+    register e4__usize l, r, d, res;
+    register struct e4__double p;
+    e4__usize q;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 3);
+
+    d = (e4__usize)e4__stack_pop(task);
+    r = (e4__usize)e4__stack_pop(task);
+    l = (e4__usize)e4__stack_pop(task);
+
+    p = e4__usize_mul(l, r, e4__F_SIGNED);
+
+    if ((res = e4__double_ndiv(p, d, e4__F_SIGNED, &q, NULL))) {
+        e4__exception_throw(task, res);
+        e4__execute_ret(task);
+    }
+
+    e4__stack_push(task, (e4__cell)q);
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_STAR_SLASH_MOD(struct e4__task *task, e4__cell user)
+{
+    register e4__usize l, r, d, res;
+    register struct e4__double p;
+    e4__usize q, rem;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 3);
+
+    d = (e4__usize)e4__stack_pop(task);
+    r = (e4__usize)e4__stack_pop(task);
+    l = (e4__usize)e4__stack_pop(task);
+
+    p = e4__usize_mul(l, r, e4__F_SIGNED);
+
+    if ((res = e4__double_ndiv(p, d, e4__F_SIGNED, &q, &rem))) {
+        e4__exception_throw(task, res);
+        e4__execute_ret(task);
+    }
+
+    e4__stack_push(task, (e4__cell)rem);
+    e4__stack_push(task, (e4__cell)q);
+
+    e4__execute_ret(task);
+
+}
+
 static void e4__builtin_SWAP(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
