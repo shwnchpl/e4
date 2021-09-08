@@ -131,8 +131,8 @@ REPL
 
 Testing
 -------
-- Split e4t__test_util_doublemath into multiple tests after the num
-  to usize/double split.
+- [DONE] Split e4t__test_util_doublemath into multiple tests after the
+  num to usize/double split.
 
 
 Version 0.4
