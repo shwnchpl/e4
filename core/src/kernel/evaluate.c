@@ -224,10 +224,11 @@ void e4__evaluate_quit(struct e4__task *task)
                    formatting is available with pictured numeric output. */
                 e4__io_type(task, " EXCEPTION: ", 12);
 
-                str = e4__num_format_exception(res, &len);
+                str = e4__usize_format_exception(res, &len);
                 e4__io_type(task, str, len);
 
-                str = e4__num_format(res, task->base, e4__F_SIGNED, buf, 130);
+                str = e4__usize_format(res, task->base, e4__F_SIGNED, buf,
+                        130);
                 *((char *)--str) = '(';
                 *((char *)--str) = ' ';
                 len = &buf[130] - str + 2;

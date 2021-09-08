@@ -19,13 +19,9 @@ Version 0.3
 
 Build
 -----
+- [DONE] Split the e4__num namespace into e4__double and e4__usize.
 - Split system required words and optional system specific extension
   words into different modules (SYSTEM and SYSTEM-EXT?).
-- Consider renaming e4__num to e4__usize and also creating an
-  e4__double prefix for functions taking doubles. This would probably
-  be far more logical than the current system. The current function
-  that doesn't quite fit would be e4__num_double, but that could be
-  moved to e4__double_ or e4__double or something along those lines.
 - Consider actually typedefing e4__double. Normally structs in e4 are
   not typedefed, although since struct e4__double is relatively small
   and is always passed/returned by value rather than by reference, it
@@ -113,7 +109,7 @@ Kernel
   numeric output instead?
 - Consider whether it might be possible to wrap the main quit loop in
   some kind of exception context (somehow?) to get around the race
-  conditon created by using multiple different exception contexts
+  condition created by using multiple different exception contexts
   within that loop. It's unclear exactly how this would look since
   the quit loop relies on certain exceptions percolating all the way
   up, so for it to itself run in an exception context some considerable

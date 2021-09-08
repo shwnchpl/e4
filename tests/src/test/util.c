@@ -14,231 +14,237 @@ static void e4t__test_util_doublemath(void)
     /* FIXME: Split this into multiple tests once everything has been
        renamed. */
 
-    /* Test e4__num_todouble. */
-    e4t__ASSERT_DEQ(e4__num_todouble(1), e4__num_double(1, 0));
-    e4t__ASSERT_DEQ(e4__num_todouble(-1), e4__num_double(-1, -1));
-    e4t__ASSERT_DEQ(e4__num_todouble(-2), e4__num_double(-2, -1));
+    /* Test e4__usize_todouble. */
+    e4t__ASSERT_DEQ(e4__usize_todouble(1), e4__double_u(1, 0));
+    e4t__ASSERT_DEQ(e4__usize_todouble(-1), e4__double_u(-1, -1));
+    e4t__ASSERT_DEQ(e4__usize_todouble(-2), e4__double_u(-2, -1));
 
-    /* Test e4__num_double_negate. */
-    e4t__ASSERT_DEQ(e4__num_double_negate(e4__num_double(0, 0)),
-            e4__num_double(0, 0));
-    e4t__ASSERT_DEQ(e4__num_double_negate(e4__num_double(1, 0)),
-            e4__num_double(-1, -1));
-    e4t__ASSERT_DEQ(e4__num_double_negate(e4__num_double(5, 0)),
-            e4__num_double(-5, -1));
-    e4t__ASSERT_DEQ(e4__num_double_negate(e4__num_double(79, 351)),
-            e4__num_double(-79, -352));
+    /* Test e4__double_negate. */
+    e4t__ASSERT_DEQ(e4__double_negate(e4__double_u(0, 0)),
+            e4__double_u(0, 0));
+    e4t__ASSERT_DEQ(e4__double_negate(e4__double_u(1, 0)),
+            e4__double_u(-1, -1));
+    e4t__ASSERT_DEQ(e4__double_negate(e4__double_u(5, 0)),
+            e4__double_u(-5, -1));
+    e4t__ASSERT_DEQ(e4__double_negate(e4__double_u(79, 351)),
+            e4__double_u(-79, -352));
 
-    /* Test e4__num_mul. */
-    e4t__ASSERT_DEQ(e4__num_mul(0, 0, 0), e4__num_double(0, 0));
-    e4t__ASSERT_DEQ(e4__num_mul(1, 0, 0), e4__num_double(0, 0));
-    e4t__ASSERT_DEQ(e4__num_mul(0, 1, 0), e4__num_double(0, 0));
-    e4t__ASSERT_DEQ(e4__num_mul(0, 0, e4__F_SIGNED), e4__num_double(0, 0));
-    e4t__ASSERT_DEQ(e4__num_mul(1, 0, e4__F_SIGNED), e4__num_double(0, 0));
-    e4t__ASSERT_DEQ(e4__num_mul(0, 1, e4__F_SIGNED), e4__num_double(0, 0));
+    /* Test e4__usize_mul. */
+    e4t__ASSERT_DEQ(e4__usize_mul(0, 0, 0), e4__double_u(0, 0));
+    e4t__ASSERT_DEQ(e4__usize_mul(1, 0, 0), e4__double_u(0, 0));
+    e4t__ASSERT_DEQ(e4__usize_mul(0, 1, 0), e4__double_u(0, 0));
+    e4t__ASSERT_DEQ(e4__usize_mul(0, 0, e4__F_SIGNED), e4__double_u(0, 0));
+    e4t__ASSERT_DEQ(e4__usize_mul(1, 0, e4__F_SIGNED), e4__double_u(0, 0));
+    e4t__ASSERT_DEQ(e4__usize_mul(0, 1, e4__F_SIGNED), e4__double_u(0, 0));
 
-    e4t__ASSERT_DEQ(e4__num_mul(1, 1, 0), e4__num_double(1, 0));
-    e4t__ASSERT_DEQ(e4__num_mul(1, 1, e4__F_SIGNED), e4__num_double(1, 0));
-    e4t__ASSERT_DEQ(e4__num_mul(-1, 1, e4__F_SIGNED), e4__num_double(-1, -1));
-    e4t__ASSERT_DEQ(e4__num_mul(-1, -1, e4__F_SIGNED), e4__num_double(1, 0));
+    e4t__ASSERT_DEQ(e4__usize_mul(1, 1, 0), e4__double_u(1, 0));
+    e4t__ASSERT_DEQ(e4__usize_mul(1, 1, e4__F_SIGNED), e4__double_u(1, 0));
+    e4t__ASSERT_DEQ(e4__usize_mul(-1, 1, e4__F_SIGNED),
+            e4__double_u(-1, -1));
+    e4t__ASSERT_DEQ(e4__usize_mul(-1, -1, e4__F_SIGNED), e4__double_u(1, 0));
 
-    e4t__ASSERT_DEQ(e4__num_mul(1, 5, 0), e4__num_double(5, 0));
-    e4t__ASSERT_DEQ(e4__num_mul(1, 5, e4__F_SIGNED), e4__num_double(5, 0));
-    e4t__ASSERT_DEQ(e4__num_mul(-1, 5, e4__F_SIGNED), e4__num_double(-5, -1));
-    e4t__ASSERT_DEQ(e4__num_mul(1, -5, e4__F_SIGNED), e4__num_double(-5, -1));
-    e4t__ASSERT_DEQ(e4__num_mul(-1, -5, e4__F_SIGNED), e4__num_double(5, 0));
+    e4t__ASSERT_DEQ(e4__usize_mul(1, 5, 0), e4__double_u(5, 0));
+    e4t__ASSERT_DEQ(e4__usize_mul(1, 5, e4__F_SIGNED), e4__double_u(5, 0));
+    e4t__ASSERT_DEQ(e4__usize_mul(-1, 5, e4__F_SIGNED),
+            e4__double_u(-5, -1));
+    e4t__ASSERT_DEQ(e4__usize_mul(1, -5, e4__F_SIGNED),
+            e4__double_u(-5, -1));
+    e4t__ASSERT_DEQ(e4__usize_mul(-1, -5, e4__F_SIGNED), e4__double_u(5, 0));
 
-    e4t__ASSERT_DEQ(e4__num_mul(2, 5, 0), e4__num_double(10, 0));
-    e4t__ASSERT_DEQ(e4__num_mul(2, 5, e4__F_SIGNED), e4__num_double(10, 0));
-    e4t__ASSERT_DEQ(e4__num_mul(-2, 5, e4__F_SIGNED), e4__num_double(-10, -1));
-    e4t__ASSERT_DEQ(e4__num_mul(2, -5, e4__F_SIGNED), e4__num_double(-10, -1));
-    e4t__ASSERT_DEQ(e4__num_mul(-2, -5, e4__F_SIGNED), e4__num_double(10, 0));
+    e4t__ASSERT_DEQ(e4__usize_mul(2, 5, 0), e4__double_u(10, 0));
+    e4t__ASSERT_DEQ(e4__usize_mul(2, 5, e4__F_SIGNED), e4__double_u(10, 0));
+    e4t__ASSERT_DEQ(e4__usize_mul(-2, 5, e4__F_SIGNED),
+            e4__double_u(-10, -1));
+    e4t__ASSERT_DEQ(e4__usize_mul(2, -5, e4__F_SIGNED),
+            e4__double_u(-10, -1));
+    e4t__ASSERT_DEQ(e4__usize_mul(-2, -5, e4__F_SIGNED),
+            e4__double_u(10, 0));
 
-    e4t__ASSERT_DEQ(e4__num_mul(-1, 2, 0), e4__num_double(-2, 1));
-    e4t__ASSERT_DEQ(e4__num_mul(-5, -10, 0), e4__num_double(50, -15));
-    e4t__ASSERT_DEQ(e4__num_mul(-1, -1, 0), e4__num_double(1, -2));
+    e4t__ASSERT_DEQ(e4__usize_mul(-1, 2, 0), e4__double_u(-2, 1));
+    e4t__ASSERT_DEQ(e4__usize_mul(-5, -10, 0), e4__double_u(50, -15));
+    e4t__ASSERT_DEQ(e4__usize_mul(-1, -1, 0), e4__double_u(1, -2));
 
     /* Test unsigned double cell by cell to cell narrowing division. */
-    e4t__ASSERT_EQ(e4__num_double_ndiv(e4__num_double(0, 0), 0, 0, &q, &r),
+    e4t__ASSERT_EQ(e4__double_ndiv(e4__double_u(0, 0), 0, 0, &q, &r),
             e4__E_DIVBYZERO);
-    e4t__ASSERT_EQ(e4__num_double_ndiv(e4__num_double(0, 1), 1, 0, &q, &r),
+    e4t__ASSERT_EQ(e4__double_ndiv(e4__double_u(0, 1), 1, 0, &q, &r),
             e4__E_RSLTOUTORANGE);
 
-    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(0, 0), 5, 0, &q, &r));
+    e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(0, 0), 5, 0, &q, &r));
     e4t__ASSERT_EQ(q, 0);
     e4t__ASSERT_EQ(r, 0);
 
-    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(5, 0), 1, 0, &q, &r));
+    e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(5, 0), 1, 0, &q, &r));
     e4t__ASSERT_EQ(q, 5);
     e4t__ASSERT_EQ(r, 0);
 
-    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(573, 0), 37, 0, &q, &r));
+    e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(573, 0), 37, 0, &q, &r));
     e4t__ASSERT_EQ(q, 15);
     e4t__ASSERT_EQ(r, 18);
 
-    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(0, 1), 2, 0, &q, &r));
+    e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(0, 1), 2, 0, &q, &r));
     e4t__ASSERT_EQ(q, (e4__usize)1 << 63);
     e4t__ASSERT_EQ(r, 0);
 
-    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(5, 1), 8, 0, &q, &r));
+    e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(5, 1), 8, 0, &q, &r));
     e4t__ASSERT_EQ(q, (e4__usize)1 << 61);
     e4t__ASSERT_EQ(r, 5);
 
-    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(0x95440111682f25b6,
+    e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(0x95440111682f25b6,
             0x157186c4791), 0xb29430a256d21, 0, &q, &r));
     e4t__ASSERT_EQ(q, 0x1ebd7510f03cdb);
     e4t__ASSERT_EQ(r, 0x5e75995a70e7b);
 
-    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(-1, -2), -1, 0, &q, &r));
+    e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(-1, -2), -1, 0, &q, &r));
     e4t__ASSERT_EQ(q, -1);
     e4t__ASSERT_EQ(r, -2);
 
     /* Test signed double cell by cell to cell narrowing division. */
-    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(0, 0), -1,
+    e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(0, 0), -1,
             e4__F_SIGNED, &q, &r));
     e4t__ASSERT_EQ(q, 0);
     e4t__ASSERT_EQ(r, 0);
 
-    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(-5, -1), 1,
+    e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(-5, -1), 1,
             e4__F_SIGNED, &q, &r));
     e4t__ASSERT_EQ(q, -5);
     e4t__ASSERT_EQ(r, 0);
 
-    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(5, 0), -1,
+    e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(5, 0), -1,
             e4__F_SIGNED, &q, &r));
     e4t__ASSERT_EQ(q, -5);
     e4t__ASSERT_EQ(r, 0);
 
-    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(-5, -1), -1,
+    e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(-5, -1), -1,
             e4__F_SIGNED, &q, &r));
     e4t__ASSERT_EQ(q, 5);
     e4t__ASSERT_EQ(r, 0);
 
-    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(-5, -1), 2,
+    e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(-5, -1), 2,
             e4__F_SIGNED, &q, &r));
     e4t__ASSERT_EQ(q, -2);
     e4t__ASSERT_EQ(r, -1);
 
-    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(5, 0), -2,
+    e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(5, 0), -2,
             e4__F_SIGNED, &q, &r));
     e4t__ASSERT_EQ(q, -2);
     e4t__ASSERT_EQ(r, -1);
 
-    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(-5, -1), -2,
+    e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(-5, -1), -2,
             e4__F_SIGNED, &q, &r));
     e4t__ASSERT_EQ(q, 2);
     e4t__ASSERT_EQ(r, 1);
 
-    e4t__ASSERT_EQ(e4__num_double_ndiv(e4__num_double(0, 1), 2,
+    e4t__ASSERT_EQ(e4__double_ndiv(e4__double_u(0, 1), 2,
             e4__F_SIGNED, &q, &r), e4__E_RSLTOUTORANGE);
-    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(0, 1), 2,
+    e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(0, 1), 2,
             e4__F_SIGNED, NULL, &r));
     e4t__ASSERT_EQ(r, 0);
 
     /* Test floored double cell by cell to cell narrowing division. */
-    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(-5, -1), 2,
+    e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(-5, -1), 2,
             e4__F_SIGNED | e4__F_FLOORDIV, &q, &r));
     e4t__ASSERT_EQ(q, -3);
     e4t__ASSERT_EQ(r, 1);
 
-    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(5, 0), -2,
+    e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(5, 0), -2,
             e4__F_SIGNED | e4__F_FLOORDIV, &q, &r));
     e4t__ASSERT_EQ(q, -3);
     e4t__ASSERT_EQ(r, 1);
 
-    e4t__ASSERT_OK(e4__num_double_ndiv(e4__num_double(4, 0), -2,
+    e4t__ASSERT_OK(e4__double_ndiv(e4__double_u(4, 0), -2,
             e4__F_SIGNED | e4__F_FLOORDIV, &q, &r));
     e4t__ASSERT_EQ(q, -2);
     e4t__ASSERT_EQ(r, 0);
 
     /* Test unsigned double cell by cell to double cell division. */
-    e4t__ASSERT_EQ(e4__num_double_div(e4__num_double(0, 0), 0, 0, &dq, &r),
+    e4t__ASSERT_EQ(e4__double_div(e4__double_u(0, 0), 0, 0, &dq, &r),
             e4__E_DIVBYZERO);
 
-    e4t__ASSERT_OK(e4__num_double_div(e4__num_double(0, 0), 5, 0, &dq, &r));
-    e4t__ASSERT_DEQ(dq, e4__num_double(0, 0));
+    e4t__ASSERT_OK(e4__double_div(e4__double_u(0, 0), 5, 0, &dq, &r));
+    e4t__ASSERT_DEQ(dq, e4__double_u(0, 0));
     e4t__ASSERT_EQ(r, 0);
 
-    e4t__ASSERT_OK(e4__num_double_div(e4__num_double(5, 0), 1, 0, &dq, &r));
-    e4t__ASSERT_DEQ(dq, e4__num_double(5, 0));
+    e4t__ASSERT_OK(e4__double_div(e4__double_u(5, 0), 1, 0, &dq, &r));
+    e4t__ASSERT_DEQ(dq, e4__double_u(5, 0));
     e4t__ASSERT_EQ(r, 0);
 
-    e4t__ASSERT_OK(e4__num_double_div(e4__num_double(573, 0), 37, 0, &dq, &r));
-    e4t__ASSERT_DEQ(dq, e4__num_double(15, 0));
+    e4t__ASSERT_OK(e4__double_div(e4__double_u(573, 0), 37, 0, &dq, &r));
+    e4t__ASSERT_DEQ(dq, e4__double_u(15, 0));
     e4t__ASSERT_EQ(r, 18);
 
-    e4t__ASSERT_OK(e4__num_double_div(e4__num_double(0, 1), 2, 0, &dq, &r));
-    e4t__ASSERT_DEQ(dq, e4__num_double((e4__usize)1 << 63, 0));
+    e4t__ASSERT_OK(e4__double_div(e4__double_u(0, 1), 2, 0, &dq, &r));
+    e4t__ASSERT_DEQ(dq, e4__double_u((e4__usize)1 << 63, 0));
     e4t__ASSERT_EQ(r, 0);
 
-    e4t__ASSERT_OK(e4__num_double_div(e4__num_double(0, 1), 1, 0, &dq, &r));
-    e4t__ASSERT_DEQ(dq, e4__num_double(0, 1));
+    e4t__ASSERT_OK(e4__double_div(e4__double_u(0, 1), 1, 0, &dq, &r));
+    e4t__ASSERT_DEQ(dq, e4__double_u(0, 1));
     e4t__ASSERT_EQ(r, 0);
 
-    e4t__ASSERT_OK(e4__num_double_div(e4__num_double(2, 4), 2, 0, &dq, &r));
-    e4t__ASSERT_DEQ(dq, e4__num_double(1, 2));
+    e4t__ASSERT_OK(e4__double_div(e4__double_u(2, 4), 2, 0, &dq, &r));
+    e4t__ASSERT_DEQ(dq, e4__double_u(1, 2));
     e4t__ASSERT_EQ(r, 0);
 
-    e4t__ASSERT_OK(e4__num_double_div(e4__num_double(0x206ade00d7babd8e,
+    e4t__ASSERT_OK(e4__double_div(e4__double_u(0x206ade00d7babd8e,
             0xe7a7a29ef454b647), 0x1081a4b61c4a8, 0, &dq, &r));
-    e4t__ASSERT_DEQ(dq, e4__num_double(0x30bd431e56cac42d, 0xe08c));
+    e4t__ASSERT_DEQ(dq, e4__double_u(0x30bd431e56cac42d, 0xe08c));
     e4t__ASSERT_EQ(r, 0xf8c5206a8c06);
 
     /* Test signed double cell by cell to double cell division. */
-    e4t__ASSERT_OK(e4__num_double_div(e4__num_double(0, 0), -1,
+    e4t__ASSERT_OK(e4__double_div(e4__double_u(0, 0), -1,
             e4__F_SIGNED, &dq, &r));
-    e4t__ASSERT_DEQ(dq, e4__num_double(0, 0));
+    e4t__ASSERT_DEQ(dq, e4__double_u(0, 0));
     e4t__ASSERT_EQ(r, 0);
 
-    e4t__ASSERT_OK(e4__num_double_div(e4__num_double(-5, -1), 1,
+    e4t__ASSERT_OK(e4__double_div(e4__double_u(-5, -1), 1,
             e4__F_SIGNED, &dq, &r));
-    e4t__ASSERT_DEQ(dq, e4__num_double(-5, -1));
+    e4t__ASSERT_DEQ(dq, e4__double_u(-5, -1));
     e4t__ASSERT_EQ(r, 0);
 
-    e4t__ASSERT_OK(e4__num_double_div(e4__num_double(5, 0), -1,
+    e4t__ASSERT_OK(e4__double_div(e4__double_u(5, 0), -1,
             e4__F_SIGNED, &dq, &r));
-    e4t__ASSERT_DEQ(dq, e4__num_double(-5, -1));
+    e4t__ASSERT_DEQ(dq, e4__double_u(-5, -1));
     e4t__ASSERT_EQ(r, 0);
 
-    e4t__ASSERT_OK(e4__num_double_div(e4__num_double(-5, -1), -1,
+    e4t__ASSERT_OK(e4__double_div(e4__double_u(-5, -1), -1,
             e4__F_SIGNED, &dq, &r));
-    e4t__ASSERT_DEQ(dq, e4__num_double(5, 0));
+    e4t__ASSERT_DEQ(dq, e4__double_u(5, 0));
     e4t__ASSERT_EQ(r, 0);
 
-    e4t__ASSERT_OK(e4__num_double_div(e4__num_double(-5, -1), 2,
+    e4t__ASSERT_OK(e4__double_div(e4__double_u(-5, -1), 2,
             e4__F_SIGNED, &dq, &r));
-    e4t__ASSERT_DEQ(dq, e4__num_double(-2, -1));
+    e4t__ASSERT_DEQ(dq, e4__double_u(-2, -1));
     e4t__ASSERT_EQ(r, -1);
 
-    e4t__ASSERT_OK(e4__num_double_div(e4__num_double(5, 0), -2,
+    e4t__ASSERT_OK(e4__double_div(e4__double_u(5, 0), -2,
             e4__F_SIGNED, &dq, &r));
-    e4t__ASSERT_DEQ(dq, e4__num_double(-2, -1));
+    e4t__ASSERT_DEQ(dq, e4__double_u(-2, -1));
     e4t__ASSERT_EQ(r, -1);
 
-    e4t__ASSERT_OK(e4__num_double_div(e4__num_double(-5, -1), -2,
+    e4t__ASSERT_OK(e4__double_div(e4__double_u(-5, -1), -2,
             e4__F_SIGNED, &dq, &r));
-    e4t__ASSERT_DEQ(dq, e4__num_double(2, 0));
+    e4t__ASSERT_DEQ(dq, e4__double_u(2, 0));
     e4t__ASSERT_EQ(r, 1);
 
-    e4t__ASSERT_OK(e4__num_double_div(e4__num_double(0, 1), 2,
+    e4t__ASSERT_OK(e4__double_div(e4__double_u(0, 1), 2,
             e4__F_SIGNED, &dq, &r));
-    e4t__ASSERT_DEQ(dq, e4__num_double((e4__usize)1 << 63, 0));
+    e4t__ASSERT_DEQ(dq, e4__double_u((e4__usize)1 << 63, 0));
     e4t__ASSERT_EQ(r, 0);
 
     /* Test floored double cell by cell to double cell division. */
-    e4t__ASSERT_OK(e4__num_double_div(e4__num_double(-5, -1), 2,
+    e4t__ASSERT_OK(e4__double_div(e4__double_u(-5, -1), 2,
             e4__F_SIGNED | e4__F_FLOORDIV, &dq, &r));
-    e4t__ASSERT_DEQ(dq, e4__num_double(-3, -1));
+    e4t__ASSERT_DEQ(dq, e4__double_u(-3, -1));
     e4t__ASSERT_EQ(r, 1);
 
-    e4t__ASSERT_OK(e4__num_double_div(e4__num_double(5, 0), -2,
+    e4t__ASSERT_OK(e4__double_div(e4__double_u(5, 0), -2,
             e4__F_SIGNED | e4__F_FLOORDIV, &dq, &r));
-    e4t__ASSERT_DEQ(dq, e4__num_double(-3, -1));
+    e4t__ASSERT_DEQ(dq, e4__double_u(-3, -1));
     e4t__ASSERT_EQ(r, 1);
 
-    e4t__ASSERT_OK(e4__num_double_div(e4__num_double(4, 0), -2,
+    e4t__ASSERT_OK(e4__double_div(e4__double_u(4, 0), -2,
             e4__F_SIGNED | e4__F_FLOORDIV, &dq, &r));
-    e4t__ASSERT_DEQ(dq, e4__num_double(-2, -1));
+    e4t__ASSERT_DEQ(dq, e4__double_u(-2, -1));
     e4t__ASSERT_EQ(r, 0);
 }
 
@@ -247,13 +253,13 @@ static void e4t__test_util_exceptionformat(void)
     e4__usize len = 0;
 
     /* Test formatting a few exceptions. */
-    e4t__ASSERT_MATCH(e4__num_format_exception(e4__E_OK, NULL), "ok");
-    e4t__ASSERT_MATCH(e4__num_format_exception(e4__E_STKUNDERFLOW, NULL),
+    e4t__ASSERT_MATCH(e4__usize_format_exception(e4__E_OK, NULL), "ok");
+    e4t__ASSERT_MATCH(e4__usize_format_exception(e4__E_STKUNDERFLOW, NULL),
             "stack underflow");
-    e4t__ASSERT_MATCH(e4__num_format_exception(1345, NULL), "unknown");
+    e4t__ASSERT_MATCH(e4__usize_format_exception(1345, NULL), "unknown");
 
     /* Test that, when requested, length is set as expected. */
-    e4t__ASSERT_MATCH(e4__num_format_exception(e4__E_RSTKUNDERFLOW, &len),
+    e4t__ASSERT_MATCH(e4__usize_format_exception(e4__E_RSTKUNDERFLOW, &len),
             "return stack underflow");
     e4t__ASSERT_EQ(len, 22);
 }
@@ -267,15 +273,15 @@ static void e4t__test_util_math(void)
     e4t__ASSERT_EQ(e4__USIZE_NEGATE((e4__usize)5), -5);
     e4t__ASSERT_EQ(e4__USIZE_IS_NEGATIVE((e4__usize)-5), 1);
 
-    e4t__ASSERT_EQ(e4__num_sdiv((e4__usize)-10, (e4__usize)3), -3);
-    e4t__ASSERT_EQ(e4__num_sdiv((e4__usize)10, (e4__usize)-3), -3);
-    e4t__ASSERT_EQ(e4__num_sdiv((e4__usize)-10, (e4__usize)-3), 3);
-    e4t__ASSERT_EQ(e4__num_sdiv((e4__usize)10, (e4__usize)3), 3);
+    e4t__ASSERT_EQ(e4__usize_sdiv((e4__usize)-10, (e4__usize)3), -3);
+    e4t__ASSERT_EQ(e4__usize_sdiv((e4__usize)10, (e4__usize)-3), -3);
+    e4t__ASSERT_EQ(e4__usize_sdiv((e4__usize)-10, (e4__usize)-3), 3);
+    e4t__ASSERT_EQ(e4__usize_sdiv((e4__usize)10, (e4__usize)3), 3);
 
-    e4t__ASSERT_EQ(e4__num_smod((e4__usize)10, (e4__usize)7), 3);
-    e4t__ASSERT_EQ(e4__num_smod((e4__usize)-10, (e4__usize)7), -3);
-    e4t__ASSERT_EQ(e4__num_smod((e4__usize)10, (e4__usize)-7), 3);
-    e4t__ASSERT_EQ(e4__num_smod((e4__usize)-10, (e4__usize)-7), -3);
+    e4t__ASSERT_EQ(e4__usize_smod((e4__usize)10, (e4__usize)7), 3);
+    e4t__ASSERT_EQ(e4__usize_smod((e4__usize)-10, (e4__usize)7), -3);
+    e4t__ASSERT_EQ(e4__usize_smod((e4__usize)10, (e4__usize)-7), 3);
+    e4t__ASSERT_EQ(e4__usize_smod((e4__usize)-10, (e4__usize)-7), -3);
 
     e4t__ASSERT_EQ(e4__mem_aligned(0), 0);
     e4t__ASSERT_EQ(e4__mem_aligned(1), 8);
@@ -288,9 +294,10 @@ static void e4t__test_util_math(void)
     e4t__ASSERT_EQ(e4__mem_aligned(8), 8);
     e4t__ASSERT_EQ(e4__mem_aligned(9), 16);
 
-    e4t__ASSERT_EQ(e4__num_clz(0), e4__USIZE_BIT);
+    e4t__ASSERT_EQ(e4__usize_clz(0), e4__USIZE_BIT);
     for (i = 0; i < e4__USIZE_BIT; ++i)
-        e4t__ASSERT_EQ(e4__num_clz((e4__usize)1 << i), e4__USIZE_BIT - 1 - i);
+        e4t__ASSERT_EQ(e4__usize_clz((e4__usize)1 << i),
+                e4__USIZE_BIT - 1 - i);
 }
 
 static void e4t__test_util_mem_dict(void)
@@ -401,7 +408,7 @@ static void e4t__test_util_numformat(void)
 {
     static char buf[31] = {0,};
 
-    #define _f(n, b, f) e4__num_format(n, b, f, buf, sizeof(buf) - 1)
+    #define _f(n, b, f) e4__usize_format(n, b, f, buf, sizeof(buf) - 1)
     e4t__ASSERT_MATCH(_f(531, 10, 0), "531");
     e4t__ASSERT_MATCH(_f(0xf3, 16, 0), "f3");
     e4t__ASSERT_MATCH(_f(-0xf3, 16, 0), "ffffffffffffff0d");

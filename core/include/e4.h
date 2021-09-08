@@ -440,6 +440,16 @@ enum e4__builtin_id {
 #define e4__USIZE_IS_NEGATIVE(u)    (u > ((e4__usize)-1 >> 1))
 #define e4__USIZE_NEGATE(u)         (((u) ^ (e4__usize)-1) + 1)
 
+#define e4__USIZE_HH(u)     (((u) & e4__USIZE_HHMASK) >> (e4__USIZE_BIT >> 1))
+#define e4__USIZE_HHMASK    (((e4__usize)-1) << (e4__USIZE_BIT >> 1))
+#define e4__USIZE_LH(u)     ((u) & e4__USIZE_LHMASK)
+#define e4__USIZE_LHMASK    (((e4__usize)-1) >> (e4__USIZE_BIT >> 1))
+
+#define e4__USIZE_U(m, l)   \
+    (((m) << (e4__USIZE_BIT >> 1) & e4__USIZE_HHMASK) | (l & e4__USIZE_LHMASK))
+#define e4__USIZE_SPLIT(u, h, l)    \
+    h = e4__USIZE_HH(u), l = e4__USIZE_LH(u)
+
 /* builtin declarations */
 /* FIXME: Should the header table even be exposed here? */
 extern const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT];
@@ -471,24 +481,13 @@ const struct e4__dict_header* e4__dict_suggest(struct e4__task *task,
         const struct e4__dict_header *from, const char *prefix,
         e4__u8 pbytes);
 
-/* stack.c functions */
-void e4__stack_clear(struct e4__task *task);
-e4__usize e4__stack_depth(struct e4__task *task);
-void e4__stack_drop(struct e4__task *task);
-void e4__stack_dup(struct e4__task *task);
-void e4__stack_over(struct e4__task *task);
-e4__cell e4__stack_peek(struct e4__task *task);
-e4__cell e4__stack_pick(struct e4__task *task, e4__usize u);
-e4__cell e4__stack_pop(struct e4__task *task);
-void e4__stack_push(struct e4__task *task, void *v);
-void e4__stack_rot(struct e4__task *task);
-e4__usize e4__stack_rdepth(struct e4__task *task);
-e4__cell e4__stack_rpeek(struct e4__task *task);
-e4__cell e4__stack_rpop(struct e4__task *task);
-void e4__stack_rpush(struct e4__task *task, void *v);
-void e4__stack_roll(struct e4__task *task);
-void e4__stack_swap(struct e4__task *task);
-void e4__stack_tuck(struct e4__task *task);
+/* double.c functions */
+e4__usize e4__double_div(struct e4__double n, e4__usize d, e4__usize flags,
+        struct e4__double *q, e4__usize *r);
+e4__usize e4__double_ndiv(struct e4__double n, e4__usize d,
+        e4__usize flags, e4__usize *q, e4__usize *r);
+struct e4__double e4__double_negate(struct e4__double d);
+struct e4__double e4__double_u(e4__usize low, e4__usize high);
 
 /* evaluate.c functions */
 e4__usize e4__evaluate(struct e4__task *task, const char *buf, e4__usize sz);
@@ -542,22 +541,24 @@ e4__usize e4__mem_number(const char *buf, e4__usize sz, e4__u8 base,
 e4__usize e4__mem_parse(const char *buf, char delim, e4__usize sz,
         e4__usize flags, const char **length);
 
-/* num.c functions */
-e4__usize e4__num_clz(e4__usize u);
-e4__usize e4__num_digit(e4__usize u, e4__u8 base, char *d);
-struct e4__double e4__num_double(e4__usize low, e4__usize high);
-e4__usize e4__num_double_div(struct e4__double n, e4__usize d, e4__usize flags,
-        struct e4__double *q, e4__usize *r);
-e4__usize e4__num_double_ndiv(struct e4__double n, e4__usize d,
-        e4__usize flags, e4__usize *q, e4__usize *r);
-struct e4__double e4__num_double_negate(struct e4__double d);
-char* e4__num_format(e4__usize n, e4__u8 base, e4__u8 flags, char *buf,
-        e4__usize sz);
-const char* e4__num_format_exception(e4__usize e, e4__usize *len);
-struct e4__double e4__num_mul(e4__usize l, e4__usize r, e4__u8 flags);
-e4__usize e4__num_sdiv(e4__usize n, e4__usize d);
-e4__usize e4__num_smod(e4__usize n, e4__usize d);
-struct e4__double e4__num_todouble(e4__usize u);
+/* stack.c functions */
+void e4__stack_clear(struct e4__task *task);
+e4__usize e4__stack_depth(struct e4__task *task);
+void e4__stack_drop(struct e4__task *task);
+void e4__stack_dup(struct e4__task *task);
+void e4__stack_over(struct e4__task *task);
+e4__cell e4__stack_peek(struct e4__task *task);
+e4__cell e4__stack_pick(struct e4__task *task, e4__usize u);
+e4__cell e4__stack_pop(struct e4__task *task);
+void e4__stack_push(struct e4__task *task, void *v);
+void e4__stack_rot(struct e4__task *task);
+e4__usize e4__stack_rdepth(struct e4__task *task);
+e4__cell e4__stack_rpeek(struct e4__task *task);
+e4__cell e4__stack_rpop(struct e4__task *task);
+void e4__stack_rpush(struct e4__task *task, void *v);
+void e4__stack_roll(struct e4__task *task);
+void e4__stack_swap(struct e4__task *task);
+void e4__stack_tuck(struct e4__task *task);
 
 /* task.c functions */
 e4__cell e4__task_allot(struct e4__task *task, e4__usize sz);
@@ -567,5 +568,16 @@ void e4__task_io_init(struct e4__task *task, struct e4__io_func *io);
 void e4__task_io_get(struct e4__task *task, struct e4__io_func *io);
 e4__usize e4__task_unused(struct e4__task *task);
 e4__cell e4__task_uservar(struct e4__task *task, e4__usize offset);
+
+/* usize.c functions */
+e4__usize e4__usize_clz(e4__usize u);
+e4__usize e4__usize_digit(e4__usize u, e4__u8 base, char *d);
+char* e4__usize_format(e4__usize n, e4__u8 base, e4__u8 flags, char *buf,
+        e4__usize sz);
+const char* e4__usize_format_exception(e4__usize e, e4__usize *len);
+struct e4__double e4__usize_mul(e4__usize l, e4__usize r, e4__u8 flags);
+e4__usize e4__usize_sdiv(e4__usize n, e4__usize d);
+e4__usize e4__usize_smod(e4__usize n, e4__usize d);
+struct e4__double e4__usize_todouble(e4__usize u);
 
 #endif /* e4_H_ */

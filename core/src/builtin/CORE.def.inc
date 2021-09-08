@@ -336,7 +336,7 @@ static void e4__builtin_DOT(struct e4__task *task, e4__cell user)
     buf = (char *)task->here;
     n = (e4__usize)e4__stack_pop(task);
 
-    num = e4__num_format(n, task->base, e4__F_SIGNED, buf, 130);
+    num = e4__usize_format(n, task->base, e4__F_SIGNED, buf, 130);
     len = &buf[130] - num;
     num[len++] = ' ';
 
@@ -964,8 +964,8 @@ static void e4__builtin_SLASH_MOD(struct e4__task *task, e4__cell user)
         return;
     }
 
-    e4__stack_push(task, (e4__cell)e4__num_smod(n, d));
-    e4__stack_push(task, (e4__cell)e4__num_sdiv(n, d));
+    e4__stack_push(task, (e4__cell)e4__usize_smod(n, d));
+    e4__stack_push(task, (e4__cell)e4__usize_sdiv(n, d));
 
     e4__execute_ret(task);
 }
@@ -1226,7 +1226,7 @@ static void e4__builtin_U_DOT(struct e4__task *task, e4__cell user)
     buf = (char *)task->here;
     n = (e4__usize)e4__stack_pop(task);
 
-    num = e4__num_format(n, task->base, 0, buf, 130);
+    num = e4__usize_format(n, task->base, 0, buf, 130);
     len = &buf[130] - num;
     num[len++] = ' ';
 

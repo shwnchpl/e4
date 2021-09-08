@@ -17,7 +17,7 @@ static void e4__builtin_DOT_S(struct e4__task *task, e4__cell user)
     /* FIXME: Once pictured numeric output has been implemented, use
        that instead of these hacks, which may not quite be safe. */
 
-    num = e4__num_format(n, task->base, e4__F_SIGNED, &buf[1], 130);
+    num = e4__usize_format(n, task->base, e4__F_SIGNED, &buf[1], 130);
     len = &buf[131] - num;
     len += 3;
     *--num = '<';
@@ -32,7 +32,7 @@ static void e4__builtin_DOT_S(struct e4__task *task, e4__cell user)
 
     while (task->sp < s) {
         n = (e4__usize)e4__DEREF(s--);
-        num = e4__num_format(n, task->base, e4__F_SIGNED, buf, 130);
+        num = e4__usize_format(n, task->base, e4__F_SIGNED, buf, 130);
         len = &buf[130] - num;
         num[len++] = ' ';
 
