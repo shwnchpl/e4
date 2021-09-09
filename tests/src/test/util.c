@@ -429,6 +429,113 @@ static void e4t__test_util_mem_dump(void)
     e4t__ASSERT_MATCH(line, expected_line[2]);
 }
 
+static void e4t__test_util_mem_pno()
+{
+    char buffer[131] = {0};
+    char *b = &buffer[129];
+    struct e4__double d;
+
+    /* XXX: Parts of this test only work correctly on a 64 bit
+       system. */
+
+    /* Test simple hold and holds utilities in isolation. */
+    e4__mem_pno_hold(&b, 'o');
+    e4t__ASSERT_EQ(b, &buffer[128]);
+    e4t__ASSERT_MATCH(&b[1], "o");
+
+    e4__mem_pno_hold(&b, 'o');
+    e4t__ASSERT_EQ(b, &buffer[127]);
+    e4t__ASSERT_MATCH(&b[1], "oo");
+
+    e4__mem_pno_hold(&b, 'f');
+    e4t__ASSERT_EQ(b, &buffer[126]);
+    e4t__ASSERT_MATCH(&b[1], "foo");
+
+    e4__mem_pno_holds(&b, "bas bar ", 8);
+    e4t__ASSERT_EQ(b, &buffer[118]);
+    e4t__ASSERT_MATCH(&b[1], "bas bar foo");
+
+    /* Test formatting of single digits. */
+    b = &buffer[129];
+    d = e4__double_u(532, 0);
+
+    e4t__ASSERT_OK(e4__mem_pno_digit(&b, 10, &d));
+    e4t__ASSERT_MATCH(&b[1], "2");
+    e4t__ASSERT_DEQ(d, e4__double_u(53, 0));
+
+    e4t__ASSERT_OK(e4__mem_pno_digit(&b, 10, &d));
+    e4t__ASSERT_MATCH(&b[1], "32");
+    e4t__ASSERT_DEQ(d, e4__double_u(5, 0));
+
+    e4t__ASSERT_OK(e4__mem_pno_digit(&b, 10, &d));
+    e4t__ASSERT_MATCH(&b[1], "532");
+    e4t__ASSERT_DEQ(d, e4__double_u(0, 0));
+
+    b = &buffer[129];
+    d = e4__double_u(0xbeef, 0);
+
+    e4t__ASSERT_OK(e4__mem_pno_digit(&b, 16, &d));
+    e4t__ASSERT_MATCH(&b[1], "f");
+    e4t__ASSERT_DEQ(d, e4__double_u(0xbee, 0));
+
+    e4t__ASSERT_OK(e4__mem_pno_digit(&b, 16, &d));
+    e4t__ASSERT_MATCH(&b[1], "ef");
+    e4t__ASSERT_DEQ(d, e4__double_u(0xbe, 0));
+
+    e4t__ASSERT_OK(e4__mem_pno_digit(&b, 16, &d));
+    e4t__ASSERT_MATCH(&b[1], "eef");
+    e4t__ASSERT_DEQ(d, e4__double_u(0xb, 0));
+
+    e4t__ASSERT_OK(e4__mem_pno_digit(&b, 16, &d));
+    e4t__ASSERT_MATCH(&b[1], "beef");
+    e4t__ASSERT_DEQ(d, e4__double_u(0, 0));
+
+    /* Test formatting an entire number in one go. */
+    b = &buffer[129];
+    d = e4__double_u(532, 0);
+
+    e4t__ASSERT_OK(e4__mem_pno_digits(&b, b - buffer, 10, &d));
+    e4t__ASSERT_MATCH(&b[1], "532");
+    e4t__ASSERT_DEQ(d, e4__double_u(0, 0));
+
+    b = &buffer[129];
+    d = e4__double_u(0xbeef, 0);
+
+    e4t__ASSERT_OK(e4__mem_pno_digits(&b, b - buffer, 16, &d));
+    e4t__ASSERT_MATCH(&b[1], "beef");
+    e4t__ASSERT_DEQ(d, e4__double_u(0, 0));
+
+    /* Test that attempting to fomrat a number with not enough space
+       writes the digits that can fit then returns
+       e4__E_PNOOVERFLOW. */
+    b = &buffer[129];
+    d = e4__double_u(0xbeef, 0);
+
+    e4t__ASSERT_EQ(e4__mem_pno_digits(&b, 2, 16, &d), e4__E_PNOOVERFLOW);
+    e4t__ASSERT_MATCH(&b[1], "ef");
+    e4t__ASSERT_DEQ(d, e4__double_u(0xbe, 0));
+
+    /* Test printing a number that actually makes use of two cells. */
+    b = &buffer[129];
+    d = e4__double_u(-1, 0xc0b);
+
+    e4t__ASSERT_OK(e4__mem_pno_digits(&b, b - buffer, 16, &d));
+    e4t__ASSERT_MATCH(&b[1], "c0bffffffffffffffff");
+    e4t__ASSERT_DEQ(d, e4__double_u(0, 0));
+
+    /* Test mixing various types of formatting together. */
+    b = &buffer[129];
+    d = e4__double_u(1995, 0);
+
+    e4t__ASSERT_OK(e4__mem_pno_digit(&b, 10, &d));
+    e4t__ASSERT_OK(e4__mem_pno_digit(&b, 10, &d));
+    e4__mem_pno_hold(&b, '.');
+    e4t__ASSERT_OK(e4__mem_pno_digits(&b, b - buffer, 10, &d));
+    e4t__ASSERT_DEQ(d, e4__double_u(0, 0));
+    e4__mem_pno_holds(&b, "Price: $", 8);
+    e4t__ASSERT_MATCH(&b[1], "Price: $19.95");
+}
+
 static void e4t__test_util_numformat(void)
 {
     static char buf[31] = {0,};
@@ -607,6 +714,7 @@ void e4t__test_util(void)
     e4t__test_util_math();
     e4t__test_util_mem_dict();
     e4t__test_util_mem_dump();
+    e4t__test_util_mem_pno();
     e4t__test_util_numformat();
     e4t__test_util_numparse();
     e4t__test_util_wordparse();

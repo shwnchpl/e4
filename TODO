@@ -91,6 +91,7 @@ General Builtins
 
 General IO
 ----------
+- [DONE] Add initial PNO utility functions.
 - Implement pictured numeric output. This can be done first as a mem
   utility under a pno namespace, then possibly under the io_pno
   namespace or even under a dedicated e4__pno namespace. Functions

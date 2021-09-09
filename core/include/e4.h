@@ -176,6 +176,7 @@ struct e4__io_func {
 #define e4__E_COMPONLYWORD  (-14)
 #define e4__E_INVFORGET     (-15)
 #define e4__E_ZLNAME        (-16)
+#define e4__E_PNOOVERFLOW   (-17)
 #define e4__E_UNSUPPORTED   (-21)
 #define e4__E_CSMISMATCH    (-22)
 #define e4__E_RSTKIMBALANCE (-25)
@@ -547,6 +548,11 @@ e4__usize e4__mem_number(const char *buf, e4__usize sz, e4__u8 base,
         e4__u8 flags, e4__usize *out);
 e4__usize e4__mem_parse(const char *buf, char delim, e4__usize sz,
         e4__usize flags, const char **length);
+e4__usize e4__mem_pno_digit(char **buf_end, e4__u8 base, struct e4__double *d);
+e4__usize e4__mem_pno_digits(char **buf_end, e4__usize len, e4__u8 base,
+        struct e4__double *d);
+void e4__mem_pno_hold(char **buf_end, char c);
+void e4__mem_pno_holds(char **buf_end, const char *s, e4__usize len);
 
 /* stack.c functions */
 void e4__stack_clear(struct e4__task *task);

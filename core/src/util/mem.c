@@ -344,3 +344,49 @@ e4__usize e4__mem_parse(const char *buf, char delim, e4__usize sz,
 
     return length;
 }
+
+e4__usize e4__mem_pno_digit(char **buf_end, e4__u8 base, struct e4__double *d)
+{
+    register e4__usize res;
+    e4__usize digit;
+
+    if ((res = e4__double_div(*d, base, 0, d, &digit)))
+        return res;
+
+    **buf_end = digit < 10 ? '0' + digit : 'A' + digit - 10;
+    --*buf_end;
+
+    return e4__E_OK;
+}
+
+e4__usize e4__mem_pno_digits(char **buf_end, e4__usize len, e4__u8 base,
+        struct e4__double *d)
+{
+    register e4__usize res = e4__E_OK;
+
+    while (d->high || d->low) {
+        if (!len) {
+            res = e4__E_PNOOVERFLOW;
+            break;
+        }
+
+        if ((res = e4__mem_pno_digit(buf_end, base, d)))
+            break;
+
+        --len;
+    }
+
+    return res;
+}
+
+void e4__mem_pno_hold(char **buf_end, char c)
+{
+    **buf_end = c;
+    --*buf_end;
+}
+
+void e4__mem_pno_holds(char **buf_end, const char *s, e4__usize len)
+{
+    *buf_end -= len;
+    memmove(*buf_end + 1, s, len);
+}
