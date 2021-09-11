@@ -526,6 +526,15 @@ e4__usize e4__io_dump(struct e4__task *task, e4__cell p, e4__usize len);
 e4__usize e4__io_key(struct e4__task *task, char *buf);
 e4__usize e4__io_parse(struct e4__task *task, char delim, e4__usize flags,
         const char **out);
+e4__usize e4__io_pno_digit(struct e4__task *task, struct e4__double *ud);
+e4__usize e4__io_pno_digits(struct e4__task *task, struct e4__double *ud,
+        e4__u8 flags);
+e4__usize e4__io_pno_finish(struct e4__task *task, char **out_buf,
+        e4__usize *out_sz);
+e4__usize e4__io_pno_hold(struct e4__task *task, char c);
+e4__usize e4__io_pno_holds(struct e4__task *task, const char *s,
+        e4__usize len);
+void e4__io_pno_start(struct e4__task *task);
 e4__usize e4__io_refill(struct e4__task *task, e4__usize *bf);
 e4__usize e4__io_type(struct e4__task *task, const char *buf, e4__usize n);
 char* e4__io_word(struct e4__task *task, char delim);

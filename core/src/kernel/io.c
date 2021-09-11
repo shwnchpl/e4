@@ -56,6 +56,124 @@ e4__usize e4__io_parse(struct e4__task *task, char delim, e4__usize flags,
     return length;
 }
 
+e4__usize e4__io_pno_digit(struct e4__task *task, struct e4__double *ud)
+{
+    register e4__usize res;
+    char *b = (char *)task->pno.offset;
+
+    if (!task->pno.offset)
+        return e4__E_INVMEMADDR;
+
+    if ((e4__usize)task->pno.offset - 1 < (e4__usize)task->here)
+        return e4__E_PNOOVERFLOW;
+
+    res = e4__mem_pno_digit(&b, (e4__u8)task->base, ud);
+    task->pno.offset = (e4__cell)b;
+
+    return res;
+}
+
+e4__usize e4__io_pno_digits(struct e4__task *task, struct e4__double *ud,
+        e4__u8 flags)
+{
+    register e4__usize res;
+    char *b = (char *)task->pno.offset;
+    register e4__usize avail_len;
+
+    if (!task->pno.offset)
+        return e4__E_INVMEMADDR;
+
+    if ((e4__usize)task->pno.offset < (e4__usize)task->here)
+        return e4__E_PNOOVERFLOW;
+    avail_len = (e4__usize)task->pno.offset - (e4__usize)task->here;
+
+    res = e4__mem_pno_digits(&b, avail_len, (e4__u8)task->base, flags, ud);
+    task->pno.offset = (e4__cell)b;
+
+    return res;
+}
+
+e4__usize e4__io_pno_finish(struct e4__task *task, char **out_buf,
+        e4__usize *out_sz)
+{
+    register e4__usize res = e4__E_OK;
+
+    if (!task->pno.offset)
+        return e4__E_INVMEMADDR;
+
+    /* If some allocation has happened since we last wrote to the PNO
+       buffer and we now no longer own memory that had been included in
+       the buffer and written to, fail.
+
+       It is possible that memory in the buffer has been trashed in some
+       other way (such as with allocation followed by deallocation), but
+       in such cases at least the buffer returned will be safely mutable
+       which is a hard requirement. Part of the PNO buffer is currently
+       part of the dictionary, it is not the case that it can be mutated
+       freely and misrepresenting that by returning a pointer into that
+       memory as mutable here could lead to far more catestrophic
+       failures than a string containing gibberish. */
+    if ((e4__usize)task->pno.offset < (e4__usize)task->here)
+        res = e4__E_PNOOVERFLOW;
+    else {
+        *out_buf = (char *)task->pno.offset + 1;
+        *out_sz = (char *)task->pno.end - (char *)task->pno.offset;
+    }
+
+    task->pno.end = NULL;
+    task->pno.offset = NULL;
+
+    return res;
+}
+
+e4__usize e4__io_pno_hold(struct e4__task *task, char c)
+{
+    char *b = (char *)task->pno.offset;
+
+    if (!task->pno.offset)
+        return e4__E_INVMEMADDR;
+
+    if ((e4__usize)task->pno.offset - 1 < (e4__usize)task->here)
+        return e4__E_PNOOVERFLOW;
+
+    e4__mem_pno_hold(&b, c);
+    task->pno.offset = (e4__cell)b;
+
+    return e4__E_OK;
+}
+
+e4__usize e4__io_pno_holds(struct e4__task *task, const char *s, e4__usize len)
+{
+    char *b = (char *)task->pno.offset;
+
+    if (!task->pno.offset)
+        return e4__E_INVMEMADDR;
+
+    if ((e4__usize)task->pno.offset - len < (e4__usize)task->here)
+        return e4__E_PNOOVERFLOW;
+
+    e4__mem_pno_holds(&b, s, len);
+    task->pno.offset = (e4__cell)b;
+
+    return e4__E_OK;
+}
+
+void e4__io_pno_start(struct e4__task *task)
+{
+    task->pno.end = (e4__cell)((char *)task->here + (e4__USIZE_BIT * 2 + 2));
+
+    /* XXX: If there is not enough space available in HERE for a full
+       sized transient PNO buffer, simply use whatever is available. If
+       the dictionary has overflowed pad, as soon as we try to write
+       something with any other PNO API, that API will fail with
+       e4__E_PNOOVERFLOW, so it is safe to initialize in this way
+       whether that is the case or not. */
+    if ((e4__usize)task->pno.end > (e4__usize)task->pad)
+        task->pno.end = (e4__cell)(char *)task->pad - 1;
+
+    task->pno.offset = task->pno.end;
+}
+
 e4__usize e4__io_refill(struct e4__task *task, e4__usize *bf)
 {
     register e4__usize io_res;

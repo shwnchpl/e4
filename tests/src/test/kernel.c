@@ -329,6 +329,155 @@ struct e4t__test_kernel_quit_data {
     e4__usize step;
 };
 
+static void e4t__test_kernel_io_pno(void)
+{
+    struct e4__task *task = e4t__transient_task();
+    struct e4__double d = {0};
+    char *pno = NULL;
+    e4__usize len = 0;
+
+    /* Test that calling PNO kernel APIs when PNO hasn't been
+       initialized results in safe failure. */
+    e4t__ASSERT_EQ(e4__io_pno_digit(task, &d), e4__E_INVMEMADDR);
+    e4t__ASSERT_EQ(e4__io_pno_digits(task, &d, 0), e4__E_INVMEMADDR);
+    e4t__ASSERT_EQ(e4__io_pno_finish(task, &pno, &len), e4__E_INVMEMADDR);
+    e4t__ASSERT_EQ(pno, NULL);
+    e4t__ASSERT_EQ(len, 0);
+    e4t__ASSERT_EQ(e4__io_pno_hold(task, 'f'), e4__E_INVMEMADDR);
+    e4t__ASSERT_EQ(e4__io_pno_holds(task, "foo bar bas", 10),
+            e4__E_INVMEMADDR);
+
+    /* Test that empty PNO works as expected. */
+    e4__io_pno_start(task);
+    len = 1;
+    e4t__ASSERT_OK(e4__io_pno_finish(task, &pno, &len));
+    e4t__ASSERT_EQ(len, 0);
+    pno = NULL;
+
+    /* Test that calling PNO kernel APIs when PNO has ever been
+       initialized but now is not results in safe failure. */
+    e4t__ASSERT_EQ(e4__io_pno_digit(task, &d), e4__E_INVMEMADDR);
+    e4t__ASSERT_EQ(e4__io_pno_digits(task, &d, 0), e4__E_INVMEMADDR);
+    e4t__ASSERT_EQ(e4__io_pno_finish(task, &pno, &len), e4__E_INVMEMADDR);
+    e4t__ASSERT_EQ(pno, NULL);
+    e4t__ASSERT_EQ(len, 0);
+    e4t__ASSERT_EQ(e4__io_pno_hold(task, 'f'), e4__E_INVMEMADDR);
+    e4t__ASSERT_EQ(e4__io_pno_holds(task, "foo bar bas", 10),
+            e4__E_INVMEMADDR);
+
+    /* Test calling each API once. */
+    e4__io_pno_start(task);
+    d = e4__double_u(53, 0);
+    e4t__ASSERT_OK(e4__io_pno_digit(task, &d));
+    e4t__ASSERT_DEQ(d, e4__double_u(5, 0));
+    e4t__ASSERT_OK(e4__io_pno_finish(task, &pno, &len));
+    e4t__ASSERT_EQ(len, 1);
+    e4t__ASSERT(!e4__mem_strncasecmp(pno, "3", len));
+
+    e4__io_pno_start(task);
+    e4t__ASSERT_OK(e4__io_pno_hold(task, 'f'));
+    e4t__ASSERT_OK(e4__io_pno_finish(task, &pno, &len));
+    e4t__ASSERT_EQ(len, 1);
+    e4t__ASSERT(!e4__mem_strncasecmp(pno, "f", len));
+
+    e4__io_pno_start(task);
+    d = e4__double_u(53419, 0);
+    e4t__ASSERT_OK(e4__io_pno_digits(task, &d, 0));
+    e4t__ASSERT_DEQ(d, e4__double_u(0, 0));
+    e4t__ASSERT_OK(e4__io_pno_finish(task, &pno, &len));
+    e4t__ASSERT_EQ(len, 5);
+    e4t__ASSERT(!e4__mem_strncasecmp(pno, "53419", len));
+
+    e4__io_pno_start(task);
+    d = e4__double_u(-53419, -1);
+    e4t__ASSERT_OK(e4__io_pno_digits(task, &d, e4__F_SIGNED));
+    e4t__ASSERT_DEQ(d, e4__double_u(0, 0));
+    e4t__ASSERT_OK(e4__io_pno_finish(task, &pno, &len));
+    e4t__ASSERT_EQ(len, 6);
+    e4t__ASSERT(!e4__mem_strncasecmp(pno, "-53419", len));
+
+    e4__io_pno_start(task);
+    e4t__ASSERT_OK(e4__io_pno_holds(task, "foo bar bas", 10));
+    e4t__ASSERT_OK(e4__io_pno_finish(task, &pno, &len));
+    e4t__ASSERT_EQ(len, 10);
+    e4t__ASSERT(!e4__mem_strncasecmp(pno, "foo bar bas", len));
+
+    /* Test combining calls. */
+    d = e4__double_u(1995, 0);
+
+    e4__io_pno_start(task);
+    e4t__ASSERT_OK(e4__io_pno_digit(task, &d));
+    e4t__ASSERT_OK(e4__io_pno_digit(task, &d));
+    e4t__ASSERT_OK(e4__io_pno_hold(task, '.'));
+    e4t__ASSERT_OK(e4__io_pno_digits(task, &d, 0));
+    e4t__ASSERT_OK(e4__io_pno_holds(task, "Price: $", 8));
+    e4t__ASSERT_OK(e4__io_pno_finish(task, &pno, &len));
+
+    e4t__ASSERT_DEQ(d, e4__double_u(0, 0));
+    e4t__ASSERT_EQ(len, 13);
+    e4t__ASSERT(!e4__mem_strncasecmp(pno, "Price: $19.95", len));
+
+    /* Test that restarting clears current output but is otherwise
+       harmless. */
+    d = e4__double_u(1234, 0);
+
+    e4__io_pno_start(task);
+    e4t__ASSERT_OK(e4__io_pno_digit(task, &d));
+    e4t__ASSERT_OK(e4__io_pno_digit(task, &d));
+
+    e4__io_pno_start(task);
+    e4t__ASSERT_OK(e4__io_pno_digit(task, &d));
+    e4t__ASSERT_OK(e4__io_pno_digit(task, &d));
+
+    e4t__ASSERT_OK(e4__io_pno_finish(task, &pno, &len));
+    e4t__ASSERT_EQ(len, 2);
+    e4t__ASSERT(!e4__mem_strncasecmp(pno, "12", len));
+
+    /* Test that overflowing works as expected. */
+    d = e4__double_u(1234, 0);
+    e4__io_pno_start(task);
+    e4__task_allot(task, e4__USIZE_BIT * 2);
+
+    e4t__ASSERT_OK(e4__io_pno_digit(task, &d));
+    e4t__ASSERT_OK(e4__io_pno_digit(task, &d));
+    e4t__ASSERT_EQ(e4__io_pno_digit(task, &d), e4__E_PNOOVERFLOW);
+    e4t__ASSERT_EQ(e4__io_pno_digits(task, &d, 0), e4__E_PNOOVERFLOW);
+    e4t__ASSERT_EQ(e4__io_pno_hold(task, 'f'), e4__E_PNOOVERFLOW);
+    e4t__ASSERT_EQ(e4__io_pno_holds(task, "foo bar bas", 10),
+            e4__E_PNOOVERFLOW);
+
+    e4t__ASSERT_OK(e4__io_pno_finish(task, &pno, &len));
+    e4t__ASSERT_EQ(len, 2);
+    e4t__ASSERT(!e4__mem_strncasecmp(pno, "34", len));
+
+    e4__io_pno_start(task);
+    e4__task_allot(task, e4__USIZE_BIT * 2 + 3);
+    e4t__ASSERT_EQ(e4__io_pno_finish(task, &pno, &len), e4__E_PNOOVERFLOW);
+
+    /* Test that PNO fails gracefully even when the dictionary is full
+       or has overflowed. */
+    e4__task_allot(task, e4__task_unused(task));
+    e4t__ASSERT_EQ(e4__task_unused(task), 0);
+    e4__io_pno_start(task);
+
+    e4t__ASSERT_EQ(e4__io_pno_digit(task, &d), e4__E_PNOOVERFLOW);
+    e4t__ASSERT_EQ(e4__io_pno_digits(task, &d, 0), e4__E_PNOOVERFLOW);
+    e4t__ASSERT_EQ(e4__io_pno_hold(task, 'f'), e4__E_PNOOVERFLOW);
+    e4t__ASSERT_EQ(e4__io_pno_holds(task, "foo bar bas", 10),
+            e4__E_PNOOVERFLOW);
+    e4t__ASSERT_EQ(e4__io_pno_finish(task, &pno, &len), e4__E_PNOOVERFLOW);
+
+    e4__task_allot(task, e4__mem_aligned(1));
+    e4__io_pno_start(task);
+
+    e4t__ASSERT_EQ(e4__io_pno_digit(task, &d), e4__E_PNOOVERFLOW);
+    e4t__ASSERT_EQ(e4__io_pno_digits(task, &d, 0), e4__E_PNOOVERFLOW);
+    e4t__ASSERT_EQ(e4__io_pno_hold(task, 'f'), e4__E_PNOOVERFLOW);
+    e4t__ASSERT_EQ(e4__io_pno_holds(task, "foo bar bas", 10),
+            e4__E_PNOOVERFLOW);
+    e4t__ASSERT_EQ(e4__io_pno_finish(task, &pno, &len), e4__E_PNOOVERFLOW);
+}
+
 static void e4t__test_kernel_mem(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -536,6 +685,7 @@ void e4t__test_kernel(void)
     e4t__test_kernel_evaluate();
     e4t__test_kernel_io();
     e4t__test_kernel_io_dump();
+    e4t__test_kernel_io_pno();
     e4t__test_kernel_mem();
     e4t__test_kernel_quit();
     e4t__test_kernel_stack();

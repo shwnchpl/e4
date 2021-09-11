@@ -7,15 +7,6 @@
 
 #include <setjmp.h>
 
-struct e4__io_src
-{
-    e4__cell buffer;    /* input buffer */
-    e4__usize sid;      /* input source id */
-    e4__usize in;       /* >IN */
-    e4__usize length;   /* input buffer populated length */
-    e4__usize sz;       /* input buffer size */
-};
-
 struct e4__compile_state
 {
     e4__usize state;
@@ -37,6 +28,21 @@ struct e4__exception_state
     e4__usize code;
     e4__code_ptr then;
     void *user;
+};
+
+struct e4__io_src
+{
+    e4__cell buffer;    /* input buffer */
+    e4__usize sid;      /* input source id */
+    e4__usize in;       /* >IN */
+    e4__usize length;   /* input buffer populated length */
+    e4__usize sz;       /* input buffer size */
+};
+
+struct e4__pno_state
+{
+    e4__cell end;
+    e4__cell offset;
 };
 
 struct e4__task
@@ -76,6 +82,7 @@ struct e4__task
     e4__cell base_ptr;
     struct e4__io_src io_src;
     struct e4__compile_state compile;
+    struct e4__pno_state pno;
 
     /* System variables. */
     e4__cell tr0;

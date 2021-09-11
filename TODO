@@ -63,6 +63,7 @@ General Builtins
 - [DONE] Implement FM/MOD and SM/REM.
 - [DONE] Implement M* and UM*.
 - [DONE] */ and */MOD.
+- Implement <#, #>, #, #S, HOLD, HOLDS, and SIGN.
 - Fix 2* and 2/ implementations. These words are meant to perform
   arithmetic shifts by one, not simply logical shifts by one.
 - Implement the PAGE builtin using escape sequences. The following
@@ -92,26 +93,7 @@ General Builtins
 General IO
 ----------
 - [DONE] Add initial PNO utility functions.
-- Implement pictured numeric output. This can be done first as a mem
-  utility under a pno namespace, then possibly under the io_pno
-  namespace or even under a dedicated e4__pno namespace. Functions
-  should include:
-    char* e4__mem_pno_digit(char *buf_end, e4__usize len,
-            struct e4__double *d)
-    char* e4__mem_pno_digits(char *buf_end, e4__usize len,
-            struct e4__double *d)
-    char* e4__mem_pno_hold(char *buf_end, e4__usize len, char c)
-    char* e4__mem_pno_holds(char *buf_end, e4__usize len, const char *s,
-            e4__usize s_len)
-  These functions should all return the pointer to the beginning of the
-  buffer after as much as possible of the requested data has been
-  prepended. For the kernel APIs, additionally pno_start and pno_finish
-  (to correspond to <# and #>) can be included. pno_start should set
-  task pno buffer offset to 0. pno_finish should simply return the
-  address of the start of the buffer's contents along with the length
-  of the buffer. Aside from being sufficient to implement builtins,
-  these functions will also greatly simplify numeric formatting through-
-  out e4 in general.
+- [DONE] Implement pictured numeric output kernel APIs.
 
 Kernel
 ------
@@ -134,6 +116,7 @@ Kernel
 - Improve exception printing implementation and other hackish printing
   implementations (such as the . builtin etc.) by using pictured
   numeric output instead?
+- Remove non-pno numeric formatting utilities.
 - Consider whether it might be possible to wrap the main quit loop in
   some kind of exception context (somehow?) to get around the race
   condition created by using multiple different exception contexts
@@ -146,6 +129,18 @@ Kernel
   is not in an interrupt context. This *may* not be an issue (failure
   to actually throw is always something an API client can work around),
   but it probably isn't entirely desirable.
+- Consider the benefits of making the word parsing/PNO area a fixed
+  buffer (similar to the area returned by PAD) rather than simply using
+  the memory pointed to by HERE. Currently, word parsing can overflow
+  the dictionary and there may not be enough space available to provide
+  a buffer as large as the standard requires. On the flip side, the
+  benefit to the current approach is that it is possible to use the
+  memory that would be reserved for the PNO buffer for something other
+  that pictured numeric output (ie. additional definitions) if that is
+  for some reason desired on a severely memory constrained system.
+  Presumably the same argument could be made about the dedicated region
+  returned by PAD (currently implemented as a fixed region), which is
+  also something to consider.
 
 REPL
 ----
