@@ -436,7 +436,7 @@ static void e4t__test_kernel_io_pno(void)
     /* Test that overflowing works as expected. */
     d = e4__double_u(1234, 0);
     e4__io_pno_start(task);
-    e4__task_allot(task, e4__USIZE_BIT * 2);
+    e4__task_allot_unchecked(task, e4__task_unused(task) + e4__USIZE_BIT * 2);
 
     e4t__ASSERT_OK(e4__io_pno_digit(task, &d));
     e4t__ASSERT_OK(e4__io_pno_digit(task, &d));
@@ -451,13 +451,11 @@ static void e4t__test_kernel_io_pno(void)
     e4t__ASSERT(!e4__mem_strncasecmp(pno, "34", len));
 
     e4__io_pno_start(task);
-    e4__task_allot(task, e4__USIZE_BIT * 2 + 3);
+    e4__task_allot_unchecked(task, 3);
     e4t__ASSERT_EQ(e4__io_pno_finish(task, &pno, &len), e4__E_PNOOVERFLOW);
 
     /* Test that PNO fails gracefully even when the dictionary is full
        or has overflowed. */
-    e4__task_allot(task, e4__task_unused(task));
-    e4t__ASSERT_EQ(e4__task_unused(task), 0);
     e4__io_pno_start(task);
 
     e4t__ASSERT_EQ(e4__io_pno_digit(task, &d), e4__E_PNOOVERFLOW);
@@ -505,25 +503,37 @@ static void e4t__test_kernel_mem(void)
     here = e4__task_allot(task, e4__USIZE_NEGATE(unused));
     e4t__ASSERT_EQ(e4__task_unused(task), unused);
 
-    /* Test that allocating everything runs into PAD. */
-    e4t__ASSERT_EQ(here, e4__task_uservar(task, e4__UV_PAD));
+    /* Test that allocating everything runs into the PNO buffer
+       then pad. */
+    e4t__ASSERT_EQ((e4__usize)here + e4__PNO_MIN_SZ,
+            e4__task_uservar(task, e4__UV_PAD));
 
     /* Test that unused reports zero whenever HERE is greater than
        PAD. */
     e4t__ASSERT((e4__usize)e4__task_uservar(task, e4__UV_HERE) <
             (e4__usize)e4__task_uservar(task, e4__UV_PAD));
-    e4__task_allot(task, e4__task_unused(task) + e4__mem_cells(2));
+    e4__task_allot_unchecked(task, e4__task_unused(task) +
+            e4__mem_aligned(e4__PNO_MIN_SZ) + e4__mem_cells(2));
     e4t__ASSERT((e4__usize)e4__task_uservar(task, e4__UV_HERE) >
             (e4__usize)e4__task_uservar(task, e4__UV_PAD));
     e4t__ASSERT_EQ(e4__task_unused(task), 0);
 
-    e4__task_allot(task, e4__USIZE_NEGATE(e4__mem_cells(1)));
+    e4__task_allot_unchecked(task,
+            e4__USIZE_NEGATE(e4__mem_aligned(e4__PNO_MIN_SZ)));
+
+    e4__task_allot_unchecked(task, e4__USIZE_NEGATE(e4__mem_cells(1)));
     e4t__ASSERT_EQ(e4__task_unused(task), 0);
-    e4__task_allot(task, e4__USIZE_NEGATE(e4__mem_cells(1)));
+    e4__task_allot_unchecked(task, e4__USIZE_NEGATE(e4__mem_cells(1)));
     e4t__ASSERT_EQ(e4__task_unused(task), 0);
 
     e4__task_allot(task, e4__USIZE_NEGATE(e4__mem_cells(1)));
     e4t__ASSERT_EQ(e4__task_unused(task), e4__mem_cells(1));
+
+    /* Test that checked allocation out of bounds simply doesn't work. */
+    here = e4__task_allot(task, e4__mem_cells(1));
+    e4t__ASSERT(here);
+    e4t__ASSERT_EQ(e4__task_allot(task, 1), NULL);
+    e4t__ASSERT_EQ(here + 1, e4__task_uservar(task, e4__UV_HERE));
 }
 
 static void e4t__test_kernel_quit(void)

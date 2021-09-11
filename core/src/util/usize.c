@@ -75,6 +75,8 @@ const char* e4__usize_format_exception(e4__usize e, e4__usize *len)
             _return_with_len("stack underflow");
         case e4__E_RSTKUNDERFLOW:
             _return_with_len("return stack underflow");
+        case e4__E_DICTOVERFLOW:
+            _return_with_len("dictionary overflow");
         case e4__E_INVMEMADDR:
             _return_with_len("invalid memory address");
         case e4__E_DIVBYZERO:
@@ -89,6 +91,8 @@ const char* e4__usize_format_exception(e4__usize e, e4__usize *len)
             _return_with_len("invalid forget");
         case e4__E_ZLNAME:
             _return_with_len("attempt to use zero-length string as a name");
+        case e4__E_PNOOVERFLOW:
+            _return_with_len("pictured numeric output string overflow");
         case e4__E_UNSUPPORTED:
             _return_with_len("unsupported operation");
         case e4__E_CSMISMATCH:
@@ -113,6 +117,8 @@ const char* e4__usize_format_exception(e4__usize e, e4__usize *len)
             _return_with_len("system bug");
         case e4__E_INVBUILTINMUT:
             _return_with_len("attempt to mutate builtin");
+        case e4__E_DICTUNDERFLOW:
+            _return_with_len("dictionary underflow");
 
         /* unknown */
         default:

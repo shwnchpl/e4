@@ -169,6 +169,7 @@ struct e4__io_func {
 #define e4__E_ABORT         (-1)
 #define e4__E_STKUNDERFLOW  (-4)
 #define e4__E_RSTKUNDERFLOW (-6)
+#define e4__E_DICTOVERFLOW  (-8)
 #define e4__E_INVMEMADDR    (-9)
 #define e4__E_DIVBYZERO     (-10)
 #define e4__E_RSLTOUTORANGE (-11)
@@ -190,6 +191,7 @@ struct e4__io_func {
 #define e4__E_BYE           (-257)
 #define e4__E_BUG           (-258)
 #define e4__E_INVBUILTINMUT (-259)
+#define e4__E_DICTUNDERFLOW (-260)
 
 /* flag constants - dictionary entry */
 #define e4__F_IMMEDIATE     (0x01)
@@ -437,6 +439,9 @@ enum e4__builtin_id {
 /* TODO: Determine if this is sensible. */
 #define e4__TASK_MIN_SZ     (1024)
 
+/* Pictured numeric output constants. */
+#define e4__PNO_MIN_SZ      (e4__USIZE_BIT * 2 + 2)
+
 /* e4 macros */
 #define e4__ASSERT_MSG0(c, m)   enum { e4__assert__ ## m = 1 / !!(c) }
 #define e4__ASSERT_MSG1(c, m)   e4__ASSERT_MSG0(c, m)
@@ -585,6 +590,7 @@ void e4__stack_tuck(struct e4__task *task);
 
 /* task.c functions */
 e4__cell e4__task_allot(struct e4__task *task, e4__usize sz);
+e4__cell e4__task_allot_unchecked(struct e4__task *task, e4__usize sz);
 e4__bool e4__task_compiling(struct e4__task *task);
 struct e4__task* e4__task_create(void *buffer, e4__usize sz);
 void e4__task_io_init(struct e4__task *task, struct e4__io_func *io);

@@ -104,6 +104,8 @@ Kernel
 - [DONE] Add support for dividing a double cell number by a single cell
   number and obtaining a double cell result (needed for #).
 - [DONE] Combine sdiv and smod utility functions into one function.
+- Use checked allocation everywhere that HERE is manipulated. WORD is
+  specifically allowed to dip into the PNO buffer but not PAD.
 - Add support for adding a single cell number to a double cell number
   (which is needed for >NUMBER). It may be assumed that the single cell
   number is signed (as in M+).
@@ -129,18 +131,6 @@ Kernel
   is not in an interrupt context. This *may* not be an issue (failure
   to actually throw is always something an API client can work around),
   but it probably isn't entirely desirable.
-- Consider the benefits of making the word parsing/PNO area a fixed
-  buffer (similar to the area returned by PAD) rather than simply using
-  the memory pointed to by HERE. Currently, word parsing can overflow
-  the dictionary and there may not be enough space available to provide
-  a buffer as large as the standard requires. On the flip side, the
-  benefit to the current approach is that it is possible to use the
-  memory that would be reserved for the PNO buffer for something other
-  that pictured numeric output (ie. additional definitions) if that is
-  for some reason desired on a severely memory constrained system.
-  Presumably the same argument could be made about the dedicated region
-  returned by PAD (currently implemented as a fixed region), which is
-  also something to consider.
 
 REPL
 ----
@@ -262,3 +252,20 @@ Kernel
 - Add more two's complement utility macros as needed and use them where
   appropriate. -- Wow, this really needs to go away. We have plenty of
   two's complement utility macros.
+- Consider the benefits of making the word parsing/PNO area a fixed
+  buffer (similar to the area returned by PAD) rather than simply using
+  the memory pointed to by HERE. Currently, word parsing can overflow
+  the dictionary and there may not be enough space available to provide
+  a buffer as large as the standard requires. On the flip side, the
+  benefit to the current approach is that it is possible to use the
+  memory that would be reserved for the PNO buffer for something other
+  that pictured numeric output (ie. additional definitions) if that is
+  for some reason desired on a severely memory constrained system.
+  Presumably the same argument could be made about the dedicated region
+  returned by PAD (currently implemented as a fixed region), which is
+  also something to consider.
+    -- The PNO buffer need not be fixed, but the minimum required space
+       should always be reserved. There is no harm in a fixed PAD
+       because while there is no standards compliant way to check
+       how much space is available in PAD, that amount of space may not
+       be variable.

@@ -64,7 +64,7 @@ e4__usize e4__io_pno_digit(struct e4__task *task, struct e4__double *ud)
     if (!task->pno.offset)
         return e4__E_INVMEMADDR;
 
-    if ((e4__usize)task->pno.offset - 1 < (e4__usize)task->here)
+    if ((e4__usize)task->pno.offset < (e4__usize)task->here)
         return e4__E_PNOOVERFLOW;
 
     res = e4__mem_pno_digit(&b, (e4__u8)task->base, ud);
@@ -85,7 +85,7 @@ e4__usize e4__io_pno_digits(struct e4__task *task, struct e4__double *ud,
 
     if ((e4__usize)task->pno.offset < (e4__usize)task->here)
         return e4__E_PNOOVERFLOW;
-    avail_len = (e4__usize)task->pno.offset - (e4__usize)task->here;
+    avail_len = (e4__usize)task->pno.offset - (e4__usize)task->here - 1;
 
     res = e4__mem_pno_digits(&b, avail_len, (e4__u8)task->base, flags, ud);
     task->pno.offset = (e4__cell)b;
@@ -113,7 +113,7 @@ e4__usize e4__io_pno_finish(struct e4__task *task, char **out_buf,
        freely and misrepresenting that by returning a pointer into that
        memory as mutable here could lead to far more catestrophic
        failures than a string containing gibberish. */
-    if ((e4__usize)task->pno.offset < (e4__usize)task->here)
+    if ((e4__usize)task->pno.offset < (e4__usize)task->here - 1)
         res = e4__E_PNOOVERFLOW;
     else {
         *out_buf = (char *)task->pno.offset + 1;
@@ -133,7 +133,7 @@ e4__usize e4__io_pno_hold(struct e4__task *task, char c)
     if (!task->pno.offset)
         return e4__E_INVMEMADDR;
 
-    if ((e4__usize)task->pno.offset - 1 < (e4__usize)task->here)
+    if ((e4__usize)task->pno.offset < (e4__usize)task->here)
         return e4__E_PNOOVERFLOW;
 
     e4__mem_pno_hold(&b, c);
@@ -149,7 +149,7 @@ e4__usize e4__io_pno_holds(struct e4__task *task, const char *s, e4__usize len)
     if (!task->pno.offset)
         return e4__E_INVMEMADDR;
 
-    if ((e4__usize)task->pno.offset - len < (e4__usize)task->here)
+    if ((e4__usize)task->pno.offset - len < (e4__usize)task->here - 1)
         return e4__E_PNOOVERFLOW;
 
     e4__mem_pno_holds(&b, s, len);
@@ -160,17 +160,7 @@ e4__usize e4__io_pno_holds(struct e4__task *task, const char *s, e4__usize len)
 
 void e4__io_pno_start(struct e4__task *task)
 {
-    task->pno.end = (e4__cell)((char *)task->here + (e4__USIZE_BIT * 2 + 2));
-
-    /* XXX: If there is not enough space available in HERE for a full
-       sized transient PNO buffer, simply use whatever is available. If
-       the dictionary has overflowed pad, as soon as we try to write
-       something with any other PNO API, that API will fail with
-       e4__E_PNOOVERFLOW, so it is safe to initialize in this way
-       whether that is the case or not. */
-    if ((e4__usize)task->pno.end > (e4__usize)task->pad)
-        task->pno.end = (e4__cell)(char *)task->pad - 1;
-
+    task->pno.end = (e4__cell)((char *)task->pad - 1);
     task->pno.offset = task->pno.end;
 }
 

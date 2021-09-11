@@ -15,9 +15,33 @@
         e4__task_allot(task, e4__mem_aligned(n)) */
 e4__cell e4__task_allot(struct e4__task *task, e4__usize sz)
 {
-    /* FIXME: Actually fail and throw an exception on dictionary
-       overflow, then add some allot_unchecked API to fill this
-       usecase. If exceptions are off, perhaps return NULL? */
+    register const e4__usize lower_bound =
+        (e4__usize)((const e4__u8 *)task + sizeof(*task));
+    register const e4__usize upper_bound =
+        (e4__usize)((const e4__u8 *)task->pad - e4__PNO_MIN_SZ);
+    register e4__cell old_here;
+    register e4__usize ex = e4__E_OK;
+
+    old_here = e4__task_allot_unchecked(task, sz);
+
+    if ((e4__usize)task->here > upper_bound)
+        ex = e4__E_DICTOVERFLOW;
+    else if ((e4__usize)task->here < lower_bound)
+        ex = e4__E_DICTUNDERFLOW;
+
+    if (ex) {
+        task->here = old_here;
+        e4__exception_throw(task, ex);
+        old_here = NULL;
+    }
+
+    return old_here;
+}
+
+/* XXX: Do not use this function unless you REALLY know what you're
+   doing. */
+e4__cell e4__task_allot_unchecked(struct e4__task *task, e4__usize sz)
+{
     register const e4__cell old_here = task->here;
     task->here = (e4__cell)((e4__u8 *)task->here + sz);
     return old_here;
@@ -100,11 +124,11 @@ void e4__task_io_get(struct e4__task *task, struct e4__io_func *io_func)
 e4__usize e4__task_unused(struct e4__task *task)
 {
     /* XXX: Dictionary overflows should be prevented from happening
-       elsewhere, but in the event that the dictionary *has* overflowed
-       into PAD, report that there is no space available. */
-    return (e4__usize)task->pad > (e4__usize)task->here ?
-            (e4__usize)(task->pad - task->here) * sizeof(e4__cell) :
-            0;
+       elsewhere, but in the event that the dictionary *has* overflowed,
+       report that there is no space available. */
+    return (e4__usize)task->pad - e4__PNO_MIN_SZ > (e4__usize)task->here ?
+            (e4__usize)(task->pad - task->here) * sizeof(e4__cell) -
+            e4__PNO_MIN_SZ : 0;
 }
 
 e4__cell e4__task_uservar(struct e4__task *task, e4__usize offset)

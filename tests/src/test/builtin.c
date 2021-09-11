@@ -1321,15 +1321,17 @@ static void e4t__test_builtin_memmanip(void)
     task = e4t__transient_task();
     e4t__ASSERT_OK(e4__evaluate(task, "unused", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
-    e4t__ASSERT_EQ(e4__stack_pop(task), 2392);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2262);
     e4t__ASSERT_OK(e4__evaluate(task, "unused allot unused", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), 0);
 
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 allot", -1), e4__E_DICTOVERFLOW);
+
     /* Calling ALLOT with a positive number should now raise an
        exception, so directly call the appropriate kernel API
        instead. */
-    e4__task_allot(task, e4__mem_cells(1));
+    e4__task_allot_unchecked(task, e4__mem_cells(1));
 
     e4t__ASSERT_OK(e4__evaluate(task, "unused", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
@@ -1342,6 +1344,11 @@ static void e4t__test_builtin_memmanip(void)
     e4t__ASSERT_OK(e4__evaluate(task, "unused", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__mem_cells(1));
+
+    /* Calling ALLOT with a negative number that is too large should
+       underflow. */
+    task = e4t__transient_task();
+    e4t__ASSERT_EQ(e4__evaluate(task, "-1 allot", -1), e4__E_DICTUNDERFLOW);
 }
 
 /* Covers >NUMBER and BASE uservar */
