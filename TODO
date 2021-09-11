@@ -63,7 +63,7 @@ General Builtins
 - [DONE] Implement FM/MOD and SM/REM.
 - [DONE] Implement M* and UM*.
 - [DONE] */ and */MOD.
-- Implement <#, #>, #, #S, HOLD, HOLDS, and SIGN.
+- [DONE] Implement <#, #>, #, #S, HOLD, HOLDS, and SIGN.
 - Fix 2* and 2/ implementations. These words are meant to perform
   arithmetic shifts by one, not simply logical shifts by one.
 - Implement the PAGE builtin using escape sequences. The following

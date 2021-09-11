@@ -516,6 +516,20 @@ static const void *e4__builtin_GREATER_THAN[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
+static void e4__builtin_HOLD(struct e4__task *task, e4__cell user)
+{
+    register char c;
+    register e4__usize res;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+
+    c = (char)(e4__usize)e4__stack_pop(task);
+    if ((res = e4__io_pno_hold(task, c)))
+        e4__exception_throw(task, res);
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_IF(struct e4__task *task, e4__cell user)
 {
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_BRANCH0]);
@@ -580,6 +594,12 @@ static void e4__builtin_LEAVE(struct e4__task *task, e4__cell user)
 static void e4__builtin_LEFT_BRACKET(struct e4__task *task, e4__cell user)
 {
     e4__compile_suspend(task);
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_LESS_NUMBER_SIGN(struct e4__task *task, e4__cell user)
+{
+    e4__io_pno_start(task);
     e4__execute_ret(task);
 }
 
@@ -725,6 +745,58 @@ static void e4__builtin_NEGATE(struct e4__task *task, e4__cell user)
 
     e4__stack_push(task,
             (e4__cell)e4__USIZE_NEGATE((e4__usize)e4__stack_pop(task)));
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_NUMBER_SIGN(struct e4__task *task, e4__cell user)
+{
+    register e4__usize res;
+    struct e4__double *d;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    d = (struct e4__double *)&task->sp[1];
+    if ((res = e4__io_pno_digit(task, d)))
+        e4__exception_throw(task, res);
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_NUMBER_SIGN_GREATER(struct e4__task *task,
+        e4__cell user)
+{
+    register e4__usize res;
+    char *str;
+    e4__usize len;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    if ((res = e4__io_pno_finish(task, &str, &len))) {
+        e4__exception_throw(task, res);
+        e4__execute_ret(task);
+        return;
+    }
+
+    e4__stack_drop(task);
+    e4__stack_drop(task);
+
+    e4__stack_push(task, (e4__cell)str);
+    e4__stack_push(task, (e4__cell)len);
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_NUMBER_SIGN_S(struct e4__task *task, e4__cell user)
+{
+    register e4__usize res;
+    struct e4__double *d;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    d = (struct e4__double *)&task->sp[1];
+    if ((res = e4__io_pno_digits(task, d, 0)))
+        e4__exception_throw(task, res);
 
     e4__execute_ret(task);
 }
@@ -984,6 +1056,22 @@ static void e4__builtin_SEMICOLON(struct e4__task *task, e4__cell user)
         e4__exception_throw(task, res);
 
     e4__execute_ret(task);
+}
+
+static void e4__builtin_SIGN(struct e4__task *task, e4__cell user)
+{
+    register e4__usize res;
+    register e4__usize n;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+
+    n = (e4__usize)e4__stack_pop(task);
+    if (e4__USIZE_IS_NEGATIVE(n) &&
+            (res = e4__io_pno_hold(task, '-')))
+        e4__exception_throw(task, res);
+
+    e4__execute_ret(task);
+
 }
 
 static const void *e4__builtin_SLASH[] = {

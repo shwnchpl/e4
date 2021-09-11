@@ -129,8 +129,8 @@ struct e4__task;
 typedef void (*e4__code_ptr)(struct e4__task *, e4__cell user);
 
 struct e4__double {
-    e4__usize low;
     e4__usize high;
+    e4__usize low;
 };
 
 struct e4__dict_header {
@@ -272,6 +272,7 @@ enum e4__builtin_id {
     e4__B_FM_SLASH_MOD,
     e4__B_GREATER_THAN,
     e4__B_HERE,
+    e4__B_HOLD,
     e4__B_I,
     e4__B_IF,
     e4__B_IMMEDIATE,
@@ -280,6 +281,7 @@ enum e4__builtin_id {
     e4__B_KEY,
     e4__B_LEAVE,
     e4__B_LEFT_BRACKET,
+    e4__B_LESS_NUMBER_SIGN,
     e4__B_LESS_THAN,
     e4__B_LITERAL,
     e4__B_LOOP,
@@ -291,6 +293,9 @@ enum e4__builtin_id {
     e4__B_MOD,
     e4__B_MOVE,
     e4__B_NEGATE,
+    e4__B_NUMBER_SIGN,
+    e4__B_NUMBER_SIGN_GREATER,
+    e4__B_NUMBER_SIGN_S,
     e4__B_ONE_MINUS,
     e4__B_ONE_PLUS,
     e4__B_OR,
@@ -312,6 +317,7 @@ enum e4__builtin_id {
     e4__B_S_TO_D,
     e4__B_S_QUOTE,
     e4__B_SEMICOLON,
+    e4__B_SIGN,
     e4__B_SLASH,
     e4__B_SLASH_MOD,
     e4__B_SM_SLASH_REM,
@@ -373,6 +379,7 @@ enum e4__builtin_id {
         e4__B_ERASE,
         e4__B_FALSE,
         e4__B_HEX,
+        e4__B_HOLDS,
         e4__B_MARKER,
         e4__B_NIP,
         e4__B_NOT_EQUALS,

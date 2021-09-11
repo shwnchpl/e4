@@ -121,6 +121,22 @@ static const void *e4__builtin_HEX[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
+static void e4__builtin_HOLDS(struct e4__task *task, e4__cell user)
+{
+    register e4__usize res, len;
+    register const char *str;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    len = (e4__usize)e4__stack_pop(task);
+    str = (const char *)e4__stack_pop(task);
+
+    if ((res = e4__io_pno_holds(task, str, len)))
+        e4__exception_throw(task, res);
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_MARKER(struct e4__task *task, e4__cell user)
 {
     register const char *word;

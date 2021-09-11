@@ -736,6 +736,100 @@ static void e4t__test_builtin_io_error(void)
     e4t__ASSERT_EQ(e4__evaluate(task, "words", -1), e4__E_UNSUPPORTED);
 }
 
+/* Covers <# #> # #S HOLD HOLDS SIGN */
+static void e4t__test_builtin_io_pno(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    e4t__term_obuf_consume();
+
+    /* Test that <# #> produces an empty string. */
+    e4t__ASSERT_OK(e4__evaluate(task, "0 0 <# #>", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4__stack_pop(task);
+
+    /* Test that <# # #> formats the least significant digit and leaves
+       the remaining digits in the double on the top of the stack. */
+    e4t__ASSERT_OK(e4__evaluate(task, "539 0 <# #", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 53);
+    e4__stack_push(task, (e4__cell)0);
+    e4__stack_push(task, (e4__cell)0);
+    e4t__ASSERT_OK(e4__evaluate(task, "#> type", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "9");
+
+    /* Test that #S formats all remaining digits and leaves 0 0 on top
+       of the stack. */
+    e4t__ASSERT_OK(e4__evaluate(task, "539 0 <# #", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 53);
+    e4__stack_push(task, (e4__cell)53);
+    e4__stack_push(task, (e4__cell)0);
+    e4t__ASSERT_OK(e4__evaluate(task, "#s", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4__stack_push(task, (e4__cell)0);
+    e4__stack_push(task, (e4__cell)0);
+    e4t__ASSERT_OK(e4__evaluate(task, "#> type", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "539");
+
+    /* Test that formatting respects base as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task,
+            "2 base ! #539 0 <# #s #> decimal type", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "1000011011");
+
+    /* Test that it is possible to format numbers that actually use
+       two cells. */
+    e4t__ASSERT_OK(e4__evaluate(task, "-1 31934 um* <# #s #> type", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "589078325249840821273410");
+
+    /* Test that HOLD and HOLDS work as expected in isolation. */
+    e4t__ASSERT_OK(e4__evaluate(task, "0 0 <# 'o' hold 'o' hold 'f' hold #> type",
+            -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "foo");
+    e4t__ASSERT_OK(e4__evaluate(task, ": price s\" Price: $\" ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "0 0 <# price holds #> type", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "Price: $");
+
+    /* Test that SIGN works as expected in isolation. */
+    e4t__ASSERT_OK(e4__evaluate(task, "0 0 <# 0 sign #> type", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "");
+    e4t__ASSERT_OK(e4__evaluate(task, "0 0 <# -1 sign #> type", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-");
+
+    /* Test that SIGN can be used to format signed numbers. */
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": dabs dup 0< if "
+                "invert swap invert 1+ dup 0= if "
+                    "swap 1+ swap "
+                "then swap "
+            "then ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": #n dup >r dabs #s r> sign ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "-539 -1 <# #n #> type", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-539");
+    e4t__ASSERT_OK(e4__evaluate(task, "539 0 <# #n #> type", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "539");
+    e4t__ASSERT_OK(e4__evaluate(task, "-53 -79 <# #n #> type", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "-1438846037749345026101");
+    e4t__ASSERT_OK(e4__evaluate(task, "53 78 <# #n #> type", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "1438846037749345026101");
+
+    /* Test combining several PNO words. */
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": price. s>d <# # # '.' hold #s price holds #> type ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "1995 price.", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "Price: $19.95");
+    e4t__ASSERT_OK(e4__evaluate(task, "325819 price.", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "Price: $3258.19");
+    e4t__ASSERT_OK(e4__evaluate(task, "2 price.", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "Price: $0.02");
+}
+
 /* Covers = < > <> 0< 0> 0<> 0= AND INVERT NEGATE OR U< U> XOR */
 static void e4t__test_builtin_logic(void)
 {
@@ -1723,6 +1817,7 @@ void e4t__test_builtin(void)
     e4t__test_builtin_io();
     e4t__test_builtin_io_dump();
     e4t__test_builtin_io_error();
+    e4t__test_builtin_io_pno();
     e4t__test_builtin_logic();
     e4t__test_builtin_math();
     e4t__test_builtin_memmanip();
