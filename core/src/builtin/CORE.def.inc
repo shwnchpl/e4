@@ -323,24 +323,20 @@ static void e4__builtin_DOES(struct e4__task *task, e4__cell user)
 
 static void e4__builtin_DOT(struct e4__task *task, e4__cell user)
 {
-    /* FIXME: Once pictured numeric output has been implemented, use
-       that instead of this implementation. */
     register e4__usize io_res;
-    register char *num;
-    register char *buf;
-    register e4__usize len;
-    register e4__usize n;
+    char *num;
+    e4__usize len;
+    struct e4__double d = {0};
 
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
 
-    buf = (char *)task->here;
-    n = (e4__usize)e4__stack_pop(task);
+    d = e4__usize_todouble((e4__usize)e4__stack_pop(task));
+    e4__io_pno_start(task);
 
-    num = e4__usize_format(n, task->base, e4__F_SIGNED, buf, 130);
-    len = &buf[130] - num;
-    num[len++] = ' ';
-
-    if ((io_res = e4__io_type(task, num, len)))
+    if ((io_res = e4__io_pno_hold(task, ' ')) ||
+            (io_res = e4__io_pno_digits(task, &d, e4__F_SIGNED)) ||
+            (io_res = e4__io_pno_finish(task, &num, &len)) ||
+            (io_res = e4__io_type(task, num, len)))
         e4__exception_throw(task, io_res);
 
     e4__execute_ret(task);
@@ -1342,27 +1338,26 @@ static void e4__builtin_TYPE(struct e4__task *task, e4__cell user)
 
 static void e4__builtin_U_DOT(struct e4__task *task, e4__cell user)
 {
-    /* FIXME: Once pictured numeric output has been implemented, use
-       that instead of this implementation. */
     register e4__usize io_res;
-    register char *num;
-    register char *buf;
-    register e4__usize len;
-    register e4__usize n;
+    char *num;
+    e4__usize len;
+    struct e4__double d = {0};
 
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
 
-    buf = (char *)task->here;
-    n = (e4__usize)e4__stack_pop(task);
+    /* We don't care about sign bits at all, so simply treat the number
+       to be displayed as the lower half of a double. */
+    d = e4__double_u((e4__usize)e4__stack_pop(task), 0);
+    e4__io_pno_start(task);
 
-    num = e4__usize_format(n, task->base, 0, buf, 130);
-    len = &buf[130] - num;
-    num[len++] = ' ';
-
-    if ((io_res = e4__io_type(task, num, len)))
+    if ((io_res = e4__io_pno_hold(task, ' ')) ||
+            (io_res = e4__io_pno_digits(task, &d, 0)) ||
+            (io_res = e4__io_pno_finish(task, &num, &len)) ||
+            (io_res = e4__io_type(task, num, len)))
         e4__exception_throw(task, io_res);
 
     e4__execute_ret(task);
+
 }
 
 static void e4__builtin_U_LESS_THAN(struct e4__task *task, e4__cell user)

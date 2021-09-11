@@ -211,29 +211,35 @@ void e4__evaluate_quit(struct e4__task *task)
                 running = 0;
                 break;
             default: {
+                struct e4__double d;
+                const char *str;
                 e4__usize len;
-                register char *buf = (char *)task->here;
-                register const char *str;
 
                 /* XXX: An uncaught exception clears the stack and
                    cancels any in-progress compilation. */
                 e4__stack_clear(task);
                 e4__compile_cancel(task);
 
-                /* FIXME: Improve this handling once better string
-                   formatting is available with pictured numeric output. */
                 e4__io_type(task, " EXCEPTION: ", 12);
-
                 str = e4__usize_format_exception(res, &len);
                 e4__io_type(task, str, len);
 
-                str = e4__usize_format(res, task->base, e4__F_SIGNED, buf,
-                        130);
-                *((char *)--str) = '(';
-                *((char *)--str) = ' ';
-                len = &buf[130] - str + 2;
-                buf[130] = ')';
-                buf[131] = '\n';
+                /* XXX: Some of these calls can theoretically fail,
+                   likely implying that the dictionary is in an overflow
+                   state. If this does happen, there isn't anything we
+                   can do to handle it anyhow and the worst thing that
+                   can happen here if we ignore it is that we'll fail
+                   to print exception information correctly. As such,
+                   the following lines ignore potential PNO errors. */
+                e4__io_pno_start(task);
+
+                e4__io_pno_holds(task, ")\n", 2);
+                d = e4__usize_todouble(res);
+                e4__io_pno_digits(task, &d, e4__F_SIGNED);
+                e4__io_pno_holds(task, " (", 2);
+
+                len = 0;
+                e4__io_pno_finish(task, (char **)&str, &len);
                 e4__io_type(task, str, len);
              }
         }

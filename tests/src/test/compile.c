@@ -587,6 +587,7 @@ static void e4t__test_compile_do_loop(void)
         "4 : 4 4 \n");
 
     /* Test that UNLOOP is necessary and behaves as expected. */
+    task = e4t__transient_task();
     e4t__ASSERT_OK(e4__evaluate(task,
             ": foo 5 swap do i 5 > if exit then i . loop 500 . ;", -1));
     e4t__ASSERT_OK(e4__evaluate(task, "2 foo", -1));
@@ -594,7 +595,6 @@ static void e4t__test_compile_do_loop(void)
     e4t__ASSERT_EQ(e4__evaluate(task, "9 foo", -1), e4__E_RSTKIMBALANCE);
     e4t__term_obuf_consume();
 
-    e4t__ASSERT_OK(e4__evaluate(task, "forget foo forget foo forget foo", -1));
     e4t__ASSERT_OK(e4__evaluate(task,
             ": foo 5 swap do i 5 > if unloop exit then i . loop 500 . ;",
             -1));

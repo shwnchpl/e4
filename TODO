@@ -104,8 +104,14 @@ Kernel
 - [DONE] Add support for dividing a double cell number by a single cell
   number and obtaining a double cell result (needed for #).
 - [DONE] Combine sdiv and smod utility functions into one function.
+- [DONE] Improve exception printing implementation and other hackish
+  printing implementations (such as the . builtin etc.) by using
+  pictured numeric output instead.
 - Use checked allocation everywhere that HERE is manipulated. WORD is
   specifically allowed to dip into the PNO buffer but not PAD.
+- Ensure, somehow, that the PNO buffer is always at least 33 characters
+  (which is a requirement of WORD). On a system where e4__USIZE_BIT is
+  greater than or equal to 16, this will always be the case.
 - Add support for adding a single cell number to a double cell number
   (which is needed for >NUMBER). It may be assumed that the single cell
   number is signed (as in M+).
@@ -115,9 +121,6 @@ Kernel
   Alternatively, consider the benefits of switching to floored division
   by default.
 - Handle dictionary overflows and other overflows.
-- Improve exception printing implementation and other hackish printing
-  implementations (such as the . builtin etc.) by using pictured
-  numeric output instead?
 - Remove non-pno numeric formatting utilities.
 - Consider whether it might be possible to wrap the main quit loop in
   some kind of exception context (somehow?) to get around the race

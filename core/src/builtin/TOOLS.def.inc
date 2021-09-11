@@ -10,33 +10,31 @@ static void e4__builtin_DOT_S(struct e4__task *task, e4__cell user)
     register e4__cell s = task->s0;
     register e4__usize n = e4__stack_depth(task);
     register e4__usize io_res;
-    register char *num;
-    register char *buf = (char *)task->here;
-    register e4__usize len;
+    struct e4__double d;
+    char *num;
+    e4__usize len;
 
-    /* FIXME: Once pictured numeric output has been implemented, use
-       that instead of these hacks, which may not quite be safe. */
+    d = e4__usize_todouble(n);
 
-    num = e4__usize_format(n, task->base, e4__F_SIGNED, &buf[1], 130);
-    len = &buf[131] - num;
-    len += 3;
-    *--num = '<';
-    num[len - 2] = '>';
-    num[len - 1] = ' ';
-
-    if ((io_res = e4__io_type(task, num, len))) {
+    e4__io_pno_start(task);
+    if ((io_res = e4__io_pno_holds(task, "> ", 2)) ||
+            (io_res = e4__io_pno_digits(task, &d, e4__F_SIGNED)) ||
+            (io_res = e4__io_pno_hold(task, '<')) ||
+            (io_res = e4__io_pno_finish(task, &num, &len)) ||
+            (io_res = e4__io_type(task, num, len))) {
         e4__exception_throw(task, io_res);
         e4__execute_ret(task);
         return;
     }
 
     while (task->sp < s) {
-        n = (e4__usize)e4__DEREF(s--);
-        num = e4__usize_format(n, task->base, e4__F_SIGNED, buf, 130);
-        len = &buf[130] - num;
-        num[len++] = ' ';
+        d = e4__usize_todouble((e4__usize)e4__DEREF(s--));
 
-        if ((io_res = e4__io_type(task, num, len))) {
+        e4__io_pno_start(task);
+        if ((io_res = e4__io_pno_hold(task, ' ')) ||
+                (io_res = e4__io_pno_digits(task, &d, e4__F_SIGNED)) ||
+                (io_res = e4__io_pno_finish(task, &num, &len)) ||
+                (io_res = e4__io_type(task, num, len))) {
             e4__exception_throw(task, io_res);
             e4__execute_ret(task);
             return;
