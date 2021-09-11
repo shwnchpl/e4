@@ -345,12 +345,12 @@ e4__usize e4__mem_parse(const char *buf, char delim, e4__usize sz,
     return length;
 }
 
-e4__usize e4__mem_pno_digit(char **buf_end, e4__u8 base, struct e4__double *d)
+e4__usize e4__mem_pno_digit(char **buf_end, e4__u8 base, struct e4__double *ud)
 {
     register e4__usize res;
     e4__usize digit;
 
-    if ((res = e4__double_div(*d, base, 0, d, &digit)))
+    if ((res = e4__double_div(*ud, base, 0, ud, &digit)))
         return res;
 
     **buf_end = digit < 10 ? '0' + digit : 'A' + digit - 10;
@@ -360,20 +360,35 @@ e4__usize e4__mem_pno_digit(char **buf_end, e4__u8 base, struct e4__double *d)
 }
 
 e4__usize e4__mem_pno_digits(char **buf_end, e4__usize len, e4__u8 base,
-        struct e4__double *d)
+        e4__u8 flags, struct e4__double *ud)
 {
     register e4__usize res = e4__E_OK;
+    register e4__bool negative = 0;
 
-    while (d->high || d->low) {
+    /* This just works with the most negative number since NEGATE ends
+       up doing nothing to change the number itself, but we'll prepend
+       a minus sign to the number since we know it had its sign bit set
+       prior to this operation. */
+    if ((flags & e4__F_SIGNED) && (negative = e4__USIZE_IS_NEGATIVE(ud->high)))
+        *ud = e4__double_negate(*ud);
+
+    do {
         if (!len) {
             res = e4__E_PNOOVERFLOW;
             break;
         }
 
-        if ((res = e4__mem_pno_digit(buf_end, base, d)))
+        if ((res = e4__mem_pno_digit(buf_end, base, ud)))
             break;
 
         --len;
+    } while (ud->high || ud->low);
+
+    if (negative) {
+        if (!len)
+            res = e4__E_PNOOVERFLOW;
+        else
+            e4__mem_pno_hold(buf_end, '-');
     }
 
     return res;

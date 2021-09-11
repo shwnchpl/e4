@@ -548,9 +548,10 @@ e4__usize e4__mem_number(const char *buf, e4__usize sz, e4__u8 base,
         e4__u8 flags, e4__usize *out);
 e4__usize e4__mem_parse(const char *buf, char delim, e4__usize sz,
         e4__usize flags, const char **length);
-e4__usize e4__mem_pno_digit(char **buf_end, e4__u8 base, struct e4__double *d);
+e4__usize e4__mem_pno_digit(char **buf_end, e4__u8 base,
+        struct e4__double *ud);
 e4__usize e4__mem_pno_digits(char **buf_end, e4__usize len, e4__u8 base,
-        struct e4__double *d);
+        e4__u8 flags, struct e4__double *ud);
 void e4__mem_pno_hold(char **buf_end, char c);
 void e4__mem_pno_holds(char **buf_end, const char *s, e4__usize len);
 

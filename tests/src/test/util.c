@@ -494,15 +494,23 @@ static void e4t__test_util_mem_pno()
     b = &buffer[129];
     d = e4__double_u(532, 0);
 
-    e4t__ASSERT_OK(e4__mem_pno_digits(&b, b - buffer, 10, &d));
+    e4t__ASSERT_OK(e4__mem_pno_digits(&b, b - buffer, 10, 0, &d));
     e4t__ASSERT_MATCH(&b[1], "532");
     e4t__ASSERT_DEQ(d, e4__double_u(0, 0));
 
     b = &buffer[129];
     d = e4__double_u(0xbeef, 0);
 
-    e4t__ASSERT_OK(e4__mem_pno_digits(&b, b - buffer, 16, &d));
+    e4t__ASSERT_OK(e4__mem_pno_digits(&b, b - buffer, 16, 0, &d));
     e4t__ASSERT_MATCH(&b[1], "beef");
+    e4t__ASSERT_DEQ(d, e4__double_u(0, 0));
+
+    /* Test formatting an entire number when that number is 0. */
+    b = &buffer[129];
+    d = e4__double_u(0, 0);
+
+    e4t__ASSERT_OK(e4__mem_pno_digits(&b, b - buffer, 10, 0, &d));
+    e4t__ASSERT_MATCH(&b[1], "0");
     e4t__ASSERT_DEQ(d, e4__double_u(0, 0));
 
     /* Test that attempting to fomrat a number with not enough space
@@ -511,7 +519,7 @@ static void e4t__test_util_mem_pno()
     b = &buffer[129];
     d = e4__double_u(0xbeef, 0);
 
-    e4t__ASSERT_EQ(e4__mem_pno_digits(&b, 2, 16, &d), e4__E_PNOOVERFLOW);
+    e4t__ASSERT_EQ(e4__mem_pno_digits(&b, 2, 16, 0, &d), e4__E_PNOOVERFLOW);
     e4t__ASSERT_MATCH(&b[1], "ef");
     e4t__ASSERT_DEQ(d, e4__double_u(0xbe, 0));
 
@@ -519,8 +527,33 @@ static void e4t__test_util_mem_pno()
     b = &buffer[129];
     d = e4__double_u(-1, 0xc0b);
 
-    e4t__ASSERT_OK(e4__mem_pno_digits(&b, b - buffer, 16, &d));
+    e4t__ASSERT_OK(e4__mem_pno_digits(&b, b - buffer, 16, 0, &d));
     e4t__ASSERT_MATCH(&b[1], "c0bffffffffffffffff");
+    e4t__ASSERT_DEQ(d, e4__double_u(0, 0));
+
+    /* Test formatting a signed number. */
+    b = &buffer[129];
+    d = e4__double_u(593, 0);
+
+    e4t__ASSERT_OK(e4__mem_pno_digits(&b, b - buffer, 10, e4__F_SIGNED, &d));
+    e4t__ASSERT_MATCH(&b[1], "593");
+    e4t__ASSERT_DEQ(d, e4__double_u(0, 0));
+
+    /* Test formatting a signed negative number */
+    b = &buffer[129];
+    d = e4__double_u(-593, -1);
+
+    e4t__ASSERT_OK(e4__mem_pno_digits(&b, b - buffer, 10, e4__F_SIGNED, &d));
+    e4t__ASSERT_MATCH(&b[1], "-593");
+    e4t__ASSERT_DEQ(d, e4__double_u(0, 0));
+
+    /* Test overflow of only the '-' sign. */
+    b = &buffer[129];
+    d = e4__double_u(-35, -1);
+
+    e4t__ASSERT_EQ(e4__mem_pno_digits(&b, 2, 10, e4__F_SIGNED, &d),
+            e4__E_PNOOVERFLOW);
+    e4t__ASSERT_MATCH(&b[1], "35");
     e4t__ASSERT_DEQ(d, e4__double_u(0, 0));
 
     /* Test mixing various types of formatting together. */
@@ -530,7 +563,7 @@ static void e4t__test_util_mem_pno()
     e4t__ASSERT_OK(e4__mem_pno_digit(&b, 10, &d));
     e4t__ASSERT_OK(e4__mem_pno_digit(&b, 10, &d));
     e4__mem_pno_hold(&b, '.');
-    e4t__ASSERT_OK(e4__mem_pno_digits(&b, b - buffer, 10, &d));
+    e4t__ASSERT_OK(e4__mem_pno_digits(&b, b - buffer, 10, 0, &d));
     e4t__ASSERT_DEQ(d, e4__double_u(0, 0));
     e4__mem_pno_holds(&b, "Price: $", 8);
     e4t__ASSERT_MATCH(&b[1], "Price: $19.95");
