@@ -490,6 +490,32 @@ static void e4t__test_util_mem_pno()
     e4t__ASSERT_MATCH(&b[1], "beef");
     e4t__ASSERT_DEQ(d, e4__double_u(0, 0));
 
+    /* Test formatting of signle digits with base out of range
+       clamps to the correct base. */
+    b = &buffer[129];
+    d = e4__double_u(6, 0);
+
+    e4t__ASSERT_OK(e4__mem_pno_digit(&b, 1, &d));
+    e4t__ASSERT_DEQ(d, e4__double_u(3, 0));
+    e4t__ASSERT_OK(e4__mem_pno_digit(&b, 1, &d));
+    e4t__ASSERT_DEQ(d, e4__double_u(1, 0));
+    e4t__ASSERT_OK(e4__mem_pno_digit(&b, 0, &d));
+    e4t__ASSERT_DEQ(d, e4__double_u(0, 0));
+
+    e4t__ASSERT_MATCH(&b[1], "110");
+
+    b = &buffer[129];
+    d = e4__double_u(23349, 0);
+
+    e4t__ASSERT_OK(e4__mem_pno_digit(&b, 90, &d));
+    e4t__ASSERT_DEQ(d, e4__double_u(648, 0));
+    e4t__ASSERT_OK(e4__mem_pno_digit(&b, 80, &d));
+    e4t__ASSERT_DEQ(d, e4__double_u(18, 0));
+    e4t__ASSERT_OK(e4__mem_pno_digit(&b, 70, &d));
+    e4t__ASSERT_DEQ(d, e4__double_u(0, 0));
+
+    e4t__ASSERT_MATCH(&b[1], "I0L");
+
     /* Test formatting an entire number in one go. */
     b = &buffer[129];
     d = e4__double_u(532, 0);

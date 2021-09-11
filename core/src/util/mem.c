@@ -350,6 +350,11 @@ e4__usize e4__mem_pno_digit(char **buf_end, e4__u8 base, struct e4__double *ud)
     register e4__usize res;
     e4__usize digit;
 
+    /* XXX: Ambiguous behavior. This implementation clamps to the
+       acceptable range. */
+    if (base < 2) base = 2;
+    else if (base > 36) base = 36;
+
     if ((res = e4__double_div(*ud, base, 0, ud, &digit)))
         return res;
 
