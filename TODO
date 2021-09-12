@@ -83,6 +83,12 @@ General Builtins
                 27 hold
             #> type
             ;
+- Implement TIME&DATE.
+- Implement MS. This will require an additional user callback and can
+  be implemented using usleep in the repl.
+- Implement KEY?. This will require an additional user callback and can
+  be implemented using the poll system call on stdin in the repl.
+- Implement [IF], [ELSE], and [THEN].
 - Implement the STATE.
 - Consider adding _NF variants to USERVAR declaration macros, defining
   e4__UV_BEGIN, and simply defining BEGIN as its own uservar rather
@@ -140,6 +146,9 @@ REPL
 - Source ~/.e4-editrc to allow for e4 specific input overrides. For
   example, tab completion on tab could be disabled by macro binding
   the tab key to two or four spaces.
+- Increase task buffer size to 32K.
+- Try running the modified ANS 94 Forth Tetris program from Rosetta
+  Code.
 
 Testing
 -------
