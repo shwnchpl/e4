@@ -1372,21 +1372,31 @@ static const void *e4__builtin_TWO_OVER[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
-static const void *e4__builtin_TWO_SLASH[] = {
-    &e4__BUILTIN_XT[e4__B_LIT_CELL],
-    (void *)1,
-    &e4__BUILTIN_XT[e4__B_RSHIFT],
-    &e4__BUILTIN_XT[e4__B_EXIT],
-    &e4__BUILTIN_XT[e4__B_SENTINEL]
-};
+static void e4__builtin_TWO_SLASH(struct e4__task *task, e4__cell user)
+{
+    register e4__usize n;
 
-static const void *e4__builtin_TWO_STAR[] = {
-    &e4__BUILTIN_XT[e4__B_LIT_CELL],
-    (void *)1,
-    &e4__BUILTIN_XT[e4__B_LSHIFT],
-    &e4__BUILTIN_XT[e4__B_EXIT],
-    &e4__BUILTIN_XT[e4__B_SENTINEL]
-};
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+
+    n = (e4__usize)e4__stack_pop(task);
+    n = (n & ((e4__usize)1 << (e4__USIZE_BIT - 1))) | (n >> 1);
+    e4__stack_push(task, (e4__cell)n);
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_TWO_STAR(struct e4__task *task, e4__cell user)
+{
+    register e4__usize n;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+
+    n = (e4__usize)e4__stack_pop(task);
+    n = (n & ((e4__usize)1 << (e4__USIZE_BIT - 1))) | (n << 1);
+    e4__stack_push(task, (e4__cell)n);
+
+    e4__execute_ret(task);
+}
 
 static const void *e4__builtin_TWO_STORE[] = {
     &e4__BUILTIN_XT[e4__B_SWAP],

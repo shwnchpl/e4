@@ -1172,6 +1172,7 @@ static void e4t__test_builtin_math(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 14);
     e4t__ASSERT_OK(_e("16 2 rshift"));
     e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+
     e4t__ASSERT_OK(_e("15 2/"));
     e4t__ASSERT_EQ(e4__stack_pop(task), 7);
     e4t__ASSERT_OK(_e("7 2/"));
@@ -1180,6 +1181,20 @@ static void e4t__test_builtin_math(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 6);
     e4t__ASSERT_OK(_e("6 2*"));
     e4t__ASSERT_EQ(e4__stack_pop(task), 12);
+
+    e4t__ASSERT_OK(_e("-15 2/"));
+    e4t__ASSERT_EQ(e4__stack_pop(task), -8);
+    e4t__ASSERT_OK(_e("-7 2/"));
+    e4t__ASSERT_EQ(e4__stack_pop(task), -4);
+    e4t__ASSERT_OK(_e("-3 2*"));
+    e4t__ASSERT_EQ(e4__stack_pop(task), -6);
+    e4t__ASSERT_OK(_e("-6 2*"));
+    e4t__ASSERT_EQ(e4__stack_pop(task), -12);
+
+    e4t__ASSERT_OK(_e("-1 2/"));
+    e4t__ASSERT_EQ(e4__stack_pop(task), -1);
+    e4t__ASSERT_OK(_e("-1 1 rshift 1+ dup 2* ="));
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
 
     /* Test that increment and decrement words work correctly. */
     e4t__ASSERT_OK(_e("5 1+"));

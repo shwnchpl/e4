@@ -118,8 +118,8 @@
     _e4__BUILTIN_THUNK_N(TWO_DUP, "2DUP")   \
     _e4__BUILTIN_THUNK_N(TWO_FETCH, "2@")   \
     _e4__BUILTIN_THUNK_N(TWO_OVER, "2OVER") \
-    _e4__BUILTIN_THUNK_N(TWO_SLASH, "2/")   \
-    _e4__BUILTIN_THUNK_N(TWO_STAR, "2*")    \
+    _e4__BUILTIN_PROC_N(TWO_SLASH, "2/")    \
+    _e4__BUILTIN_PROC_N(TWO_STAR, "2*")     \
     _e4__BUILTIN_THUNK_N(TWO_STORE, "2!")   \
     _e4__BUILTIN_THUNK_N(TWO_SWAP, "2SWAP") \
     _e4__BUILTIN_PROC(TYPE) \
