@@ -22,40 +22,29 @@ Build
 - [DONE] Split the e4__num namespace into e4__double and e4__usize.
 - Split system required words and optional system specific extension
   words into different modules (SYSTEM and SYSTEM-EXT?).
-- Consider actually typedefing e4__double. Normally structs in e4 are
-  not typedefed, although since struct e4__double is relatively small
-  and is always passed/returned by value rather than by reference, it
-  may make sense to simply typedef away the fact that it is a struct
-  in the first place as a special case. I'm currently leaning towards
-  not doing this, but it is still worth consideration.
 
 Compilation
 -----------
 - Add conditional structure words CASE OF ENDCASE ENDOF etc.
-- Implement decompilation (ie. SEE). This only needs to work for words
-  defined with execute_threaded to start; everything else can just
-  display "builtin." The key way that this can be achieved is by
-  placing a special sentinel value on the stack *after* the final EXIT
-  call (this can be written by ;). The only other issue is how to
-  handle words like THEN etc. This can be done with a little bit of
-  look ahead state. If we know that IF is followed by BRANCH then some
-  address, then we can simply keep track of what that address is and
-  output THEN when we get to that address. We can use the stack for
-  this. On function entry, track initial stack count. When IF is
-  encountered, push THEN token (assuming we will need to do this with
-  something other than THEN as well; we may not, in which case only
-  an address is necessary) followed by an address. On each pass, before
-  writing anything else, if stack depth is greater than initial depth,
-  peek the top. If we're at that address, pop (once or twice, depending
-  on whether a THEN token is needed) then display the appropriate word
-  based on token. Aside from this, the only thing that needs to be done
-  is look up a word in *reverse* based on its XT, and display that if
-  it is present. If it isn't, we can assume it's a literal and just
-  include it. Alternatively, we can understand LIT_CELL and other key
-  words as look ahead words and not include them. Or, on the other
-  hand, we could just naively display the internal representation and
-  not worry about things like THEN and LIT_CELL. This is the easiest
-  solution and is probably a perfectly reasonable place to start.
+- Implement decompilation (ie. SEE). To start, simply naively display
+  the internal representation. The fully naive approach, for words with
+  the threaded_execute handler, is to simply search the dictionary
+  linearly for each word to see if any entry has each address as an
+  execution token. If it does, display the name corresponding to that
+  entry. If not, simply display the address. This isn't terribly
+  efficient, but it doesn't require storing any references from XT to
+  dictionary entry or any other metadata, so it is probably sufficient.
+  Output can look something like this for threaded code.
+    : foo 2 2 dup . ; see foo
+        : foo (threaded) (user: 0x0)
+            LIT_CELL
+            0x2
+            LIT_CELL
+            0x2
+            DUP
+            .
+            EXIT
+            SENTINEL
 
 General Builtins
 ----------------
@@ -87,12 +76,18 @@ General Builtins
 - Implement KEY?. This will require an additional user callback and can
   be implemented using the poll system call on stdin in the repl.
 - Implement [IF], [ELSE], and [THEN].
-- Implement the STATE.
+- Move the C" builtin to CORE-EXT, where it belongs.
+- Implement ENVIRONMENT?.
+- Implement STATE, >IN, and SOURCE.
+- Implement ABORT".
+- Implement ACCEPT.
+- Implement FIND.
+- Implement UM/MOD.
+- Verify that all CORE builtins have been implemented.
 - Consider adding _NF variants to USERVAR declaration macros, defining
   e4__UV_BEGIN, and simply defining BEGIN as its own uservar rather
   than in terms of HERE using PUN macros. Consider also removing pun
   macros.
-- Implement the ENVIRONMENT? builtin.
 
 General IO
 ----------
@@ -126,18 +121,6 @@ Kernel
   by default.
 - Handle dictionary overflows and other overflows.
 - Remove non-pno numeric formatting utilities.
-- Consider whether it might be possible to wrap the main quit loop in
-  some kind of exception context (somehow?) to get around the race
-  condition created by using multiple different exception contexts
-  within that loop. It's unclear exactly how this would look since
-  the quit loop relies on certain exceptions percolating all the way
-  up, so for it to itself run in an exception context some considerable
-  refactoring might be necessary. This is important because on embedded
-  systems, or even in a repl where a signal can be caught, it may be
-  desirable to throw an exception when quit, as currently implemented,
-  is not in an interrupt context. This *may* not be an issue (failure
-  to actually throw is always something an API client can work around),
-  but it probably isn't entirely desirable.
 
 REPL
 ----
@@ -168,6 +151,18 @@ Kernel
   text interpreter extension for numbers of the format XXXX. as outlined
   in section 8.3.1 of the standard, etc.) by implementing all (or most)
   of the DOUBLE word set.
+- Consider whether it might be possible to wrap the main quit loop in
+  some kind of exception context (somehow?) to get around the race
+  condition created by using multiple different exception contexts
+  within that loop. It's unclear exactly how this would look since
+  the quit loop relies on certain exceptions percolating all the way
+  up, so for it to itself run in an exception context some considerable
+  refactoring might be necessary. This is important because on embedded
+  systems, or even in a repl where a signal can be caught, it may be
+  desirable to throw an exception when quit, as currently implemented,
+  is not in an interrupt context. This *may* not be an issue (failure
+  to actually throw is always something an API client can work around),
+  but it probably isn't entirely desirable.
 
 
 Version 0.9
@@ -279,3 +274,12 @@ Kernel
        because while there is no standards compliant way to check
        how much space is available in PAD, that amount of space may not
        be variable.
+- Consider actually typedefing e4__double. Normally structs in e4 are
+  not typedefed, although since struct e4__double is relatively small
+  and is always passed/returned by value rather than by reference, it
+  may make sense to simply typedef away the fact that it is a struct
+  in the first place as a special case. I'm currently leaning towards
+  not doing this, but it is still worth consideration.
+    -- This would just be too inconsistent with the way that structs
+       are treated elsewhere in e4 and would violate the principal of
+       least astonishment for no real reason. Better to just not do it.
