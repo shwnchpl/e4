@@ -61,6 +61,9 @@ static const void *_e4__BUILTIN_RETURN_THUNK[] =
 #if defined(e4__INCLUDE_EXCEPTION)
     #include "EXCEPTION.def.inc"
 #endif
+#if defined(e4__INCLUDE_FACILITY)
+    #include "FACILITY.def.inc"
+#endif
 #if defined(e4__INCLUDE_TOOLS)
     #include "TOOLS.def.inc"
 #endif
@@ -78,6 +81,9 @@ static const void *_e4__BUILTIN_RETURN_THUNK[] =
 #endif
 #if defined(e4__INCLUDE_EXCEPTION)
     #include "EXCEPTION.decl.inc"
+#endif
+#if defined(e4__INCLUDE_FACILITY)
+    #include "FACILITY.decl.inc"
 #endif
 #if defined(e4__INCLUDE_TOOLS)
     #include "TOOLS.decl.inc"
@@ -162,6 +168,9 @@ const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT] =
     #if defined(e4__INCLUDE_EXCEPTION)
         _e4__BUILTIN_EXCEPTION_DECL()
     #endif
+    #if defined(e4__INCLUDE_FACILITY)
+        _e4__BUILTIN_FACILITY_DECL()
+    #endif
     #if defined(e4__INCLUDE_TOOLS)
         _e4__BUILTIN_TOOLS_DECL()
     #endif
@@ -204,6 +213,9 @@ const struct e4__execute_tuple e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
     #endif
     #if defined(e4__INCLUDE_EXCEPTION)
         _e4__BUILTIN_EXCEPTION_DECL()
+    #endif
+    #if defined(e4__INCLUDE_FACILITY)
+        _e4__BUILTIN_FACILITY_DECL()
     #endif
     #if defined(e4__INCLUDE_TOOLS)
         _e4__BUILTIN_TOOLS_DECL()

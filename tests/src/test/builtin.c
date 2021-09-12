@@ -736,6 +736,17 @@ static void e4t__test_builtin_io_error(void)
     e4t__ASSERT_EQ(e4__evaluate(task, "words", -1), e4__E_UNSUPPORTED);
 }
 
+/* Covers PAGE */
+static void e4t__test_builtin_io_facility(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    e4t__term_obuf_consume();
+
+    e4t__ASSERT_OK(e4__evaluate(task, "page", -1));
+    e4t__ASSERT(!strcmp(e4t__term_obuf_consume(), "\033[2J\033[0;0H"));
+}
+
 /* Covers <# #> # #S HOLD HOLDS SIGN */
 static void e4t__test_builtin_io_pno(void)
 {
@@ -1832,6 +1843,7 @@ void e4t__test_builtin(void)
     e4t__test_builtin_io();
     e4t__test_builtin_io_dump();
     e4t__test_builtin_io_error();
+    e4t__test_builtin_io_facility();
     e4t__test_builtin_io_pno();
     e4t__test_builtin_logic();
     e4t__test_builtin_math();

@@ -69,6 +69,9 @@ int main(int argc, char **argv)
         #if defined(e4__INCLUDE_EXCEPTION)
             wordset |= (1 << EXCEPTION_BIT);
         #endif
+        #if defined(e4__INCLUDE_FACILITY)
+            wordset |= (1 << FACILITY_BIT);
+        #endif
         #if defined(e4__INCLUDE_TOOLS)
             wordset |= (1 << TOOLS_BIT);
         #endif

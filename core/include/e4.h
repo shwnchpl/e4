@@ -28,6 +28,7 @@
 #if defined(e4__BUILD_EVERYTHING)
     #define e4__INCLUDE_CORE_EXT
     #define e4__INCLUDE_EXCEPTION
+    #define e4__INCLUDE_FACILITY
     #define e4__INCLUDE_TOOLS
     #define e4__INCLUDE_TOOLS_EXT
 #elif defined(e4__BUILD_DEFAULT)
@@ -35,6 +36,7 @@
        will not always be the case. */
     #define e4__INCLUDE_CORE_EXT
     #define e4__INCLUDE_EXCEPTION
+    #define e4__INCLUDE_FACILITY
     #define e4__INCLUDE_TOOLS
     #define e4__INCLUDE_TOOLS_EXT
 #endif
@@ -45,6 +47,10 @@
 
 #if defined(e4__EXCLUDE_EXCEPTION) && defined(e4__INCLUDE_EXCEPTION)
     #undef e4__INCLUDE_EXCEPTION
+#endif
+
+#if defined(e4__EXCLUDE_FACILITY) && defined(e4__INCLUDE_FACILITY)
+    #undef e4__INCLUDE_FACILITY
 #endif
 
 #if defined(e4__EXCLUDE_TOOLS) && defined(e4__INCLUDE_TOOLS)
@@ -411,6 +417,13 @@ enum e4__builtin_id {
         e4__B_THROW,
 
     #endif /* defined(e4__INCLUDE_EXCEPTION) */
+
+    #if defined(e4__INCLUDE_FACILITY)
+
+        /* FACILITY words */
+        e4__B_PAGE,
+
+    #endif /* defined(e4__INCLUDE_FACILITY) */
 
     #if defined(e4__INCLUDE_TOOLS)
 

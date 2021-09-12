@@ -66,9 +66,7 @@ General Builtins
 - [DONE] Implement <#, #>, #, #S, HOLD, HOLDS, and SIGN.
 - [DONE] Fix 2* and 2/ implementations. These words are meant to perform
   arithmetic shifts by one, not simply logical shifts by one.
-- Implement the PAGE builtin using escape sequences. The following
-  implementation works:
-        : page s\" \e[2J\e[0;0H" type ;
+- [DONE] Implement the PAGE builtin using escape sequences.
 - Implement the AT-XY builtin using pictured numeric output and escape
   the ASCII cursor position escape sequence \033[<L>;<C>H. The
   following implementation works:
