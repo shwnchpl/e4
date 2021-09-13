@@ -745,6 +745,15 @@ static void e4t__test_builtin_io_facility(void)
 
     e4t__ASSERT_OK(e4__evaluate(task, "page", -1));
     e4t__ASSERT(!strcmp(e4t__term_obuf_consume(), "\033[2J\033[0;0H"));
+
+    e4t__ASSERT_OK(e4__evaluate(task, "0 0 at-xy ", -1));
+    e4t__ASSERT(!strcmp(e4t__term_obuf_consume(), "\033[0;0H"));
+
+    e4t__ASSERT_OK(e4__evaluate(task, "30 15 at-xy ", -1));
+    e4t__ASSERT(!strcmp(e4t__term_obuf_consume(), "\033[15;30H"));
+
+    e4t__ASSERT_OK(e4__evaluate(task, "15 30 at-xy ", -1));
+    e4t__ASSERT(!strcmp(e4t__term_obuf_consume(), "\033[30;15H"));
 }
 
 /* Covers <# #> # #S HOLD HOLDS SIGN */

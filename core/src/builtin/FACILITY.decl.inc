@@ -6,6 +6,7 @@
    context. */
 
 #define _e4__BUILTIN_FACILITY_DECL()    \
+    _e4__BUILTIN_THUNK_N(AT_XY, "AT-XY")    \
     _e4__BUILTIN_THUNK(PAGE)
 
 /* vim: set ft=c: */

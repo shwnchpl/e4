@@ -421,6 +421,7 @@ enum e4__builtin_id {
     #if defined(e4__INCLUDE_FACILITY)
 
         /* FACILITY words */
+        e4__B_AT_XY,
         e4__B_PAGE,
 
     #endif /* defined(e4__INCLUDE_FACILITY) */

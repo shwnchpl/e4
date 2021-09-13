@@ -56,20 +56,8 @@ General Builtins
 - [DONE] Fix 2* and 2/ implementations. These words are meant to perform
   arithmetic shifts by one, not simply logical shifts by one.
 - [DONE] Implement the PAGE builtin using escape sequences.
-- Implement the AT-XY builtin using pictured numeric output and escape
-  the ASCII cursor position escape sequence \033[<L>;<C>H. The
-  following implementation works:
-        : at-xy
-            s>d rot s>d
-            <#
-                'H' hold
-                #s 2drop
-                ';' hold
-                #s
-                '[' hold
-                27 hold
-            #> type
-            ;
+- [DONE] Implement the AT-XY builtin using pictured numeric output and
+  escape sequences.
 - Implement TIME&DATE.
 - Implement MS. This will require an additional user callback and can
   be implemented using usleep in the repl.
