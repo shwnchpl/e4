@@ -737,7 +737,7 @@ static void e4t__test_builtin_io_error(void)
     e4t__ASSERT_EQ(e4__evaluate(task, "words", -1), e4__E_UNSUPPORTED);
 }
 
-/* Covers AT-XY KEY? PAGE */
+/* Covers AT-XY KEY? MS PAGE */
 static void e4t__test_builtin_io_facility(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -786,6 +786,9 @@ static void e4t__test_builtin_io_facility(void)
     e4t__ASSERT_OK(e4__evaluate(task, "key?", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "39145 ms", -1));
+    e4t__ASSERT_EQ(e4t__term_lastms_get(), 39145);
 }
 
 /* Covers <# #> # #S HOLD HOLDS SIGN */
@@ -1482,7 +1485,7 @@ static void e4t__test_builtin_memmanip(void)
     task = e4t__transient_task();
     e4t__ASSERT_OK(e4__evaluate(task, "unused", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
-    e4t__ASSERT_EQ(e4__stack_pop(task), 2246);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2238);
     e4t__ASSERT_OK(e4__evaluate(task, "unused allot unused", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), 0);

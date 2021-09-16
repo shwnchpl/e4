@@ -268,6 +268,16 @@ static e4__usize repl_keyq(void *user, e4__usize *bflag)
     return e4__E_OK;
 }
 
+static e4__usize repl_ms(void *user, e4__usize ms)
+{
+    struct timespec ts;
+
+    ts.tv_sec = ms / 1000;
+    ts.tv_nsec = (ms % 1000) * 1000000;
+
+    return nanosleep(&ts, NULL) ? e4__E_FAILURE : e4__E_OK;
+}
+
 static e4__usize repl_type(void *user, const char *buf, e4__usize n)
 {
     while (n > 0) {
@@ -309,6 +319,7 @@ int main(int argc, char **argv)
         repl_key,
         repl_type,
         repl_keyq,
+        repl_ms,
         repl_unixtime,
     };
     EditLine *el = NULL;

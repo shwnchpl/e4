@@ -240,7 +240,14 @@ char* e4__io_word(struct e4__task *task, char delim)
 
 #if defined(e4__INCLUDE_FACILITY_EXT)
 
-    /* FACILITY EXT io.c functions */
+    e4__usize e4__io_ms(struct e4__task *task, e4__usize ms)
+    {
+        if (!task->io_func.ms)
+            return e4__E_UNSUPPORTED;
+
+        return task->io_func.ms(task->io_func.user, ms);
+    }
+
     e4__usize e4__io_unixtime(struct e4__task *task, e4__usize *t)
     {
         /* XXX: The unixtime handler is expected to set t to the

@@ -60,8 +60,7 @@ General Builtins
   escape sequences.
 - [DONE] Implement the KEY? builtin.
 - [DONE] Implement TIME&DATE.
-- Implement MS. This will require an additional user callback and can
-  be implemented using usleep in the repl.
+- [DONE] Implement MS.
 - Implement [IF], [ELSE], and [THEN].
 - Move the C" builtin to CORE-EXT, where it belongs.
 - Implement ENVIRONMENT?.

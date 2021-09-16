@@ -6,6 +6,7 @@
    context. */
 
 #define _e4__BUILTIN_FACILITY_EXT_DECL()    \
+    _e4__BUILTIN_PROC(MS)   \
     _e4__BUILTIN_PROC_N(TIME_AND_DATE, "TIME&DATE")
 
 /* vim: set ft=c: */

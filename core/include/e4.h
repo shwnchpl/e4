@@ -187,6 +187,7 @@ struct e4__io_func {
     #if defined(e4__INCLUDE_FACILITY_EXT)
 
         /* FACILITY EXT IO handlers */
+        e4__usize (*ms)(void *user, e4__usize ms);
         e4__usize (*unixtime)(void *user, e4__usize *t);
 
     #endif /* defined(e4__INCLUDE_FACILITY_EXT) */
@@ -465,6 +466,7 @@ enum e4__builtin_id {
     #if defined(e4__INCLUDE_FACILITY_EXT)
 
         /* FACILITY EXT words */
+        e4__B_MS,
         e4__B_TIME_AND_DATE,
 
     #endif /* defined(e4__INCLUDE_FACILITY_EXT) */
@@ -618,6 +620,7 @@ char* e4__io_word(struct e4__task *task, char delim);
 #if defined(e4__INCLUDE_FACILITY_EXT)
 
     /* FACILITY EXT io.c functions */
+    e4__usize e4__io_ms(struct e4__task *task, e4__usize ms);
     e4__usize e4__io_unixtime(struct e4__task *task, e4__usize *t);
 
 #endif /* defined(e4__INCLUDE_FACILITY_EXT) */

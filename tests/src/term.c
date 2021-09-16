@@ -18,6 +18,7 @@ struct e4t__term_obuf {
 
 static struct e4t__term_ibuf e4t__term_ib = {0,};
 static struct e4t__term_obuf e4t__term_ob = {0,};
+static e4__usize e4t__term_lastms = 0;
 
 static e4__usize e4t__term_ibuf_accept(void *user, char *buf, e4__usize *n)
 {
@@ -55,6 +56,12 @@ static e4__usize e4t__term_ibuf_keyq(void *user, e4__usize *bflag)
 
     *bflag = (b->offset >= b->length) ? e4__BF_FALSE : e4__BF_TRUE;
 
+    return e4__E_OK;
+}
+
+static e4__usize e4t__term_ms(void *user, e4__usize ms)
+{
+    e4t__term_lastms = ms;
     return e4__E_OK;
 }
 
@@ -96,6 +103,7 @@ void e4t__term_io_init(struct e4__task *task)
         e4t__term_ibuf_key,
         e4t__term_obuf_type,
         e4t__term_ibuf_keyq,
+        e4t__term_ms,
         e4t__term_unixtime,
     };
 
@@ -113,6 +121,13 @@ void e4t__term_ibuf_feed(const char *buf, e4__usize length)
     b->buf = buf;
     b->length = length != (e4__usize)-1 ? length : strlen(buf);
     b->offset = 0;
+}
+
+/* Returns the last "delay" time sent to the handler. Mostly useless,
+   but tests that the handler was called at least. */
+e4__usize e4t__term_lastms_get(void)
+{
+    return e4t__term_lastms;
 }
 
 /* "Erases" whatever is currently in the output buffer and returns
@@ -190,4 +205,11 @@ void e4t__term_selftest(void)
     e4t__ASSERT_OK(e4__io_accept(task, buf, &len));
     e4t__ASSERT_EQ(len, 0);
     e4t__ASSERT_EQ(buf[0], 'e');
+
+    /* XXX: e4__io_unixtime is intentionally not tested here. The
+       handler implementation is quite simple and is covered by the
+       TIME&DATE builtin tests in builtin.c. */
+
+    e4t__ASSERT_OK(e4__io_ms(task, 5341));
+    e4t__ASSERT_EQ(e4t__term_lastms_get(), 5341);
 }

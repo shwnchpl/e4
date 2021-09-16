@@ -78,6 +78,7 @@ struct e4__task* e4t__transient_task(void);
 /* term.c declarations */
 void e4t__term_io_init(struct e4__task *task);
 void e4t__term_ibuf_feed(const char *buf, e4__usize length);
+e4__usize e4t__term_lastms_get(void);
 const char* e4t__term_obuf_consume(void);
 const char* e4t__term_obuf_peek(void);
 void e4t__term_selftest(void);
