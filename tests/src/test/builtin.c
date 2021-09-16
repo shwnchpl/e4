@@ -839,8 +839,8 @@ static void e4t__test_builtin_io_pno(void)
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "589078325249840821273410");
 
     /* Test that HOLD and HOLDS work as expected in isolation. */
-    e4t__ASSERT_OK(e4__evaluate(task, "0 0 <# 'o' hold 'o' hold 'f' hold #> type",
-            -1));
+    e4t__ASSERT_OK(e4__evaluate(task,
+            "0 0 <# 'o' hold 'o' hold 'f' hold #> type", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "foo");
     e4t__ASSERT_OK(e4__evaluate(task, ": price s\" Price: $\" ;", -1));
     e4t__ASSERT_OK(e4__evaluate(task, "0 0 <# price holds #> type", -1));

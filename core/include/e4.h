@@ -179,6 +179,15 @@ struct e4__io_func {
     #endif /* defined(e4__INCLUDE_FACILITY) */
 };
 
+struct e4__gmt {
+    e4__usize year;
+    e4__u8 mon;
+    e4__u8 mday;
+    e4__u8 hour;
+    e4__u8 min;
+    e4__u8 sec;
+};
+
 /* error constants - standard */
 #define e4__E_OK            (0)
 #define e4__E_ABORT         (-1)
@@ -645,5 +654,6 @@ const char* e4__usize_format_exception(e4__usize e, e4__usize *len);
 struct e4__double e4__usize_mul(e4__usize l, e4__usize r, e4__u8 flags);
 e4__usize e4__usize_sdiv(e4__usize n, e4__usize d, e4__usize *r);
 struct e4__double e4__usize_todouble(e4__usize u);
+void e4__usize_togmt(e4__usize t, struct e4__gmt *gmt);
 
 #endif /* e4_H_ */

@@ -201,3 +201,70 @@ struct e4__double e4__usize_todouble(e4__usize n)
     d.high = e4__USIZE_IS_NEGATIVE(d.low) ? -1 : 0;
     return d;
 }
+
+void e4__usize_togmt(e4__usize t, struct e4__gmt *gmt)
+{
+    static const e4__usize days_per_fyear = 365 * 4 + 1;
+    static const e4__usize days_per_cent = 25 * days_per_fyear - 1;
+    static const e4__usize days_per_qcent = days_per_cent * 4 + 1;
+    static const e4__u8 month_days[] = {
+        31, 30, 31, 30, 31, 31,
+        30, 31, 30, 31, 31, 29,
+    };
+    register e4__usize days, fyears, cents, qcents;
+    register e4__bool negated = 0;
+
+    /* FIXME: Consider only defining this utility when
+       e4__INCLUDE_FACILITY_EXT has been defined. */
+
+    /* XXX: Does not account for leap seconds. */
+
+    gmt->sec = t % 60;
+    gmt->min = (t / 60) % 60;
+    gmt->hour = (t / 3600) % 24;
+
+    days = t / 86400;
+
+    /* XXX: Normalize to March 1st, 2000. This may result in t going
+       negative. If it does, that's alright; we will handle this case
+       when writing final values. */
+    days -= 11017;
+    if ((negated = e4__USIZE_IS_NEGATIVE(days)))
+        days = e4__USIZE_NEGATE(days);
+
+    qcents = days / days_per_qcent;
+    days %= days_per_qcent;
+
+    cents = days / days_per_cent;
+    days %= days_per_cent;
+
+    fyears = days / days_per_fyear;
+    days %= days_per_fyear;
+
+    gmt->year = days / 365 + 4 * fyears + 100 * cents + 400 * qcents + negated;
+    if (negated)
+        gmt->year = e4__USIZE_NEGATE(gmt->year);
+    gmt->year += 2000;
+
+    days %= 365;
+    if (negated) {
+        /* For the years that would require us to have negated, every
+           four year set contains a leap year, so we can simply switch
+           to a floored modulo and add one day to account for the leap
+           day. */
+        days = e4__USIZE_NEGATE(days) + 366;
+    }
+
+    if (!days && (fyears || !(cents % 4))) {
+        gmt->mon = 2;
+        gmt->mday = 29;
+    } else {
+        for (gmt->mon = 0; gmt->mon < 12 && days >= month_days[gmt->mon];
+                ++gmt->mon)
+            days -= month_days[gmt->mon];
+
+        gmt->year += (gmt->mon > 9);
+        gmt->mon = ((gmt->mon + 2) % 12) + 1;
+        gmt->mday = (e4__u8)days + 1;
+    }
+}

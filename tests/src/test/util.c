@@ -674,39 +674,6 @@ static void e4t__test_util_numparse(void)
     #undef _p
 }
 
-static void e4t__test_util_wordparse(void)
-{
-    const char *word;
-    e4__usize len;
-
-    #define _p(s, d, f) e4__mem_parse(s, d, strlen(s), f, &word)
-    len = _p("   foo bar bas", ' ', e4__F_SKIP_LEADING);
-    e4t__ASSERT(!e4__mem_strncasecmp(word, "foo", len));
-
-    len = _p("   foo, bar,, bas", ',', e4__F_SKIP_LEADING);
-    e4t__ASSERT(!e4__mem_strncasecmp(word, "   foo", len));
-
-    len = _p("         ", ' ', e4__F_SKIP_LEADING);
-    e4t__ASSERT_EQ(len, 0);
-
-    len = _p("  foo\nbar", ' ', e4__F_SKIP_LEADING);
-    e4t__ASSERT(!e4__mem_strncasecmp(word, "foo", len));
-
-    len = _p("  foo.bar", ' ', e4__F_SKIP_LEADING);
-    e4t__ASSERT(!e4__mem_strncasecmp(word, "foo.bar", len));
-
-    len = _p("  foo.bar", ' ', 0);
-    e4t__ASSERT_EQ(len, 0);
-
-    e4t__ASSERT_EQ((len = _p("foo\\\"bar\" bas", '"', 0)), 4);
-    e4t__ASSERT(!e4__mem_strncasecmp(word, "foo\\\"", len));
-
-    e4t__ASSERT_EQ((len = _p("foo\\\"bar\" bas", '"', e4__F_IGNORE_ESC)), 8);
-    e4t__ASSERT(!e4__mem_strncasecmp(word, "foo\\\"bar", len));
-
-    #undef _p
-}
-
 static void e4t__test_util_strnescape(void)
 {
     static const char *escaped_str = "foo\\abar\\b some more \\e\\f\\l"
@@ -763,6 +730,127 @@ static void e4t__test_util_strnescape(void)
     #undef _expect_chunk
 }
 
+static void e4t__test_util_togmt(void)
+{
+    /* XXX: Parts of this test only work correctly on a 64 bit
+       system. */
+    struct e4__gmt gmt = {0};
+
+    #define _e4t__ASSERT_GMT(g, y, mo, d, h, mn, s) \
+        do {    \
+            e4__usize_togmt(g, &gmt);   \
+            e4t__ASSERT_EQ(gmt.year, y);    \
+            e4t__ASSERT_EQ(gmt.mon, mo);    \
+            e4t__ASSERT_EQ(gmt.mday, d);    \
+            e4t__ASSERT_EQ(gmt.hour, h);    \
+            e4t__ASSERT_EQ(gmt.min, mn);    \
+            e4t__ASSERT_EQ(gmt.sec, s);     \
+        } while (0)
+
+    _e4t__ASSERT_GMT(1631662695, 2021, 9, 14, 23, 38, 15);
+    _e4t__ASSERT_GMT(946684800, 2000, 1, 1, 0, 0, 0);
+    _e4t__ASSERT_GMT(31536000, 1971, 1, 1, 0, 0, 0);
+    _e4t__ASSERT_GMT(1078041843, 2004, 2, 29, 8, 4, 3);
+    _e4t__ASSERT_GMT(699382985, 1992, 2, 29, 17, 3, 5);
+    _e4t__ASSERT_GMT(93539898187, 4934, 2, 28, 17, 3, 7);
+    _e4t__ASSERT_GMT(978220800, 2000, 12, 31, 0, 0, 0);
+    _e4t__ASSERT_GMT(4102444800, 2100, 1, 1, 0, 0, 0);
+    _e4t__ASSERT_GMT(4107535860, 2100, 2, 28, 22, 11, 0);
+    _e4t__ASSERT_GMT(4133894400, 2100, 12, 31, 0, 0, 0);
+    _e4t__ASSERT_GMT(4107556982, 2100, 3, 1, 4, 3, 2);
+    _e4t__ASSERT_GMT(13574643060, 2400, 2, 29, 22, 11, 0);
+    _e4t__ASSERT_GMT(68270582, 1972, 3, 1, 4, 3, 2);
+    _e4t__ASSERT_GMT(349056312, 1981, 1, 23, 0, 5, 12);
+    _e4t__ASSERT_GMT(192406260, 1976, 2, 5, 22, 11, 0);
+
+    _e4t__ASSERT_GMT(158191860, 1975, 1, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(160870260, 1975, 2, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(163289460, 1975, 3, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(165967860, 1975, 4, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(168559860, 1975, 5, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(171238260, 1975, 6, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(173830260, 1975, 7, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(176508660, 1975, 8, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(179187060, 1975, 9, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(181779060, 1975, 10, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(184457460, 1975, 11, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(187049460, 1975, 12, 5, 22, 11, 0);
+
+    _e4t__ASSERT_GMT(158191860 + 31536000 , 1976, 1, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(160870260 + 31536000 , 1976, 2, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(163289460 + 31536000 + 86400, 1976, 3, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(165967860 + 31536000 + 86400, 1976, 4, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(168559860 + 31536000 + 86400, 1976, 5, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(171238260 + 31536000 + 86400, 1976, 6, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(173830260 + 31536000 + 86400, 1976, 7, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(176508660 + 31536000 + 86400, 1976, 8, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(179187060 + 31536000 + 86400, 1976, 9, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(181779060 + 31536000 + 86400, 1976, 10, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(184457460 + 31536000 + 86400, 1976, 11, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(187049460 + 31536000 + 86400, 1976, 12, 5, 22, 11, 0);
+
+    _e4t__ASSERT_GMT(3313951860, 2075, 1, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(3316630260, 2075, 2, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(3319049460, 2075, 3, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(3321727860, 2075, 4, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(3324319860, 2075, 5, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(3326998260, 2075, 6, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(3329590260, 2075, 7, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(3332268660, 2075, 8, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(3334947060, 2075, 9, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(3337539060, 2075, 10, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(3340217460, 2075, 11, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(3342809460, 2075, 12, 5, 22, 11, 0);
+
+    _e4t__ASSERT_GMT(3313951860 + 31536000, 2076, 1, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(3316630260 + 31536000, 2076, 2, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(3319049460 + 31536000 + 86400, 2076, 3, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(3321727860 + 31536000 + 86400, 2076, 4, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(3324319860 + 31536000 + 86400, 2076, 5, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(3326998260 + 31536000 + 86400, 2076, 6, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(3329590260 + 31536000 + 86400, 2076, 7, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(3332268660 + 31536000 + 86400, 2076, 8, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(3334947060 + 31536000 + 86400, 2076, 9, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(3337539060 + 31536000 + 86400, 2076, 10, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(3340217460 + 31536000 + 86400, 2076, 11, 5, 22, 11, 0);
+    _e4t__ASSERT_GMT(3342809460 + 31536000 + 86400, 2076, 12, 5, 22, 11, 0);
+
+    #undef _e4t__ASSERT_GMT
+}
+
+static void e4t__test_util_wordparse(void)
+{
+    const char *word;
+    e4__usize len;
+
+    #define _p(s, d, f) e4__mem_parse(s, d, strlen(s), f, &word)
+    len = _p("   foo bar bas", ' ', e4__F_SKIP_LEADING);
+    e4t__ASSERT(!e4__mem_strncasecmp(word, "foo", len));
+
+    len = _p("   foo, bar,, bas", ',', e4__F_SKIP_LEADING);
+    e4t__ASSERT(!e4__mem_strncasecmp(word, "   foo", len));
+
+    len = _p("         ", ' ', e4__F_SKIP_LEADING);
+    e4t__ASSERT_EQ(len, 0);
+
+    len = _p("  foo\nbar", ' ', e4__F_SKIP_LEADING);
+    e4t__ASSERT(!e4__mem_strncasecmp(word, "foo", len));
+
+    len = _p("  foo.bar", ' ', e4__F_SKIP_LEADING);
+    e4t__ASSERT(!e4__mem_strncasecmp(word, "foo.bar", len));
+
+    len = _p("  foo.bar", ' ', 0);
+    e4t__ASSERT_EQ(len, 0);
+
+    e4t__ASSERT_EQ((len = _p("foo\\\"bar\" bas", '"', 0)), 4);
+    e4t__ASSERT(!e4__mem_strncasecmp(word, "foo\\\"", len));
+
+    e4t__ASSERT_EQ((len = _p("foo\\\"bar\" bas", '"', e4__F_IGNORE_ESC)), 8);
+    e4t__ASSERT(!e4__mem_strncasecmp(word, "foo\\\"bar", len));
+
+    #undef _p
+}
+
 void e4t__test_util(void)
 {
     e4t__test_util_double();
@@ -776,6 +864,7 @@ void e4t__test_util(void)
     e4t__test_util_mem_pno();
     e4t__test_util_numformat();
     e4t__test_util_numparse();
-    e4t__test_util_wordparse();
     e4t__test_util_strnescape();
+    e4t__test_util_togmt();
+    e4t__test_util_wordparse();
 }
