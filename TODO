@@ -25,7 +25,7 @@ Build
 
 Compilation
 -----------
-- Add conditional structure words CASE OF ENDCASE ENDOF etc.
+- [DONE] Add conditional structure words CASE OF ENDCASE ENDOF etc.
 - Implement decompilation (ie. SEE). To start, simply naively display
   the internal representation. The fully naive approach, for words with
   the threaded_execute handler, is to simply search the dictionary

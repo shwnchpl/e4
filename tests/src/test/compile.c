@@ -1,6 +1,67 @@
 #include "e4.h"
 #include "../e4t.h" /* FIXME: Add this to an include path? */
 
+/* Covers CASE ENDCASE ENDOF OF */
+static void e4t__test_compile_case(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* Test that unbalanced CASE, ENDCASE, ENDOF, and OF do not
+       compile. */
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo case ;", -1), e4__E_CSMISMATCH);
+    e4__compile_cancel(task);
+    e4__stack_clear(task);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo of", -1), e4__E_CSMISMATCH);
+    e4__compile_cancel(task);
+    e4__stack_clear(task);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo endof", -1), e4__E_CSMISMATCH);
+    e4__compile_cancel(task);
+    e4__stack_clear(task);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo endcase", -1), e4__E_CSMISMATCH);
+    e4__compile_cancel(task);
+    e4__stack_clear(task);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo case of endof ;", -1),
+            e4__E_CSMISMATCH);
+    e4__compile_cancel(task);
+    e4__stack_clear(task);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo case of of", -1),
+            e4__E_CSMISMATCH);
+    e4__compile_cancel(task);
+    e4__stack_clear(task);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo case of endcase endcase", -1),
+            e4__E_CSMISMATCH);
+    e4__compile_cancel(task);
+    e4__stack_clear(task);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo case of endcase", -1),
+            e4__E_CSMISMATCH);
+    e4__compile_cancel(task);
+    e4__stack_clear(task);
+    e4t__ASSERT_EQ(e4__evaluate(task, ": foo case endof", -1),
+            e4__E_CSMISMATCH);
+    e4__compile_cancel(task);
+    e4__stack_clear(task);
+
+    /* Test that case words work as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": foo case 1 of 11 endof 2 of 22 endof 3 of 33 endof "
+            "99 swap endcase ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "1 foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 11);
+    e4t__ASSERT_OK(e4__evaluate(task, "2 foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 22);
+    e4t__ASSERT_OK(e4__evaluate(task, "3 foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 33);
+    e4t__ASSERT_OK(e4__evaluate(task, "4 foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 99);
+    e4t__ASSERT_OK(e4__evaluate(task, "5 foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 99);
+}
+
 /* Covers ELSE IF THEN */
 static void e4t__test_compile_conditional(void)
 {
@@ -675,6 +736,7 @@ static void e4t__test_compile_while_loop(void)
 void e4t__test_compile(void)
 {
     /* FIXME: Add direct compilation API tests? */
+    e4t__test_compile_case();
     e4t__test_compile_conditional();
     e4t__test_compile_does();
     e4t__test_compile_failure();

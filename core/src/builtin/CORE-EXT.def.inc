@@ -31,6 +31,13 @@ static const void *e4__builtin_BUFFER_COLON[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
+static void e4__builtin_CASE(struct e4__task *task, e4__cell user)
+{
+    e4__stack_push(task, task->here);
+    e4__stack_push(task, (e4__cell)&e4__BUILTIN_XT[e4__B_CASE]);
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_COLON_NONAME(struct e4__task *task, e4__cell user)
 {
     register struct e4__execute_token *xt =
@@ -100,6 +107,55 @@ static void e4__builtin_DOT_PAREN(struct e4__task *task, e4__cell user)
     len = e4__io_parse(task, ')', 0, &str);
     if ((io_res = e4__io_type(task, str, len)))
         e4__exception_throw(task, io_res);
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_ENDCASE(struct e4__task *task, e4__cell user)
+{
+    register e4__cell ref;
+
+    _e4__BUILTIN_EXPECT_REF(task, 2);
+
+    if (e4__stack_pop(task) != (e4__cell)&e4__BUILTIN_XT[e4__B_CASE]) {
+        e4__compile_cancel(task);
+        e4__exception_throw(task, e4__E_CSMISMATCH);
+        e4__execute_ret(task);
+        return;
+    }
+
+    ref = e4__stack_pop(task);
+
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_DROP]);
+
+    /* Handle intermediary ENDOF and branch to here. */
+    while (ref < task->here) {
+        if (*ref == (e4__cell)&e4__BUILTIN_XT[e4__B_SENTINEL])
+            *ref = (e4__cell)(task->here - ref);
+        ++ref;
+    }
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_ENDOF(struct e4__task *task, e4__cell user)
+{
+    register e4__cell ref;
+
+    _e4__BUILTIN_EXPECT_REF(task, 2);
+
+    if (e4__stack_pop(task) != (e4__cell)&e4__BUILTIN_XT[e4__B_OF]) {
+        e4__compile_cancel(task);
+        e4__exception_throw(task, e4__E_CSMISMATCH);
+        e4__execute_ret(task);
+        return;
+    }
+
+    ref = e4__stack_pop(task);
+
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_BRANCH]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_SENTINEL]);
+    e4__DEREF(ref) = (e4__cell)(task->here - ref);
 
     e4__execute_ret(task);
 }
@@ -175,6 +231,28 @@ static const void *e4__builtin_NOT_EQUALS[] = {
     &e4__BUILTIN_XT[e4__B_EXIT],
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
+
+static void e4__builtin_OF(struct e4__task *task, e4__cell user)
+{
+    _e4__BUILTIN_EXPECT_REF(task, 1);
+
+    if (e4__stack_peek(task) != (e4__cell)&e4__BUILTIN_XT[e4__B_CASE]) {
+        e4__compile_cancel(task);
+        e4__exception_throw(task, e4__E_CSMISMATCH);
+        e4__execute_ret(task);
+        return;
+    }
+
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_OVER]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_EQUALS]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_BRANCH0]);
+    e4__stack_push(task, task->here++);
+
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_DROP]);
+    e4__stack_push(task, (e4__cell)&e4__BUILTIN_XT[e4__B_OF]);
+
+    e4__execute_ret(task);
+}
 
 static void e4__builtin_PICK(struct e4__task *task, e4__cell user)
 {
