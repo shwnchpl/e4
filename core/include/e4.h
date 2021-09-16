@@ -160,14 +160,23 @@ struct e4__execute_token {
     e4__cell data[1];
 };
 
-/* FIXME: The current API is unstable. As it stands, if you're
-   going to implement one of these, you need to implement them
-   all. In the future, this may change. */
+/* FIXME: The current API is unstable. As it stands, these must all be
+   set at once, either to pointers to handler implementations or NULL,
+   indicating the handler is not supported (e4__E_UNSUPPORTED). In the
+   future, this may change. */
 struct e4__io_func {
     void *user;
+
     e4__usize (*accept)(void *user, char *buf, e4__usize *n);
     e4__usize (*key)(void *user, char *buf);
     e4__usize (*type)(void *user, const char *buf, e4__usize n);
+
+    #if defined(e4__INCLUDE_FACILITY)
+
+        /* FACILITY IO handlers */
+        e4__usize (*keyq)(void *user, e4__usize *bflag);
+
+    #endif /* defined(e4__INCLUDE_FACILITY) */
 };
 
 /* error constants - standard */
@@ -422,6 +431,7 @@ enum e4__builtin_id {
 
         /* FACILITY words */
         e4__B_AT_XY,
+        e4__B_KEY_QUESTION,
         e4__B_PAGE,
 
     #endif /* defined(e4__INCLUDE_FACILITY) */
@@ -564,6 +574,13 @@ void e4__io_pno_start(struct e4__task *task);
 e4__usize e4__io_refill(struct e4__task *task, e4__usize *bf);
 e4__usize e4__io_type(struct e4__task *task, const char *buf, e4__usize n);
 char* e4__io_word(struct e4__task *task, char delim);
+
+#if defined(e4__INCLUDE_FACILITY)
+
+    /* FACILITY io.c functions */
+    e4__usize e4__io_keyq(struct e4__task *task, e4__usize *bflag);
+
+#endif /* defined(e4__INCLUDE_FACILITY) */
 
 /* mem.c functions */
 e4__usize e4__mem_aligned(e4__usize n);

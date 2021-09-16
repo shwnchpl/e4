@@ -4,7 +4,9 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/poll.h>
 #include <unistd.h>
+
 #include <histedit.h>
 
 struct repl_data {
@@ -236,6 +238,34 @@ static e4__usize repl_key(void *user, char *buf)
     return e4__E_OK;
 }
 
+static e4__usize repl_keyq(void *user, e4__usize *bflag)
+{
+    struct pollfd pfd;
+    int pres;
+    struct repl_data *rd = user;
+
+    pfd.fd = STDIN_FILENO;
+    pfd.events = POLLIN;
+
+    /* Set terminal to raw mode. By default, libedit keeps the terminal
+       in cooked mode and we don't do anything to change that, so it is
+       safe to simply assume we are in cooked mode when this function
+       is being called and we should restore the terminal to cooked mode
+       before we return. */
+    el_set(rd->el, EL_PREP_TERM, 1);
+    pres = poll(&pfd, 1, 0);
+    el_set(rd->el, EL_PREP_TERM, 0);
+
+    if (pres < 0)
+        return e4__E_FAILURE;
+    else if (!pres || !(pfd.revents & POLLIN))
+        *bflag = e4__BF_FALSE;
+    else
+        *bflag = e4__BF_TRUE;
+
+    return e4__E_OK;
+}
+
 static e4__usize repl_type(void *user, const char *buf, e4__usize n)
 {
     while (n > 0) {
@@ -260,7 +290,8 @@ int main(int argc, char **argv)
         NULL,
         repl_accept,
         repl_key,
-        repl_type
+        repl_type,
+        repl_keyq
     };
     EditLine *el = NULL;
     History *hist;

@@ -736,7 +736,7 @@ static void e4t__test_builtin_io_error(void)
     e4t__ASSERT_EQ(e4__evaluate(task, "words", -1), e4__E_UNSUPPORTED);
 }
 
-/* Covers PAGE */
+/* Covers AT-XY KEY? PAGE */
 static void e4t__test_builtin_io_facility(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -754,6 +754,37 @@ static void e4t__test_builtin_io_facility(void)
 
     e4t__ASSERT_OK(e4__evaluate(task, "15 30 at-xy ", -1));
     e4t__ASSERT(!strcmp(e4t__term_obuf_consume(), "\033[30;15H"));
+
+    e4t__ASSERT_OK(e4__evaluate(task, "key?", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
+
+    e4t__term_ibuf_feed("foo", -1);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "key?", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+    e4t__ASSERT_OK(e4__evaluate(task, "key", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 'f');
+
+    e4t__ASSERT_OK(e4__evaluate(task, "key?", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+    e4t__ASSERT_OK(e4__evaluate(task, "key", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 'o');
+
+    e4t__ASSERT_OK(e4__evaluate(task, "key?", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+    e4t__ASSERT_OK(e4__evaluate(task, "key", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 'o');
+
+    e4t__ASSERT_OK(e4__evaluate(task, "key?", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
 }
 
 /* Covers <# #> # #S HOLD HOLDS SIGN */
@@ -1450,7 +1481,7 @@ static void e4t__test_builtin_memmanip(void)
     task = e4t__transient_task();
     e4t__ASSERT_OK(e4__evaluate(task, "unused", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
-    e4t__ASSERT_EQ(e4__stack_pop(task), 2262);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2254);
     e4t__ASSERT_OK(e4__evaluate(task, "unused allot unused", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), 0);

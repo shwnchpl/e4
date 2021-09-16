@@ -225,3 +225,15 @@ char* e4__io_word(struct e4__task *task, char delim)
 
     return (char *)task->here;
 }
+
+#if defined(e4__INCLUDE_FACILITY)
+
+    e4__usize e4__io_keyq(struct e4__task *task, e4__usize *bflag)
+    {
+        if (!task->io_func.keyq)
+            return e4__E_UNSUPPORTED;
+
+        return task->io_func.keyq(task->io_func.user, bflag);
+    }
+
+#endif /* defined(e4__INCLUDE_FACILITY) */

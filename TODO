@@ -36,7 +36,7 @@ Compilation
   dictionary entry or any other metadata, so it is probably sufficient.
   Output can look something like this for threaded code.
     : foo 2 2 dup . ; see foo
-        : foo (threaded) (user: 0x0)
+        : foo ( threaded - user: 0x0 )
             LIT_CELL
             0x2
             LIT_CELL
@@ -58,11 +58,10 @@ General Builtins
 - [DONE] Implement the PAGE builtin using escape sequences.
 - [DONE] Implement the AT-XY builtin using pictured numeric output and
   escape sequences.
+- [DONE] Implement the KEY? builtin.
 - Implement TIME&DATE.
 - Implement MS. This will require an additional user callback and can
   be implemented using usleep in the repl.
-- Implement KEY?. This will require an additional user callback and can
-  be implemented using the poll system call on stdin in the repl.
 - Implement [IF], [ELSE], and [THEN].
 - Move the C" builtin to CORE-EXT, where it belongs.
 - Implement ENVIRONMENT?.

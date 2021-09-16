@@ -31,6 +31,19 @@ static const void *e4__builtin_AT_XY[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
+static void e4__builtin_KEY_QUESTION(struct e4__task *task, e4__cell user)
+{
+    register e4__usize io_res;
+    e4__usize bflag;
+
+    if ((io_res = e4__io_keyq(task, &bflag)))
+        e4__exception_throw(task, io_res);
+    else
+        e4__stack_push(task, (e4__cell)bflag);
+
+    e4__execute_ret(task);
+}
+
 static const void *e4__builtin_PAGE[] = {
     &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)"\033[2J\033[0;0H",

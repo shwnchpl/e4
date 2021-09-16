@@ -45,6 +45,18 @@ static e4__usize e4t__term_ibuf_key(void *user, char *buf)
     return e4__E_OK;
 }
 
+static e4__usize e4t__term_ibuf_keyq(void *user, e4__usize *bflag)
+{
+    struct e4t__term_ibuf *b = &e4t__term_ib;
+
+    if (!b->buf)
+        return e4__E_FAILURE;
+
+    *bflag = (b->offset >= b->length) ? e4__BF_FALSE : e4__BF_TRUE;
+
+    return e4__E_OK;
+}
+
 static e4__usize e4t__term_obuf_type(void *user, const char *buf, e4__usize n)
 {
     struct e4t__term_obuf *b = &e4t__term_ob;
@@ -67,6 +79,7 @@ void e4t__term_io_init(struct e4__task *task)
         e4t__term_ibuf_accept,
         e4t__term_ibuf_key,
         e4t__term_obuf_type,
+        e4t__term_ibuf_keyq,
     };
 
     e4__task_io_init(task, &io_func);
@@ -115,6 +128,7 @@ void e4t__term_selftest(void)
     struct e4__task *task = e4t__transient_task();
     char buf[32];
     e4__usize len;
+    e4__usize key_avail;
 
     e4t__ASSERT_OK(e4__io_type(task, "Hello, ", -1));
     e4t__ASSERT_MATCH("Hello, ", e4t__term_obuf_peek());
@@ -140,12 +154,18 @@ void e4t__term_selftest(void)
     buf[len] = '\0';
     e4t__ASSERT_MATCH(buf, " six ni");
 
+    e4t__ASSERT_OK(e4__io_keyq(task, &key_avail));
+    e4t__ASSERT_EQ(key_avail, e4__BF_TRUE);
     e4t__ASSERT_OK(e4__io_key(task, buf));
     e4t__ASSERT_EQ(buf[0], 'n');
 
+    e4t__ASSERT_OK(e4__io_keyq(task, &key_avail));
+    e4t__ASSERT_EQ(key_avail, e4__BF_TRUE);
     e4t__ASSERT_OK(e4__io_key(task, buf));
     e4t__ASSERT_EQ(buf[0], 'e');
 
+    e4t__ASSERT_OK(e4__io_keyq(task, &key_avail));
+    e4t__ASSERT_EQ(key_avail, e4__BF_FALSE);
     e4t__ASSERT_EQ(e4__io_key(task, buf), e4__E_FAILURE);
     e4t__ASSERT_EQ(buf[0], 'e');
 
