@@ -22,29 +22,11 @@ Build
 - [DONE] Split the e4__num namespace into e4__double and e4__usize.
 - Split system required words and optional system specific extension
   words into different modules (SYSTEM and SYSTEM-EXT?).
+- Test minimal REPL build on an Arduino.
 
 Compilation
 -----------
 - [DONE] Add conditional structure words CASE OF ENDCASE ENDOF etc.
-- Implement decompilation (ie. SEE). To start, simply naively display
-  the internal representation. The fully naive approach, for words with
-  the threaded_execute handler, is to simply search the dictionary
-  linearly for each word to see if any entry has each address as an
-  execution token. If it does, display the name corresponding to that
-  entry. If not, simply display the address. This isn't terribly
-  efficient, but it doesn't require storing any references from XT to
-  dictionary entry or any other metadata, so it is probably sufficient.
-  Output can look something like this for threaded code.
-    : foo 2 2 dup . ; see foo
-        : foo ( threaded - user: 0x0 )
-            LIT_CELL
-            0x2
-            LIT_CELL
-            0x2
-            DUP
-            .
-            EXIT
-            SENTINEL
 
 General Builtins
 ----------------
@@ -92,6 +74,8 @@ Kernel
 - [DONE] Improve exception printing implementation and other hackish
   printing implementations (such as the . builtin etc.) by using
   pictured numeric output instead.
+- Consider moving MS and TIME&DATE handlers into e4/core behind some
+  POSIX handlers inclusion flag.
 - Use checked allocation everywhere that HERE is manipulated. WORD is
   specifically allowed to dip into the PNO buffer but not PAD.
 - Ensure, somehow, that the PNO buffer is always at least 33 characters
@@ -113,9 +97,9 @@ REPL
 - Source ~/.e4-editrc to allow for e4 specific input overrides. For
   example, tab completion on tab could be disabled by macro binding
   the tab key to two or four spaces.
-- Increase task buffer size to 32K.
-- Try running the modified ANS 94 Forth Tetris program from Rosetta
-  Code.
+- Create REPL task buffer size to something much larger (32K? 8M?)
+  and/or allow for setting buffer size via a command line argument or
+  environment variable.
 
 Testing
 -------
@@ -130,6 +114,53 @@ Testing
 
 Version 0.4
 ===========
+
+General Builtins
+----------------
+- Implement remaining CORE EXT builtins.
+- Add FILE and some FILE EXT word sets impls.
+
+Kernel
+------
+- Consider providing optional POSIX handlers for file IO. These could
+  be enabled/disabled at compile time.
+
+Repl
+----
+- Try running some the Tetris program again.
+- Make it so that it is possible to automatically include/execute a
+  file that has been specified as a command line argument. That is
+  to say, doing this:
+        $ e4 foo.fth
+  should produce the same result as doing this:
+        $ e4
+        s" foo.fth" included
+
+
+Version 0.5
+===========
+
+Compilation
+-----------
+- Implement decompilation (ie. SEE). To start, simply naively display
+  the internal representation. The fully naive approach, for words with
+  the threaded_execute handler, is to simply search the dictionary
+  linearly for each word to see if any entry has each address as an
+  execution token. If it does, display the name corresponding to that
+  entry. If not, simply display the address. This isn't terribly
+  efficient, but it doesn't require storing any references from XT to
+  dictionary entry or any other metadata, so it is probably sufficient.
+  Output can look something like this for threaded code.
+    : foo 2 2 dup . ; see foo
+        : foo ( threaded - user: 0x0 )
+            LIT_CELL
+            0x2
+            LIT_CELL
+            0x2
+            DUP
+            .
+            EXIT
+            SENTINEL
 
 Kernel
 ------
@@ -269,3 +300,11 @@ Kernel
     -- This would just be too inconsistent with the way that structs
        are treated elsewhere in e4 and would violate the principal of
        least astonishment for no real reason. Better to just not do it.
+
+Repl
+----
+- Try running the modified ANS 94 Forth Tetris program from Rosetta
+  Code.
+    -- This doesn't work well yet. Perhaps it will be worth revisiting
+       once the remaining words from CORE, CORE EXT, and the file word
+       set have been implemented.
