@@ -4,6 +4,8 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+
 #include <sys/poll.h>
 #include <unistd.h>
 
@@ -278,6 +280,21 @@ static e4__usize repl_type(void *user, const char *buf, e4__usize n)
     return e4__E_OK;
 }
 
+static e4__usize repl_unixtime(void *user, e4__usize *t)
+{
+    e4__ASSERT(sizeof(time_t) <= sizeof(e4__usize));
+
+    time_t ut;
+
+    ut = time(NULL);
+    if (ut < 0)
+        return e4__E_FAILURE;
+
+    *t = (e4__usize)ut;
+
+    return e4__E_OK;
+}
+
 int main(int argc, char **argv)
 {
     static char task_buffer[4096];
@@ -291,7 +308,8 @@ int main(int argc, char **argv)
         repl_accept,
         repl_key,
         repl_type,
-        repl_keyq
+        repl_keyq,
+        repl_unixtime,
     };
     EditLine *el = NULL;
     History *hist;

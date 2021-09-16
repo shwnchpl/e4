@@ -237,3 +237,20 @@ char* e4__io_word(struct e4__task *task, char delim)
     }
 
 #endif /* defined(e4__INCLUDE_FACILITY) */
+
+#if defined(e4__INCLUDE_FACILITY_EXT)
+
+    /* FACILITY EXT io.c functions */
+    e4__usize e4__io_unixtime(struct e4__task *task, e4__usize *t)
+    {
+        /* XXX: The unixtime handler is expected to set t to the
+           positive number of seconds elapsed from the Unix epoch at the
+           real time when the handler is invoked. */
+
+        if (!task->io_func.unixtime)
+            return e4__E_UNSUPPORTED;
+
+        return task->io_func.unixtime(task->io_func.user, t);
+    }
+
+#endif /* defined(e4__INCLUDE_FACILITY_EXT) */

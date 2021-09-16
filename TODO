@@ -59,7 +59,7 @@ General Builtins
 - [DONE] Implement the AT-XY builtin using pictured numeric output and
   escape sequences.
 - [DONE] Implement the KEY? builtin.
-- Implement TIME&DATE.
+- [DONE] Implement TIME&DATE.
 - Implement MS. This will require an additional user callback and can
   be implemented using usleep in the repl.
 - Implement [IF], [ELSE], and [THEN].

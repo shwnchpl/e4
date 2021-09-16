@@ -2,6 +2,7 @@
 #include "../e4t.h" /* FIXME: Add this to an include path? */
 
 #include <string.h>
+#include <time.h>
 
 /* Covers *SLASH *SLASH-MOD FM/MOD M* SM/DIV S>D UM* */
 static void e4t__test_builtin_doublemath(void)
@@ -1481,7 +1482,7 @@ static void e4t__test_builtin_memmanip(void)
     task = e4t__transient_task();
     e4t__ASSERT_OK(e4__evaluate(task, "unused", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
-    e4t__ASSERT_EQ(e4__stack_pop(task), 2254);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2246);
     e4t__ASSERT_OK(e4__evaluate(task, "unused allot unused", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), 0);
@@ -1846,6 +1847,53 @@ static void e4t__test_builtin_stackmanip(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 5);
 }
 
+/* Covers TIME&DATE */
+static void e4t__test_builtin_timedate(void)
+{
+    time_t before, after;
+    e4__u8 attempts;
+    e4__usize res;
+    struct e4__task *task = e4t__transient_task();
+    struct tm *t;
+
+    /* XXX: The behavior of the utility underlying TIME&DATE is tested
+       more extensively in util.c. This is just a simple test to ensure
+       the builtin itself works as expected. */
+
+    /* Compare the time reported by TIME&DATE to the time reported by
+       gmtime(time(NULL). If the Unix timestamp happens to change
+       between our initial call to time and our invocation of the
+       TIME&DATE plugin, retry a few times. */
+    for (attempts = 0; attempts < 3; ++attempts) {
+        before = time(NULL);
+        res = e4__evaluate(task, "clear time&date", -1);
+        after = time(NULL);
+        if (before == after)
+            break;
+    }
+
+    e4t__ASSERT(attempts < 3);
+    e4t__ASSERT_OK(res);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 6);
+
+    t = gmtime(&before);
+    e4t__ASSERT(t != NULL);
+
+    /* XXX: The follow tests may fail in the event of a leap second if
+       somehow gmtime happens to actually handle and report leap
+       seconds. Both of these things are very unlikely and if the test
+       fails for what appears to be this reason, it should be simple
+       enough to verify whether or not a leap second has actually
+       occurred. As such, this limitation is acceptable. */
+
+    e4t__ASSERT_EQ(e4__stack_pop(task), t->tm_year + 1900);
+    e4t__ASSERT_EQ(e4__stack_pop(task), t->tm_mon + 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), t->tm_mday);
+    e4t__ASSERT_EQ(e4__stack_pop(task), t->tm_hour);
+    e4t__ASSERT_EQ(e4__stack_pop(task), t->tm_min);
+    e4t__ASSERT_EQ(e4__stack_pop(task), t->tm_sec);
+}
+
 /* Covers BASE HERE PAD SOURCE-ID */
 static void e4t__test_builtin_uservars(void)
 {
@@ -1892,5 +1940,6 @@ void e4t__test_builtin(void)
     e4t__test_builtin_parseword();
     e4t__test_builtin_rstackmanip();
     e4t__test_builtin_stackmanip();
+    e4t__test_builtin_timedate();
     e4t__test_builtin_uservars();
 }

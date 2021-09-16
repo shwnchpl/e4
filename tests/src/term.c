@@ -2,6 +2,7 @@
 #include "e4t.h"
 
 #include <string.h>
+#include <time.h>
 
 struct e4t__term_ibuf {
     const char *buf;
@@ -72,6 +73,21 @@ static e4__usize e4t__term_obuf_type(void *user, const char *buf, e4__usize n)
     return e4__E_OK;
 }
 
+static e4__usize e4t__term_unixtime(void *user, e4__usize *t)
+{
+    e4__ASSERT(sizeof(time_t) <= sizeof(e4__usize));
+
+    time_t ut;
+
+    ut = time(NULL);
+    if (ut < 0)
+        return e4__E_FAILURE;
+
+    *t = (e4__usize)ut;
+
+    return e4__E_OK;
+}
+
 void e4t__term_io_init(struct e4__task *task)
 {
     struct e4__io_func io_func = {
@@ -80,6 +96,7 @@ void e4t__term_io_init(struct e4__task *task)
         e4t__term_ibuf_key,
         e4t__term_obuf_type,
         e4t__term_ibuf_keyq,
+        e4t__term_unixtime,
     };
 
     e4__task_io_init(task, &io_func);

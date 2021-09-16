@@ -29,6 +29,7 @@
     #define e4__INCLUDE_CORE_EXT
     #define e4__INCLUDE_EXCEPTION
     #define e4__INCLUDE_FACILITY
+    #define e4__INCLUDE_FACILITY_EXT
     #define e4__INCLUDE_TOOLS
     #define e4__INCLUDE_TOOLS_EXT
 #elif defined(e4__BUILD_DEFAULT)
@@ -37,6 +38,7 @@
     #define e4__INCLUDE_CORE_EXT
     #define e4__INCLUDE_EXCEPTION
     #define e4__INCLUDE_FACILITY
+    #define e4__INCLUDE_FACILITY_EXT
     #define e4__INCLUDE_TOOLS
     #define e4__INCLUDE_TOOLS_EXT
 #endif
@@ -51,6 +53,10 @@
 
 #if defined(e4__EXCLUDE_FACILITY) && defined(e4__INCLUDE_FACILITY)
     #undef e4__INCLUDE_FACILITY
+#endif
+
+#if defined(e4__EXCLUDE_FACILITY_EXT) && defined(e4__INCLUDE_FACILITY_EXT)
+    #undef e4__INCLUDE_FACILITY_EXT
 #endif
 
 #if defined(e4__EXCLUDE_TOOLS) && defined(e4__INCLUDE_TOOLS)
@@ -177,6 +183,13 @@ struct e4__io_func {
         e4__usize (*keyq)(void *user, e4__usize *bflag);
 
     #endif /* defined(e4__INCLUDE_FACILITY) */
+
+    #if defined(e4__INCLUDE_FACILITY_EXT)
+
+        /* FACILITY EXT IO handlers */
+        e4__usize (*unixtime)(void *user, e4__usize *t);
+
+    #endif /* defined(e4__INCLUDE_FACILITY_EXT) */
 };
 
 struct e4__gmt {
@@ -445,6 +458,13 @@ enum e4__builtin_id {
 
     #endif /* defined(e4__INCLUDE_FACILITY) */
 
+    #if defined(e4__INCLUDE_FACILITY_EXT)
+
+        /* FACILITY EXT words */
+        e4__B_TIME_AND_DATE,
+
+    #endif /* defined(e4__INCLUDE_FACILITY_EXT) */
+
     #if defined(e4__INCLUDE_TOOLS)
 
         /* TOOLS words */
@@ -590,6 +610,13 @@ char* e4__io_word(struct e4__task *task, char delim);
     e4__usize e4__io_keyq(struct e4__task *task, e4__usize *bflag);
 
 #endif /* defined(e4__INCLUDE_FACILITY) */
+
+#if defined(e4__INCLUDE_FACILITY_EXT)
+
+    /* FACILITY EXT io.c functions */
+    e4__usize e4__io_unixtime(struct e4__task *task, e4__usize *t);
+
+#endif /* defined(e4__INCLUDE_FACILITY_EXT) */
 
 /* mem.c functions */
 e4__usize e4__mem_aligned(e4__usize n);
