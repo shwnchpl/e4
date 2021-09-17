@@ -72,6 +72,7 @@
  *************************************************/
 
 #include <stdlib.h>
+#include <limits.h>
 
 /* e4 types */
 typedef void** e4__cell;
@@ -87,8 +88,6 @@ typedef void** e4__cell;
     #else
         /* Attempt to deduce the appropriate size for e4__usize based on
            whatever information is available. */
-        #include <limits.h>
-
         #if !defined(e4__WORDSIZE)
             #if defined(__WORDSIZE)
                 #define e4__WORDSIZE __WORDSIZE

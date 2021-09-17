@@ -4,14 +4,16 @@ General TODO
 Repo Maintenance
 ----------------
 - Add license text to all source files.
+- Consider updating project to use GPL or Apache license.
 - Update README.rst to actually explain this project.
 - Add C++ include guards to all headers.
 
 Build
 -----
-- Attempt to set up an AVR build (or some other 8-16 bit target build)
-  to determine ROM size in that environment. (Preliminary size optimized
-  builds seem to be at around 21K when targeting the ATMega328p).
+- Attempt to set up an 8-bit STM8 build (specifically, targetting the
+  STM8S-DISCOVERY - UM0817). This will involve making some code changes
+  to make sdcc happy (which is a good thing in-and-of itself). It may
+  also be worth considering setting up some kind of SDCC test target.
 
 
 Version 0.3
@@ -20,13 +22,31 @@ Version 0.3
 Build
 -----
 - [DONE] Split the e4__num namespace into e4__double and e4__usize.
-- Split system required words and optional system specific extension
-  words into different modules (SYSTEM and SYSTEM-EXT?).
-- Test minimal REPL build on an Arduino.
+- Test minimal REPL build on an Arduino MKR Zero.
 
 Compilation
 -----------
 - [DONE] Add conditional structure words CASE OF ENDCASE ENDOF etc.
+
+Documentation
+-------------
+- Create initial documentation framework.
+- State that all e4 related variables must be stored in the same
+  address space. This limitation makes it impossible to store constant
+  values in flash on architectures where ROM variables must be stored
+  in a different address space (for example, some 8-bit AVR chips). In
+  theory, it might be possible to work around this to some extent by
+  providing hooks to allow the user to define things like e4__DEREF to
+  check how a variable should be accessed and e4__ROM to declare a
+  constant as belong in ROM (on AVR, this could potentially be done
+  using some custom linker script and __flash; it may also be possible
+  to somehow use __memx in the type for e4__cell and work around needing
+  to set e4__DEREF entirely), but for now support is limited to systems
+  that can (somehow) fit all of e4 into one address space (which, for
+  now, unfortunately means no ATMega328p etc).
+- Note somewhere that all divisions are symmetric by default.
+  Alternatively, consider the benefits of switching to floored division
+  by default.
 
 General Builtins
 ----------------
@@ -86,9 +106,6 @@ Kernel
   number is signed (as in M+).
 - Update words meant to support double width numbers that are currently
   implemented without any such support. This includes >NUMBER.
-- Note somewhere that all divisions are symmetric by default.
-  Alternatively, consider the benefits of switching to floored division
-  by default.
 - Handle dictionary overflows and other overflows.
 - Remove non-pno numeric formatting utilities.
 
@@ -187,6 +204,11 @@ Version 0.9
 
 (things to have done prior to 1.0)
 
+Build
+-----
+- Split system required words and optional system specific extension
+  words into different modules (SYSTEM and SYSTEM-EXT?).
+
 Compilation
 -----------
 - Implement AHEAD?
@@ -268,6 +290,16 @@ Transfer Station
 ================
 
 (won't do lists; cleared after each release)
+
+Build
+-----
+- Attempt to set up an AVR build (or some other 8-16 bit target build)
+  to determine ROM size in that environment. (Preliminary size optimized
+  builds seem to be at around 21K when targeting the ATMega328p).
+    -- Unfortunately, because it is not trivial to store constants in
+       flash memory and read them back in the same way as variables
+       stored in SRAM on the 8-bit AVR archetecture, this is not
+       trivial. Punting for now in favor of an STM8 build.
 
 Kernel
 ------
