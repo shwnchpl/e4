@@ -5,8 +5,10 @@ Repo Maintenance
 ----------------
 - Add license text to all source files.
 - Consider updating project to use GPL or Apache license.
+- Ensure that license is copied into all deliverables (for instance,
+  the amalgam and Arduino sketch build directories/archives).
 - Update README.rst to actually explain this project.
-- Add C++ include guards to all headers.
+- Add C++ include guards to all headers?
 
 Build
 -----
@@ -22,7 +24,9 @@ Version 0.3
 Build
 -----
 - [DONE] Split the e4__num namespace into e4__double and e4__usize.
-- Test minimal REPL build on an Arduino MKR Zero.
+- [DONE] Set up example REPL build for the Arduino MKR Zero.
+- Update amalgam build target to be a .zip file (rather than e4.c) and
+  produce this file when building.
 
 Compilation
 -----------

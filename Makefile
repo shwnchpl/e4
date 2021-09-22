@@ -32,7 +32,8 @@ TESTS_LDFLAGS := -L$(BUILD_DIR) -le4
 # If a target fails, delete it.
 .DELETE_ON_ERROR:
 
-.PHONY: all amalgamation clean repl tests run-repl run-tests longest-lines tags
+.PHONY: all amalgamation clean examples repl tests run-repl run-tests
+.PHONY: longest-lines tags
 
 # Default "all" target.
 all: $(TARGET_LIB) amalgamation repl tests
@@ -44,6 +45,11 @@ clean:
 repl: $(TARGET_REPL)
 tests: $(TARGET_TESTS)
 
+# Examples targets.
+EXAMPLES_TARGETS :=
+include examples/arduino/arduino.mk
+examples: $(EXAMPLES_TARGETS)
+
 # Utility targets to run the repl and tests.
 run-repl: repl
 	$(TARGET_REPL)
@@ -53,7 +59,8 @@ run-tests: tests
 # Utility target to find the longest line length in each source/header
 # file.
 longest-lines:
-	find . -name '*.[ch]' -o -name '*.inc' | xargs wc -L
+	find . -name '*.[ch]' -o -name '*.in[co]' -o -name '*.mk' \
+		-o -name 'Makefile' | xargs wc -L
 
 # Utility target to generate tags. Requires the clean target, to ensure
 # that tags do not erroneously point into the amalgamation.
