@@ -25,8 +25,6 @@ Build
 -----
 - [DONE] Split the e4__num namespace into e4__double and e4__usize.
 - [DONE] Set up example REPL build for the Arduino MKR Zero.
-- Update amalgam build target to be a .zip file (rather than e4.c) and
-  produce this file when building.
 
 Compilation
 -----------
@@ -76,10 +74,6 @@ General Builtins
 - Implement FIND.
 - Implement UM/MOD.
 - Verify that all CORE builtins have been implemented.
-- Consider adding _NF variants to USERVAR declaration macros, defining
-  e4__UV_BEGIN, and simply defining BEGIN as its own uservar rather
-  than in terms of HERE using PUN macros. Consider also removing pun
-  macros.
 
 General IO
 ----------
@@ -105,11 +99,6 @@ Kernel
 - Ensure, somehow, that the PNO buffer is always at least 33 characters
   (which is a requirement of WORD). On a system where e4__USIZE_BIT is
   greater than or equal to 16, this will always be the case.
-- Add support for adding a single cell number to a double cell number
-  (which is needed for >NUMBER). It may be assumed that the single cell
-  number is signed (as in M+).
-- Update words meant to support double width numbers that are currently
-  implemented without any such support. This includes >NUMBER.
 - Handle dictionary overflows and other overflows.
 - Remove non-pno numeric formatting utilities.
 
@@ -136,10 +125,19 @@ Testing
 Version 0.4
 ===========
 
+Build
+-----
+- Update amalgam build target to be a .zip file (rather than e4.c) and
+  produce this file when building.
+
 General Builtins
 ----------------
 - Implement remaining CORE EXT builtins.
 - Add FILE and some FILE EXT word sets impls.
+- Consider adding _NF variants to USERVAR declaration macros, defining
+  e4__UV_BEGIN, and simply defining BEGIN as its own uservar rather
+  than in terms of HERE using PUN macros. Consider also removing pun
+  macros.
 
 Kernel
 ------
@@ -201,6 +199,11 @@ Kernel
   is not in an interrupt context. This *may* not be an issue (failure
   to actually throw is always something an API client can work around),
   but it probably isn't entirely desirable.
+- Add support for adding a single cell number to a double cell number
+  (which is needed for >NUMBER). It may be assumed that the single cell
+  number is signed (as in M+).
+- Update words meant to support double width numbers that are currently
+  implemented without any such support. This includes >NUMBER.
 
 
 Version 0.9
