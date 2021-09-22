@@ -5,7 +5,7 @@
    file and it is *not* designed to work correctly in any other
    context. */
 
-static const void *e4__builtin_AT_XY[] = {
+static const void * const e4__builtin_AT_XY[] = {
     &e4__BUILTIN_XT[e4__B_S_TO_D],
     &e4__BUILTIN_XT[e4__B_ROT],
     &e4__BUILTIN_XT[e4__B_S_TO_D],
@@ -44,7 +44,7 @@ static void e4__builtin_KEY_QUESTION(struct e4__task *task, e4__cell user)
     e4__execute_ret(task);
 }
 
-static const void *e4__builtin_PAGE[] = {
+static const void * const e4__builtin_PAGE[] = {
     &e4__BUILTIN_XT[e4__B_LIT_CELL],
     (void *)"\033[2J\033[0;0H",
     &e4__BUILTIN_XT[e4__B_LIT_CELL],
