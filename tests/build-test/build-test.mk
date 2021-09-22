@@ -22,23 +22,37 @@ $($(1)_BUILD_DIR)/%.c.o: %.c
 endef
 
 # Test the three main build modes.
-$(eval $(call build-test,BUILD_EVERYTHING,0x601a1,-De4__BUILD_EVERYTHING))
+$(eval $(call build-test,BUILD_EVERYTHING,0x20601a1,-De4__BUILD_EVERYTHING))
 $(eval $(call build-test,BUILD_DEFAULT,0x601a1,-De4__BUILD_DEFAULT))
 $(eval $(call build-test,BUILD_MINIMAL,0,-De4__BUILD_MINIMAL))
 
-# Test excluding any single word set.
-$(eval $(call build-test,BUILD_NO_CORE_EXT,0x601a0,\
+# Test excluding any single wordlist from an everything build.
+$(eval $(call build-test,BUILD_EVERYTHING_NO_CORE_EXT,0x20601a0,\
 	-De4__BUILD_EVERYTHING -De4__EXCLUDE_CORE_EXT))
-$(eval $(call build-test,BUILD_NO_EXCEPTION,0x60181,\
+$(eval $(call build-test,BUILD_EVERYTHING_NO_EXCEPTION,0x2060181,\
 	-De4__BUILD_EVERYTHING -De4__EXCLUDE_EXCEPTION))
-$(eval $(call build-test,BUILD_NO_FACILITY,0x60121,\
+$(eval $(call build-test,BUILD_EVERYTHING_NO_FACILITY,0x2060121,\
 	-De4__BUILD_EVERYTHING -De4__EXCLUDE_FACILITY))
-$(eval $(call build-test,BUILD_NO_FACILITY_EXT,0x600a1,\
+$(eval $(call build-test,BUILD_EVERYTHING_NO_FACILITY_EXT,0x20600a1,\
 	-De4__BUILD_EVERYTHING -De4__EXCLUDE_FACILITY_EXT))
-$(eval $(call build-test,BUILD_NO_TOOLS,0x401a1,\
+$(eval $(call build-test,BUILD_EVERYTHING_NO_TOOLS,0x20401a1,\
 	-De4__BUILD_EVERYTHING -De4__EXCLUDE_TOOLS))
-$(eval $(call build-test,BUILD_NO_TOOLS_EXT,0x201a1,\
+$(eval $(call build-test,BUILD_EVERYTHING_NO_TOOLS_EXT,0x20201a1,\
 	-De4__BUILD_EVERYTHING -De4__EXCLUDE_TOOLS_EXT))
+
+# Test excluding any single wordlist from a default build.
+$(eval $(call build-test,BUILD_DEFAULT_NO_CORE_EXT,0x601a0,\
+	-De4__BUILD_DEFAULT -De4__EXCLUDE_CORE_EXT))
+$(eval $(call build-test,BUILD_DEFAULT_NO_EXCEPTION,0x60181,\
+	-De4__BUILD_DEFAULT -De4__EXCLUDE_EXCEPTION))
+$(eval $(call build-test,BUILD_DEFAULT_NO_FACILITY,0x60121,\
+	-De4__BUILD_DEFAULT -De4__EXCLUDE_FACILITY))
+$(eval $(call build-test,BUILD_DEFAULT_NO_FACILITY_EXT,0x600a1,\
+	-De4__BUILD_DEFAULT -De4__EXCLUDE_FACILITY_EXT))
+$(eval $(call build-test,BUILD_DEFAULT_NO_TOOLS,0x401a1,\
+	-De4__BUILD_DEFAULT -De4__EXCLUDE_TOOLS))
+$(eval $(call build-test,BUILD_DEFAULT_NO_TOOLS_EXT,0x201a1,\
+	-De4__BUILD_DEFAULT -De4__EXCLUDE_TOOLS_EXT))
 
 build-test: $(BUILD_TEST_TARGETS)
 

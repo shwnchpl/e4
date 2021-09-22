@@ -4,7 +4,6 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
 #include <sys/poll.h>
 #include <unistd.h>
@@ -268,16 +267,6 @@ static e4__usize repl_keyq(void *user, e4__usize *bflag)
     return e4__E_OK;
 }
 
-static e4__usize repl_ms(void *user, e4__usize ms)
-{
-    struct timespec ts;
-
-    ts.tv_sec = ms / 1000;
-    ts.tv_nsec = (ms % 1000) * 1000000;
-
-    return nanosleep(&ts, NULL) ? e4__E_FAILURE : e4__E_OK;
-}
-
 static e4__usize repl_type(void *user, const char *buf, e4__usize n)
 {
     while (n > 0) {
@@ -286,21 +275,6 @@ static e4__usize repl_type(void *user, const char *buf, e4__usize n)
             return e4__E_FAILURE;
         n -= wrote;
     }
-
-    return e4__E_OK;
-}
-
-static e4__usize repl_unixtime(void *user, e4__usize *t)
-{
-    e4__ASSERT(sizeof(time_t) <= sizeof(e4__usize));
-
-    time_t ut;
-
-    ut = time(NULL);
-    if (ut < 0)
-        return e4__E_FAILURE;
-
-    *t = (e4__usize)ut;
 
     return e4__E_OK;
 }
@@ -319,8 +293,8 @@ int main(int argc, char **argv)
         repl_key,
         repl_type,
         repl_keyq,
-        repl_ms,
-        repl_unixtime,
+        e4__posix_ms,
+        e4__posix_unixtime,
     };
     EditLine *el = NULL;
     History *hist;

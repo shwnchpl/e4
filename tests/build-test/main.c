@@ -32,6 +32,7 @@
 #define STRING_EXT_BIT      22
 #define XCHAR_BIT           23
 #define XCHAR_EXT_BIT       24
+#define POSIX_HOOKS_BIT     25
 
 /* ASCII escape sequences for simple colored output. */
 #define COLOR_RESET         "\033[0m"
@@ -74,6 +75,9 @@ int main(int argc, char **argv)
         #endif
         #if defined(e4__INCLUDE_FACILITY_EXT)
             wordset |= (1 << FACILITY_EXT_BIT);
+        #endif
+        #if defined(e4__INCLUDE_POSIX_HOOKS)
+            wordset |= (1 << POSIX_HOOKS_BIT);
         #endif
         #if defined(e4__INCLUDE_TOOLS)
             wordset |= (1 << TOOLS_BIT);

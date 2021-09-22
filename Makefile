@@ -26,6 +26,7 @@ TESTS_OBJS := $(TESTS_SRCS:%=$(BUILD_DIR)/%.o)
 TESTS_DEPS := $(TESTS_OBJS:.o=.d)
 
 CFLAGS := -Wall -Wpedantic -Werror -std=c89 -Os -MMD -MP
+POSIX_FLAGS := $(CFLAGS) -De4__BUILD_EVERYTHING
 REPL_LDFLAGS := -ledit
 TESTS_LDFLAGS := -L$(BUILD_DIR) -le4
 
@@ -83,7 +84,8 @@ $(TARGET_LIB): $(CORE_OBJS)
 	$(AR) rcs $@ $(CORE_OBJS)
 
 $(TARGET_REPL): $(REPL_OBJS) $(TARGET_AMALGAM)
-	$(CC) $(CFLAGS) $(TARGET_AMALGAM) $(REPL_OBJS) $(REPL_LDFLAGS) -o $@
+	$(CC) $(POSIX_FLAGS) $(TARGET_AMALGAM) $(REPL_OBJS) $(REPL_LDFLAGS) \
+		-o $@
 
 $(TARGET_TESTS): $(TESTS_OBJS) $(TARGET_LIB)
 	$(CC) $(TESTS_OBJS) $(TESTS_LDFLAGS) -o $@
@@ -91,7 +93,7 @@ $(TARGET_TESTS): $(TESTS_OBJS) $(TARGET_LIB)
 # Build step for C source
 $(BUILD_DIR)/%.c.o: %.c
 	mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -I$(INC_DIRS) -c $< -o $@
+	$(CC) $(POSIX_FLAGS) -I$(INC_DIRS) -c $< -o $@
 
 -include $(CORE_DEPS)
 -include $(REPL_DEPS)

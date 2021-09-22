@@ -30,11 +30,10 @@
     #define e4__INCLUDE_EXCEPTION
     #define e4__INCLUDE_FACILITY
     #define e4__INCLUDE_FACILITY_EXT
+    #define e4__INCLUDE_POSIX_HOOKS
     #define e4__INCLUDE_TOOLS
     #define e4__INCLUDE_TOOLS_EXT
 #elif defined(e4__BUILD_DEFAULT)
-    /* XXX: For now, this is the same as everything, but that likely
-       will not always be the case. */
     #define e4__INCLUDE_CORE_EXT
     #define e4__INCLUDE_EXCEPTION
     #define e4__INCLUDE_FACILITY
@@ -59,6 +58,10 @@
     #undef e4__INCLUDE_FACILITY_EXT
 #endif
 
+#if defined(e4__EXCLUDE_POSIX_HOOKS) && defined(e4__INCLUDE_POSIX_HOOKS)
+    #undef e4__INCLUDE_POSIX_HOOKS
+#endif
+
 #if defined(e4__EXCLUDE_TOOLS) && defined(e4__INCLUDE_TOOLS)
     #undef e4__INCLUDE_TOOLS
 #endif
@@ -70,6 +73,10 @@
 /**************************************************
  *               e4 public C API
  *************************************************/
+
+#if defined(e4__INCLUDE_POSIX_HOOKS) && !defined(_POSIX_C_SOURCE)
+    #define _POSIX_C_SOURCE 199309L
+#endif
 
 #include <stdlib.h>
 #include <limits.h>
@@ -689,5 +696,12 @@ struct e4__double e4__usize_mul(e4__usize l, e4__usize r, e4__u8 flags);
 e4__usize e4__usize_sdiv(e4__usize n, e4__usize d, e4__usize *r);
 struct e4__double e4__usize_todouble(e4__usize u);
 void e4__usize_togmt(e4__usize t, struct e4__gmt *gmt);
+
+#if defined(e4__INCLUDE_POSIX_HOOKS)
+    #if defined(e4__INCLUDE_FACILITY_EXT)
+        e4__usize e4__posix_ms(void *user, e4__usize ms);
+        e4__usize e4__posix_unixtime(void *user, e4__usize *t);
+    #endif /* defined(e4__INCLUDE_FACILITY_EXT) */
+#endif /* defined(e4__INCLUDE_POSIX_HOOKS) */
 
 #endif /* e4_H_ */
