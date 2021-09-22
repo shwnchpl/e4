@@ -673,8 +673,9 @@ e4__cell e4__task_allot(struct e4__task *task, e4__usize sz);
 e4__cell e4__task_allot_unchecked(struct e4__task *task, e4__usize sz);
 e4__bool e4__task_compiling(struct e4__task *task);
 struct e4__task* e4__task_create(void *buffer, e4__usize sz);
-void e4__task_io_init(struct e4__task *task, struct e4__io_func *io);
-void e4__task_io_get(struct e4__task *task, struct e4__io_func *io);
+void e4__task_io_init(struct e4__task *task,
+        const struct e4__io_func *io_func);
+void e4__task_io_get(struct e4__task *task, struct e4__io_func *io_func);
 e4__usize e4__task_unused(struct e4__task *task);
 e4__cell e4__task_uservar(struct e4__task *task, e4__usize offset);
 

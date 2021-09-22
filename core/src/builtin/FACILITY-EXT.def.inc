@@ -7,9 +7,12 @@
 
 static void e4__builtin_MS(struct e4__task *task, e4__cell user)
 {
+    register e4__usize io_res;
+
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
 
-    e4__io_ms(task, (e4__usize)e4__stack_pop(task));
+    if ((io_res = e4__io_ms(task, (e4__usize)e4__stack_pop(task))))
+        e4__exception_throw(task, io_res);
 
     e4__execute_ret(task);
 }
