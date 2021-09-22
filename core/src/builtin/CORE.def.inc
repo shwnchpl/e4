@@ -111,28 +111,6 @@ static void e4__builtin_C_FETCH(struct e4__task *task, e4__cell user)
     e4__execute_ret(task);
 }
 
-static void e4__builtin_C_QUOTE(struct e4__task *task, e4__cell user)
-{
-    const char *str;
-    register e4__usize len;
-    register e4__u8 clamped_len;
-
-    len = e4__io_parse(task, '"', 0, &str);
-
-    /* XXX: Ambiguous condition. If len is greater than 255, only take
-       the first 255 bytes since that's all that can be stored in a
-       counted string. */
-    clamped_len = len < 256 ? (e4__u8)len : 255;
-
-    if (e4__task_compiling(task)) {
-        e4__compile_cstr(task, str, clamped_len);
-    }
-
-    /* FIXME: Handle runtime semantics. */
-
-    e4__execute_ret(task);
-}
-
 static void e4__builtin_C_STORE(struct e4__task *task, e4__cell user)
 {
     register e4__u8 *c, v;
