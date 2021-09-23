@@ -561,6 +561,91 @@ static void e4t__test_builtin_forget(void)
     e4t__ASSERT_EQ(e4__task_uservar(task, e4__UV_HERE), here);
 }
 
+/* Covers [ELSE] [IF] [THEN] */
+static void e4t__test_builtin_immed_cond(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* Test that [IF]/[THEN] works while evaluating. */
+    e4t__ASSERT_OK(e4__evaluate(task, "1 [if] 5 [then]", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+    e4t__ASSERT_OK(e4__evaluate(task, "0 [if] 5 [then]", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
+
+    /* Test that whatever is between [IF]/[THEN] need not be valid
+       syntax when [IF]'s condition is false. */
+    e4t__ASSERT_OK(e4__evaluate(task, "0 [if] just some junk [then]", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 [if] just some junk [then]", -1),
+            e4__E_UNDEFWORD);
+
+    /* Test that [IF]/[THEN] may span multiple input lines. */
+    e4t__ASSERT_OK(e4__evaluate(task, "0 [if] just some junk\n"
+            "even more junk\nand finally done [then] 5", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+
+    /* Test that nested [IF]/[THEN] works as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task, "1 [if] 5 1 [if] 10 [then] 15 [then]",
+            -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 3);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 15);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 10);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "1 [if] 5 0 [if] 10 [then] 15 [then]",
+            -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 15);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "0 [if] 5 0 [if] 10 [then] 15 [then]",
+            -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
+
+    /* Test that [IF]/[ELSE]/[THEN] works while evaluating. */
+    e4t__ASSERT_OK(e4__evaluate(task, "1 [if] 5 [else] 7 [then]", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+    e4t__ASSERT_OK(e4__evaluate(task, "0 [if] 5 [else] 7 [then]", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 7);
+
+    /* Test that whatever is between [ELSE]/[THEN] need not be valid
+       syntax when the initial [IF]'s condition was true. */
+    e4t__ASSERT_OK(e4__evaluate(task, "1 [if] [else] just some junk [then]",
+            -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "0 [if] [else] just some junk [then]",
+            -1), e4__E_UNDEFWORD);
+
+    /* Test that [IF]/[ELSE]/[THEN] may span multiple input lines. */
+    e4t__ASSERT_OK(e4__evaluate(task, "1 [if] 10 [else] just some junk\n"
+            "even more junk\nand finally done [then] 5", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 10);
+
+    /* Test that nested [IF]/[ELSE]/[THEN] works as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task,
+            "1 [if] 5 1 [if] 10 [else] 17 [then] 15 [else] 7 [then]", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 3);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 15);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 10);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+
+    e4t__ASSERT_OK(e4__evaluate(task,
+            "1 [if] 5 0 [if] 10 [else] 17 [then] 15 [else] 7 [then]", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 3);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 15);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 17);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+
+    e4t__ASSERT_OK(e4__evaluate(task,
+            "0 [if] 5 1 [if] 10 [else] 17 [then] 15 [else] 7 [then]", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 7);
+}
+
 /* Covers ['] TO and ancillary compilation words */
 static void e4t__test_builtin_immediate(void)
 {
@@ -1930,6 +2015,7 @@ void e4t__test_builtin(void)
     e4t__test_builtin_evaluate();
     e4t__test_builtin_exceptions();
     e4t__test_builtin_forget();
+    e4t__test_builtin_immed_cond();
     e4t__test_builtin_immediate();
     e4t__test_builtin_io();
     e4t__test_builtin_io_dump();

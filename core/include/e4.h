@@ -490,6 +490,9 @@ enum e4__builtin_id {
     #if defined(e4__INCLUDE_TOOLS_EXT)
 
         /* TOOLS EXT words */
+        e4__B_BRACKET_ELSE,
+        e4__B_BRACKET_IF,
+        e4__B_BRACKET_THEN,
         e4__B_BYE,
         e4__B_FORGET,
 

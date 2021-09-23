@@ -156,9 +156,9 @@ static void e4__builtin_RESTRICT(struct e4__task *task, e4__cell user)
 static void e4__builtin_SENTINEL(struct e4__task *task, e4__cell user)
 {
     /* XXX: This function's sole purpose is to act as a unique
-       identifier. The standard guarantees that this is okay, as any
-       compiler optimization that would cause its address to compare
-       equally to the address of some other function would be
+       identifier and noop. The standard guarantees that this is okay,
+       as any compiler optimization that would cause its address to
+       compare equally to the address of some other function would be
        a violation of the as-if clause. */
     e4__execute_ret(task);
 }

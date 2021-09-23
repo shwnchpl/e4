@@ -95,7 +95,7 @@ General Builtins
 - [DONE] Implement TIME&DATE.
 - [DONE] Implement MS.
 - [DONE] Move the C" builtin to CORE-EXT, where it belongs.
-- Implement [IF], [ELSE], and [THEN].
+- [DONE] Implement [IF], [ELSE], and [THEN].
 - Implement ENVIRONMENT?.
 - Implement STATE, >IN, and SOURCE.
 - Implement ABORT".
