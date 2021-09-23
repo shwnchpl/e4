@@ -211,6 +211,7 @@ struct e4__gmt {
 /* error constants - standard */
 #define e4__E_OK            (0)
 #define e4__E_ABORT         (-1)
+#define e4__E_ABORTQ        (-2)
 #define e4__E_STKUNDERFLOW  (-4)
 #define e4__E_RSTKUNDERFLOW (-6)
 #define e4__E_DICTOVERFLOW  (-8)
@@ -272,6 +273,7 @@ struct e4__gmt {
 enum e4__builtin_id {
     /* CORE words */
     e4__B_ABORT = 0,
+    e4__B_ABORT_QUOTE,
     e4__B_ABS,
     e4__B_ALIGN,
     e4__B_ALIGNED,
@@ -398,6 +400,7 @@ enum e4__builtin_id {
     e4__B_ZERO_LESS,
 
     /* SYSTEM words */
+    e4__B_ABORTQ,
     e4__B_BRANCH,
     e4__B_BRANCH0,
     e4__B_CLEAR,
@@ -686,6 +689,7 @@ struct e4__task* e4__task_create(void *buffer, e4__usize sz);
 void e4__task_io_init(struct e4__task *task,
         const struct e4__io_func *io_func);
 void e4__task_io_get(struct e4__task *task, struct e4__io_func *io_func);
+e4__usize e4__task_last_abortq(struct e4__task *task, const char **msg);
 e4__usize e4__task_unused(struct e4__task *task);
 e4__cell e4__task_uservar(struct e4__task *task, e4__usize offset);
 

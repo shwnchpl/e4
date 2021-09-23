@@ -26,6 +26,22 @@ static void e4__builtin_ABORT(struct e4__task *task, e4__cell user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_ABORT_QUOTE(struct e4__task *task, e4__cell user)
+{
+    const char *str;
+    register e4__usize len;
+    register e4__cell fref;
+
+    len = e4__io_parse(task, '"', 0, &str);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_BRANCH0]);
+    fref = task->here++;
+    e4__compile_str(task, str, len);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_ABORTQ]);
+    e4__DEREF(fref) = (e4__cell)(task->here - fref);
+
+    e4__execute_ret(task);
+}
+
 static const void * const e4__builtin_ABS[] = {
     &e4__BUILTIN_XT[e4__B_DUP],
     &e4__BUILTIN_XT[e4__B_ZERO_LESS],

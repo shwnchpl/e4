@@ -71,6 +71,8 @@ const char* e4__usize_format_exception(e4__usize e, e4__usize *len)
             _return_with_len("ok");
         case e4__E_ABORT:
             _return_with_len("abort");
+        case e4__E_ABORTQ:
+            _return_with_len("abort with message");
         case e4__E_STKUNDERFLOW:
             _return_with_len("stack underflow");
         case e4__E_RSTKUNDERFLOW:

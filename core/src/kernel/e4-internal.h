@@ -77,6 +77,8 @@ struct e4__task
     struct e4__dict_header *dict;
     struct e4__io_func io_func;
     struct e4__exception_state exception;
+    const char *abortq_msg;
+    e4__usize abortq_msg_len;
 };
 
 #endif /* e4_INTERNAL_H_ */

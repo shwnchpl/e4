@@ -1,6 +1,27 @@
 #include "e4.h"
 #include "../e4t.h" /* FIXME: Add this to an include path? */
 
+/* Covers ABORT" ABORTQ */
+static void e4t__test_compile_abortq(void)
+{
+    struct e4__task *task = e4t__transient_task();
+    e4__usize len;
+    const char *msg = NULL;
+
+    /* Test that compiling ABORT" works as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": ifabort abort\" Was nonzero.\" 55 ;",
+            -1));
+
+    /* Test that ABORT" evaluates ABORTQ on zero and skips over it
+       otherwise. */
+    e4t__ASSERT_OK(e4__evaluate(task, "0 ifabort", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 ifabort", -1), e4__E_ABORTQ);
+    e4t__ASSERT_EQ(e4__evaluate(task, "-1 ifabort", -1), e4__E_ABORTQ);
+    e4t__ASSERT_EQ((len = e4__task_last_abortq(task, &msg)), 12);
+    e4t__ASSERT(msg);
+    e4t__ASSERT(!e4__mem_strncasecmp("Was nonzero.", msg, len));
+}
+
 /* Covers CASE ENDCASE ENDOF OF */
 static void e4t__test_compile_case(void)
 {
@@ -736,6 +757,7 @@ static void e4t__test_compile_while_loop(void)
 void e4t__test_compile(void)
 {
     /* FIXME: Add direct compilation API tests? */
+    e4t__test_compile_abortq();
     e4t__test_compile_case();
     e4t__test_compile_conditional();
     e4t__test_compile_does();

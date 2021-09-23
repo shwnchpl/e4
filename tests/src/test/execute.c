@@ -247,9 +247,11 @@ static void e4t__test_execute_does(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 53);
 }
 
-/* Covers ABORT (exceptions disabled) LIT_CELL and nested execution. */
+/* Covers ABORT and ABORTQ (exceptions disabled) LIT_CELL and nested
+   execution. */
 static void e4t__test_execute_nested(void)
 {
+    const char *msg = (const char *)0x1234;
     static const void *push_12345[] = {
         (void *)(e4__usize)e4__execute_threaded,
         NULL,
@@ -294,7 +296,23 @@ static void e4t__test_execute_nested(void)
         &e4__BUILTIN_XT[e4__B_EXIT],
         &e4__BUILTIN_XT[e4__B_SENTINEL]
     };
+    static const void *push_seq_abortq[] = {
+        (void *)(e4__usize)e4__execute_threaded,
+        NULL,
+        push_77777,
+        push_abcde,
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
+        "Abort message.",
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
+        (void *)14,
+        &e4__BUILTIN_XT[e4__B_ABORTQ],
+        push_12345,
+        &e4__BUILTIN_XT[e4__B_EXIT],
+        &e4__BUILTIN_XT[e4__B_SENTINEL]
+    };
     struct e4__task *task = e4t__transient_task();
+
+    e4t__term_obuf_consume();
 
     e4__execute(task, push_12345);
     e4t__ASSERT_EQ(e4__stack_pop(task), 0x12345);
@@ -308,6 +326,13 @@ static void e4t__test_execute_nested(void)
     /* Test exception disabled ABORT behavior. */
     e4__execute(task, push_seq_abort);
     e4t__ASSERT_EQ(e4__stack_depth(task), 0);
+
+    /* Test exception disabled ABORTQ behavior. */
+    e4__execute(task, push_seq_abortq);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), " Abort message.\n");
+    e4t__ASSERT_EQ(e4__task_last_abortq(task, &msg), 0);
+    e4t__ASSERT_EQ(msg, NULL);
 }
 
 /* Covers string literals. */

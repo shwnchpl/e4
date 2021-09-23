@@ -121,6 +121,19 @@ void e4__task_io_get(struct e4__task *task, struct e4__io_func *io_func)
     *io_func = task->io_func;
 }
 
+/* XXX: The results of this function are not necessarily valid if any
+   deallocation whatsoever has occurred since task->abortq_msg was set.
+   This means that if e4__E_ABORTQ has been caught, deallocation has
+   occurred, and e4__E_ABORTQ has been manually rethrown, the validity
+   of the string returned from this function is not well defined.
+   May set msg to NULL and/or return 0. In either case, *msg should not
+   be considered to point to valid data. */
+e4__usize e4__task_last_abortq(struct e4__task *task, const char **msg)
+{
+    *msg = task->abortq_msg;
+    return task->abortq_msg_len;
+}
+
 e4__usize e4__task_unused(struct e4__task *task)
 {
     /* XXX: Dictionary overflows should be prevented from happening

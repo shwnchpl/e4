@@ -6,6 +6,7 @@
    context. */
 
 #define _e4__BUILTIN_SYSTEM_DECL()    \
+    _e4__BUILTIN_PROC(ABORTQ)   \
     _e4__BUILTIN_PROC_F(BRANCH, e4__F_COMPONLY)     \
     _e4__BUILTIN_PROC_F(BRANCH0, e4__F_COMPONLY)    \
     _e4__BUILTIN_PROC(CLEAR)    \

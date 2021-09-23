@@ -210,6 +210,16 @@ void e4__evaluate_quit(struct e4__task *task)
             case e4__E_BYE:
                 running = 0;
                 break;
+            case e4__E_ABORTQ:
+                if (task->abortq_msg) {
+                    e4__io_type(task, " ", 1);
+                    e4__io_type(task, task->abortq_msg, task->abortq_msg_len);
+                    e4__io_type(task, "\n", 1);
+
+                    task->abortq_msg = NULL;
+                    task->abortq_msg_len = 0;
+                }
+                /* fall through */
             default: {
                 struct e4__double d;
                 const char *str;

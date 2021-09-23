@@ -5,6 +5,41 @@
    file and it is *not* designed to work correctly in any other
    context. */
 
+static void e4__builtin_ABORTQ(struct e4__task *task, e4__cell user)
+{
+    register int i;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    /* Set abortq fields as appropriate. */
+    task->abortq_msg_len = (e4__usize)e4__stack_pop(task);
+    task->abortq_msg = (const char *)e4__stack_pop(task);
+
+    /* Try to just throw an exception. */
+    e4__exception_throw(task, e4__E_ABORTQ);
+
+    /* Okay, exceptions aren't enabled, meaning we definitely aren't
+       running within the context of quit. Attempt to display the
+       message and manually perform the core ABORT semantics outlined in
+       6.1.0670 by manually clearing the data stack and filling the
+       return stack with immediate return thunks. */
+    /* XXX: While these calls may fail, we already know that we can't
+       raise an exception if they do, so simply ignore any errors. */
+    e4__io_type(task, " ", 1);
+    e4__io_type(task, task->abortq_msg, task->abortq_msg_len);
+    e4__io_type(task, "\n", 1);
+
+    task->abortq_msg = NULL;
+    task->abortq_msg_len = 0;
+
+    e4__stack_clear(task);
+
+    for (i = 1; &task->rp[i] <= task->r0; ++i)
+        task->rp[i] = _e4__BUILTIN_RETURN_THUNK;
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_BRANCH(struct e4__task *task, e4__cell user)
 {
     register e4__usize offset;

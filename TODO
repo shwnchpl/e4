@@ -78,6 +78,15 @@ Documentation
   currently so to say that it's on the back burner would be overly
   generous; for the time being, the pot needed to make the soup is still
   hanging over the sink.
+- Note that when calling e4__evaluate, if an ABORT" exception is thrown,
+  with message, it is the callers responsibility to display the message
+  if they want to do so. The message is available via the
+  e4__task_last_abortq API. If exceptions are disabled completely or if
+  the top exception handler is the handler in e4__evaluate_quit (ie.
+  e4 is being run interactively), an attempt will be made to write the
+  message using type IO handler, if available. Much like abort or any
+  other exception, it is also the responsibility of the caller to clear
+  the stack or cancel compilation as is appropriate.
 
 General Builtins
 ----------------
@@ -96,9 +105,9 @@ General Builtins
 - [DONE] Implement MS.
 - [DONE] Move the C" builtin to CORE-EXT, where it belongs.
 - [DONE] Implement [IF], [ELSE], and [THEN].
+- [DONE] Implement ABORT".
 - Implement ENVIRONMENT?.
 - Implement STATE, >IN, and SOURCE.
-- Implement ABORT".
 - Implement ACCEPT.
 - Implement FIND.
 - Implement UM/MOD.

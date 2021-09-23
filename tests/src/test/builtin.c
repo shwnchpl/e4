@@ -476,10 +476,12 @@ static void e4t__test_builtin_evaluate(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__SID_STR);
 }
 
-/* Covers ABORT BYE CATCH THROW QUIT */
+/* Covers ABORT ABORTQ BYE CATCH THROW QUIT */
 static void e4t__test_builtin_exceptions(void)
 {
     struct e4__task *task = e4t__transient_task();
+    e4__usize len;
+    const char *msg = NULL;
 
     /* XXX: Detailed stack and return stack preservation semantics are
        covered by e4t__test_kernel_exceptions in kernel.c. */
@@ -516,6 +518,17 @@ static void e4t__test_builtin_exceptions(void)
     e4t__ASSERT_EQ(e4__stack_depth(task), 2);
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__E_OK);
     e4t__ASSERT_EQ(e4__stack_pop(task), 5);
+
+    /* Test that ABORTQ throws -2 and sets last_abortq appropriately,
+       without writing to the output buffer. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo s\" An abort message.\" ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "31", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "foo abortq", -1), e4__E_ABORTQ);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 31);
+    e4t__ASSERT_EQ((len = e4__task_last_abortq(task, &msg)), 17);
+    e4t__ASSERT(msg);
+    e4t__ASSERT(!e4__mem_strncasecmp("An abort message.", msg, len));
 }
 
 /* Covers FORGET, MARKER and look-ahead idiom (which uses builtin
@@ -1570,7 +1583,7 @@ static void e4t__test_builtin_memmanip(void)
     task = e4t__transient_task();
     e4t__ASSERT_OK(e4__evaluate(task, "unused", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
-    e4t__ASSERT_EQ(e4__stack_pop(task), 2238);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2222);
     e4t__ASSERT_OK(e4__evaluate(task, "unused allot unused", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), 0);

@@ -564,6 +564,7 @@ static e4__usize e4t__test_kernel_quit_accept(void *user, char *buf,
         e4__usize *n)
 {
     struct e4t__test_kernel_quit_data *test_data = user;
+    const char *msg = (const char *)0x1234;
 
     #define _m(s)   \
         do { \
@@ -630,6 +631,20 @@ static e4__usize e4t__test_kernel_quit_accept(void *user, char *buf,
                exception has occurred. */
             e4t__ASSERT_MATCH(e4t__term_obuf_consume(),
                     " EXCEPTION: generic failure (-256)\n");
+            /* Test that a firing ABORT" exception is formatted
+               correctly. */
+            e4t__ASSERT_OK(e4__evaluate(test_data->task,
+                    ": alwaysabort -1 abort\" You asked for it.\" ;", -1));
+            _m("alwaysabort");
+            break;
+        case 10:
+            /* The output buffer should reflect the fact that an ABORT"
+               exception has occurred. */
+            e4t__ASSERT_MATCH(e4t__term_obuf_consume(),
+                    " You asked for it.\n"
+                    " EXCEPTION: abort with message (-2)\n");
+            e4t__ASSERT_EQ(e4__task_last_abortq(test_data->task, &msg), 0);
+            e4t__ASSERT_EQ(msg, NULL);
             _m("bye");
             break;
         default:
