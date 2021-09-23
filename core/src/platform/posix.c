@@ -1,10 +1,10 @@
 #include "e4.h"
 
-#include <time.h>
-
 #if defined(e4__INCLUDE_POSIX_HOOKS)
 
     #if defined(e4__INCLUDE_FACILITY_EXT)
+
+        #include <time.h>
 
         e4__usize e4__posix_ms(void *user, e4__usize ms)
         {
