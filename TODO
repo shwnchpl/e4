@@ -49,6 +49,35 @@ Documentation
 - Note somewhere that all divisions are symmetric by default.
   Alternatively, consider the benefits of switching to floored division
   by default.
+- Document why there are no plans to implement the FLOAT word set. The
+  reason is that it would be difficult/impossible to do so in portable
+  ANSI C. C89 does not require IEEE-754 binary representation for
+  floating point values, nor is it possible to completely check at
+  compile time whether this representation is used (especially when
+  accounting for endianness etc). Not only does the Forth 2012 standard
+  require this representation, if it cannot be guaranteed then certain
+  standard words (such as REPRESENT) may be difficult/inefficient to
+  implement using ANSI C standard library floating point utility
+  functions alone. Furthermore, even assuming these ANSI C standard
+  library floating point utility functions were sufficient,
+  unfortunately they are not required by POSIX to be async-signal safe,
+  meaning any FLOAT wordset implementation making use of them would not
+  be compatible with the current repl implementation.
+  Short of implementing everything from scratch "soft float" style,
+  which would neither be efficient nor trivial, it would be very
+  difficult to support floating point words in a portable way. In
+  theory, a portable soft float library could be written based around
+  the following structs:
+        struct e4__ieee754_float {
+            char data[4];
+        };
+        struct e4__ieee754_double {
+            char data[8];
+        };
+  This may be worth doing at some point, but it is far from a priority
+  currently so to say that it's on the back burner would be overly
+  generous; for the time being, the pot needed to make the soup is still
+  hanging over the sink.
 
 General Builtins
 ----------------
