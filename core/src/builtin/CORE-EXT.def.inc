@@ -55,6 +55,8 @@ static void e4__builtin_C_QUOTE(struct e4__task *task, e4__cell user)
 
 static void e4__builtin_CASE(struct e4__task *task, e4__cell user)
 {
+    _e4__BUILTIN_EXPECT_AVAIL(task, 2);
+
     e4__stack_push(task, task->here);
     e4__stack_push(task, (e4__cell)&e4__BUILTIN_XT[e4__B_CASE]);
     e4__execute_ret(task);
@@ -257,6 +259,7 @@ static const void * const e4__builtin_NOT_EQUALS[] = {
 static void e4__builtin_OF(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_REF(task, 1);
+    _e4__BUILTIN_EXPECT_AVAIL(task, 2);
 
     if (e4__stack_peek(task) != (e4__cell)&e4__BUILTIN_XT[e4__B_CASE]) {
         e4__compile_cancel(task);
@@ -286,6 +289,8 @@ static void e4__builtin_PICK(struct e4__task *task, e4__cell user)
 
 static void e4__builtin_QUESTION_DO(struct e4__task *task, e4__cell user)
 {
+    _e4__BUILTIN_EXPECT_AVAIL(task, 1);
+
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TWO_DUP]);
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TWO_TO_R]);
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_EQUALS]);
@@ -345,6 +350,7 @@ static void e4__builtin_S_BACKSLASH_QUOTE(struct e4__task *task, e4__cell user)
             if (!(str = e4__mem_cbuf_epush(&task->tsb, str, &len)) && len) {
                 e4__exception_throw(task, e4__E_PSTROVERFLOW);
             } else {
+                _e4__BUILTIN_EXPECT_AVAIL(task, 2);
                 e4__stack_push(task, (e4__cell)str);
                 e4__stack_push(task, (e4__cell)len);
             }
@@ -391,6 +397,7 @@ static void e4__builtin_TO(struct e4__task *task, e4__cell user)
 static void e4__builtin_TUCK(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+    _e4__BUILTIN_EXPECT_AVAIL(task, 1);
     e4__stack_tuck(task);
     e4__execute_ret(task);
 }
@@ -400,6 +407,7 @@ static void e4__builtin_TWO_R_FETCH(struct e4__task *task, e4__cell user)
     register e4__cell l, r;
 
     _e4__BUILTIN_EXPECT_RDEPTH(task, 3);
+    _e4__BUILTIN_EXPECT_AVAIL(task, 2);
 
     /* The top of the return stack is the place to which *we* must
        return, so consume that value before doing anything else. */
@@ -420,6 +428,7 @@ static void e4__builtin_TWO_R_FETCH(struct e4__task *task, e4__cell user)
 static void e4__builtin_TWO_R_FROM(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_RDEPTH(task, 3);
+    _e4__BUILTIN_EXPECT_AVAIL(task, 2);
 
     /* The top of the return stack is the place to which *we* must
        return, so consume that value before doing anything else. */

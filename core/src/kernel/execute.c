@@ -1,6 +1,14 @@
 #include "e4.h"
 #include "e4-internal.h"
 
+/* XXX: If exceptions are disabled, many of the functions in this file
+   can fail silently (but safely) in certain edge cases. Only execute e4
+   threaded code without exceptions enabled if it is absolutely
+   necessary and you have other mechanisms of knowing/ensuring that its
+   behavior is correct. The ability to execute e4 code without
+   exceptions enabled may be either enhanced or removed completely in
+   the future. */
+
 /* XXX: Although e4__execute does expect a pointer to something that
    resembles an execute token or execute tuple, really whatever is
    passed must only appear to be an execute tuple when accessed in
@@ -34,6 +42,11 @@ void e4__execute_deferthunk(struct e4__task *task, e4__cell user)
 
 void e4__execute_doesthunk(struct e4__task *task, e4__cell user)
 {
+    if (!e4__stack_avail(task)) {
+        e4__exception_throw(task, e4__E_STKOVERFLOW);
+        return;
+    }
+
     /* Push the address of the data pointer onto the stack then
        branch to the address in user. */
     e4__stack_push(task, (e4__cell)user + 1);
@@ -148,26 +161,50 @@ void e4__execute_threadedthunk(struct e4__task *task, e4__cell user)
 
 void e4__execute_userval(struct e4__task *task, e4__cell user)
 {
-    register const e4__cell val = e4__DEREF(user);
+    register e4__cell val;
+
+    if (!e4__stack_avail(task)) {
+        e4__exception_throw(task, e4__E_STKOVERFLOW);
+        return;
+    }
+
+    val = e4__DEREF(user);
     e4__stack_push(task, val);
     e4__execute_ret(task);
 }
 
 void e4__execute_uservar(struct e4__task *task, e4__cell user)
 {
-    register const e4__cell uv_offset = e4__DEREF(user);
+    register e4__cell uv_offset;
+
+    if (!e4__stack_avail(task)) {
+        e4__exception_throw(task, e4__E_STKOVERFLOW);
+        return;
+    }
+
+    uv_offset = e4__DEREF(user);
     e4__stack_push(task, e4__task_uservar(task, (e4__usize)uv_offset));
     e4__execute_ret(task);
 }
 
 void e4__execute_value(struct e4__task *task, e4__cell user)
 {
+    if (!e4__stack_avail(task)) {
+        e4__exception_throw(task, e4__E_STKOVERFLOW);
+        return;
+    }
+
     e4__stack_push(task, e4__DEREF(user + 1));
     e4__execute_ret(task);
 }
 
 void e4__execute_variable(struct e4__task *task, e4__cell user)
 {
+    if (!e4__stack_avail(task)) {
+        e4__exception_throw(task, e4__E_STKOVERFLOW);
+        return;
+    }
+
     e4__stack_push(task, user + 1);
     e4__execute_ret(task);
 }

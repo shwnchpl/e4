@@ -77,12 +77,17 @@ static void e4__builtin_CLEAR(struct e4__task *task, e4__cell user)
 
 static void e4__builtin_LIT_CELL(struct e4__task *task, e4__cell user)
 {
+    register e4__cell lit;
+
     /* Since we're manipulating rp directly rather than calling
        e4__execute_ret, ensure that we aren't going to underflow. */
     _e4__BUILTIN_EXPECT_RDEPTH(task, 1);
 
-    e4__stack_push(task, e4__DEREF2(++task->rp));
+    lit = e4__DEREF2(++task->rp);
     task->ip = e4__DEREF(task->rp) + 1;
+
+    _e4__BUILTIN_EXPECT_AVAIL(task, 1);
+    e4__stack_push(task, lit);
 
     /* e4__execute_ret intentionally omitted. */
 }
@@ -108,6 +113,7 @@ static void e4__builtin_LIT_CSTR(struct e4__task *task, e4__cell user)
 
     /* With that out of the way, push the address of the beginning
        of the string and the length of the string onto the stack. */
+    _e4__BUILTIN_EXPECT_AVAIL(task, 1);
     e4__stack_push(task, str);
 
     /* e4__execute_ret intentionally omitted. */
@@ -164,6 +170,7 @@ static void e4__builtin_LIT_STR(struct e4__task *task, e4__cell user)
 
     /* With that out of the way, push the address of the beginning
        of the string and the length of the string onto the stack. */
+    _e4__BUILTIN_EXPECT_AVAIL(task, 2);
     e4__stack_push(task, str);
     e4__stack_push(task, (e4__cell)len);
 

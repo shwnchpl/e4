@@ -704,6 +704,25 @@ static void e4t__test_kernel_stack(void)
     e4t__ASSERT_EQ(e4__stack_ravail(task), 52);
 }
 
+static void e4t__test_kernel_stack_overflow(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* XXX: Only tests kernel stack overflow by pushing onto the
+       return stack and repeatedly executing dup, with exceptions
+       enabled. The corresponding tests for the case when exceptions are
+       disabled are in execute.c. */
+    /* FIXME: There are other ways the stack could overflow but those
+       are not currently covered. */
+
+    /* Test return stack overflows with exceptions enabled. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": overflow begin 5 again ;", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "overflow", -1), e4__E_STKOVERFLOW);
+    e4__stack_clear(task);
+    e4t__ASSERT_OK(e4__evaluate(task, ": overflow 5 begin dup again ;", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "overflow", -1), e4__E_STKOVERFLOW);
+}
+
 void e4t__test_kernel(void)
 {
     /* FIXME: Add uservar tests. */
@@ -717,4 +736,5 @@ void e4t__test_kernel(void)
     e4t__test_kernel_mem();
     e4t__test_kernel_quit();
     e4t__test_kernel_stack();
+    e4t__test_kernel_stack_overflow();
 }

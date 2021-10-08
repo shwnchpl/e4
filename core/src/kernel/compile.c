@@ -85,6 +85,8 @@ void e4__compile_estr(struct e4__task *task, const char *str, e4__usize len)
 
 e4__usize e4__compile_finish(struct e4__task *task)
 {
+    register e4__usize res = e4__E_OK;
+
     /* Resume compilation if it has been suspended. If it hasn't, this
        is a no-op. */
     e4__compile_resume(task);
@@ -104,9 +106,13 @@ e4__usize e4__compile_finish(struct e4__task *task)
         task->compile.xt->code = e4__execute_doesthunk;
         task->compile.xt->user = task->compile.here0;
     } else {
-        if (task->compile.state == e4__COMP_NONAME)
-            e4__stack_push(task, (e4__cell)task->compile.xt);
-        else if (task->compile.state == e4__COMP_COLON)
+        if (task->compile.state == e4__COMP_NONAME) {
+            if (!e4__stack_avail(task)) {
+                res = e4__E_STKOVERFLOW;
+            } else {
+                e4__stack_push(task, (e4__cell)task->compile.xt);
+            }
+        } else if (task->compile.state == e4__COMP_COLON)
             task->dict->flags &= ~e4__F_COMPILING;
         task->compile.xt->code = e4__execute_threaded;
     }
@@ -116,7 +122,7 @@ e4__usize e4__compile_finish(struct e4__task *task)
 
     task->compile.state = 0;
 
-    return e4__E_OK;
+    return res;
 }
 
 void e4__compile_literal(struct e4__task *task, e4__cell lit)

@@ -57,7 +57,10 @@ static void e4__evaluate_interpret(struct e4__task *task, const char *word,
         e4__F_CHAR_LITERAL | e4__F_NEG_PREFIX | e4__F_BASE_PREFIX, &num);
     /* FIXME: Should e4__mem_number return a e4__u8? */
     if (pcount == (e4__usize)len) {
-        e4__stack_push(task, (e4__cell)num);
+        if (e4__stack_avail(task))
+            e4__stack_push(task, (e4__cell)num);
+        else
+            e4__exception_throw(task, e4__E_STKOVERFLOW);
         return;
     }
 

@@ -167,6 +167,7 @@ static void e4__builtin_CHAR(struct e4__task *task, e4__cell user)
        does not specify what should be done in this scenario (or even
        that it is an ambiguous conditon). */
     _e4__BUILTIN_LOOKAHEAD(task, word, len);
+    _e4__BUILTIN_EXPECT_AVAIL(task, 1);
 
     e4__stack_push(task, (e4__cell)(e4__usize)word[0]);
 
@@ -267,12 +268,15 @@ static const void * const e4__builtin_DECIMAL[] = {
 
 static void e4__builtin_DEPTH(struct e4__task *task, e4__cell user)
 {
+    _e4__BUILTIN_EXPECT_AVAIL(task, 1);
     e4__stack_push(task, (e4__cell)e4__stack_depth(task));
     e4__execute_ret(task);
 }
 
 static void e4__builtin_DO(struct e4__task *task, e4__cell user)
 {
+    _e4__BUILTIN_EXPECT_AVAIL(task, 1);
+
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_SWAP]);
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TO_R]);
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TO_R]);
@@ -365,6 +369,7 @@ static void e4__builtin_DROP(struct e4__task *task, e4__cell user)
 static void e4__builtin_DUP(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+    _e4__BUILTIN_EXPECT_AVAIL(task, 1);
     e4__stack_dup(task);
     e4__execute_ret(task);
 }
@@ -526,6 +531,8 @@ static void e4__builtin_HOLD(struct e4__task *task, e4__cell user)
 
 static void e4__builtin_IF(struct e4__task *task, e4__cell user)
 {
+    _e4__BUILTIN_EXPECT_AVAIL(task, 1);
+
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_BRANCH0]);
     e4__stack_push(task, task->here++);
 
@@ -554,6 +561,7 @@ static void e4__builtin_INVERT(struct e4__task *task, e4__cell user)
 static void e4__builtin_J(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_RDEPTH(task, 5);
+    _e4__BUILTIN_EXPECT_AVAIL(task, 1);
 
     /* The top of the return stack is the place to which *we* must
        return, so consume that value before doing anything else. */
@@ -571,6 +579,8 @@ static void e4__builtin_KEY(struct e4__task *task, e4__cell user)
 
     if ((io_res = e4__io_key(task, &k)))
         e4__exception_throw(task, io_res);
+
+    _e4__BUILTIN_EXPECT_AVAIL(task, 1);
 
     e4__stack_push(task, (e4__cell)(e4__usize)k);
 
@@ -828,6 +838,7 @@ static void e4__builtin_OR(struct e4__task *task, e4__cell user)
 static void e4__builtin_OVER(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+    _e4__BUILTIN_EXPECT_AVAIL(task, 1);
     e4__stack_over(task);
     e4__execute_ret(task);
 }
@@ -929,6 +940,7 @@ static void e4__builtin_QUIT(struct e4__task *task, e4__cell user)
 static void e4__builtin_R_FETCH(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_RDEPTH(task, 2);
+    _e4__BUILTIN_EXPECT_AVAIL(task, 1);
 
     /* The top of the return stack is the place to which *we* must
        return, so consume that value before doing anything else. */
@@ -942,6 +954,7 @@ static void e4__builtin_R_FETCH(struct e4__task *task, e4__cell user)
 static void e4__builtin_R_FROM(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_RDEPTH(task, 2);
+    _e4__BUILTIN_EXPECT_AVAIL(task, 1);
 
     /* The top of the return stack is the place to which *we* must
        return, so consume that value before doing anything else. */
@@ -1012,6 +1025,7 @@ static void e4__builtin_S_TO_D(struct e4__task *task, e4__cell user)
     register struct e4__double d;
 
     _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+    _e4__BUILTIN_EXPECT_AVAIL(task, 1);
 
     d = e4__usize_todouble((e4__usize)e4__stack_pop(task));
     e4__stack_push(task, (e4__cell)d.low);
@@ -1042,6 +1056,7 @@ static void e4__builtin_S_QUOTE(struct e4__task *task, e4__cell user)
             if (!(str = e4__mem_cbuf_push(&task->tsb, str, len)) && len) {
                 e4__exception_throw(task, e4__E_PSTROVERFLOW);
             } else {
+                _e4__BUILTIN_EXPECT_AVAIL(task, 2);
                 e4__stack_push(task, (e4__cell)str);
                 e4__stack_push(task, (e4__cell)len);
             }
@@ -1275,6 +1290,8 @@ static void e4__builtin_TICK(struct e4__task *task, e4__cell user)
         e4__exception_throw(task, e4__E_UNDEFWORD);
         e4__execute_ret(task);
     }
+
+    _e4__BUILTIN_EXPECT_AVAIL(task, 1);
 
     e4__stack_push(task, (e4__cell)header->xt);
 

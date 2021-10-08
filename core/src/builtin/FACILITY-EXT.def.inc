@@ -31,6 +31,8 @@ static void e4__builtin_TIME_AND_DATE(struct e4__task *task, e4__cell user)
 
     e4__usize_togmt(t, &gmt);
 
+    _e4__BUILTIN_EXPECT_AVAIL(task, 6);
+
     e4__stack_push(task, (e4__cell)(e4__usize)gmt.sec);
     e4__stack_push(task, (e4__cell)(e4__usize)gmt.min);
     e4__stack_push(task, (e4__cell)(e4__usize)gmt.hour);

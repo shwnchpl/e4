@@ -335,6 +335,52 @@ static void e4t__test_execute_nested(void)
     e4t__ASSERT_EQ(msg, NULL);
 }
 
+static void e4t__test_execute_stack_overflow(void)
+{
+    const void *overflow_lit[] = {
+        (void *)(e4__usize)e4__execute_threaded,
+        NULL,
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
+        (void *)1,
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
+        (void *)0,
+        &e4__BUILTIN_XT[e4__B_BRANCH0],
+        (void *)e4__USIZE_NEGATE(5),
+        &e4__BUILTIN_XT[e4__B_EXIT],
+        &e4__BUILTIN_XT[e4__B_SENTINEL]
+    };
+    const void *overflow_dup[] = {
+        (void *)(e4__usize)e4__execute_threaded,
+        NULL,
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
+        (void *)1,
+        &e4__BUILTIN_XT[e4__B_DUP],
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
+        (void *)0,
+        &e4__BUILTIN_XT[e4__B_BRANCH0],
+        (void *)e4__USIZE_NEGATE(4),
+        &e4__BUILTIN_XT[e4__B_EXIT],
+        &e4__BUILTIN_XT[e4__B_SENTINEL]
+    };
+
+    struct e4__task *task = e4t__transient_task();
+
+    /* XXX: Only tests kernel stack overflow by pushing onto the
+       return stack and repeatedly executing dup, with exceptions
+       disabled. The corresponding tests for the case when exceptions
+       are enabled are in kernel.c. */
+    /* FIXME: There are other ways the stack could overflow but those
+       are not currently covered. */
+
+    e4__execute(task, overflow_lit);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 51);
+    e4__stack_clear(task);
+
+    e4__execute(task, overflow_dup);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 51);
+    e4__stack_clear(task);
+}
+
 /* Covers string literals. */
 static void e4t__test_execute_string(void)
 {
@@ -508,6 +554,7 @@ void e4t__test_execute(void)
     e4t__test_execute_defer();
     e4t__test_execute_does();
     e4t__test_execute_nested();
+    e4t__test_execute_stack_overflow();
     e4t__test_execute_string();
     e4t__test_execute_threadedthunk();
     e4t__test_execute_tr0coherent();

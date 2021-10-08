@@ -38,8 +38,10 @@ static void e4__builtin_KEY_QUESTION(struct e4__task *task, e4__cell user)
 
     if ((io_res = e4__io_keyq(task, &bflag)))
         e4__exception_throw(task, io_res);
-    else
+    else {
+        _e4__BUILTIN_EXPECT_AVAIL(task, 1);
         e4__stack_push(task, (e4__cell)bflag);
+    }
 
     e4__execute_ret(task);
 }

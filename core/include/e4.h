@@ -230,6 +230,7 @@ struct e4__gmt {
 #define e4__E_OK            (0)
 #define e4__E_ABORT         (-1)
 #define e4__E_ABORTQ        (-2)
+#define e4__E_STKOVERFLOW   (-3)
 #define e4__E_STKUNDERFLOW  (-4)
 #define e4__E_RSTKUNDERFLOW (-6)
 #define e4__E_DICTOVERFLOW  (-8)

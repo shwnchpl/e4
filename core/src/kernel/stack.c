@@ -1,12 +1,32 @@
 #include "e4.h"
 #include "e4-internal.h"
 
-/* FIXME: For performance reasons, they aren't actually used internally
-   where we have access to the fields of struct task. Is this the right
-   decision?
-   FIXME: Add bounds checking? Probably not. It can be added in Forth
-   user facing builtin words. C programmers can do their own, so this
-   API probably doesn't need it. */
+/* XXX: For performance and compatibility reasons, none of these
+   functions perform bounds checking internally, nor do they throw
+   any exceptions. When writing user functions, it is critical to
+   confirm that there is data/space on the stack/return-stack before
+   pushing/popping. The e4__stack_avail, e4__stack_depth,
+   e4__stack_ravail, and e4__stack_rdepth APIs are provided for this
+   purpose.
+
+   It is, of course, not necessary to perform a check before *every*
+   stack manipulation if the manipulation is known to be safe based
+   on the results of some prior check. For example, if some user
+   function needs to pop two values off the stack and subsequently
+   push two values onto it, that user function need only check that
+   stack depth is greater than or equal to two before popping anything,
+   since there must be space for at least two values on the stack
+   after two values have been popped from the stack.
+
+   This assumes, of course, that the stack is in a coherent state when
+   the user function in question has been invoked. This assumption is
+   reasonable and if the stack is ever *not* in a reasonable state as
+   a result of code internal to e4, that indicates a bug within e4.
+
+   Even if these functions were to throw exceptions themselves, e4 code
+   is intended to execute correctly even when exceptions are disabled,
+   so explicit checking (either of stack depth or some hypothetical
+   error return value) would still be necessary anyhow. */
 
 e4__usize e4__stack_avail(struct e4__task *task)
 {

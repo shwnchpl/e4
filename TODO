@@ -141,6 +141,7 @@ Kernel
 - [DONE] Move MS and TIME&DATE handlers into e4/core behind a POSIX
   hooks inclusion flag and update build tests accordingly.
 - [DONE] Improve stack size calculations.
+- [DONE] Handle stack overflow.
 - Use checked allocation everywhere that HERE is manipulated. WORD is
   specifically allowed to dip into the PNO buffer but not PAD.
 - Ensure, somehow, that the PNO buffer is always at least 33 characters
