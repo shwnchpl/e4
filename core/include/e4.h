@@ -427,6 +427,7 @@ enum e4__builtin_id {
     e4__B_LIT_CSTR,
     e4__B_LIT_DOES,
     e4__B_LIT_STR,
+    e4__B_LOOP_INC,
     e4__B_RESTRICT,
     e4__B_SENTINEL,
 

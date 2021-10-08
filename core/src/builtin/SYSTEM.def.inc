@@ -170,6 +170,42 @@ static void e4__builtin_LIT_STR(struct e4__task *task, e4__cell user)
     /* e4__execute_ret intentionally omitted. */
 }
 
+/* ( inc index limit -- stop-flag new-index ) */
+static const void * const e4__builtin_LOOP_INC[] = {
+    &e4__BUILTIN_XT[e4__B_TO_R],
+    &e4__BUILTIN_XT[e4__B_TWO_DUP],
+    &e4__BUILTIN_XT[e4__B_PLUS],
+    &e4__BUILTIN_XT[e4__B_R_FROM], /* inc index index+inc limit */
+    &e4__BUILTIN_XT[e4__B_SWAP],
+    &e4__BUILTIN_XT[e4__B_TO_R], /* S: inc index limit R: index+inc */
+
+    /* Next calculate X = index - limit + minimum signed integer. Add
+       the increment to X. If this causes a sign change, flag is true,
+       otherwise it is false. */
+    &e4__BUILTIN_XT[e4__B_MINUS],
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
+    (e4__cell)((e4__usize)1 << (e4__USIZE_BIT - 1)),
+    &e4__BUILTIN_XT[e4__B_PLUS], /* inc X=index-limit+MININT */
+    &e4__BUILTIN_XT[e4__B_DUP],
+    &e4__BUILTIN_XT[e4__B_ROT],
+    &e4__BUILTIN_XT[e4__B_PLUS], /* X X+inc */
+
+    /* To test if the sign changed, XOR X and X+inc. If the sign bit of
+       the result is non-zero, sign changed, otherwise it did not. */
+    &e4__BUILTIN_XT[e4__B_XOR],
+    &e4__BUILTIN_XT[e4__B_LIT_CELL],
+    (e4__cell)(e4__USIZE_BIT - 1),
+    &e4__BUILTIN_XT[e4__B_RSHIFT],
+    &e4__BUILTIN_XT[e4__B_ZERO_EQUALS],
+    &e4__BUILTIN_XT[e4__B_INVERT],
+
+    /* Restore new-index. */
+    &e4__BUILTIN_XT[e4__B_R_FROM],
+
+    &e4__BUILTIN_XT[e4__B_EXIT],
+    &e4__BUILTIN_XT[e4__B_SENTINEL]
+};
+
 static void e4__builtin_RESTRICT(struct e4__task *task, e4__cell user)
 {
     if (task->dict->flags & e4__F_BUILTIN)

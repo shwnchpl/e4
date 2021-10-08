@@ -1118,6 +1118,35 @@ static void e4t__test_builtin_logic(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_FALSE);
 }
 
+/* Covers LOOP_INC */
+static void e4t__test_builtin_loop_inc(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* Test that LOOP_INC correctly reports new index and when this new
+       index has crossed the boundary between the loop limit minus one
+       and the loop limit as described in section 6.1.0140 of the Forth
+       2012 standard. */
+    e4t__term_obuf_consume();
+
+    e4t__ASSERT_OK(e4__evaluate(task, "1 9 10 LOOP_INC .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<2> -1 10 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "5 9 10 LOOP_INC .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<2> -1 14 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "1 10 10 LOOP_INC .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<2> 0 11 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "1 12 10 LOOP_INC .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<2> 0 13 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "-1 -10 -10 LOOP_INC .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<2> -1 -11 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "-1 -11 -10 LOOP_INC .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<2> 0 -12 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "-1 -9 -10 LOOP_INC .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<2> 0 -10 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "-3 -9 -10 LOOP_INC .s clear", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "<2> -1 -12 ");
+}
+
 /* Covers + - . / 1+ 1- 2* 2/ /MOD ABS LSHIFT MAX MIN MOD RSHIFT U. */
 static void e4t__test_builtin_math(void)
 {
@@ -2100,6 +2129,7 @@ void e4t__test_builtin(void)
     e4t__test_builtin_io_facility();
     e4t__test_builtin_io_pno();
     e4t__test_builtin_logic();
+    e4t__test_builtin_loop_inc();
     e4t__test_builtin_math();
     e4t__test_builtin_memmanip();
     e4t__test_builtin_parsenum();
