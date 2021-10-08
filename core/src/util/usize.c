@@ -95,6 +95,8 @@ const char* e4__usize_format_exception(e4__usize e, e4__usize *len)
             _return_with_len("attempt to use zero-length string as a name");
         case e4__E_PNOOVERFLOW:
             _return_with_len("pictured numeric output string overflow");
+        case e4__E_PSTROVERFLOW:
+            _return_with_len("parsed string overflow");
         case e4__E_UNSUPPORTED:
             _return_with_len("unsupported operation");
         case e4__E_CSMISMATCH:

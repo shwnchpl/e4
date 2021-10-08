@@ -1995,6 +1995,70 @@ static void e4t__test_builtin_timedate(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), t->tm_sec);
 }
 
+/* Covers S" and S\" interpretation semantics. */
+static void e4t__test_builtin_transientstr(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* XXX: Circular buffer wrap-around receives more in-depth coverage
+       in e4t__test_util_cbuf. This test focuses instead on the
+       additional functionality provided by the S" and S\" words
+       themselves (as opposed to the e4__cbuf APIs that they wrap). */
+
+    e4t__term_obuf_consume();
+
+    /* Test that zero length strings work correctly. */
+    e4t__ASSERT_OK(e4__evaluate(task, "s\" \"", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_EQ(e4__stack_pop(task), NULL);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "s\\\" \"", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_EQ(e4__stack_pop(task), NULL);
+
+    /* Test that strings work correctly in general. */
+    e4t__ASSERT_OK(e4__evaluate(task, "s\" foo bar bas\"", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 11);
+    e4t__ASSERT(!e4__mem_strncasecmp((const char *)e4__stack_pop(task),
+            "foo bar bas", 11));
+
+    e4t__ASSERT_OK(e4__evaluate(task, "s\\\" foo bar\\nbas\\z\"", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 12);
+    e4t__ASSERT_MATCH((const char *)e4__stack_pop(task), "foo bar\nbas");
+
+    /* Test that two consecutive calls to S" and/or S\" both work
+       correctly. */
+    e4t__ASSERT_OK(e4__evaluate(task, "s\" bar\" s\" foo\" type type", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "foobar");
+
+    e4t__ASSERT_OK(e4__evaluate(task, "s\\\" bar\" s\" foo\" type type", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "foobar");
+
+    e4t__ASSERT_OK(e4__evaluate(task, "s\" bar\" s\\\" foo\" type type", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "foobar");
+
+    e4t__ASSERT_OK(e4__evaluate(task, "s\\\" bar\" s\\\" foo\" type type",
+            -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "foobar");
+
+    /* Test that strings that would overflow the buffer raise the
+       appropriate exception. */
+    e4t__ASSERT_EQ(e4__evaluate(task, "s\" aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"",
+            -1), e4__E_PSTROVERFLOW);
+    e4t__ASSERT_EQ(e4__evaluate(task, "s\\\" aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"",
+            -1), e4__E_PSTROVERFLOW);
+}
+
 /* Covers BASE HERE PAD SOURCE-ID */
 static void e4t__test_builtin_uservars(void)
 {
@@ -2043,5 +2107,6 @@ void e4t__test_builtin(void)
     e4t__test_builtin_rstackmanip();
     e4t__test_builtin_stackmanip();
     e4t__test_builtin_timedate();
+    e4t__test_builtin_transientstr();
     e4t__test_builtin_uservars();
 }

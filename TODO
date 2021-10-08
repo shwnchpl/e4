@@ -106,6 +106,7 @@ General Builtins
 - [DONE] Move the C" builtin to CORE-EXT, where it belongs.
 - [DONE] Implement [IF], [ELSE], and [THEN].
 - [DONE] Implement ABORT".
+- [DONE] Implement S" and S\" interpretation semantics.
 - Implement ENVIRONMENT?.
 - Implement STATE, >IN, and SOURCE.
 - Implement ACCEPT.
@@ -307,17 +308,6 @@ General Builtins
 - Determine whether CR should actually output \r\n. If it should,
   ensure that \r\n is used instead of \n in all places where \n is
   currently in use.
-- Implement S", S\", and C" run time semantics. These words should
-  use the designated transient memory buffers as necessary during
-  runtime. Last offset can be tracked, modulo style, and only spill
-  over if a buffer is too long to fit. This is needed for the FILE
-  word set, but is probably expressly non-desirable for minimal
-  builds since being standards complient requires reserving 160 bytes
-  of memory minimum and it is not specified that this memoery can be
-  overrun by dictionary changes, meaning it is expected to be
-  dedicated. As such, this should almost certianly live behind some
-  compiler flag (perhaps the file word set compiler flag?) and it is
-  decidedly not a high priority.
 
 REPL
 ----

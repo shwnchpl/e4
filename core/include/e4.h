@@ -241,6 +241,7 @@ struct e4__gmt {
 #define e4__E_INVFORGET     (-15)
 #define e4__E_ZLNAME        (-16)
 #define e4__E_PNOOVERFLOW   (-17)
+#define e4__E_PSTROVERFLOW  (-18)
 #define e4__E_UNSUPPORTED   (-21)
 #define e4__E_CSMISMATCH    (-22)
 #define e4__E_RSTKIMBALANCE (-25)

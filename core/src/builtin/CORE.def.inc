@@ -1031,13 +1031,28 @@ static void e4__builtin_S_QUOTE(struct e4__task *task, e4__cell user)
     const char *str;
     register e4__usize len;
 
+    #if !defined(e4__INCLUDE_FILE)
+        if (!e4__task_compiling(task)) {
+            e4__exception_throw(task, e4__E_COMPONLYWORD);
+            e4__execute_ret(task);
+            return;
+        }
+    #endif
+
     len = e4__io_parse(task, '"', 0, &str);
 
     if (e4__task_compiling(task)) {
         e4__compile_str(task, str, len);
+    } else {
+        #if defined(e4__INCLUDE_FILE)
+            if (!(str = e4__mem_cbuf_push(&task->tsb, str, len)) && len) {
+                e4__exception_throw(task, e4__E_PSTROVERFLOW);
+            } else {
+                e4__stack_push(task, (e4__cell)str);
+                e4__stack_push(task, (e4__cell)len);
+            }
+        #endif /* defined(e4__INCLUDE_FILE) */
     }
-
-    /* FIXME: Handle runtime semantics. */
 
     e4__execute_ret(task);
 }
