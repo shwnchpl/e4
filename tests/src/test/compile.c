@@ -184,6 +184,19 @@ static void e4t__test_compile_does(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 15);
     e4t__ASSERT_OK(e4__evaluate(task, "bas", -1));
     e4t__ASSERT_EQ(e4__stack_pop(task), 100);
+
+    /* Test that applying a does literal does not move HERE, making it
+       possibly to allocate after creating a word with some other word
+       with a does clause. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo create does> dup drop ; "
+            "foo bar bar here", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__stack_pop(task));
+
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo create does> @ 1+ ; "
+            "foo bar 41 , bar", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 42);
 }
 
 /* Covers compilation failure do to stack mismatch and implicitly

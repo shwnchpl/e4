@@ -107,6 +107,9 @@ General Builtins
 - [DONE] Implement [IF], [ELSE], and [THEN].
 - [DONE] Implement ABORT".
 - [DONE] Implement S" and S\" interpretation semantics.
+- [DONE] Fix broken DOES> implementation.
+- [DONE] Add DOES> tests that cover the actual semantics correctly and
+  prevent an incorrect implementation (as was present before).
 - Implement ENVIRONMENT?.
 - Implement STATE, >IN, and SOURCE.
 - Implement ACCEPT.
@@ -146,6 +149,8 @@ REPL
 - Source ~/.e4-editrc to allow for e4 specific input overrides. For
   example, tab completion on tab could be disabled by macro binding
   the tab key to two or four spaces.
+- Re-evaluate not printing a newline on enter (and just simply printing
+  a space or something). This would look far cleaner.
 - Create REPL task buffer size to something much larger (32K? 8M?)
   and/or allow for setting buffer size via a command line argument or
   environment variable.
@@ -183,7 +188,7 @@ Kernel
 - Consider providing optional POSIX handlers for file IO. These could
   be enabled/disabled at compile time.
 
-Repl
+REPL
 ----
 - Try running some the Tetris program again.
 - Make it so that it is possible to automatically include/execute a

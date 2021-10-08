@@ -115,33 +115,25 @@ static void e4__builtin_LIT_CSTR(struct e4__task *task, e4__cell user)
 
 static void e4__builtin_LIT_DOES(struct e4__task *task, e4__cell user)
 {
-    register e4__usize res;
-
     if (task->dict->flags & e4__F_BUILTIN) {
         e4__exception_throw(task, e4__E_INVBUILTINMUT);
         e4__execute_ret(task);
         return;
     }
 
-    if ((res = e4__compile_start(task, task->dict->xt, e4__COMP_DOES))) {
-        /* Looks like we're already compiling. Bail out. */
-        e4__exception_throw(task, res);
+    if (e4__task_compiling(task)) {
+        /* Looks like we're compiling. Bail out. */
+        e4__exception_throw(task, e4__E_NESTEDCOMPILE);
         e4__execute_ret(task);
     }
 
     /* Return from this function. */
     e4__execute_ret(task);
 
-    /* Advance the instruction pointer until SENTINEL has been
-       encountered, compiling each word along the way. */
-    do {
-        e4__compile_cell(task, e4__DEREF(task->ip++));
-    } while (e4__DEREF(task->ip) != (e4__cell)&e4__BUILTIN_XT[e4__B_SENTINEL]);
-
-    if ((res = e4__compile_finish(task)))
-        /* We haven't touched the stack. This should absolutely never
-           happen, but if it does, pass the exception along. */
-        e4__exception_throw(task, res);
+    /* Make the execution semantics of the most recent definition
+       the threaded code following LIT_DOES. */
+    task->dict->xt->code = e4__execute_doesthunk;
+    task->dict->xt->user = task->ip;
 
     /* Set the instruction pointer to a return thunk so that we can
        return as we would have at the end of threaded_execute of the
