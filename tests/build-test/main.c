@@ -76,6 +76,12 @@ int main(int argc, char **argv)
         #if defined(e4__INCLUDE_FACILITY_EXT)
             wordset |= (1 << FACILITY_EXT_BIT);
         #endif
+        #if defined(e4__INCLUDE_FILE)
+            wordset |= (1 << FILE_BIT);
+        #endif
+        #if defined(e4__INCLUDE_FILE_EXT)
+            wordset |= (1 << FILE_EXT_BIT);
+        #endif
         #if defined(e4__INCLUDE_POSIX_HOOKS)
             wordset |= (1 << POSIX_HOOKS_BIT);
         #endif

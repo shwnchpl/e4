@@ -1583,7 +1583,7 @@ static void e4t__test_builtin_memmanip(void)
     task = e4t__transient_task();
     e4t__ASSERT_OK(e4__evaluate(task, "unused", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
-    e4t__ASSERT_EQ(e4__stack_pop(task), 2222);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 2038);
     e4t__ASSERT_OK(e4__evaluate(task, "unused allot unused", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), 0);

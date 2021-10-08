@@ -47,13 +47,6 @@ struct e4__pno_state
 
 struct e4__task
 {
-    /* FIXME: Add a dedicated counted string scratch buffer (to be
-       used by S", S\", and C"), which must be able to store strings
-       at least 80 characters long *AND* must allow strings returned
-       to be valid for at least one consecutive call. For instance,
-       `S" bar" S" foo" type type` should output "foobar" not
-       "foofoo." */
-
     /* FIXME: Reorder these, if necessary. */
     /* User table. */
     e4__cell here;
@@ -79,6 +72,11 @@ struct e4__task
     struct e4__exception_state exception;
     const char *abortq_msg;
     e4__usize abortq_msg_len;
+
+    #if defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT)
+        struct e4__cbuf tsb;
+        char tsb_buf[160];
+    #endif
 };
 
 #endif /* e4_INTERNAL_H_ */

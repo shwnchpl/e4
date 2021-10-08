@@ -30,6 +30,8 @@
     #define e4__INCLUDE_EXCEPTION
     #define e4__INCLUDE_FACILITY
     #define e4__INCLUDE_FACILITY_EXT
+    #define e4__INCLUDE_FILE
+    #define e4__INCLUDE_FILE_EXT
     #define e4__INCLUDE_POSIX_HOOKS
     #define e4__INCLUDE_TOOLS
     #define e4__INCLUDE_TOOLS_EXT
@@ -38,6 +40,8 @@
     #define e4__INCLUDE_EXCEPTION
     #define e4__INCLUDE_FACILITY
     #define e4__INCLUDE_FACILITY_EXT
+    #define e4__INCLUDE_FILE
+    #define e4__INCLUDE_FILE_EXT
     #define e4__INCLUDE_TOOLS
     #define e4__INCLUDE_TOOLS_EXT
 #endif
@@ -56,6 +60,14 @@
 
 #if defined(e4__EXCLUDE_FACILITY_EXT) && defined(e4__INCLUDE_FACILITY_EXT)
     #undef e4__INCLUDE_FACILITY_EXT
+#endif
+
+#if defined(e4__EXCLUDE_FILE) && defined(e4__INCLUDE_FILE)
+    #undef e4__INCLUDE_FILE
+#endif
+
+#if defined(e4__EXCLUDE_FILE_EXT) && defined(e4__INCLUDE_FILE_EXT)
+    #undef e4__INCLUDE_FILE_EXT
 #endif
 
 #if defined(e4__EXCLUDE_POSIX_HOOKS) && defined(e4__INCLUDE_POSIX_HOOKS)

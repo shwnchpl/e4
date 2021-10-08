@@ -108,6 +108,10 @@ struct e4__task* e4__task_create(void *buffer, e4__usize sz)
     task->tr0 = task->r0;
     task->base = 10;
 
+    #if defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT)
+        e4__mem_cbuf_init(&task->tsb, task->tsb_buf, sizeof(task->tsb_buf));
+    #endif
+
     return task;
 }
 
