@@ -93,19 +93,23 @@ struct e4__task* e4__task_create(void *buffer, e4__usize sz)
        sizeof(e4__cell) (since it contains fields that are
        e4__cell), so this is safe. */
 
-    task->here = c0 + sizeof(*task) / sizeof(e4__cell);
-    task->pad = c0 + (70 * sz) / (100 * sizeof(e4__cell));
-    task->s0 = c0 + (85 * sz) / (100 * sizeof(e4__cell));
-    task->sp = task->s0;
-    task->tib = c0 + (85 * sz) / (100 * sizeof(e4__cell)) + 1;
-    task->tib_sz = (((e4__u8 *)c0 + (90 * sz) / 100) -
-            (e4__u8 *)task->tib - 1);
-    task->base_ptr = (e4__cell)&task->base;
+    task->here  = c0 + sizeof(*task) / sizeof(e4__cell);
+    task->pad   = c0 + (70 * sz) / (100 * sizeof(e4__cell));
+    task->sl    = c0 + (75 * sz) / (100 * sizeof(e4__cell));
+    task->s0    = c0 + (85 * sz) / (100 * sizeof(e4__cell)) - 1;
+    task->tib   = c0 + (85 * sz) / (100 * sizeof(e4__cell));
+    task->rl    = c0 + (90 * sz) / (100 * sizeof(e4__cell));
+    task->r0    = c0 + sz / sizeof(e4__cell) - 1;
+
+    task->tib_sz = (e4__u8 *)task->rl - (e4__u8 *)task->tib;
     task->io_src.buffer = task->tib;
     task->io_src.sz = task->tib_sz;
-    task->r0 = c0 + sz / sizeof(e4__cell) - 1;
+
+    task->sp = task->s0;
     task->rp = task->r0;
     task->tr0 = task->r0;
+
+    task->base_ptr = (e4__cell)&task->base;
     task->base = 10;
 
     #if defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT)

@@ -53,7 +53,7 @@ struct e4__task
     e4__cell pad; /* 84 characters minimum */
     e4__cell s0;
     e4__cell sp;
-    e4__cell tib; /* FIXME: tib size is calculable. Do this. */
+    e4__cell tib;
     e4__cell r0;
     e4__cell rp;
     e4__cell ip;
@@ -64,6 +64,8 @@ struct e4__task
 
     /* System variables. */
     e4__cell tr0;
+    e4__cell sl;
+    e4__cell rl;
     e4__usize sz;
     e4__usize tib_sz;
     e4__usize base; /* Initialize to 10. */

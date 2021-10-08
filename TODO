@@ -140,6 +140,7 @@ Kernel
   pictured numeric output instead.
 - [DONE] Move MS and TIME&DATE handlers into e4/core behind a POSIX
   hooks inclusion flag and update build tests accordingly.
+- [DONE] Improve stack size calculations.
 - Use checked allocation everywhere that HERE is manipulated. WORD is
   specifically allowed to dip into the PNO buffer but not PAD.
 - Ensure, somehow, that the PNO buffer is always at least 33 characters
@@ -310,6 +311,16 @@ Kernel
   there could be no reasonable application). As an alternative, these
   words could be given some kind of "hidden" flag so that it isn't
   possible to look them up.
+- Consider either enhancing the ability to run e4 without exceptions
+  enabled or removing that ability completely. That is, consider making
+  it undefined behavior to call the e4__execute family of functions and
+  all builtins without exceptions enabled (and removing all associated
+  handling that currently exists), or adding more facilities to make it
+  possible to disable exceptions completely at a global level. This
+  would likely involve adding some mechanism for reporting errors
+  (perhaps some sort of last_error field in the e4__task struct) in
+  cases where failure is currently silent. Alternatively, leaving
+  support partial/tentative indefinitely is also a reasonable option.
 
 General Builtins
 ----------------
