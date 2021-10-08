@@ -119,6 +119,66 @@ struct e4__task* e4__task_create(void *buffer, e4__usize sz)
     return task;
 }
 
+/* Except where otherwise noted, the type of out should be e4__usize *.
+
+   For the following queries, type is e4__double *:
+
+        e4__EQ_MAXDOUBLE
+        e4__EQ_MAXUDOUBLE
+
+   Whenever the value of q passed is a valid e4__env_query variant,
+   aside from e4__ENV_QUERY_COUNT, out will always be set. If the q
+   passed is not a valid e4__env_query variant or is
+   e4__ENV_QUERY_COUNT, out will not be set. */
+void e4__task_eq(struct e4__task *task, enum e4__env_query q, void *out)
+{
+    switch (q) {
+        case e4__EQ_ADDRUNITBITS:
+            *((e4__usize *)out) = e4__USIZE_BIT;
+            break;
+        case e4__EQ_FLOORED:
+            *((e4__usize *)out) = 0;
+            break;
+        case e4__EQ_HOLDSZ:
+            *((e4__usize *)out) = e4__PNO_MIN_SZ;
+            break;
+        case e4__EQ_MAXCHAR:
+        case e4__EQ_MAXCSTRSZ:
+            *((e4__usize *)out) = 255;
+            break;
+        case e4__EQ_MAXDOUBLE:
+            ((struct e4__double *)out)->low = (e4__usize)-1;
+            ((struct e4__double *)out)->high = (((e4__usize)-1) >> 1);
+            break;
+        case e4__EQ_MAXINT:
+            *((e4__usize *)out) = (((e4__usize)-1) >> 1);
+            break;
+        case e4__EQ_MAXUDOUBLE:
+            ((struct e4__double *)out)->low = (e4__usize)-1;
+            ((struct e4__double *)out)->high = (e4__usize)-1;
+            break;
+        case e4__EQ_MAXUINT:
+            *((e4__usize *)out) = (e4__usize)-1;
+            break;
+        case e4__EQ_PADSZ:
+            *((e4__usize *)out) = (e4__usize)((char *)task->sl -
+                    (char *)task->pad);
+            break;
+        case e4__EQ_RSTACKCELLS:
+            *((e4__usize *)out) = (e4__usize)((char *)task->r0 -
+                    (char *)(task->rl - 1)) / sizeof(e4__cell);
+            break;
+        case e4__EQ_STACKCELLS:
+            *((e4__usize *)out) = (e4__usize)((char *)task->s0 -
+                    (char*)(task->sl - 1)) / sizeof(e4__cell);
+            break;
+
+        case e4__ENV_QUERY_COUNT:
+            /* do nothing */
+            break;
+    }
+}
+
 void e4__task_io_init(struct e4__task *task, const struct e4__io_func *io_func)
 {
     task->io_func = *io_func;

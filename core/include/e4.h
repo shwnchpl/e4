@@ -526,6 +526,25 @@ enum e4__builtin_id {
     e4__BUILTIN_COUNT
 };
 
+/* environmental query constants */
+enum e4__env_query {
+    /* CORE environmental queries */
+    e4__EQ_ADDRUNITBITS = 0,
+    e4__EQ_FLOORED,
+    e4__EQ_HOLDSZ,
+    e4__EQ_MAXCHAR,
+    e4__EQ_MAXCSTRSZ,
+    e4__EQ_MAXDOUBLE,
+    e4__EQ_MAXINT,
+    e4__EQ_MAXUDOUBLE,
+    e4__EQ_MAXUINT,
+    e4__EQ_PADSZ,
+    e4__EQ_RSTACKCELLS,
+    e4__EQ_STACKCELLS,
+
+    e4__ENV_QUERY_COUNT
+};
+
 /* source ID constants */
 #define e4__SID_STR         (-1)
 #define e4__SID_UID         (0)
@@ -714,6 +733,7 @@ e4__cell e4__task_allot(struct e4__task *task, e4__usize sz);
 e4__cell e4__task_allot_unchecked(struct e4__task *task, e4__usize sz);
 e4__bool e4__task_compiling(struct e4__task *task);
 struct e4__task* e4__task_create(void *buffer, e4__usize sz);
+void e4__task_eq(struct e4__task *task, enum e4__env_query q, void *out);
 void e4__task_io_init(struct e4__task *task,
         const struct e4__io_func *io_func);
 void e4__task_io_get(struct e4__task *task, struct e4__io_func *io_func);

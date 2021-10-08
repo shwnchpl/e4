@@ -75,6 +75,83 @@ static void e4t__test_kernel_dict(void)
     #undef _d
 }
 
+static void e4t__test_kernel_environmentq(void)
+{
+    struct e4__task *task = e4t__transient_task();
+    e4__usize uout;
+    struct e4__double dout;
+
+    /* XXX: Many of these tests are either tautological and absurd or
+       subject to frequent change if any fields are ever added to the
+       task struct, but honestly whatever. */
+
+    e4__task_eq(task, e4__EQ_ADDRUNITBITS, &uout);
+    e4t__ASSERT_EQ(uout, e4__USIZE_BIT);
+
+    e4__task_eq(task, e4__EQ_FLOORED, &uout);
+    e4t__ASSERT_EQ(uout, 0);
+
+    e4__task_eq(task, e4__EQ_HOLDSZ, &uout);
+    e4t__ASSERT_EQ(uout, e4__PNO_MIN_SZ);
+
+    e4__task_eq(task, e4__EQ_MAXCHAR, &uout);
+    e4t__ASSERT_EQ(uout, 255);
+    uout = 0;
+
+    e4__task_eq(task, e4__EQ_MAXCSTRSZ, &uout);
+    e4t__ASSERT_EQ(uout, 255);
+
+    e4__task_eq(task, e4__EQ_MAXDOUBLE, &dout);
+    e4t__ASSERT_DEQ(dout, e4__double_u(-1, (e4__usize)-1 >> 1));
+
+    e4__task_eq(task, e4__EQ_MAXINT, &uout);
+    e4t__ASSERT_EQ(uout, ((e4__usize)-1) >> 1);
+
+    e4__task_eq(task, e4__EQ_MAXUDOUBLE, &dout);
+    e4t__ASSERT_DEQ(dout, e4__double_u(-1, -1));
+
+    e4__task_eq(task, e4__EQ_MAXUINT, &uout);
+    e4t__ASSERT_EQ(uout, -1);
+
+    e4__task_eq(task, e4__EQ_PADSZ, &uout);
+    e4t__ASSERT_EQ(uout, 208);
+
+    e4__task_eq(task, e4__EQ_RSTACKCELLS, &uout);
+    e4t__ASSERT_EQ(uout, 52);
+
+    e4__task_eq(task, e4__EQ_STACKCELLS, &uout);
+    e4t__ASSERT_EQ(uout, 51);
+}
+
+static void e4t__test_kernel_evaluate(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* FIXME: Add more explicit evaluate tests. */
+
+    /* Empty strings or strings with only delimiters should be
+       no-ops. */
+    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
+    e4t__ASSERT_EQ(e4__evaluate(task, "", -1), e4__E_OK);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
+
+    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
+    e4t__ASSERT_EQ(e4__evaluate(task, " ", -1), e4__E_OK);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
+
+    /* Undefined words should generate an exception and clear
+       the stack. */
+    e4__stack_clear(task);
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 4 5 rll", -1),
+            e4__E_UNDEFWORD);
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "");
+    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
+
+    /* Attempting to interpret a compile-only word throws
+       an exception. */
+    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 exit", -1), e4__E_COMPONLYWORD);
+}
+
 static void e4t__test_kernel_exceptions_da(struct e4__task *task,
         e4__cell user);
 static void e4t__test_kernel_exceptions_throw10then(struct e4__task *task,
@@ -188,35 +265,6 @@ static void e4t__test_kernel_exceptions_throw50(struct e4__task *task,
         e4__cell user)
 {
     e4__exception_throw(task, 50);
-}
-
-static void e4t__test_kernel_evaluate(void)
-{
-    struct e4__task *task = e4t__transient_task();
-
-    /* FIXME: Add more explicit evaluate tests. */
-
-    /* Empty strings or strings with only delimiters should be
-       no-ops. */
-    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
-    e4t__ASSERT_EQ(e4__evaluate(task, "", -1), e4__E_OK);
-    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
-
-    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
-    e4t__ASSERT_EQ(e4__evaluate(task, " ", -1), e4__E_OK);
-    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
-
-    /* Undefined words should generate an exception and clear
-       the stack. */
-    e4__stack_clear(task);
-    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 3 4 5 rll", -1),
-            e4__E_UNDEFWORD);
-    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "");
-    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
-
-    /* Attempting to interpret a compile-only word throws
-       an exception. */
-    e4t__ASSERT_EQ(e4__evaluate(task, "1 2 exit", -1), e4__E_COMPONLYWORD);
 }
 
 static void e4t__test_kernel_io(void)
@@ -746,8 +794,9 @@ void e4t__test_kernel(void)
     /* FIXME: Add uservar tests. */
     e4t__test_kernel_builtin_exec();
     e4t__test_kernel_dict();
-    e4t__test_kernel_exceptions();
+    e4t__test_kernel_environmentq();
     e4t__test_kernel_evaluate();
+    e4t__test_kernel_exceptions();
     e4t__test_kernel_io();
     e4t__test_kernel_io_dump();
     e4t__test_kernel_io_pno();
