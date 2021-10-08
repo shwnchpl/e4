@@ -878,37 +878,10 @@ static void e4__builtin_PLUS_LOOP(struct e4__task *task, e4__cell user)
 
     _e4__BUILTIN_EXPECT_REF(task, 1);
 
-    /* FIXME: Consider replacing with some META_LOOP word to decrease
-       the size of compiled code? */
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_DUP]);
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_R_FROM]);
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_R_FROM]);
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TWO_DUP]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_R_FETCH]);
+    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_LOOP_INC]);
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TO_R]);
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TO_R]);
-
-    /* Next calculate X = index - limit + minimum signed integer. Check
-       the sign. Add the increment to X. If the sign changed, break,
-       otherwise continue. */
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_MINUS]);
-    e4__compile_literal(task, (e4__cell)((e4__usize)1 << (e4__USIZE_BIT - 1)));
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_PLUS]);
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_DUP]);
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_ROT]);
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_PLUS]);
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_XOR]);
-    e4__compile_literal(task, (e4__cell)(e4__USIZE_BIT - 1));
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_RSHIFT]);
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_ZERO_EQUALS]);
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_INVERT]);
-
-    /* Value on top of the stack is whether or not to continue. Now
-       apply increment. */
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_SWAP]);
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_R_FROM]);
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_PLUS]);
-    e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_TO_R]);
-
     e4__compile_cell(task, (e4__cell)&e4__BUILTIN_XT[e4__B_BRANCH]);
 
     ref = e4__stack_pop(task);
