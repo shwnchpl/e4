@@ -64,10 +64,10 @@ void e4__compile_cstr(struct e4__task *task, const char *str, e4__u8 len)
 
 void e4__compile_estr(struct e4__task *task, const char *str, e4__usize len)
 {
-    const char *chunk;
+    register const char *chunk;
     e4__usize chunk_len;
     char scratch[2];
-    char *buffer = (char *)(task->here + 2);
+    register char *buffer = (char *)(task->here + 2);
 
     /* Copy the string to the correct position *first*, since we may be
        about to write over it. */

@@ -10,6 +10,81 @@ e4__usize e4__mem_aligned(e4__usize n)
     return n;
 }
 
+void e4__mem_cbuf_init(struct e4__cbuf *cbuf, char *buf, e4__usize sz)
+{
+    cbuf->offset = 0;
+    cbuf->sz = sz;
+    cbuf->buf = buf;
+}
+
+/* Pushes into a circular buffer initialized with e4__mem_cbuf_init.
+   Guaranteed not to smash the previous M entries of size N or less
+   where M is equal to buffer size divided by N.
+   Returns NULL if an entry is too large to fit in the buffer or size is
+   zero. */
+char* e4__mem_cbuf_push(struct e4__cbuf *cbuf, const char *buf, e4__usize sz)
+{
+    register char *entry;
+
+    if (sz > cbuf->sz || !sz)
+        return NULL;
+
+    if (sz > cbuf->sz - cbuf->offset)
+        cbuf->offset = 0;
+
+    entry = &cbuf->buf[cbuf->offset];
+    memmove(entry, buf, sz);
+    cbuf->offset += sz;
+
+    return entry;
+}
+
+/* Same semantics as e4__mem_cbuf_push, except buf is escaped using
+   e4__mem_strnescape before it is pushed into the buffer. Escaped size,
+   rather than sz itself, is considered when determining whether or not
+   the requested submission will fit into the circular buffer, so a
+   submission that is too large will not only fail to insert into the
+   circular buffer successfully, it may also fill the circular buffer
+   with garbage. As such, when NULL is returned and sz was not zero, all
+   previous circular buffer entries should be considered invalidated.
+   Escaped size is written back to sz only on success. */
+char* e4__mem_cbuf_epush(struct e4__cbuf *cbuf, const char *buf, e4__usize *sz)
+{
+    register e4__usize start_offset;
+    register const char *chunk;
+    e4__usize len = *sz;
+    e4__usize chunk_len;
+    char scratch[2];
+
+    if (!len)
+        return NULL;
+
+    start_offset = cbuf->offset;
+    while ((chunk = e4__mem_strnescape(&buf, &len, &chunk_len, scratch))) {
+        if (chunk_len > cbuf->sz - cbuf->offset) {
+            if (!start_offset ||
+                    chunk_len > cbuf->sz - (cbuf->offset - start_offset)) {
+                /* The thing we're trying to insert is larger than the
+                   buffer itself. Time to fail. */
+                cbuf->offset = 0;
+                return NULL;
+            } else {
+                /* The thing we're trying to insert is too large to fit
+                   at the end of the buffer. We need to wrap around. */
+                cbuf->offset -= start_offset;
+                memmove(cbuf->buf, &cbuf->buf[start_offset], cbuf->offset);
+                start_offset = 0;
+            }
+        }
+        memmove(&cbuf->buf[cbuf->offset], chunk, chunk_len);
+        cbuf->offset += chunk_len;
+    }
+
+    *sz = cbuf->offset - start_offset;
+
+    return &cbuf->buf[start_offset];
+}
+
 /* FIXME: This function is unused internally. Consider removing. */
 e4__usize e4__mem_cells(e4__usize n)
 {

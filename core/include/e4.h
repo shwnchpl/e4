@@ -146,6 +146,12 @@ struct e4__task;
 
 typedef void (*e4__code_ptr)(struct e4__task *, e4__cell user);
 
+struct e4__cbuf {
+    e4__usize sz;
+    e4__usize offset;
+    char *buf;
+};
+
 struct e4__double {
     e4__usize high;
     e4__usize low;
@@ -639,6 +645,10 @@ char* e4__io_word(struct e4__task *task, char delim);
 
 /* mem.c functions */
 e4__usize e4__mem_aligned(e4__usize n);
+void e4__mem_cbuf_init(struct e4__cbuf *cbuf, char *buf, e4__usize sz);
+char* e4__mem_cbuf_push(struct e4__cbuf *cbuf, const char *buf, e4__usize sz);
+char* e4__mem_cbuf_epush(struct e4__cbuf *cbuf, const char *buf,
+        e4__usize *sz);
 e4__usize e4__mem_cells(e4__usize n);
 e4__usize e4__mem_dict_entry(void *here, struct e4__dict_header *prev,
         const char *name, e4__u8 nbytes, e4__u8 flags, e4__code_ptr code,

@@ -268,6 +268,85 @@ static void e4t__test_util_double_ndiv(void)
     e4t__ASSERT_EQ(r, 0);
 }
 
+static void e4t__test_util_cbuf(void)
+{
+    struct e4__cbuf cbuf;
+    e4__usize len;
+    char buf[20];
+    char *r0, *r1, *r2;
+
+    /* Test pushing unescaped strings. */
+    e4__mem_cbuf_init(&cbuf, buf, sizeof(buf));
+
+    e4t__ASSERT_EQ(e4__mem_cbuf_push(&cbuf, NULL, 40), NULL);
+    e4t__ASSERT_EQ(e4__mem_cbuf_push(&cbuf, NULL, 0), NULL);
+
+    e4t__ASSERT_MATCH((r0 = e4__mem_cbuf_push(&cbuf, "foo", 4)), "foo");
+    e4t__ASSERT_MATCH((r1 = e4__mem_cbuf_push(&cbuf, "bar", 4)), "bar");
+    e4t__ASSERT_MATCH((r2 = e4__mem_cbuf_push(&cbuf, "bas", 4)), "bas");
+
+    e4t__ASSERT_MATCH(r0, "foo");
+    e4t__ASSERT_MATCH(r1, "bar");
+    e4t__ASSERT_MATCH(r2, "bas");
+
+    e4t__ASSERT(e4__mem_cbuf_push(&cbuf, "justsomejunk", 8));
+    e4t__ASSERT_MATCH(r0, "foo");
+
+    e4t__ASSERT(e4__mem_cbuf_push(&cbuf, "newjunk", 8));
+    e4t__ASSERT_MATCH(r0, "newjunk");
+    e4t__ASSERT_MATCH(r1, "unk");
+
+    /* Test pushing escaped strings. */
+    e4__mem_cbuf_init(&cbuf, buf, sizeof(buf));
+
+    len = 0;
+    e4t__ASSERT_EQ(e4__mem_cbuf_epush(&cbuf, NULL, &len), NULL);
+
+    len = 8;
+    e4t__ASSERT_MATCH((r0 = e4__mem_cbuf_epush(&cbuf, "foo\\r\\n", &len)),
+            "foo\r\n");
+    e4t__ASSERT_EQ(len, 6);
+    len = 8;
+    e4t__ASSERT_MATCH((r1 = e4__mem_cbuf_epush(&cbuf, "bar\\r\\n", &len)),
+            "bar\r\n");
+    e4t__ASSERT_EQ(len, 6);
+    len = 8;
+    e4t__ASSERT_MATCH((r2 = e4__mem_cbuf_epush(&cbuf, "bas\\r\\n", &len)),
+            "bas\r\n");
+    e4t__ASSERT_EQ(len, 6);
+
+    e4t__ASSERT_MATCH(r0, "foo\r\n");
+    e4t__ASSERT_MATCH(r1, "bar\r\n");
+    e4t__ASSERT_MATCH(r2, "bas\r\n");
+
+    len = 7;
+    e4t__ASSERT_MATCH(e4__mem_cbuf_epush(&cbuf, "qu\\r\\n", &len), "qu\r\n");
+    e4t__ASSERT_MATCH(r0, "qu\r\n");
+    e4t__ASSERT_EQ(len, 5);
+
+    len = 42;
+    e4t__ASSERT_EQ(e4__mem_cbuf_epush(&cbuf,
+            "quux\\zbarbasfooblah\\nandthenevenmorejunk", &len), NULL);
+    e4t__ASSERT_MATCH(r0, "quux");
+    e4t__ASSERT_EQ(len, 42);
+
+    e4t__ASSERT_EQ(e4__mem_cbuf_epush(&cbuf,
+            "quuxfzbarbasfooblahmnandthenevenmorejunk", &len), NULL);
+    e4t__ASSERT_EQ(len, 42);
+
+    e4t__ASSERT(e4__mem_cbuf_push(&cbuf, "f", 1));
+
+    len = 42;
+    e4t__ASSERT_EQ(e4__mem_cbuf_epush(&cbuf,
+            "quux\\zbarbasfooblah\\nandthenevenmorejunk", &len), NULL);
+    e4t__ASSERT_MATCH(r0, "fquux");
+    e4t__ASSERT_EQ(len, 42);
+
+    e4t__ASSERT_EQ(e4__mem_cbuf_epush(&cbuf,
+            "quuxfzbarbasfooblahmnandthenevenmorejunk", &len), NULL);
+    e4t__ASSERT_EQ(len, 42);
+}
+
 static void e4t__test_util_exceptionformat(void)
 {
     e4__usize len = 0;
@@ -857,6 +936,7 @@ void e4t__test_util(void)
     e4t__test_util_double_div();
     e4t__test_util_double_mul();
     e4t__test_util_double_ndiv();
+    e4t__test_util_cbuf();
     e4t__test_util_exceptionformat();
     e4t__test_util_math();
     e4t__test_util_mem_dict();
