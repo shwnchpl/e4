@@ -142,6 +142,7 @@ Kernel
   hooks inclusion flag and update build tests accordingly.
 - [DONE] Improve stack size calculations.
 - [DONE] Handle stack overflow.
+- [DONE] Handle return stack overflow.
 - Use checked allocation everywhere that HERE is manipulated. WORD is
   specifically allowed to dip into the PNO buffer but not PAD.
 - Ensure, somehow, that the PNO buffer is always at least 33 characters

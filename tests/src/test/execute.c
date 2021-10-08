@@ -335,6 +335,55 @@ static void e4t__test_execute_nested(void)
     e4t__ASSERT_EQ(msg, NULL);
 }
 
+static void e4t__test_execute_rstack_overflow(void)
+{
+    const void *overflow_loop[] = {
+        (void *)(e4__usize)e4__execute_threaded,
+        NULL,
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
+        (void *)0,
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
+        (void *)39,
+        &e4__BUILTIN_XT[e4__B_TO_R],
+        &e4__BUILTIN_XT[e4__B_DUP],
+        &e4__BUILTIN_XT[e4__B_BRANCH0],
+        (void *)e4__USIZE_NEGATE(5),
+        &e4__BUILTIN_XT[e4__B_EXIT],
+        &e4__BUILTIN_XT[e4__B_SENTINEL]
+    };
+    const void *overflow_recurse[] = {
+        (void *)(e4__usize)e4__execute_threaded,
+        NULL,
+        NULL,
+        &e4__BUILTIN_XT[e4__B_LIT_CELL],
+        (void *)33,
+        &e4__BUILTIN_XT[e4__B_EXIT],
+        &e4__BUILTIN_XT[e4__B_SENTINEL]
+    };
+    struct e4__task *task = e4t__transient_task();
+
+    overflow_recurse[2] = &overflow_recurse;
+
+    /* XXX: Only tests kernel return stack overflow through recursion
+       and by pushing onto the return stack, with exceptions disabled.
+       The corresponding tests for the case when exceptions are enabled
+       are in kernel.c. */
+    /* FIXME: There are other ways the return stack could overflow but
+       those are not currently covered. */
+
+    e4__execute(task, overflow_recurse);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
+    e4t__ASSERT_EQ(e4__stack_rdepth(task), 0);
+    e4t__ASSERT_EQ(e4__stack_ravail(task), 52);
+
+    e4__execute(task, overflow_loop);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 39);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_EQ(e4__stack_rdepth(task), 0);
+    e4t__ASSERT_EQ(e4__stack_ravail(task), 52);
+}
+
 static void e4t__test_execute_stack_overflow(void)
 {
     const void *overflow_lit[] = {
@@ -554,6 +603,7 @@ void e4t__test_execute(void)
     e4t__test_execute_defer();
     e4t__test_execute_does();
     e4t__test_execute_nested();
+    e4t__test_execute_rstack_overflow();
     e4t__test_execute_stack_overflow();
     e4t__test_execute_string();
     e4t__test_execute_threadedthunk();

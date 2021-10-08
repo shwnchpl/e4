@@ -25,6 +25,16 @@
         }   \
     } while (0)
 
+#define _e4__BUILTIN_EXPECT_RAVAIL(t, c) \
+    do {    \
+        register const e4__usize _c = (e4__usize)(c);   \
+        if (e4__stack_ravail(t) < _c) { \
+            e4__exception_throw(t, e4__E_RSTKOVERFLOW); \
+            e4__execute_ret(task);  \
+            return; \
+        }   \
+    } while (0)
+
 #define _e4__BUILTIN_EXPECT_RDEPTH(t, c)    \
     do {    \
         register const e4__usize _c = (e4__usize)(c);   \

@@ -666,6 +666,24 @@ static e4__usize e4t__test_kernel_quit_key(void *user, char *b)
     return e4__E_OK;
 }
 
+static void e4t__test_kernel_rstack_overflow(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* XXX: Only tests kernel return stack overflow through recursion
+       and by pushing onto the return stack, with exceptions enabled.
+       The corresponding tests for the case when exceptions are disabled
+       are in execute.c. */
+    /* FIXME: There are other ways the return stack could overflow but
+       those are not currently covered. */
+
+    /* Test return stack overflows with exceptions enabled. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": overflow recurse ;", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "overflow", -1), e4__E_RSTKOVERFLOW);
+    e4t__ASSERT_OK(e4__evaluate(task, ": overflow begin 5 >r again ;", -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "overflow", -1), e4__E_RSTKOVERFLOW);
+}
+
 static void e4t__test_kernel_stack(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -735,6 +753,7 @@ void e4t__test_kernel(void)
     e4t__test_kernel_io_pno();
     e4t__test_kernel_mem();
     e4t__test_kernel_quit();
+    e4t__test_kernel_rstack_overflow();
     e4t__test_kernel_stack();
     e4t__test_kernel_stack_overflow();
 }

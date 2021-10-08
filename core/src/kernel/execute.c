@@ -23,7 +23,12 @@ void e4__execute(struct e4__task *task, void *xt)
 
     /* If the instruction pointer is currently NULL, simply return
        to NULL. */
-    e4__DEREF(task->rp--) = ip_valid ? task->ip + 1 : NULL;
+    if (!e4__stack_ravail(task)) {
+        e4__exception_throw(task, e4__E_RSTKOVERFLOW);
+        return;
+    }
+
+    e4__stack_rpush(task, ip_valid ? task->ip + 1 : NULL);
 
     xtup->code(task, &xtup->user);
 
@@ -103,6 +108,12 @@ void e4__execute_threaded(struct e4__task *task, e4__cell user)
 {
     register int depth = 1;
 
+    if (!e4__stack_ravail(task)) {
+        e4__exception_throw(task, e4__E_RSTKOVERFLOW);
+        e4__execute_ret(task);
+        return;
+    }
+
     e4__stack_rpush(task, task->tr0);
     task->tr0 = task->rp;
 
@@ -114,6 +125,16 @@ void e4__execute_threaded(struct e4__task *task, e4__cell user)
     while (depth) {
         if (e4__DEREF2(task->ip) ==
                 (e4__cell)(e4__usize)e4__execute_threaded) {
+            if (e4__stack_ravail(task) < 2) {
+                e4__exception_throw(task, e4__E_RSTKOVERFLOW);
+                task->rp = task->tr0;
+                while (--depth) {
+                    task->tr0 = e4__stack_rpop(task);
+                    task->rp = task->tr0;
+                }
+                break;
+            }
+
             depth += 1;
 
             /* Stash expected thread base return pointer for this

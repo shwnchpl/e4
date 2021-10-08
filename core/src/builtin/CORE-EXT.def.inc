@@ -444,6 +444,7 @@ static void e4__builtin_TWO_R_FROM(struct e4__task *task, e4__cell user)
 static void e4__builtin_TWO_TO_R(struct e4__task *task, e4__cell user)
 {
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+    _e4__BUILTIN_EXPECT_RAVAIL(task, 2);
 
     /* The top of the return stack is the place to which *we* must
        return, so consume that value before doing anything else. */
