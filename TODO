@@ -114,7 +114,7 @@ General Builtins
 - [DONE] Add +LOOP tests that cover the actual semantics correctly and
   prevent an incorrect implementation (as was present before).
 - [DONE] Uses system LOOP_INC builtin in +LOOP builtin impl.
-- Implement ENVIRONMENT?.
+- [DONE] Implement ENVIRONMENT?.
 - Implement STATE, >IN, and SOURCE.
 - Implement ACCEPT.
 - Implement FIND.
@@ -148,7 +148,7 @@ Kernel
 - Ensure, somehow, that the PNO buffer is always at least 33 characters
   (which is a requirement of WORD). On a system where e4__USIZE_BIT is
   greater than or equal to 16, this will always be the case.
-- Handle dictionary overflows and other overflows.
+- Confirm that all overflows are now handled.
 - Remove non-pno numeric formatting utilities.
 
 REPL
@@ -205,6 +205,14 @@ REPL
   should produce the same result as doing this:
         $ e4
         s" foo.fth" included
+
+Testing
+-------
+- Consider splitting exceedingly long builtin tests into multiple
+  functions. Current candidates for splitting include doublemath,
+  logic, math, and memmanip in particular.
+- Consider splitting builtin tests into multiple files, possibly even
+  in a builtin/ test directory.
 
 
 Version 0.5

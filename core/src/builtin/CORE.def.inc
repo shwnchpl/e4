@@ -405,6 +405,77 @@ static void e4__builtin_EMIT(struct e4__task *task, e4__cell user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_ENVIRONMENT_QUERY(struct e4__task *task, e4__cell user)
+{
+    register const char *str;
+    register e4__usize len;
+    e4__usize u = 0;
+    struct e4__double d = {0,};
+    register e4__usize known = (e4__usize)-1;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    len = (e4__usize)e4__stack_pop(task);
+    str = (const char *)e4__stack_pop(task);
+
+    #define _match(_s) \
+        ((len == (sizeof(_s) - 1)) && !e4__mem_strncasecmp(str, _s, len))
+
+    /* CORE environmental queries */
+    if (_match("/COUNTED-STRING")) {
+        e4__task_eq(task, e4__EQ_MAXCSTRSZ, &u);
+        e4__stack_push(task, (e4__cell)u);
+    } else if (_match("/HOLD")) {
+        e4__task_eq(task, e4__EQ_HOLDSZ, &u);
+        e4__stack_push(task, (e4__cell)u);
+    } else if (_match("/PAD")) {
+        e4__task_eq(task, e4__EQ_PADSZ, &u);
+        e4__stack_push(task, (e4__cell)u);
+    } else if (_match("ADDRESS-UNIT-BITS")) {
+        e4__task_eq(task, e4__EQ_ADDRUNITBITS, &u);
+        e4__stack_push(task, (e4__cell)u);
+    } else if (_match("FLOORED")) {
+        e4__task_eq(task, e4__EQ_FLOORED, &u);
+        e4__stack_push(task, (e4__cell)u);
+    } else if (_match("MAX-CHAR")) {
+        e4__task_eq(task, e4__EQ_MAXCHAR, &u);
+        e4__stack_push(task, (e4__cell)u);
+    } else if (_match("MAX-D")) {
+        e4__task_eq(task, e4__EQ_MAXDOUBLE, &d);
+        e4__stack_push(task, (e4__cell)d.low);
+        e4__stack_push(task, (e4__cell)d.high);
+    } else if (_match("MAX-N")) {
+        e4__task_eq(task, e4__EQ_MAXINT, &u);
+        e4__stack_push(task, (e4__cell)u);
+    } else if (_match("MAX-U")) {
+        e4__task_eq(task, e4__EQ_MAXUINT, &u);
+        e4__stack_push(task, (e4__cell)u);
+    } else if (_match("MAX-UD")) {
+        e4__task_eq(task, e4__EQ_MAXUDOUBLE, &d);
+        e4__stack_push(task, (e4__cell)d.low);
+        e4__stack_push(task, (e4__cell)d.high);
+    } else if (_match("RETURN-STACK-CELLS")) {
+        e4__task_eq(task, e4__EQ_RSTACKCELLS, &u);
+        e4__stack_push(task, (e4__cell)u);
+    } else if (_match("STACK-CELLS")) {
+        e4__task_eq(task, e4__EQ_STACKCELLS, &u);
+        e4__stack_push(task, (e4__cell)u);
+    } else {
+        known = 0;
+    }
+
+    #undef _match
+
+    /* We know it was okay to push two elements onto the stack because
+       we popped two off, but we may have already pushed two elements
+       on. As such, it's necessary to check that there's space for at
+       lease one more. */
+    _e4__BUILTIN_EXPECT_AVAIL(task, 1);
+    e4__stack_push(task, (e4__cell)known);
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_EQUALS(struct e4__task *task, e4__cell user)
 {
     register e4__usize l, r;

@@ -329,6 +329,7 @@ enum e4__builtin_id {
     e4__B_DUP,
     e4__B_ELSE,
     e4__B_EMIT,
+    e4__B_ENVIRONMENT_QUERY,
     e4__B_EQUALS,
     e4__B_EVALUATE,
     e4__B_EXECUTE,

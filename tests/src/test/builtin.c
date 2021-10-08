@@ -456,6 +456,84 @@ static void e4t__test_builtin_does(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 158);
 }
 
+/* Covers ENVIRONMENT? */
+static void e4t__test_builtin_environmentq(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    e4t__ASSERT_OK(e4__evaluate(task, "s\" junk\" environment?", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "s\" /counted-string\" environment?",
+            -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 255);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "s\" /hold\" environment?", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__PNO_MIN_SZ);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "s\" /pad\" environment?", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 208);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "s\" address-unit-bits\" environment?",
+            -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__USIZE_BIT);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "s\" floored\" environment?", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "s\" max-char\" environment?",
+            -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 255);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "s\" max-d\" environment?",
+            -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 3);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), (e4__usize)-1 >> 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -1);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "s\" max-n\" environment?",
+            -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), (e4__usize)-1 >> 1);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "s\" max-u\" environment?", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -1);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "s\" max-ud\" environment?", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 3);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -1);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "s\" return-stack-cells\" environment?",
+            -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 52);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "s\" stack-cells\" environment?", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 51);
+}
+
 /* Covers EVALUATE S" SOURCE-ID */
 static void e4t__test_builtin_evaluate(void)
 {
@@ -2118,6 +2196,7 @@ void e4t__test_builtin(void)
     e4t__test_builtin_data();
     e4t__test_builtin_defer();
     e4t__test_builtin_does();
+    e4t__test_builtin_environmentq();
     e4t__test_builtin_evaluate();
     e4t__test_builtin_exceptions();
     e4t__test_builtin_forget();
