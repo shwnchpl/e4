@@ -110,6 +110,11 @@ General Builtins
 - [DONE] Fix broken DOES> implementation.
 - [DONE] Add DOES> tests that cover the actual semantics correctly and
   prevent an incorrect implementation (as was present before).
+- [DONE] Fix broken +LOOP implementation.
+- [DONE] Add +LOOP tests that cover the actual semantics correctly and
+  prevent an incorrect implementation (as was present before).
+- Replace +LOOP impl with some impl that uses some system (+LOOP) word
+  (or something).
 - Implement ENVIRONMENT?.
 - Implement STATE, >IN, and SOURCE.
 - Implement ACCEPT.

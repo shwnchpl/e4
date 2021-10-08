@@ -637,6 +637,7 @@ static void e4t__test_compile_do_loop(void)
     e4t__ASSERT_OK(e4__evaluate(task, ": foo 5 0 do r@ . loop ;", -1));
     e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 1 2 3 4 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
 
     /* Test that LEAVE works correctly. */
     e4t__ASSERT_OK(e4__evaluate(task,
@@ -653,21 +654,40 @@ static void e4t__test_compile_do_loop(void)
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "3 4 5 ");
     e4t__ASSERT_OK(e4__evaluate(task, "15 10 foo", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "10 11 12 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
 
     /* Test that ?DO loops work correctly. */
     e4t__ASSERT_OK(e4__evaluate(task,
             ": foo do i  dup . 10 = if leave then loop ;", -1));
     e4t__ASSERT_OK(e4__evaluate(task, "8 8 foo", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "8 9 10 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
     e4t__ASSERT_OK(e4__evaluate(task,
             ": foo ?do i dup . 10 = if leave then loop ;", -1));
     e4t__ASSERT_OK(e4__evaluate(task, "8 8 foo", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "");
+    e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
 
     /* Test that +LOOP works as expected. */
     e4t__ASSERT_OK(e4__evaluate(task, ": foo 10 0 do i . 2 +loop ;", -1));
     e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 2 4 6 8 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
+
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo 9 0 do i . 2 +loop ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 2 4 6 8 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
+
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo -10 0 do i . -2 +loop ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 -2 -4 -6 -8 -10 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
+
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo -9 0 do i . -2 +loop ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "0 -2 -4 -6 -8 ");
+    e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
 
     /* Test that nested do loops work correctly. */
     e4t__ASSERT_OK(e4__evaluate(task,
@@ -689,6 +709,7 @@ static void e4t__test_compile_do_loop(void)
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "2 3 4 500 ");
     e4t__ASSERT_EQ(e4__evaluate(task, "9 foo", -1), e4__E_RSTKIMBALANCE);
     e4t__term_obuf_consume();
+    e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
 
     e4t__ASSERT_OK(e4__evaluate(task,
             ": foo 5 swap do i 5 > if unloop exit then i . loop 500 . ;",
@@ -697,6 +718,7 @@ static void e4t__test_compile_do_loop(void)
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "2 3 4 500 ");
     e4t__ASSERT_OK(e4__evaluate(task, "9 foo", -1));
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "");
+    e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
 }
 
 /* Covers AGAIN BEGIN UNTIL REPEAT WHILE and various other builtins */
