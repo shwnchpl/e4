@@ -687,6 +687,7 @@ void e4__mem_pno_hold(char **buf_end, char c);
 void e4__mem_pno_holds(char **buf_end, const char *s, e4__usize len);
 
 /* stack.c functions */
+e4__usize e4__stack_avail(struct e4__task *task);
 void e4__stack_clear(struct e4__task *task);
 e4__usize e4__stack_depth(struct e4__task *task);
 void e4__stack_drop(struct e4__task *task);
@@ -697,6 +698,7 @@ e4__cell e4__stack_pick(struct e4__task *task, e4__usize u);
 e4__cell e4__stack_pop(struct e4__task *task);
 void e4__stack_push(struct e4__task *task, void *v);
 void e4__stack_rot(struct e4__task *task);
+e4__usize e4__stack_ravail(struct e4__task *task);
 e4__usize e4__stack_rdepth(struct e4__task *task);
 e4__cell e4__stack_rpeek(struct e4__task *task);
 e4__cell e4__stack_rpop(struct e4__task *task);

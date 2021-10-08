@@ -699,6 +699,9 @@ static void e4t__test_kernel_stack(void)
     e4t__ASSERT_EQ(e4__stack_rpop(task), 5);
     e4t__ASSERT_EQ(e4__stack_rpop(task), 3);
     e4t__ASSERT_EQ(e4__stack_rdepth(task), 0);
+
+    e4t__ASSERT_EQ(e4__stack_avail(task), 51);
+    e4t__ASSERT_EQ(e4__stack_ravail(task), 52);
 }
 
 void e4t__test_kernel(void)

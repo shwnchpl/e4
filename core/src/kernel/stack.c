@@ -8,7 +8,11 @@
    user facing builtin words. C programmers can do their own, so this
    API probably doesn't need it. */
 
-/* XXX: Nonstandard. */
+e4__usize e4__stack_avail(struct e4__task *task)
+{
+    return (e4__usize)(task->sp - task->sl + 1);
+}
+
 void e4__stack_clear(struct e4__task *task)
 {
     task->sp = task->s0;
@@ -62,6 +66,11 @@ void e4__stack_rot(struct e4__task *task)
     e4__DEREF(task->sp + 3) = e4__DEREF(task->sp + 2);
     e4__DEREF(task->sp + 2) = e4__DEREF(task->sp + 1);
     e4__DEREF(task->sp + 1) = tmp;
+}
+
+e4__usize e4__stack_ravail(struct e4__task *task)
+{
+    return (e4__usize)(task->rp - task->rl + 1);
 }
 
 e4__usize e4__stack_rdepth(struct e4__task *task)
