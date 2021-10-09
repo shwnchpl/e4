@@ -46,6 +46,9 @@ clean:
 repl: $(TARGET_REPL)
 tests: $(TARGET_TESTS)
 
+# Documentation targets.
+include doc/sphinx.mk
+
 # Examples targets.
 EXAMPLES_TARGETS :=
 include examples/arduino/arduino.mk

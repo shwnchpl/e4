@@ -1,21 +1,21 @@
 General TODO
 ============
 
-Repo Maintenance
-----------------
-- Add license text to all source files.
-- Consider updating project to use GPL or Apache license.
-- Ensure that license is copied into all deliverables (for instance,
-  the amalgam and Arduino sketch build directories/archives).
-- Update README.rst to actually explain this project.
-- Add C++ include guards to all headers?
-
 Build
 -----
 - Attempt to set up an 8-bit STM8 build (specifically, targetting the
   STM8S-DISCOVERY - UM0817). This will involve making some code changes
   to make sdcc happy (which is a good thing in-and-of itself). It may
   also be worth considering setting up some kind of SDCC test target.
+
+Repo Maintenance
+----------------
+- Add license text to all source files.
+- Consider updating project to use GPL or Apache license.
+- Ensure that license is copied into all deliverables (for instance,
+  the amalgam and Arduino sketch build directories/archives).
+- Add C++ include guards to all headers?
+- Add logo (possibly color and monochrome) where appropriate.
 
 
 Version 0.3
@@ -32,7 +32,20 @@ Compilation
 
 Documentation
 -------------
-- Create initial documentation framework.
+- [DONE] Create initial documentation framework with Sphinx.
+- Add initial core documentation.
+- Add initial wordlist documentation/constraints.
+- Add current specification.
+- Add initial REPL documentation.
+- Consider adding README.rst files and release notes to documentation
+  (somehow?).
+- Consider including genindex in some capacity (if this would be
+  helpful).
+- Document version scheme somewhere, which is essentially that tagged
+  releases are tagged and version number is not bumped between releases
+  but "-dev" is appended to the version string. Consider switching to
+  even patch numbers for releases and odd patch numbers (followed by
+  "-dev" in the version string) for development versions.
 - State that all e4 related variables must be stored in the same
   address space. This limitation makes it impossible to store constant
   values in flash on architectures where ROM variables must be stored
@@ -162,6 +175,11 @@ REPL
   and/or allow for setting buffer size via a command line argument or
   environment variable.
 
+Repo Maintenance
+----------------
+- Update README.rst to actually explain this project.
+- Consider renaming wip branches to dev.
+
 Testing
 -------
 - [DONE] Split e4t__test_util_doublemath into multiple tests after the
@@ -179,7 +197,9 @@ Version 0.4
 Build
 -----
 - Update amalgam build target to be a .zip file (rather than e4.c) and
-  produce this file when building.
+  produce this file when building? Alternatively, create some kind of
+  "dist" make target that creates a zip file including the amalgam as
+  well as full license text and PDF/HTML documentation.
 
 General Builtins
 ----------------
@@ -290,6 +310,7 @@ Documentation
 - Document all implementation-defined behavior as per Forth 2012 4.1.1.
 - Document all ambiguous condition handling as per Forth 2012 4.1.2.
 - Provide other system documentation as per by Forth 2012 4.1.3.
+- Add project logo to documentation.
 - Document the fact that excluding the exception wordlist does not
   actually disable exceptions. Even with the exceptions wordlist
   excluded, exceptions are still used internally; it's just that the
