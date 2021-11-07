@@ -17,10 +17,15 @@ source_suffix = {
     '.txt': 'restructuredtext',
 }
 
+numfig_format = {
+    'section': '{number} {name}',
+}
+
 
 # -- Options for HTML output -------------------------------------------------
 
 html_theme = 'bizstyle'
+html_secnumber_suffix = ' '
 html_static_path = ['']
 
 # FIXME: Add logo.
@@ -31,6 +36,10 @@ html_static_path = ['']
 
 
 # -- Options for LaTeX output ------------------------------------------------
+
+latex_elements = {
+    'preamble': '\setcounter{secnumdepth}{4}',
+}
 
 latex_engine = 'pdflatex'
 latex_show_pagerefs = True

@@ -32,6 +32,8 @@ Setting IO Handler Callbacks
 FIXME: populate this section
 
 
+.. _qsg-compile-time-config:
+
 **************************
 Compile Time Configuration
 **************************
