@@ -1,0 +1,41 @@
+#######
+License
+#######
+
+FIXME: Should license include stipulation about including version
+and/or release date of documentation? Or perhaps a recommendation?
+
+FIXME: Review license and make sure it makes some kind of legal sense?
+
+The contents of this directory and all sub-directories (if viewed in
+source form) or any documentation generated from this source in any
+format (whether in HTML or PDF) is Copyright Shawn M. Chapla, 2021, and
+is *not* released under the GPL, the BSD license, the MIT license, or
+any other license used anywhere else in this repository for code or any
+other assets. As such, this documentation may only be reproduced and
+distributed as per standard copyright regulations with the following
+allowances and restrictions.
+
+Any code examples in this documentation may be reproduced freely for any
+purpose, commercial or otherwise, without any prior written approval or
+need for citation. The documentation text itself may also be reproduced
+freely, for any purpose, commercial or otherwise, provided that a) it is
+cited in a manner appropriate to the format in which the documentation
+text is being reproduced and at a minimum must indicate that the
+material is from the "official e4 documentation" (and do so making
+direct use of the phrase "official e4 documentation") and b) no claim is
+made that the author of the reproduction is the author of the reproduced
+documentation.
+
+Any documentation not included in this official documentation should not
+be considered official and must not misrepresent itself as being the
+work of Shawn M. Chapla or as having any official association with the
+e4 project unless those things are actually the case.
+
+THIS DOCUMENTATION IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

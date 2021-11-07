@@ -16,6 +16,7 @@ Repo Maintenance
   the amalgam and Arduino sketch build directories/archives).
 - Add C++ include guards to all headers?
 - Add logo (possibly color and monochrome) where appropriate.
+- Consider adding a HACKING.rst document and/or a style guide?
 
 
 Version 0.3
@@ -33,14 +34,13 @@ Compilation
 Documentation
 -------------
 - [DONE] Create initial documentation framework with Sphinx.
-- Add initial core documentation.
-- Add initial wordlist documentation/constraints.
-- Add current specification.
-- Add initial REPL documentation.
-- Consider adding README.rst files and release notes to documentation
-  (somehow?).
-- Consider including genindex in some capacity (if this would be
-  helpful).
+- [DONE] Create initial documentation license.
+- [DONE] Create initial background summary.
+- Complete standard documentation intro.
+- Complete kernel standard documentation.
+- Complete CORE standard documentation.
+- Complete CORE-EXT standard documentation (as much as possible).
+- Add initial system label. This can be kept up to date over time.
 - Document version scheme somewhere, which is essentially that tagged
   releases are tagged and version number is not bumped between releases
   but "-dev" is appended to the version string. Consider switching to
@@ -199,7 +199,7 @@ Build
 - Update amalgam build target to be a .zip file (rather than e4.c) and
   produce this file when building? Alternatively, create some kind of
   "dist" make target that creates a zip file including the amalgam as
-  well as full license text and PDF/HTML documentation.
+  well as full license text and PDF/HTML/RST documentation.
 
 General Builtins
 ----------------
@@ -307,6 +307,18 @@ Compilation
 
 Documentation
 -------------
+- Review/fix license.
+- Complete "about" documentation.
+- Complete project overview documentation.
+- Complete REPL documentation.
+- Complete quickstart documentation.
+- Complete testing documentation.
+- Complete API reference documentation.
+- Complete Standard documentation.
+- Consider adding README.rst files and release notes to documentation
+  (somehow?).
+- Consider including genindex in some capacity (if this would be
+  helpful).
 - Document all implementation-defined behavior as per Forth 2012 4.1.1.
 - Document all ambiguous condition handling as per Forth 2012 4.1.2.
 - Provide other system documentation as per by Forth 2012 4.1.3.
