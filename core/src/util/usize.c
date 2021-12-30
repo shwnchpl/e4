@@ -105,6 +105,8 @@ const char* e4__usize_format_exception(e4__usize e, e4__usize *len)
             _return_with_len("unsupported operation");
         case e4__E_CSMISMATCH:
             _return_with_len("control structure mismatch");
+        case e4__E_INVNUMARG:
+            _return_with_len("invalid numeric argument");
         case e4__E_RSTKIMBALANCE:
             _return_with_len("return stack imbalance");
         case e4__E_USERINTERRUPT:
@@ -137,6 +139,8 @@ const char* e4__usize_format_exception(e4__usize e, e4__usize *len)
             _return_with_len("dictionary underflow");
         case e4__E_INCFOVERFLOW:
             _return_with_len("nested include overflow");
+        case e4__E_LONGFILEPATH:
+            _return_with_len("file path too long");
 
         /* unknown */
         default:

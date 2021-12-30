@@ -89,6 +89,9 @@ void e4t__term_io_init(struct e4__task *task)
         e4t__term_ibuf_keyq,
         e4t__term_ms,
         e4__posix_unixtime,
+        e4__posix_file_close,
+        e4__posix_file_open,
+        e4__posix_file_read,
     };
 
     e4__task_io_init(task, &io_func);

@@ -166,6 +166,14 @@ Kernel
 
 REPL
 ----
+- [DONE] Make it so that it is possible to automatically include/execute
+  a file that has been specified as a command line argument. That is
+  to say, doing this:
+        $ e4 foo.fth
+  should produce the same result as doing this:
+        $ e4
+        s" foo.fth" included
+  (once the later has also been implemented).
 - Source ~/.e4-editrc to allow for e4 specific input overrides. For
   example, tab completion on tab could be disabled by macro binding
   the tab key to two or four spaces.
@@ -228,13 +236,6 @@ Kernel
 REPL
 ----
 - Try running some the Tetris program again.
-- Make it so that it is possible to automatically include/execute a
-  file that has been specified as a command line argument. That is
-  to say, doing this:
-        $ e4 foo.fth
-  should produce the same result as doing this:
-        $ e4
-        s" foo.fth" included
 
 Testing
 -------
@@ -243,6 +244,8 @@ Testing
   logic, math, and memmanip in particular.
 - Consider splitting builtin tests into multiple files, possibly even
   in a builtin/ test directory.
+- Consider adding mock file IO tests that do not rely upon the POSIX
+  handlers.
 
 
 Version 0.5

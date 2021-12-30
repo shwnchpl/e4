@@ -160,6 +160,14 @@ typedef void** e4__cell;
     #if !defined(e4__FIB_SZ)
         #define e4__FIB_SZ  130
     #endif
+
+    /* Define maximum path size for use with the POSIX hooks, if such
+       a value is needed and has not yet been defined. */
+    #if defined(e4__INCLUDE_POSIX_HOOKS)
+        #if !defined(e4__POSIX_PATH_MAX)
+            #define e4__POSIX_PATH_MAX  4096
+        #endif
+    #endif
 #endif /* defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT) */
 
 typedef unsigned char e4__bool;
@@ -307,6 +315,7 @@ struct e4__gmt {
 #define e4__E_PSTROVERFLOW  (-18)
 #define e4__E_UNSUPPORTED   (-21)
 #define e4__E_CSMISMATCH    (-22)
+#define e4__E_INVNUMARG     (-24)
 #define e4__E_RSTKIMBALANCE (-25)
 #define e4__E_USERINTERRUPT (-28)
 #define e4__E_NESTEDCOMPILE (-29)
@@ -324,6 +333,7 @@ struct e4__gmt {
 #define e4__E_INVBUILTINMUT (-259)
 #define e4__E_DICTUNDERFLOW (-260)
 #define e4__E_INCFOVERFLOW  (-261)
+#define e4__E_LONGFILEPATH  (-262)
 
 /* flag constants - dictionary entry */
 #define e4__F_IMMEDIATE     (0x01)
@@ -861,11 +871,47 @@ e4__usize e4__usize_sdiv(e4__usize n, e4__usize d, e4__usize *r);
 struct e4__double e4__usize_todouble(e4__usize u);
 void e4__usize_togmt(e4__usize t, struct e4__gmt *gmt);
 
+/* posix.c functions */
+
 #if defined(e4__INCLUDE_POSIX_HOOKS)
+
     #if defined(e4__INCLUDE_FACILITY_EXT)
         e4__usize e4__posix_ms(void *user, e4__usize ms);
         e4__usize e4__posix_unixtime(void *user, e4__usize *t);
     #endif /* defined(e4__INCLUDE_FACILITY_EXT) */
+
+    #if defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT)
+        e4__usize e4__posix_file_close(void *user, e4__usize fd,
+                e4__usize *ior);
+        e4__usize e4__posix_file_open(void *user, const char *path,
+                e4__usize sz, e4__usize perm, e4__usize *fd, e4__usize *ior);
+        e4__usize e4__posix_file_read(void *user, e4__usize fd, char *buf,
+                e4__usize *n, e4__usize *ior);
+    #endif /* defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT) */
+
+    #if defined(e4__INCLUDE_FILE)
+        e4__usize e4__posix_file_create(void *user, const char *path,
+                e4__usize sz, e4__usize perm, e4__usize *fd, e4__usize *ior);
+        e4__usize e4__posix_file_delete(void *user, const char *path,
+                e4__usize sz, e4__usize *ior);
+        e4__usize e4__posix_file_position(void *user, e4__usize fd,
+                e4__usize *pos, e4__usize *ior);
+        e4__usize e4__posix_file_reposition(void *user, e4__usize fd,
+                e4__usize pos, e4__usize *ior);
+        e4__usize e4__posix_file_resize(void *user, e4__usize fd,
+                e4__usize sz, e4__usize *ior);
+        e4__usize e4__posix_file_size(void *user, e4__usize fd, e4__usize *sz,
+                e4__usize *ior);
+    #endif /* defined(e4__INCLUDE_FILE) */
+
+    #if defined(e4__INCLUDE_FILE_EXT)
+        e4__usize e4__posix_file_flush(void *user, e4__usize fd,
+                e4__usize *ior);
+        e4__usize e4__posix_file_rename(void *user, const char *old_path,
+                e4__usize old_sz, const char *new_path, e4__usize new_sz,
+                e4__usize *ior);
+    #endif /* defined(e4__INCLUDE_FILE_EXT) */
+
 #endif /* defined(e4__INCLUDE_POSIX_HOOKS) */
 
 #endif /* e4_H_ */

@@ -1,7 +1,12 @@
+#define _POSIX_C_SOURCE 200809L
 #include "e4.h"
 #include "../e4t.h" /* FIXME: Add this to an include path? */
 
+#include <errno.h>
+#include <fcntl.h>
+#include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 static void e4t__test_kernel_builtin_exec(void)
 {
@@ -150,6 +155,106 @@ static void e4t__test_kernel_evaluate(void)
     /* Attempting to interpret a compile-only word throws
        an exception. */
     e4t__ASSERT_EQ(e4__evaluate(task, "1 2 exit", -1), e4__E_COMPONLYWORD);
+}
+
+static void e4t__test_kernel_evaluate_file(void)
+{
+    struct e4__task *task = e4t__transient_task();
+    struct e4__file_exception fex = { e4__E_BUG, };
+    char path[] = "/tmp/e4-XXXXXX";
+    int fd;
+    e4__usize fid = (e4__usize)-1;
+
+    /* FIXME: This test exercises the POSIX file handlers. Ideally, it
+       would also install mock handlers to test for behavioral issues
+       unrelated to the POSIX handlers. */
+
+    /* Create a temporary file and write some data into it. */
+    fd = mkstemp(path);
+    e4t__ASSERT(fd >= 0);
+    e4t__ASSERT_EQ(write(fd, ": foo 3 7 + ;\n", 14), 14);
+    e4t__ASSERT_EQ(write(fd, "foo 15", 6), 6);
+    e4t__ASSERT_EQ(close(fd), 0);
+
+    /* Attempt to evaluate a file with an open handler, ensuring that
+       doing so closes the file descriptor and has the expected side
+       effects on the task. */
+    e4t__ASSERT_OK(e4__io_file_open(task, path, -1, e4__F_READ, &fid));
+    e4t__ASSERT_EQ(fcntl((int)fid, F_GETFD), 0);
+    e4t__ASSERT_OK(e4__evaluate_file(task, fid, NULL));
+    e4t__ASSERT(fcntl((int)fid, F_GETFD) < 0);
+
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 15);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 10);
+    e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 10);
+
+    /* Attempt to evaluate a file based upon path. */
+    e4t__ASSERT_OK(e4__evaluate_path(task, path, -1, &fex));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 15);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 10);
+    e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 10);
+
+    /* Ensure that on, on success, exception info is populated
+       correctly. */
+    e4t__ASSERT_EQ(fex.ex, e4__E_OK);
+
+    /* Append some bad code to the file. */
+    fd = open(path, O_WRONLY);
+    e4t__ASSERT(fd >= 0);
+    e4t__ASSERT(lseek(fd, 0, SEEK_END) >= 0);
+    e4t__ASSERT_EQ(write(fd, "\nfoo bar", 8), 8);
+    e4t__ASSERT_EQ(close(fd), 0);
+
+    /* Ensure that exception info is populated correctly when executing
+       from file descriptor. */
+    e4t__ASSERT_OK(e4__io_file_open(task, path, -1, e4__F_READ, &fid));
+    e4t__ASSERT_EQ(fcntl((int)fid, F_GETFD), 0);
+    e4t__ASSERT_OK(e4__evaluate_file(task, fid, &fex));
+    e4t__ASSERT(fcntl((int)fid, F_GETFD) < 0);
+
+    e4t__ASSERT_EQ(fex.ex, e4__E_UNDEFWORD);
+    e4t__ASSERT_EQ(fex.line, 3);
+    e4t__ASSERT_EQ(fex.path_sz, 0);
+    e4t__ASSERT_EQ(fex.path, NULL);
+    e4t__ASSERT_EQ(fex.buf_sz, 7);
+    e4t__ASSERT(!memcmp(fex.buf, "foo bar", 7));
+
+    /* Ensure that exception info is populated correctly when executing
+       from path. */
+    e4t__ASSERT_OK(e4__evaluate_path(task, path, -1, &fex));
+    e4t__ASSERT_EQ(fex.ex, e4__E_UNDEFWORD);
+    e4t__ASSERT_EQ(fex.line, 3);
+    e4t__ASSERT_EQ(fex.path_sz, 14);
+    e4t__ASSERT(!memcmp(fex.path, path, 14));
+    e4t__ASSERT_EQ(fex.buf_sz, 7);
+    e4t__ASSERT(!memcmp(fex.buf, "foo bar", 7));
+
+    e4__stack_clear(task);
+
+    /* Ensure that exception info reflects e4__E_BYE exception when BYE
+       occurs in a file and also that BYE halts file execution. */
+    e4t__ASSERT_EQ(truncate(path, 0), 0);
+    fd = open(path, O_WRONLY);
+    e4t__ASSERT(fd >= 0);
+    e4t__ASSERT_EQ(write(fd, "33 bye", 6), 6);
+    e4t__ASSERT_EQ(close(fd), 0);
+
+    e4t__ASSERT_OK(e4__evaluate_path(task, path, -1, &fex));
+    e4t__ASSERT_EQ(fex.ex, e4__E_BYE);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
+
+    /* Ensure that attempting to evaluate a non-existent file throws the
+       appropriate error. */
+    e4t__ASSERT_EQ(e4__evaluate_path(task, "/not/real/bogusfile123", -1, NULL),
+            e4__E_FILEIO);
+    e4t__ASSERT_EQ(e4__task_ior(task, 0), ENOENT);
+
+    /* Delete the temporary file. */
+    e4t__ASSERT_EQ(unlink(path), 0);
 }
 
 static void e4t__test_kernel_exceptions_da(struct e4__task *task,
@@ -367,6 +472,80 @@ static void e4t__test_kernel_io_dump(void)
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), expected);
 }
 
+static void e4t__test_kernel_io_file(void)
+{
+    struct e4__task *task = e4t__transient_task();
+    char buf[140] = {0};
+    char path[] = "/tmp/e4-XXXXXX";
+    int fd;
+    e4__usize fid = (e4__usize)-1;
+    e4__usize sz;
+
+    /* FIXME: This test exercises the POSIX file handlers. Ideally, it
+       would also install mock handlers to test for behavioral issues
+       unrelated to the POSIX handlers. */
+
+    /* Create a temporary file and write some data into it. */
+    fd = mkstemp(path);
+    e4t__ASSERT(fd >= 0);
+    e4t__ASSERT_EQ(write(fd, "foo bar bas\n", 12), 12);
+    e4t__ASSERT_EQ(write(fd, "quux\n", 5), 5);
+    e4t__ASSERT_EQ(8, write(fd, "lastline", 8));
+    e4t__ASSERT_EQ(close(fd), 0);
+
+    /* Test that it's possible to open a file with read permissions
+       and read from the file. */
+    e4t__ASSERT_OK(e4__io_file_open(task, path, -1, e4__F_READ, &fid));
+    sz = 4;
+    e4t__ASSERT_OK(e4__io_file_read(task, fid, buf, &sz));
+    e4t__ASSERT_EQ(sz, 4);
+    buf[4] = '\0';
+    e4t__ASSERT(!strcmp(buf, "foo "));
+
+    /* Test that readline works as expected. */
+    sz = sizeof(buf);
+    e4t__ASSERT_OK(e4__io_file_readline(task, fid, buf, &sz));
+    e4t__ASSERT_EQ(sz, 8);
+    buf[8] = '\0';
+    e4t__ASSERT(!strcmp(buf, "bar bas\n"));
+
+    sz = sizeof(buf);
+    e4t__ASSERT_OK(e4__io_file_readline(task, fid, buf, &sz));
+    e4t__ASSERT_EQ(sz, 5);
+    buf[5] = '\0';
+    e4t__ASSERT(!strcmp(buf, "quux\n"));
+
+    sz = sizeof(buf);
+    e4t__ASSERT_OK(e4__io_file_readline(task, fid, buf, &sz));
+    e4t__ASSERT_EQ(sz, 8);
+    buf[8] = '\0';
+    e4t__ASSERT(!strcmp(buf, "lastline"));
+
+    /* Test that EOF is returned when attempting to read from a file
+       with no more data available. */
+    sz = sizeof(buf);
+    e4t__ASSERT_EQ(e4__io_file_readline(task, fid, buf, &sz), e4__E_EOF);
+    e4t__ASSERT_EQ(sz, 0);
+
+    /* Test that it's possible to close a file. */
+    e4t__ASSERT_OK(e4__io_file_close(task, fid));
+
+    /* Test that attempting to open a file that doesn't exist returns
+       the appropriate error code and sets the task platform specific
+       IO error code as expected. */
+    e4t__ASSERT_EQ(e4__io_file_open(task, "/not/real/bogusfile123", -1,
+            e4__F_READ, &fid), e4__E_FILEIO);
+    e4t__ASSERT_EQ(e4__task_ior(task, 0), ENOENT);
+
+    /* Delete temporary file. */
+    e4t__ASSERT_EQ(unlink(path), 0);
+
+    /* FIXME: Add tests for opening a file with write permissions and
+       writing to the file once associated handlers have been
+       implemented. */
+    /* FIXME: Add tests for all remaining io_file kernel APIs once the
+       associated handlers have been implemented. */
+}
 
 static e4__usize e4t__test_kernel_quit_accept(void *user, char *buf,
         e4__usize *n);
@@ -796,9 +975,11 @@ void e4t__test_kernel(void)
     e4t__test_kernel_dict();
     e4t__test_kernel_environmentq();
     e4t__test_kernel_evaluate();
+    e4t__test_kernel_evaluate_file();
     e4t__test_kernel_exceptions();
     e4t__test_kernel_io();
     e4t__test_kernel_io_dump();
+    e4t__test_kernel_io_file();
     e4t__test_kernel_io_pno();
     e4t__test_kernel_mem();
     e4t__test_kernel_quit();
