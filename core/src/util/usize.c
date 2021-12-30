@@ -113,6 +113,14 @@ const char* e4__usize_format_exception(e4__usize e, e4__usize *len)
             _return_with_len("compiler nesting");
         case e4__E_INVNAMEARG:
             _return_with_len("invalid name argument");
+        case e4__E_FILEINVPOS:
+            _return_with_len("invalid file position");
+        case e4__E_FILEIO:
+            _return_with_len("file I/O exception");
+        case e4__E_FILENOEXIST:
+            _return_with_len("non-existent file");
+        case e4__E_EOF:
+            _return_with_len("unexpected end of file");
         case e4__E_QUIT:
             _return_with_len("quit");
 
@@ -127,6 +135,8 @@ const char* e4__usize_format_exception(e4__usize e, e4__usize *len)
             _return_with_len("attempt to mutate builtin");
         case e4__E_DICTUNDERFLOW:
             _return_with_len("dictionary underflow");
+        case e4__E_INCFOVERFLOW:
+            _return_with_len("nested include overflow");
 
         /* unknown */
         default:

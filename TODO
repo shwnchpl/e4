@@ -204,11 +204,21 @@ Build
 General Builtins
 ----------------
 - Implement remaining CORE EXT builtins.
-- Add FILE and some FILE EXT word sets impls.
+- Add FILE and some FILE EXT word sets impls. Ensure that behavior
+  of relevant words (such as SOURCE-ID, REFILL, and () is also updated
+  as appropriate.
 - Consider adding _NF variants to USERVAR declaration macros, defining
   e4__UV_BEGIN, and simply defining BEGIN as its own uservar rather
   than in terms of HERE using PUN macros. Consider also removing pun
   macros.
+
+Documentation
+-------------
+- Note that all file IO handlers must set a non-zero platform specific
+  error code in *ior (to later be read with e4__task_ior) when returning
+  e4__E_FILEIO. It is not necessary nor is it correct to set a non-zero
+  value when a user handler is mapping a platform specific error to
+  another exception, such as e4__E_FILEINVPOS or e4__E_FILENOEXIST.
 
 Kernel
 ------

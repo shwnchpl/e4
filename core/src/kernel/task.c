@@ -114,6 +114,8 @@ struct e4__task* e4__task_create(void *buffer, e4__usize sz)
 
     #if defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT)
         e4__mem_cbuf_init(&task->tsb, task->tsb_buf, sizeof(task->tsb_buf));
+        task->fib_depth = 0;
+        task->ior = 0;
     #endif
 
     return task;
@@ -218,3 +220,14 @@ e4__cell e4__task_uservar(struct e4__task *task, e4__usize offset)
        an inappropriate offset. */
     return ((e4__cell *)task)[offset];
 }
+
+#if defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT)
+
+    e4__usize e4__task_ior(struct e4__task *task, e4__usize ior)
+    {
+        register const e4__usize old_ior = task->ior;
+        task->ior = ior;
+        return old_ior;
+    }
+
+#endif /* defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT) */

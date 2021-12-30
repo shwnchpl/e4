@@ -69,12 +69,14 @@ static void e4__evaluate_interpret(struct e4__task *task, const char *word,
 
 static void e4__evaluate_wrapper(struct e4__task *task, e4__cell user);
 
-static e4__usize e4__evaluate_internal(struct e4__task *task)
+static e4__usize e4__evaluate_internal(struct e4__task *task,
+        e4__bool force_thunk)
 {
 
-    if (!task->exception.valid) {
-        /* If there's nothing currently catching exceptions, catch and
-           return them here. */
+    if (!task->exception.valid || force_thunk) {
+        /* If there's nothing currently catching exceptions or a thunk
+           is being explicitly requested, catch exceptions and return
+           them here. */
         static const struct e4__evaluate_thunk thunk = {
             e4__evaluate_wrapper,
             NULL
@@ -106,9 +108,10 @@ static e4__usize e4__evaluate_internal(struct e4__task *task)
 
 static void e4__evaluate_refill_wrapper(struct e4__task *task, e4__cell user);
 
-static e4__usize e4__evaluate_refill(struct e4__task *task)
+static e4__usize e4__evaluate_refill(struct e4__task *task,
+        e4__bool force_thunk)
 {
-    if (!task->exception.valid) {
+    if (!task->exception.valid || force_thunk) {
         static const struct e4__evaluate_thunk thunk = {
             e4__evaluate_refill_wrapper,
             NULL
@@ -137,7 +140,7 @@ static void e4__evaluate_refill_wrapper(struct e4__task *task, e4__cell user)
 
 static void e4__evaluate_wrapper(struct e4__task *task, e4__cell user)
 {
-    e4__evaluate_internal(task);
+    e4__evaluate_internal(task, 0);
     e4__execute_ret(task);
 }
 
@@ -157,7 +160,7 @@ e4__usize e4__evaluate(struct e4__task *task, const char *buf, e4__usize sz)
     task->io_src.sz = task->io_src.length;
     task->io_src.sid = e4__SID_STR;
 
-    res = e4__evaluate_internal(task);
+    res = e4__evaluate_internal(task, 0);
 
     /* Restore old IO src. */
     /* FIXME: Is this *actually* always correct? */
@@ -200,8 +203,8 @@ void e4__evaluate_quit(struct e4__task *task)
            code. This will allow REPL implementations to raise
            exceptions while e4 is blocked waiting for input within
            the quit loop, which may be desirable in many scenarios. */
-        res = e4__evaluate_refill(task);
-        res = res ? res : e4__evaluate_internal(task);
+        res = e4__evaluate_refill(task, 1);
+        res = res ? res : e4__evaluate_internal(task, 1);
         switch (res) {
             case e4__E_OK:
                 /* FIXME: Use CR here instead for newline? */
@@ -258,3 +261,93 @@ void e4__evaluate_quit(struct e4__task *task)
         }
     }
 }
+
+#if defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT)
+
+    /* XXX: Never throws, even when called in an exception context.
+       Any exception that occurs while parsing the file is stored in
+       *ex. Other exceptions are stored in return value.
+
+       Platform specific file related exception codes can be
+       accessed with e4__task_ior. */
+    e4__usize e4__evaluate_file(struct e4__task *task, e4__usize fd,
+            struct e4__file_exception *fex)
+    {
+        register struct e4__io_src old_io_src;
+        register e4__usize res;
+        register e4__bool running;
+        register e4__usize line = 0;
+
+        if (task->fib_depth >= e4__FIB_MAXDEPTH)
+            return e4__E_INCFOVERFLOW;
+
+        old_io_src = task->io_src;
+
+        task->io_src.buffer = (e4__cell)task->fib[task->fib_depth++];
+        task->io_src.sid = fd;
+        task->io_src.sz = e4__FIB_SZ;
+
+        running = 1;
+        while (running) {
+            task->io_src.in = 0;
+            task->io_src.length = 0;
+
+            ++line;
+
+            res = e4__evaluate_refill(task, 1);
+            res = res ? res : e4__evaluate_internal(task, 1);
+            switch (res) {
+                case e4__E_EOF:
+                    running = 0;
+                    /* fall through */
+                case e4__E_QUIT:
+                    res = e4__E_OK;
+                    /* fall through */
+                case e4__E_OK:
+                    break;
+                case e4__E_BYE:
+                default:
+                    running = 0;
+                    break;
+            }
+        }
+
+        --task->fib_depth;
+
+        if (fex) {
+            fex->ex = res;
+            fex->line = line;
+            fex->path = NULL;
+            fex->path_sz = 0;
+            fex->buf = ((const char *)task->io_src.buffer) + task->io_src.in;
+            fex->buf_sz = task->io_src.length;
+        }
+
+        task->io_src = old_io_src;
+
+        return e4__io_file_close(task, fd);
+    }
+
+    e4__usize e4__evaluate_path(struct e4__task *task, const char *path,
+            e4__usize sz, struct e4__file_exception *fex)
+    {
+        register e4__usize res;
+        e4__usize fd;
+
+        if (task->fib_depth >= e4__FIB_MAXDEPTH)
+            return e4__E_INCFOVERFLOW;
+
+        if ((res = e4__io_file_open(task, path, sz, e4__F_READ, &fd)))
+            return res;
+
+        res = e4__evaluate_file(task, fd, fex);
+
+        if (fex) {
+            fex->path = path;
+            fex->path_sz = sz != (e4__usize)-1 ? sz : strlen(path);
+        }
+
+        return res;
+    }
+
+#endif /* defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT) */

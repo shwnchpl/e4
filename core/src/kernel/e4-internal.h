@@ -77,7 +77,11 @@ struct e4__task
 
     #if defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT)
         struct e4__cbuf tsb;
+        e4__usize fib_depth;
+        e4__usize ior;
+
         char tsb_buf[160];
+        char fib[e4__FIB_SZ][e4__FIB_MAXDEPTH];
     #endif
 };
 

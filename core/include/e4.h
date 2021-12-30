@@ -151,6 +151,17 @@ typedef void** e4__cell;
 
 #define e4__USIZE_BIT   (sizeof(e4__usize) * CHAR_BIT)
 
+#if defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT)
+    /* Define maximum file include depth and file input buffer size when
+       they have not been explicitly defined elsewhere. */
+    #if !defined(e4__FIB_MAXDEPTH)
+        #define e4__FIB_MAXDEPTH    4
+    #endif
+    #if !defined(e4__FIB_SZ)
+        #define e4__FIB_SZ  130
+    #endif
+#endif /* defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT) */
+
 typedef unsigned char e4__bool;
 typedef unsigned char e4__u8;
 
@@ -190,6 +201,17 @@ struct e4__execute_token {
     e4__cell data[1];
 };
 
+#if defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT)
+    struct e4__file_exception {
+        e4__usize ex;
+        e4__usize line;
+        const char *path;
+        e4__usize path_sz;
+        const char *buf;
+        e4__usize buf_sz;
+    };
+#endif /* defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT) */
+
 /* FIXME: The current API is unstable. As it stands, these must all be
    set at once, either to pointers to handler implementations or NULL,
    indicating the handler is not supported (e4__E_UNSUPPORTED). In the
@@ -215,6 +237,45 @@ struct e4__io_func {
         e4__usize (*unixtime)(void *user, e4__usize *t);
 
     #endif /* defined(e4__INCLUDE_FACILITY_EXT) */
+
+    #if defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT)
+
+        /* FILE and/or FILE EXT IO handlers */
+        e4__usize (*file_close)(void *user, e4__usize fd, e4__usize *ior);
+        e4__usize (*file_open)(void *user, const char *path, e4__usize sz,
+                e4__usize perm, e4__usize *fd, e4__usize *ior);
+        e4__usize (*file_read)(void *user, e4__usize fd, char *buf,
+                e4__usize *n, e4__usize *ior);
+
+    #endif /* defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT) */
+
+    #if defined(e4__INCLUDE_FILE)
+
+        /* FILE IO handlers */
+        e4__usize (*file_create)(void *user, const char *path, e4__usize sz,
+                e4__usize perm, e4__usize *fd, e4__usize *ior);
+        e4__usize (*file_delete)(void *user, const char *path, e4__usize sz,
+                e4__usize *ior);
+        e4__usize (*file_position)(void *user, e4__usize fd, e4__usize *pos,
+                e4__usize *ior);
+        e4__usize (*file_reposition)(void *user, e4__usize fd, e4__usize pos,
+                e4__usize *ior);
+        e4__usize (*file_resize)(void *user, e4__usize fd, e4__usize sz,
+                e4__usize *ior);
+        e4__usize (*file_size)(void *user, e4__usize fd, e4__usize *sz,
+                e4__usize *ior);
+
+    #endif /* defined(e4__INCLUDE_FILE) */
+
+    #if defined(e4__INCLUDE_FILE_EXT)
+
+        /* FILE EXT IO handlers */
+        e4__usize (*file_flush)(void *user, e4__usize fd, e4__usize *ior);
+        e4__usize (*file_rename)(void *user, const char *old_path,
+                e4__usize old_sz, const char *new_path, e4__usize new_sz,
+                e4__usize *ior);
+
+    #endif /* defined(e4__INCLUDE_FILE_EXT) */
 };
 
 struct e4__gmt {
@@ -250,6 +311,10 @@ struct e4__gmt {
 #define e4__E_USERINTERRUPT (-28)
 #define e4__E_NESTEDCOMPILE (-29)
 #define e4__E_INVNAMEARG    (-32)
+#define e4__E_FILEINVPOS    (-36)
+#define e4__E_FILEIO        (-37)
+#define e4__E_FILENOEXIST   (-38)
+#define e4__E_EOF           (-39)
 #define e4__E_QUIT          (-56)
 
 /* error constants - system */
@@ -258,6 +323,7 @@ struct e4__gmt {
 #define e4__E_BUG           (-258)
 #define e4__E_INVBUILTINMUT (-259)
 #define e4__E_DICTUNDERFLOW (-260)
+#define e4__E_INCFOVERFLOW  (-261)
 
 /* flag constants - dictionary entry */
 #define e4__F_IMMEDIATE     (0x01)
@@ -265,6 +331,12 @@ struct e4__gmt {
 #define e4__F_CONSTANT      (0x04)
 #define e4__F_BUILTIN       (0x08)
 #define e4__F_COMPILING     (0x10)
+
+/* flag constants - file permissions */
+#define e4__F_READ          (0x01)
+#define e4__F_WRITE         (0x02)
+#define e4__F_READWRITE     (e4__F_READ | e4__F_WRITE)
+#define e4__F_BIN           (0x04)
 
 /* flag constants - numeric parsing */
 #define e4__F_NEG_PREFIX    (0x01)
@@ -626,6 +698,13 @@ struct e4__double e4__double_u(e4__usize low, e4__usize high);
 e4__usize e4__evaluate(struct e4__task *task, const char *buf, e4__usize sz);
 void e4__evaluate_quit(struct e4__task *task);
 
+#if defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT)
+    e4__usize e4__evaluate_file(struct e4__task *task, e4__usize fd,
+            struct e4__file_exception *fex);
+    e4__usize e4__evaluate_path(struct e4__task *task, const char *path,
+            e4__usize sz, struct e4__file_exception *fex);
+#endif /* defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT) */
+
 /* exception.c functions */
 e4__usize e4__exception_catch(struct e4__task *task, void *xt);
 void e4__exception_throw(struct e4__task *task, e4__usize e);
@@ -665,19 +744,44 @@ e4__usize e4__io_type(struct e4__task *task, const char *buf, e4__usize n);
 char* e4__io_word(struct e4__task *task, char delim);
 
 #if defined(e4__INCLUDE_FACILITY)
-
-    /* FACILITY io.c functions */
     e4__usize e4__io_keyq(struct e4__task *task, e4__usize *bflag);
-
 #endif /* defined(e4__INCLUDE_FACILITY) */
 
 #if defined(e4__INCLUDE_FACILITY_EXT)
-
-    /* FACILITY EXT io.c functions */
     e4__usize e4__io_ms(struct e4__task *task, e4__usize ms);
     e4__usize e4__io_unixtime(struct e4__task *task, e4__usize *t);
-
 #endif /* defined(e4__INCLUDE_FACILITY_EXT) */
+
+#if defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT)
+    e4__usize e4__io_file_close(struct e4__task *task, e4__usize fd);
+    e4__usize e4__io_file_open(struct e4__task *task, const char *path,
+            e4__usize sz, e4__usize perm, e4__usize *fd);
+    e4__usize e4__io_file_read(struct e4__task *task, e4__usize fd, char *buf,
+            e4__usize *n);
+    e4__usize e4__io_file_readline(struct e4__task *task, e4__usize fd,
+            char *buf, e4__usize *n);
+#endif /* defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT) */
+
+#if defined(e4__INCLUDE_FILE)
+    e4__usize e4__io_file_create(struct e4__task *task, const char *path,
+            e4__usize sz, e4__usize perm, e4__usize *fd);
+    e4__usize e4__io_file_delete(struct e4__task *task, const char *path,
+            e4__usize sz);
+    e4__usize e4__io_file_position(struct e4__task *task, e4__usize fd,
+            e4__usize *pos);
+    e4__usize e4__io_file_reposition(struct e4__task *task, e4__usize fd,
+            e4__usize pos);
+    e4__usize e4__io_file_resize(struct e4__task *task, e4__usize fd,
+            e4__usize sz);
+    e4__usize e4__io_file_size(struct e4__task *task, e4__usize fd,
+            e4__usize *sz);
+#endif /* defined(e4__INCLUDE_FILE) */
+
+#if defined(e4__INCLUDE_FILE_EXT)
+    e4__usize e4__io_file_flush(struct e4__task *task, e4__usize fd);
+    e4__usize e4__io_file_rename(struct e4__task *task, const char *old_path,
+            e4__usize old_sz, const char *new_path, e4__usize new_sz);
+#endif /* defined(e4__INCLUDE_FILE_EXT) */
 
 /* mem.c functions */
 e4__usize e4__mem_aligned(e4__usize n);
@@ -741,6 +845,10 @@ void e4__task_io_get(struct e4__task *task, struct e4__io_func *io_func);
 e4__usize e4__task_last_abortq(struct e4__task *task, const char **msg);
 e4__usize e4__task_unused(struct e4__task *task);
 e4__cell e4__task_uservar(struct e4__task *task, e4__usize offset);
+
+#if defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT)
+    e4__usize e4__task_ior(struct e4__task *task, e4__usize ior);
+#endif /* defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT) */
 
 /* usize.c functions */
 e4__usize e4__usize_clz(e4__usize u);
