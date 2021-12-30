@@ -10,6 +10,10 @@
 
 #include <histedit.h>
 
+/* ASCII escape sequences for simple colored output. */
+#define COLOR_RESET         "\033[0m"
+#define COLOR_RED           "\033[0;31m"
+
 struct repl_data {
     EditLine *el;
     History *hist;
@@ -281,7 +285,7 @@ static e4__usize repl_type(void *user, const char *buf, e4__usize n)
 
 int main(int argc, char **argv)
 {
-    static char task_buffer[4096];
+    static char task_buffer[128 * 1024];
     struct e4__task *task;
     union sigval sv;
     struct sigaction sa = {0};
@@ -295,9 +299,14 @@ int main(int argc, char **argv)
         repl_keyq,
         e4__posix_ms,
         e4__posix_unixtime,
+        e4__posix_file_close,
+        e4__posix_file_open,
+        e4__posix_file_read,
     };
+    struct e4__file_exception fex;
     EditLine *el = NULL;
     History *hist;
+    int exit_status = EXIT_SUCCESS;
 
     hist = history_init();
     history(hist, &rd.ev, H_SETSIZE, 100);
@@ -353,8 +362,40 @@ int main(int argc, char **argv)
     sigaction(SIGSEGV, &sa, &old_sa[1]);
     sigaction(SIGWINCH, &sa, &old_sa[2]);
 
+    /* XXX: Hack to allow shebang lines. */
+    e4__dict_entry(task, "#!", 2, 0, e4__BUILTIN_XT[e4__B_BACKSLASH].code,
+            e4__BUILTIN_XT[e4__B_BACKSLASH].user);
+
+    /* XXX: Temporary "hack" to add file execution and some diagnostic
+       information. Evaluates a file. So long as the evaluation doesn't
+       exit with any exception, including e4__E_BYE, drops into a repl
+       after the file has been evaluated. */
+    if (argc > 1) {
+        const e4__usize res = e4__evaluate_path(task, argv[1], -1, &fex);
+
+        if (res) {
+            fprintf(stderr, COLOR_RED "Failed to evaluate file %s: %s (%ld)\n"
+                    COLOR_RESET, argv[1],
+                    e4__usize_format_exception(res, NULL), res);
+            if (res == e4__E_FILEIO)
+                fprintf(stderr, "%s\n", strerror(e4__task_ior(task, 0)));
+            exit_status = EXIT_FAILURE;
+        } else if (fex.ex && fex.ex != e4__E_BYE) {
+            fprintf(stderr, COLOR_RED "\nEXCEPTION: %s (%ld)\n" COLOR_RESET
+                    "...while evaluating file %.*s, line %ld:\n\t%.*s\n",
+                    e4__usize_format_exception(fex.ex, NULL), fex.ex,
+                    (int)fex.path_sz, fex.path, fex.line,
+                    (int)fex.buf_sz, fex.buf);
+            exit_status = EXIT_FAILURE;
+        }
+
+        if (res || fex.ex)
+            goto exit_repl;
+    }
+
     e4__evaluate_quit(task);
 
+exit_repl:
     sigaction(SIGWINCH, &old_sa[2], NULL);
     sigaction(SIGSEGV, &old_sa[1], NULL);
     sigaction(SIGINT, &old_sa[0], NULL);
@@ -362,5 +403,8 @@ int main(int argc, char **argv)
     history_end(hist);
     el_end(el);
 
+    exit(exit_status);
+
+    /* unreachable */
     return 0;
 }

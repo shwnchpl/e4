@@ -158,10 +158,16 @@ Kernel
 - [DONE] Handle return stack overflow.
 - Use checked allocation everywhere that HERE is manipulated. WORD is
   specifically allowed to dip into the PNO buffer but not PAD.
+  Compilation also does not currently fail correctly/gracefully when
+  there is no remaining space.
 - Ensure, somehow, that the PNO buffer is always at least 33 characters
   (which is a requirement of WORD). On a system where e4__USIZE_BIT is
   greater than or equal to 16, this will always be the case.
 - Confirm that all overflows are now handled.
+- Once PNO buffer always works correctly, create file exception
+  formatting utility using PNO that outputs information similar to
+  the current hack in the repl, then use that instead of the hack
+  in both the repl and when implementing INCLUDED etc.
 - Remove non-pno numeric formatting utilities.
 
 REPL
