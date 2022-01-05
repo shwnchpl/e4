@@ -325,6 +325,8 @@ struct e4__gmt {
 #define e4__E_FILENOEXIST   (-38)
 #define e4__E_EOF           (-39)
 #define e4__E_QUIT          (-56)
+#define e4__E_CLOSE_FILE    (-62)
+#define e4__E_OPEN_FILE     (-69)
 
 /* error constants - system */
 #define e4__E_FAILURE       (-256)
@@ -589,6 +591,10 @@ enum e4__builtin_id {
 
         /* FILE words */
         e4__B_BIN,
+        e4__B_CLOSE_FILE,
+        e4__B_INCLUDED,
+        e4__B_INCLUDE_FILE,
+        e4__B_OPEN_FILE,
         e4__B_R_SLASH_O,
         e4__B_R_SLASH_W,
         e4__B_W_SLASH_O,

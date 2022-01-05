@@ -1,8 +1,12 @@
+#define _POSIX_C_SOURCE 200809L
 #include "e4.h"
 #include "../e4t.h" /* FIXME: Add this to an include path? */
 
+#include <errno.h>
+#include <fcntl.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 /* Covers *SLASH *SLASH-MOD FM/MOD M* SM/DIV S>D UM* */
 static void e4t__test_builtin_doublemath(void)
@@ -635,6 +639,106 @@ static void e4t__test_builtin_file_constants(void)
     e4t__ASSERT_OK(e4__evaluate(task, "w/o bin", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__F_WRITE | e4__F_BIN);
+}
+
+/* Covers CLOSE-FILE, INCLUDED, INCLUDE-FILE, OPEN-FILE */
+static void e4t__test_builtin_file_include(void)
+{
+    struct e4__task *task = e4t__transient_task();
+    char buf[64] = {0};
+    char path[] = "/tmp/e4-XXXXXX";
+    int fd;
+
+    /* Test that attempting to open, close, or include a file doesn't
+       exist fails as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task, "s\" /some/fake/file\" r/o open-file",
+            -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), ENOENT);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_OK(e4__evaluate(task, "32576 close-file", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), EBADF);
+
+    e4t__ASSERT_EQ(e4__evaluate(task, "s\" /some/fake/file\" included", -1),
+            e4__E_OPEN_FILE);
+    e4t__ASSERT_EQ(e4__evaluate(task, "234958 include-file", -1),
+            e4__E_CLOSE_FILE);
+
+    /* Create a temporary file and write some data into it. */
+    fd = mkstemp(path);
+    e4t__ASSERT(fd >= 0);
+    e4t__ASSERT_EQ(write(fd, ": foo 3 7 + ;\n", 14), 14);
+    e4t__ASSERT_EQ(write(fd, "foo 15", 6), 6);
+    e4t__ASSERT_EQ(close(fd), 0);
+
+    /* Attempt to open a file as read only. */
+    sprintf(buf, "s\" %s\"", path);
+    e4t__ASSERT_OK(e4__evaluate(task, buf, -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "r/o open-file", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    /* Attempt to close a file that has been opened. */
+    e4t__ASSERT_OK(e4__evaluate(task, "close-file", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    /* Attempt to open and include a file, checking to see that doing so
+       has the expected side effects. */
+    e4t__ASSERT_OK(e4__evaluate(task, buf, -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "r/o open-file", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4__stack_dup(task);
+    e4t__ASSERT_OK(e4__evaluate(task, "include-file", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 3);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 15);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 10);
+    e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 10);
+    e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
+
+    /* Attempt to close a file that has already been closed. */
+    e4t__ASSERT_OK(e4__evaluate(task, "close-file", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), EBADF);
+
+    /* Attempt to include an unopened file based on path rather than
+       descriptor. */
+    e4t__ASSERT_OK(e4__evaluate(task, buf, -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "included", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 15);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 10);
+    e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 10);
+    e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
+
+    /* Write bad code into the file to be included. */
+    fd = open(path, O_WRONLY);
+    e4t__ASSERT(fd >= 0);
+    e4t__ASSERT(lseek(fd, 0, SEEK_END) >= 0);
+    e4t__ASSERT_EQ(write(fd, "\nfoo bar", 8), 8);
+    e4t__ASSERT_EQ(close(fd), 0);
+
+    /* Check to see that exceptions that occur within a file are
+       percolated up as expected, but that other side effects are still
+       present as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task, buf, -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "included", -1), e4__E_UNDEFWORD);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 15);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 10);
+    e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
+    e4t__ASSERT_EQ(e4__stack_pop(task), 10);
+    e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
+
+    /* Delete the temporary file. */
+    e4t__ASSERT_EQ(unlink(path), 0);
 }
 
 /* Covers FORGET, MARKER and look-ahead idiom (which uses builtin
@@ -2228,6 +2332,7 @@ void e4t__test_builtin(void)
     e4t__test_builtin_evaluate();
     e4t__test_builtin_exceptions();
     e4t__test_builtin_file_constants();
+    e4t__test_builtin_file_include();
     e4t__test_builtin_forget();
     e4t__test_builtin_immed_cond();
     e4t__test_builtin_immediate();
