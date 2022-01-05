@@ -87,6 +87,9 @@ static const void *_e4__BUILTIN_RETURN_THUNK[] =
 #if defined(e4__INCLUDE_FACILITY_EXT)
     #include "FACILITY-EXT.def.inc"
 #endif
+#if defined(e4__INCLUDE_FILE)
+    #include "FILE.def.inc"
+#endif
 #if defined(e4__INCLUDE_TOOLS)
     #include "TOOLS.def.inc"
 #endif
@@ -110,6 +113,9 @@ static const void *_e4__BUILTIN_RETURN_THUNK[] =
 #endif
 #if defined(e4__INCLUDE_FACILITY_EXT)
     #include "FACILITY-EXT.decl.inc"
+#endif
+#if defined(e4__INCLUDE_FILE)
+    #include "FILE.decl.inc"
 #endif
 #if defined(e4__INCLUDE_TOOLS)
     #include "TOOLS.decl.inc"
@@ -157,6 +163,9 @@ static const void *_e4__BUILTIN_RETURN_THUNK[] =
 #define _e4__BUILTIN_USERVAR(w) \
     _e4__BUILTIN_USERVAR_N(w, #w)
 
+#define _e4__BUILTIN_CONSTANT(w, c) \
+    _e4__BUILTIN_CONSTANT_N(w, #w, c)
+
 /* Define builtin header table. */
 #define _e4__BUILTIN_PROC_HEADER(w, link, n, f) \
     {   \
@@ -178,8 +187,8 @@ static const void *_e4__BUILTIN_RETURN_THUNK[] =
     _e4__BUILTIN_PROC_NF(w, n, f)
 #define _e4__BUILTIN_ALIAS_NF(w, t, n, f)   \
     _e4__BUILTIN_PROC_NF(w, n, f)
-#define _e4__BUILTIN_CONSTANT(w, c) \
-    _e4__BUILTIN_PROC_F(w, e4__F_CONSTANT)
+#define _e4__BUILTIN_CONSTANT_N(w, n, c) \
+    _e4__BUILTIN_PROC_NF(w, n, e4__F_CONSTANT)
 #define _e4__BUILTIN_USERVAR_N(w, n)    \
     _e4__BUILTIN_PROC_N(w, n)
 
@@ -200,6 +209,9 @@ const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT] =
     #if defined(e4__INCLUDE_FACILITY_EXT)
         _e4__BUILTIN_FACILITY_EXT_DECL()
     #endif
+    #if defined(e4__INCLUDE_FILE)
+        _e4__BUILTIN_FILE_DECL()
+    #endif
     #if defined(e4__INCLUDE_TOOLS)
         _e4__BUILTIN_TOOLS_DECL()
     #endif
@@ -209,7 +221,7 @@ const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT] =
 };
 
 #undef _e4__BUILTIN_USERVAR_N
-#undef _e4__BUILTIN_CONSTANT
+#undef _e4__BUILTIN_CONSTANT_N
 #undef _e4__BUILTIN_ALIAS_NF
 #undef _e4__BUILTIN_PUN_NF
 #undef _e4__BUILTIN_THUNK_NF
@@ -227,7 +239,7 @@ const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT] =
     {e4__execute_deferthunk, (void *)&e4__BUILTIN_XT[e4__B_##t]},
 #define _e4__BUILTIN_ALIAS_NF(w, t, n, f)   \
     {e4__builtin_##t, NULL},
-#define _e4__BUILTIN_CONSTANT(w, c) \
+#define _e4__BUILTIN_CONSTANT_N(w, n, c) \
     {e4__execute_userval, (void *)((e4__usize)(c))},
 #define _e4__BUILTIN_USERVAR_N(w, n)    \
     {e4__execute_uservar, (void *)((e4__usize)(e4__UV_##w))},
@@ -249,6 +261,9 @@ const struct e4__execute_tuple e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
     #if defined(e4__INCLUDE_FACILITY_EXT)
         _e4__BUILTIN_FACILITY_EXT_DECL()
     #endif
+    #if defined(e4__INCLUDE_FILE)
+        _e4__BUILTIN_FILE_DECL()
+    #endif
     #if defined(e4__INCLUDE_TOOLS)
         _e4__BUILTIN_TOOLS_DECL()
     #endif
@@ -258,12 +273,13 @@ const struct e4__execute_tuple e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
 };
 
 #undef _e4__BUILTIN_USERVAR_N
-#undef _e4__BUILTIN_CONSTANT
+#undef _e4__BUILTIN_CONSTANT_N
 #undef _e4__BUILTIN_ALIAS_NF
 #undef _e4__BUILTIN_PUN_NF
 #undef _e4__BUILTIN_THUNK_NF
 #undef _e4__BUILTIN_PROC_NF
 #undef _e4__BUILTIN_PROC_FIRST
+#undef _e4__BUILTIN_CONSTANT
 #undef _e4__BUILTIN_USERVAR
 #undef _e4__BUILTIN_ALIAS_F
 #undef _e4__BUILTIN_ALIAS_N

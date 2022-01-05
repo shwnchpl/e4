@@ -609,6 +609,34 @@ static void e4t__test_builtin_exceptions(void)
     e4t__ASSERT(!e4__mem_strncasecmp("An abort message.", msg, len));
 }
 
+/* Covers BIN R/O R/W W/O */
+static void e4t__test_builtin_file_constants(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* Test that constants produce expected results. */
+    e4t__ASSERT_OK(e4__evaluate(task, "r/o", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__F_READ);
+    e4t__ASSERT_OK(e4__evaluate(task, "r/w", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__F_READWRITE);
+    e4t__ASSERT_OK(e4__evaluate(task, "w/o", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__F_WRITE);
+
+    /* Test that BIN modifies values as appropriate. */
+    e4t__ASSERT_OK(e4__evaluate(task, "r/o bin", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__F_READ | e4__F_BIN);
+    e4t__ASSERT_OK(e4__evaluate(task, "r/w bin", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__F_READWRITE | e4__F_BIN);
+    e4t__ASSERT_OK(e4__evaluate(task, "w/o bin", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__F_WRITE | e4__F_BIN);
+}
+
 /* Covers FORGET, MARKER and look-ahead idiom (which uses builtin
    WORD) */
 static void e4t__test_builtin_forget(void)
@@ -2199,6 +2227,7 @@ void e4t__test_builtin(void)
     e4t__test_builtin_environmentq();
     e4t__test_builtin_evaluate();
     e4t__test_builtin_exceptions();
+    e4t__test_builtin_file_constants();
     e4t__test_builtin_forget();
     e4t__test_builtin_immed_cond();
     e4t__test_builtin_immediate();

@@ -585,6 +585,16 @@ enum e4__builtin_id {
 
     #endif /* defined(e4__INCLUDE_FACILITY_EXT) */
 
+    #if defined(e4__INCLUDE_FILE)
+
+        /* FILE words */
+        e4__B_BIN,
+        e4__B_R_SLASH_O,
+        e4__B_R_SLASH_W,
+        e4__B_W_SLASH_O,
+
+    #endif /* defined(e4__INCLUDE_FILE) */
+
     #if defined(e4__INCLUDE_TOOLS)
 
         /* TOOLS words */
