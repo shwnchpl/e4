@@ -212,6 +212,7 @@ struct e4__execute_token {
 #if defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT)
     struct e4__file_exception {
         e4__usize ex;
+        e4__usize ior;
         e4__usize line;
         const char *path;
         e4__usize path_sz;
@@ -327,6 +328,7 @@ struct e4__gmt {
 #define e4__E_QUIT          (-56)
 #define e4__E_CLOSE_FILE    (-62)
 #define e4__E_OPEN_FILE     (-69)
+#define e4__E_READ_FILE     (-70)
 
 /* error constants - system */
 #define e4__E_FAILURE       (-256)
@@ -668,6 +670,14 @@ enum e4__env_query {
 #define e4__DEREF(p)    (*((e4__cell *)(p)))
 #define e4__DEREF2(p)   (**((e4__cell **)(p)))
 
+#define e4__E_HAS_PLATFORM_IOR(e)   \
+    ((e) == e4__E_FILEINVPOS    ||  \
+     (e) == e4__E_FILEIO        ||  \
+     (e) == e4__E_FILENOEXIST   ||  \
+     (e) == e4__E_CLOSE_FILE    ||  \
+     (e) == e4__E_OPEN_FILE     ||  \
+     (e) == e4__E_READ_FILE)
+
 #define e4__USIZE_IS_NEGATIVE(u)    (u > ((e4__usize)-1 >> 1))
 #define e4__USIZE_NEGATE(u)         (((u) ^ (e4__usize)-1) + 1)
 
@@ -725,10 +735,9 @@ e4__usize e4__evaluate(struct e4__task *task, const char *buf, e4__usize sz);
 void e4__evaluate_quit(struct e4__task *task);
 
 #if defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT)
-    e4__usize e4__evaluate_file(struct e4__task *task, e4__usize fd,
-            struct e4__file_exception *fex);
+    e4__usize e4__evaluate_file(struct e4__task *task, e4__usize fd);
     e4__usize e4__evaluate_path(struct e4__task *task, const char *path,
-            e4__usize sz, struct e4__file_exception *fex);
+            e4__usize sz);
 #endif /* defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT) */
 
 /* exception.c functions */
@@ -873,6 +882,8 @@ e4__usize e4__task_unused(struct e4__task *task);
 e4__cell e4__task_uservar(struct e4__task *task, e4__usize offset);
 
 #if defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT)
+    e4__usize e4__task_fex(struct e4__task *task,
+        struct e4__file_exception *fex);
     e4__usize e4__task_ior(struct e4__task *task, e4__usize ior);
 #endif /* defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT) */
 

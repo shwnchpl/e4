@@ -231,6 +231,16 @@ void e4__evaluate_quit(struct e4__task *task)
                 const char *str;
                 e4__usize len;
 
+                #if defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT)
+                    if (e4__E_HAS_PLATFORM_IOR(res)) {
+                        /* FIXME: Would it be better to print this
+                           error in some way? */
+                        e4__task_ior(task, 0);
+                    }
+
+                    /* FIXME: Print file exception info as well. */
+                #endif
+
                 /* XXX: An uncaught exception clears the stack and
                    cancels any in-progress compilation. */
                 e4__stack_clear(task);
@@ -269,14 +279,36 @@ void e4__evaluate_quit(struct e4__task *task)
        *ex. Other exceptions are stored in return value.
 
        Platform specific file related exception codes can be
-       accessed with e4__task_ior. */
-    e4__usize e4__evaluate_file(struct e4__task *task, e4__usize fd,
-            struct e4__file_exception *fex)
+       accessed with e4__task_ior. Extended file exception info can
+       be accessed with e4__task_fex. e4__task_fex can/should always be
+       called by user code to check for an error after a call to
+       e4__evaluate_file, but a call to e4__task_ior is only indicated
+       when an error code with e4__E_HAS_PLATFORM_IOR is returned from
+       e4__evaluate_file_internal (and therefore e4__evaluate_file or
+       e4__evaluate_path) or some other function. When there has been
+       an ior error in a function, the ior filed of fex will be set.
+       This field can be expected to be non-zero and valid in cases
+       when e4__E_HAS_PLATFORM_IOR is true for fex.ex.
+
+       It is critical to note that this means when a file is being
+       included and evaluated via some code executed by e4__evaluate
+       (such as the INCLUDED builtin word), a return code indicating
+       an IO error may have its corresponding error code in either
+       the task IOR field (to be retrieved via e4__task_ior) or the
+       task FEX field's ior field (to be retrieved via e4__task_fex).
+       Should such a scenario arise, the best practice would be to
+       check for and handle errors from both sources.
+       */
+    static e4__usize e4__evaluate_file_internal(struct e4__task *task,
+            e4__usize fd, const char *path, e4__usize sz)
     {
         register struct e4__io_src old_io_src;
         register e4__usize res;
         register e4__bool running;
         register e4__usize line = 0;
+
+        /* Clear any existing file exceptions. */
+        e4__task_fex(task, NULL);
 
         if (task->fib_depth >= e4__FIB_MAXDEPTH)
             return e4__E_INCFOVERFLOW;
@@ -314,13 +346,17 @@ void e4__evaluate_quit(struct e4__task *task)
 
         --task->fib_depth;
 
-        if (fex) {
-            fex->ex = res;
-            fex->line = line;
-            fex->path = NULL;
-            fex->path_sz = 0;
-            fex->buf = ((const char *)task->io_src.buffer) + task->io_src.in;
-            fex->buf_sz = task->io_src.length;
+        /* Record this file exception only if there hasn't already been
+           another one further down. For now, only the most deeply
+           nested file exception is recorded. */
+        if (!task->fex.ex && res) {
+            task->fex.ex = res;
+            task->fex.ior = e4__task_ior(task, 0);
+            task->fex.line = line;
+            task->fex.path = path;
+            task->fex.path_sz = sz;
+            task->fex.buf = (const char *)task->io_src.buffer;
+            task->fex.buf_sz = task->io_src.length;
         }
 
         task->io_src = old_io_src;
@@ -328,11 +364,19 @@ void e4__evaluate_quit(struct e4__task *task)
         return e4__io_file_close(task, fd);
     }
 
+    e4__usize e4__evaluate_file(struct e4__task *task, e4__usize fd)
+    {
+        return e4__evaluate_file_internal(task, fd, NULL, 0);
+    }
+
     e4__usize e4__evaluate_path(struct e4__task *task, const char *path,
-            e4__usize sz, struct e4__file_exception *fex)
+            e4__usize sz)
     {
         register e4__usize res;
         e4__usize fd;
+
+        /* Clear any existing file exceptions. */
+        e4__task_fex(task, NULL);
 
         if (task->fib_depth >= e4__FIB_MAXDEPTH)
             return e4__E_INCFOVERFLOW;
@@ -340,14 +384,8 @@ void e4__evaluate_quit(struct e4__task *task)
         if ((res = e4__io_file_open(task, path, sz, e4__F_READ, &fd)))
             return res;
 
-        res = e4__evaluate_file(task, fd, fex);
-
-        if (fex) {
-            fex->path = path;
-            fex->path_sz = sz != (e4__usize)-1 ? sz : strlen(path);
-        }
-
-        return res;
+        return e4__evaluate_file_internal(task, fd, path,
+                sz != (e4__usize)-1 ? sz : strlen(path));
     }
 
 #endif /* defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT) */

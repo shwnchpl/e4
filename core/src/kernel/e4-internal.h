@@ -79,9 +79,10 @@ struct e4__task
         struct e4__cbuf tsb;
         e4__usize fib_depth;
         e4__usize ior;
+        struct e4__file_exception fex;
 
         char tsb_buf[160];
-        char fib[e4__FIB_SZ][e4__FIB_MAXDEPTH];
+        char fib[e4__FIB_MAXDEPTH][e4__FIB_SZ];
     #endif
 };
 

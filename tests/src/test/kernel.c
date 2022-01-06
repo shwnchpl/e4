@@ -181,7 +181,7 @@ static void e4t__test_kernel_evaluate_file(void)
        effects on the task. */
     e4t__ASSERT_OK(e4__io_file_open(task, path, -1, e4__F_READ, &fid));
     e4t__ASSERT_EQ(fcntl((int)fid, F_GETFD), 0);
-    e4t__ASSERT_OK(e4__evaluate_file(task, fid, NULL));
+    e4t__ASSERT_OK(e4__evaluate_file(task, fid));
     e4t__ASSERT(fcntl((int)fid, F_GETFD) < 0);
 
     e4t__ASSERT_EQ(e4__stack_depth(task), 2);
@@ -191,7 +191,8 @@ static void e4t__test_kernel_evaluate_file(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 10);
 
     /* Attempt to evaluate a file based upon path. */
-    e4t__ASSERT_OK(e4__evaluate_path(task, path, -1, &fex));
+    e4t__ASSERT_OK(e4__evaluate_path(task, path, -1));
+    e4t__ASSERT_OK(e4__task_fex(task, &fex));
     e4t__ASSERT_EQ(e4__stack_depth(task), 2);
     e4t__ASSERT_EQ(e4__stack_pop(task), 15);
     e4t__ASSERT_EQ(e4__stack_pop(task), 10);
@@ -213,7 +214,8 @@ static void e4t__test_kernel_evaluate_file(void)
        from file descriptor. */
     e4t__ASSERT_OK(e4__io_file_open(task, path, -1, e4__F_READ, &fid));
     e4t__ASSERT_EQ(fcntl((int)fid, F_GETFD), 0);
-    e4t__ASSERT_OK(e4__evaluate_file(task, fid, &fex));
+    e4t__ASSERT_OK(e4__evaluate_file(task, fid));
+    e4t__ASSERT_EQ(e4__task_fex(task, &fex), e4__E_UNDEFWORD);
     e4t__ASSERT(fcntl((int)fid, F_GETFD) < 0);
 
     e4t__ASSERT_EQ(fex.ex, e4__E_UNDEFWORD);
@@ -225,7 +227,8 @@ static void e4t__test_kernel_evaluate_file(void)
 
     /* Ensure that exception info is populated correctly when executing
        from path. */
-    e4t__ASSERT_OK(e4__evaluate_path(task, path, -1, &fex));
+    e4t__ASSERT_OK(e4__evaluate_path(task, path, -1));
+    e4t__ASSERT_EQ(e4__task_fex(task, &fex), e4__E_UNDEFWORD);
     e4t__ASSERT_EQ(fex.ex, e4__E_UNDEFWORD);
     e4t__ASSERT_EQ(fex.line, 3);
     e4t__ASSERT_EQ(fex.path_sz, 14);
@@ -243,14 +246,15 @@ static void e4t__test_kernel_evaluate_file(void)
     e4t__ASSERT_EQ(write(fd, "33 bye", 6), 6);
     e4t__ASSERT_EQ(close(fd), 0);
 
-    e4t__ASSERT_OK(e4__evaluate_path(task, path, -1, &fex));
+    e4t__ASSERT_OK(e4__evaluate_path(task, path, -1));
+    e4t__ASSERT_EQ(e4__task_fex(task, &fex), e4__E_BYE);
     e4t__ASSERT_EQ(fex.ex, e4__E_BYE);
     e4t__ASSERT_EQ(e4__stack_depth(task), 0);
 
     /* Ensure that attempting to evaluate a non-existent file throws the
        appropriate error. */
-    e4t__ASSERT_EQ(e4__evaluate_path(task, "/not/real/bogusfile123", -1, NULL),
-            e4__E_FILEIO);
+    e4t__ASSERT_EQ(e4__evaluate_path(task, "/not/real/bogusfile123", -1),
+            e4__E_OPEN_FILE);
     e4t__ASSERT_EQ(e4__task_ior(task, 0), ENOENT);
 
     /* Delete the temporary file. */
@@ -534,7 +538,7 @@ static void e4t__test_kernel_io_file(void)
        the appropriate error code and sets the task platform specific
        IO error code as expected. */
     e4t__ASSERT_EQ(e4__io_file_open(task, "/not/real/bogusfile123", -1,
-            e4__F_READ, &fid), e4__E_FILEIO);
+            e4__F_READ, &fid), e4__E_OPEN_FILE);
     e4t__ASSERT_EQ(e4__task_ior(task, 0), ENOENT);
 
     /* Delete temporary file. */

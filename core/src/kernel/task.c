@@ -223,6 +223,27 @@ e4__cell e4__task_uservar(struct e4__task *task, e4__usize offset)
 
 #if defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT)
 
+    /* Data returned from e4__task_fex remains valid only until the next
+       call to e4__evaluate_file or e4__evaluate_path. Calling
+       e4__task_fex clears stored file exception data. Returns the value
+       of the stored ex field.
+
+       When e4__E_OK is returned, it should be assumed that there is no
+       file error and that fields in fex other than ex are not valid. */
+    e4__usize e4__task_fex(struct e4__task *task,
+        struct e4__file_exception *fex)
+    {
+        e4__usize res;
+
+        if (fex)
+            *fex = task->fex;
+
+        res = task->fex.ex;
+        task->fex.ex = e4__E_OK;
+
+        return res;
+    }
+
     e4__usize e4__task_ior(struct e4__task *task, e4__usize ior)
     {
         register const e4__usize old_ior = task->ior;

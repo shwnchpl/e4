@@ -741,6 +741,131 @@ static void e4t__test_builtin_file_include(void)
     e4t__ASSERT_EQ(unlink(path), 0);
 }
 
+/* Covers CLOSE-FILE, INCLUDED, INCLUDE-FILE, OPEN-FILE, file
+   exceptions, and IO errors in a nested context. */
+static void e4t__test_builtin_file_nested(void)
+{
+    struct e4__task *task = e4t__transient_task();
+    struct e4__file_exception fex = { e4__E_BUG, };
+    char buf0[64] = {0};
+    char buf1[64] = {0};
+    char path0[] = "/tmp/e4-foo-XXXXXX";
+    char path1[] = "/tmp/e4-bar-XXXXXX";
+    int fd0, fd1;
+
+    /* Create two temporary files and write code into one to include the
+       other. */
+    fd0 = mkstemp(path0);
+    e4t__ASSERT(fd0 >= 0);
+    fd1 = mkstemp(path1);
+    e4t__ASSERT(fd1 >= 0);
+
+    sprintf(buf0, "s\" %s\"", path0);
+    sprintf(buf1, "s\" %s\"", path1);
+
+    e4t__ASSERT_EQ(write(fd0, "12345\n", 6), 6);
+    e4t__ASSERT_EQ(write(fd0, buf1, strlen(buf1)), strlen(buf1));
+    e4t__ASSERT_EQ(write(fd0, " included\n", 10), 10);
+    e4t__ASSERT_EQ(write(fd0, "54321", 5), 5);
+    e4t__ASSERT_EQ(close(fd0), 0);
+
+    e4t__ASSERT_EQ(write(fd1, "67890\n", 6), 6);
+    e4t__ASSERT_EQ(close(fd1), 0);
+
+    /* Evaluate the first file and see that it also evaluates the
+       second. */
+    e4t__ASSERT_OK(e4__evaluate(task, buf0, -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "included", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 3);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 54321);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 67890);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 12345);
+
+    /* Add code to create an IO error in the second file. See that this
+       exception is percolated up and that the IO error is set. */
+    fd1 = open(path1, O_WRONLY);
+    e4t__ASSERT(fd1 >= 0);
+    e4t__ASSERT(lseek(fd1, 0, SEEK_END) >= 0);
+    e4t__ASSERT_EQ(write(fd1, "s\" /some/fake/file/blah\" included", 33),
+            33);
+    e4t__ASSERT_EQ(close(fd1), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, buf0, -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "included", -1), e4__E_OPEN_FILE);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 67890);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 12345);
+
+    e4t__ASSERT_OK(e4__task_ior(task, 0));
+    e4t__ASSERT_EQ(e4__task_fex(task, &fex), e4__E_OPEN_FILE);
+    e4t__ASSERT_EQ(fex.ex, e4__E_OPEN_FILE);
+    e4t__ASSERT_EQ(fex.ior, ENOENT);
+    e4t__ASSERT_EQ(fex.line, 2);
+    e4t__ASSERT_EQ(fex.path_sz, strlen(path1));
+    e4t__ASSERT(!memcmp(fex.path, path1, strlen(path1)));
+    e4t__ASSERT_EQ(fex.buf_sz, 33);
+    e4t__ASSERT(!memcmp(fex.buf, "s\" /some/fake/file/blah\" included", 33));
+
+    /* Execute the included file using INCLUDE-FILE instead and see
+       that path and path_sz are set correctly in the associated IO
+       exception. */
+    e4t__ASSERT_EQ(truncate(path0, 0), 0);
+    fd1 = open(path0, O_WRONLY);
+    e4t__ASSERT(fd0 >= 0);
+    e4t__ASSERT_EQ(write(fd0, "12345\n", 6), 6);
+    e4t__ASSERT_EQ(write(fd0, buf1, strlen(buf1)), strlen(buf1));
+    e4t__ASSERT_EQ(write(fd0, " r/o open-file drop include-file\n", 33), 33);
+    e4t__ASSERT_EQ(write(fd0, "54321", 5), 5);
+    e4t__ASSERT_EQ(close(fd0), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, buf0, -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "included", -1), e4__E_OPEN_FILE);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 67890);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 12345);
+
+    e4t__ASSERT_OK(e4__task_ior(task, 0));
+    e4t__ASSERT_EQ(e4__task_fex(task, &fex), e4__E_OPEN_FILE);
+    e4t__ASSERT_EQ(fex.ex, e4__E_OPEN_FILE);
+    e4t__ASSERT_EQ(fex.ior, ENOENT);
+    e4t__ASSERT_EQ(fex.line, 2);
+    e4t__ASSERT_EQ(fex.path_sz, 0);
+    e4t__ASSERT_EQ(fex.path, NULL);
+    e4t__ASSERT_EQ(fex.buf_sz, 33);
+    e4t__ASSERT(!memcmp(fex.buf, "s\" /some/fake/file/blah\" included", 33));
+
+    /* Update the second file to recursively include itself and see
+       that the appropriate exception is thrown. */
+    e4t__ASSERT_EQ(truncate(path1, 0), 0);
+    fd1 = open(path1, O_WRONLY);
+    e4t__ASSERT(fd1 >= 0);
+    e4t__ASSERT_EQ(write(fd1, "67890\n", 6), 6);
+    e4t__ASSERT_EQ(write(fd1, buf1, strlen(buf1)), strlen(buf1));
+    e4t__ASSERT_EQ(write(fd1, " included\n", 10), 10);
+    e4t__ASSERT_EQ(close(fd1), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, buf0, -1));
+    e4t__ASSERT_EQ(e4__evaluate(task, "included", -1), e4__E_INCFOVERFLOW);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 67890);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 12345);
+
+    e4t__ASSERT_OK(e4__task_ior(task, 0));
+    e4t__ASSERT_EQ(e4__task_fex(task, &fex), e4__E_INCFOVERFLOW);
+    e4t__ASSERT_EQ(fex.ex, e4__E_INCFOVERFLOW);
+    e4t__ASSERT_EQ(fex.ior, 0);
+    e4t__ASSERT_EQ(fex.line, 2);
+    e4t__ASSERT_EQ(fex.path_sz, strlen(path1));
+    e4t__ASSERT(!memcmp(fex.path, path1, strlen(path1)));
+    e4t__ASSERT_EQ(fex.buf_sz, 32);
+    e4t__ASSERT(!memcmp(fex.buf, "s\" /tmp/e4-bar-", 15));
+
+    /* Delete the temporary files. */
+    e4t__ASSERT_EQ(unlink(path0), 0);
+    e4t__ASSERT_EQ(unlink(path1), 0);
+}
+
+
 /* Covers FORGET, MARKER and look-ahead idiom (which uses builtin
    WORD) */
 static void e4t__test_builtin_forget(void)
@@ -2333,6 +2458,7 @@ void e4t__test_builtin(void)
     e4t__test_builtin_exceptions();
     e4t__test_builtin_file_constants();
     e4t__test_builtin_file_include();
+    e4t__test_builtin_file_nested();
     e4t__test_builtin_forget();
     e4t__test_builtin_immed_cond();
     e4t__test_builtin_immediate();

@@ -230,9 +230,8 @@ Documentation
 -------------
 - Note that all file IO handlers must set a non-zero platform specific
   error code in *ior (to later be read with e4__task_ior) when returning
-  e4__E_FILEIO. It is not necessary nor is it correct to set a non-zero
-  value when a user handler is mapping a platform specific error to
-  another exception, such as e4__E_FILEINVPOS or e4__E_FILENOEXIST.
+  e4__E_FILEIO or any other return code for which a platform IO error is
+  expected (see e4__E_HAS_PLATFORM_IOR in e4.h).
 
 Kernel
 ------

@@ -47,7 +47,7 @@
 
             if (res) {
                 *ior = errno;
-                return e4__E_FILEIO;
+                return e4__E_CLOSE_FILE;
             }
 
             return e4__E_OK;
@@ -95,7 +95,7 @@
                 return e4__E_BUG;
             } else if (res < 0) {
                 *ior = errno;
-                return e4__E_FILEIO;
+                return e4__E_OPEN_FILE;
             }
 
             *fd = res;
@@ -110,7 +110,7 @@
 
             if (count < 0) {
                 *ior = errno;
-                return e4__E_FILEIO;
+                return e4__E_READ_FILE;
             }
 
             *n = count;

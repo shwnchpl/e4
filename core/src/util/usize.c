@@ -129,6 +129,8 @@ const char* e4__usize_format_exception(e4__usize e, e4__usize *len)
             _return_with_len("CLOSE-FILE");
         case e4__E_OPEN_FILE:
             _return_with_len("OPEN-FILE");
+        case e4__E_READ_FILE:
+            _return_with_len("READ-FILE");
 
         /* error constants - system */
         case e4__E_FAILURE:

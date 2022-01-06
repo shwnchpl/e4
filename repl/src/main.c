@@ -371,18 +371,20 @@ int main(int argc, char **argv)
        exit with any exception, including e4__E_BYE, drops into a repl
        after the file has been evaluated. */
     if (argc > 1) {
-        const e4__usize res = e4__evaluate_path(task, argv[1], -1, &fex);
+        const e4__usize res = e4__evaluate_path(task, argv[1], -1);
 
         if (res) {
             fprintf(stderr, COLOR_RED "Failed to evaluate file %s: %s (%ld)\n"
                     COLOR_RESET, argv[1],
                     e4__usize_format_exception(res, NULL), res);
-            if (res == e4__E_FILEIO)
+            if (e4__E_HAS_PLATFORM_IOR(res))
                 fprintf(stderr, "%s\n", strerror(e4__task_ior(task, 0)));
             exit_status = EXIT_FAILURE;
-        } else if (fex.ex && fex.ex != e4__E_BYE) {
+        }
+
+        if (e4__task_fex(task, &fex) && fex.ex != e4__E_BYE) {
             fprintf(stderr, COLOR_RED "\nEXCEPTION: %s (%ld)\n" COLOR_RESET
-                    "...while evaluating file %.*s, line %ld:\n\t%.*s\n",
+                    "...while evaluating file '%.*s', line %ld:\n\t%.*s\n",
                     e4__usize_format_exception(fex.ex, NULL), fex.ex,
                     (int)fex.path_sz, fex.path, fex.line,
                     (int)fex.buf_sz, fex.buf);
