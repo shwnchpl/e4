@@ -33,21 +33,39 @@ static void e4__builtin_CLOSE_FILE(struct e4__task *task, e4__cell user)
     e4__execute_ret(task);
 }
 
-static const void * const e4__builtin_INCLUDED[] = {
-    &e4__BUILTIN_XT[e4__B_R_SLASH_O],
-    &e4__BUILTIN_XT[e4__B_OPEN_FILE],
-    &e4__BUILTIN_XT[e4__B_BRANCH0],
-    (void *)7,
-    &e4__BUILTIN_XT[e4__B_LIT_CELL],
-    (void *)e4__E_OPEN_FILE,
-    &e4__BUILTIN_XT[e4__B_THROW],
-    &e4__BUILTIN_XT[e4__B_DROP],
-    &e4__BUILTIN_XT[e4__B_BRANCH],
-    (void *)1,
-    &e4__BUILTIN_XT[e4__B_INCLUDE_FILE],
-    &e4__BUILTIN_XT[e4__B_EXIT],
-    &e4__BUILTIN_XT[e4__B_SENTINEL]
-};
+static void e4__builtin_INCLUDED(struct e4__task *task, e4__cell user)
+{
+    register e4__usize res, u;
+    register const char *addr;
+    struct e4__file_exception fex;
+
+    /* XXX: It would be nice to implement this as a thunk, but
+       unfortunately we need to throw an exception and THROW is not
+       necessarily available if this wordlist is being included but
+       the exception wordlist is not. */
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    u = (e4__usize)e4__stack_pop(task);
+    addr = (const char *)e4__stack_pop(task);
+
+    if ((res = e4__evaluate_path(task, addr, u, &fex))) {
+        if (res == e4__E_FILEIO) {
+            /* Eat the system specific IO error; there is no meaningful
+               way to let it percolate up at this point. */
+            e4__task_ior(task, 0);
+            e4__exception_throw(task, e4__E_OPEN_FILE);
+        } else
+            e4__exception_throw(task, res);
+    } else if (fex.ex) {
+        if (fex.ex != e4__E_BYE) {
+            /* FIXME: Print exception info? */
+        }
+        e4__exception_throw(task, fex.ex);
+    }
+
+    e4__execute_ret(task);
+}
 
 static void e4__builtin_INCLUDE_FILE(struct e4__task *task, e4__cell user)
 {
