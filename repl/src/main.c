@@ -1,4 +1,12 @@
-#define _POSIX_C_SOURCE 199309L
+#define _XOPEN_SOURCE 500
+
+#if defined(__MACH__)
+    #define _DARWIN_C_SOURCE    1
+#elif defined(__unix__) && !defined(__linux__)
+    /* We may be on a BSD. Define __BSD_VISIBLE just in case. */
+    #define __BSD_VISIBLE   1
+#endif
+
 #include "e4.h"
 
 #include <signal.h>
@@ -28,6 +36,8 @@ struct repl_data {
     e4__bool no_jump;
 };
 
+static struct repl_data *GLOBAL_rd = NULL;
+
 static char* repl_prompt(EditLine *el)
 {
     return "";
@@ -37,7 +47,7 @@ static void repl_sighandler_thenunblock(struct e4__task *task, e4__cell user);
 
 static void repl_sighandler(int sig, siginfo_t *si, void *ucontext)
 {
-    static struct repl_data *rd = NULL;
+    struct repl_data *rd = GLOBAL_rd;
 
     /* Technically, it is undefined behavior to longjmp out of a
        nested signal handler, which is a signal handler that runs while
@@ -61,12 +71,11 @@ static void repl_sighandler(int sig, siginfo_t *si, void *ucontext)
        This is a little bit of a hack, but it is safe. */
 
     switch (sig) {
-        case SIGUSR1:
-            rd = si->si_ptr;
-            return;
         case SIGWINCH:
-            el_resize(rd->el);
-            rd->winch = 1;
+            if (rd) {
+                el_resize(rd->el);
+                rd->winch = 1;
+            }
             return;
         case SIGSEGV:
             if (rd && !rd->no_jump)
@@ -287,7 +296,6 @@ int main(int argc, char **argv)
 {
     static char task_buffer[128 * 1024];
     struct e4__task *task;
-    union sigval sv;
     struct sigaction sa = {0};
     struct sigaction old_sa[3];
     struct repl_data rd = {0};
@@ -344,11 +352,7 @@ int main(int argc, char **argv)
     sa.sa_sigaction = repl_sighandler;
     sigemptyset(&sa.sa_mask);
 
-    /* XXX: Hack to push context into the signal handler. */
-    sigaction(SIGUSR1, &sa, &old_sa[0]);
-    sv.sival_ptr = &rd;
-    sigqueue(getpid(), SIGUSR1, sv);
-    sigaction(SIGUSR1, &old_sa[0], NULL);
+    GLOBAL_rd = &rd;
 
     /* All signals we're handling with the handler function when our
        handler is invoked. */
@@ -401,6 +405,8 @@ exit_repl:
     sigaction(SIGWINCH, &old_sa[2], NULL);
     sigaction(SIGSEGV, &old_sa[1], NULL);
     sigaction(SIGINT, &old_sa[0], NULL);
+
+    GLOBAL_rd = NULL;
 
     history_end(hist);
     el_end(el);
