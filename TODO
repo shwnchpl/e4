@@ -129,7 +129,7 @@ General Builtins
 - [DONE] Uses system LOOP_INC builtin in +LOOP builtin impl.
 - [DONE] Implement ENVIRONMENT?.
 - [DONE] Implement STATE and >IN.
-- Implement SOURCE.
+- [DONE] Implement SOURCE.
 - Implement ACCEPT.
 - Implement FIND.
 - Implement UM/MOD.

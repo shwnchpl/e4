@@ -104,6 +104,7 @@
     _e4__BUILTIN_THUNK_N(SLASH, "/")    \
     _e4__BUILTIN_PROC_N(SLASH_MOD, "/MOD") \
     _e4__BUILTIN_PROC_N(SM_SLASH_REM, "SM/REM") \
+    _e4__BUILTIN_PROC(SOURCE)   \
     _e4__BUILTIN_THUNK(SPACE)   \
     _e4__BUILTIN_THUNK(SPACES)  \
     _e4__BUILTIN_PROC_N(STAR, "*")  \

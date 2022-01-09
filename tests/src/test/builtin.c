@@ -2423,7 +2423,7 @@ static void e4t__test_builtin_transientstr(void)
             -1), e4__E_PSTROVERFLOW);
 }
 
-/* Covers >IN BASE HERE PAD SOURCE-ID STATE */
+/* Covers >IN BASE HERE PAD SOURCE SOURCE-ID STATE */
 static void e4t__test_builtin_uservars(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -2461,6 +2461,22 @@ static void e4t__test_builtin_uservars(void)
     e4t__ASSERT_OK(e4__evaluate(task, "pad", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__task_uservar(task, e4__UV_PAD));
+
+    /* Test SOURCE. */
+    e4t__ASSERT_OK(e4__evaluate(task,
+            ": test-source s\" source\" 2dup evaluate >r swap >r = r> r> = ;",
+            -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "test-source", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__BF_TRUE);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "forget test-source", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, ": test-source source >in ! drop ;",
+            -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "test-source 123 456 notevenarealword",
+            -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 0);
 
     /* Test SOURCE-ID. */
     e4t__ASSERT_OK(e4__evaluate(task, "source-id", -1));

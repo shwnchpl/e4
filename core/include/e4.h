@@ -476,6 +476,7 @@ enum e4__builtin_id {
     e4__B_SLASH,
     e4__B_SLASH_MOD,
     e4__B_SM_SLASH_REM,
+    e4__B_SOURCE,
     e4__B_SPACE,
     e4__B_SPACES,
     e4__B_STAR,

@@ -1222,6 +1222,16 @@ static void e4__builtin_SM_SLASH_REM(struct e4__task *task, e4__cell user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_SOURCE(struct e4__task *task, e4__cell user)
+{
+    _e4__BUILTIN_EXPECT_AVAIL(task, 2);
+
+    e4__stack_push(task, (e4__cell)task->io_src.buffer);
+    e4__stack_push(task, (e4__cell)task->io_src.length);
+
+    e4__execute_ret(task);
+}
+
 static const void * const e4__builtin_SPACE[] = {
     &e4__BUILTIN_XT[e4__B_BL],
     &e4__BUILTIN_XT[e4__B_EMIT],
