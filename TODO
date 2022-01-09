@@ -128,7 +128,8 @@ General Builtins
   prevent an incorrect implementation (as was present before).
 - [DONE] Uses system LOOP_INC builtin in +LOOP builtin impl.
 - [DONE] Implement ENVIRONMENT?.
-- Implement STATE, >IN, and SOURCE.
+- [DONE] Implement STATE and >IN.
+- Implement SOURCE.
 - Implement ACCEPT.
 - Implement FIND.
 - Implement UM/MOD.
@@ -180,14 +181,12 @@ REPL
         $ e4
         s" foo.fth" included
   (once the later has also been implemented).
+- [DONE] Create REPL task buffer size to something much larger (32K?
+  8M?) and/or allow for setting buffer size via a command line argument
+  or environment variable.
 - Source ~/.e4-editrc to allow for e4 specific input overrides. For
   example, tab completion on tab could be disabled by macro binding
   the tab key to two or four spaces.
-- Re-evaluate not printing a newline on enter (and just simply printing
-  a space or something). This would look far cleaner.
-- Create REPL task buffer size to something much larger (32K? 8M?)
-  and/or allow for setting buffer size via a command line argument or
-  environment variable.
 
 Repo Maintenance
 ----------------
@@ -456,3 +455,10 @@ Repl
     -- This doesn't work well yet. Perhaps it will be worth revisiting
        once the remaining words from CORE, CORE EXT, and the file word
        set have been implemented.
+- Re-evaluate not printing a newline on enter (and just simply printing
+  a space or something). This would look far cleaner.
+    -- No. This isn't going to happen without completely abandoning
+       libedit and making some kind of bespoke line editing system,
+       which absolutely isn't worth it, because that isn't the goal of
+       this project. It works fine as it stands; this action item is
+       out of here.

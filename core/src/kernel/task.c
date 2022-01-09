@@ -112,6 +112,9 @@ struct e4__task* e4__task_create(void *buffer, e4__usize sz)
     task->base_ptr = (e4__cell)&task->base;
     task->base = 10;
 
+    task->in_ptr = (e4__cell)&task->io_src.in;
+    task->state_ptr = (e4__cell)&task->compile.state;
+
     #if defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT)
         e4__mem_cbuf_init(&task->tsb, task->tsb_buf, sizeof(task->tsb_buf));
         task->fib_depth = 0;

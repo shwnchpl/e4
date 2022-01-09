@@ -374,7 +374,9 @@ struct e4__gmt {
 #define e4__UV_HERE         (0)
 #define e4__UV_PAD          (1)
 #define e4__UV_BASE         (8)
-#define e4__UV_SOURCE_ID    (10)
+#define e4__UV_TO_IN        (9)
+#define e4__UV_STATE        (10)
+#define e4__UV_SOURCE_ID    (12)
 
 /* builtin constants */
 enum e4__builtin_id {
@@ -479,11 +481,13 @@ enum e4__builtin_id {
     e4__B_STAR,
     e4__B_STAR_SLASH,
     e4__B_STAR_SLASH_MOD,
+    e4__B_STATE,
     e4__B_STORE,
     e4__B_SWAP,
     e4__B_THEN,
     e4__B_TICK,
     e4__B_TO_BODY,
+    e4__B_TO_IN,
     e4__B_TO_NUMBER,
     e4__B_TO_R,
     e4__B_TWO_DROP,

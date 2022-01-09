@@ -58,6 +58,8 @@ struct e4__task
     e4__cell rp;
     e4__cell ip;
     e4__cell base_ptr;
+    e4__cell in_ptr;
+    e4__cell state_ptr;
     struct e4__io_src io_src;
     struct e4__compile_state compile;
     struct e4__pno_state pno;

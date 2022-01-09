@@ -2423,26 +2423,61 @@ static void e4t__test_builtin_transientstr(void)
             -1), e4__E_PSTROVERFLOW);
 }
 
-/* Covers BASE HERE PAD SOURCE-ID */
+/* Covers >IN BASE HERE PAD SOURCE-ID STATE */
 static void e4t__test_builtin_uservars(void)
 {
     struct e4__task *task = e4t__transient_task();
 
+    /* XXX: Technically SOURCE is not implemented as a uservar, but the
+       test for it is included here since from a behavior standpoint it
+       behaves very much like a uservar. */
+
+    /* Test >IN. */
+    e4t__ASSERT_OK(e4__evaluate(task, "        >in @", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 14);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "123456 depth over 9 < 35 and + >in !",
+            -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 6);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 6);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 56);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 456);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 3456);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 23456);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 123456);
+
+    /* Test BASE. */
     e4t__ASSERT_OK(e4__evaluate(task, "base", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__task_uservar(task, e4__UV_BASE));
 
+    /* Test HERE. */
     e4t__ASSERT_OK(e4__evaluate(task, "here", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__task_uservar(task, e4__UV_HERE));
 
+    /* Test PAD. */
     e4t__ASSERT_OK(e4__evaluate(task, "pad", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__task_uservar(task, e4__UV_PAD));
 
+    /* Test SOURCE-ID. */
     e4t__ASSERT_OK(e4__evaluate(task, "source-id", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__SID_STR);
+
+    /* Test STATE. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": compiling-now? state @ ; immediate",
+            -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "compiling-now?", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo compiling-now? literal ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "foo", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 1);
 }
 
 void e4t__test_builtin(void)

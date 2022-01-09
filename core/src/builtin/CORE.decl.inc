@@ -109,11 +109,13 @@
     _e4__BUILTIN_PROC_N(STAR, "*")  \
     _e4__BUILTIN_PROC_N(STAR_SLASH, "*/")   \
     _e4__BUILTIN_PROC_N(STAR_SLASH_MOD, "*/MOD")    \
+    _e4__BUILTIN_USERVAR(STATE) \
     _e4__BUILTIN_PROC_N(STORE, "!") \
     _e4__BUILTIN_PROC(SWAP) \
     _e4__BUILTIN_PROC_F(THEN, e4__F_COMPONLY | e4__F_IMMEDIATE) \
     _e4__BUILTIN_PROC_N(TICK, "'")  \
     _e4__BUILTIN_PROC_N(TO_BODY, ">BODY")   \
+    _e4__BUILTIN_USERVAR_N(TO_IN, ">IN")    \
     _e4__BUILTIN_PROC_N(TO_NUMBER, ">NUMBER")   \
     _e4__BUILTIN_PROC_NF(TO_R, ">R", e4__F_COMPONLY)    \
     _e4__BUILTIN_THUNK_N(TWO_DROP, "2DROP") \
