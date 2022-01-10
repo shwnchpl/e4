@@ -52,6 +52,25 @@ static const void * const e4__builtin_ABS[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL]
 };
 
+static void e4__builtin_ACCEPT(struct e4__task *task, e4__cell user)
+{
+    register char *addr;
+    register e4__usize io_res;
+    e4__usize sz;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 2);
+
+    sz = (e4__usize)e4__stack_pop(task);
+    addr = (char *)e4__stack_pop(task);
+
+    if ((io_res = e4__io_accept(task, addr, &sz)))
+        e4__exception_throw(task, io_res);
+
+    e4__stack_push(task, (e4__cell)sz);
+
+    e4__execute_ret(task);
+}
+
 static const void * const e4__builtin_ALIGN[] = {
     &e4__BUILTIN_XT[e4__B_HERE],
     &e4__BUILTIN_XT[e4__B_DUP],

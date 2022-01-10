@@ -10,6 +10,7 @@
     _e4__BUILTIN_PROC_NF(ABORT_QUOTE, "ABORT\"",    \
         e4__F_COMPONLY | e4__F_IMMEDIATE)   \
     _e4__BUILTIN_THUNK(ABS) \
+    _e4__BUILTIN_PROC(ACCEPT)   \
     _e4__BUILTIN_THUNK(ALIGN)   \
     _e4__BUILTIN_PROC(ALIGNED)  \
     _e4__BUILTIN_PROC(ALLOT)    \

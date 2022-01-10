@@ -1122,6 +1122,25 @@ static void e4t__test_builtin_io(void)
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "     ");
 }
 
+/* Covers ACCEPT */
+static void e4t__test_builtin_io_accept(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* XXX: The kernel API behind ACCEPT is covered in term.c. This test
+       serves mainly to verify that the builtin itself invokes this API
+       correctly. */
+
+    e4t__ASSERT_OK(e4__evaluate(task, "create buf 80 chars allot", -1));
+    e4t__term_ibuf_feed("okay here we go", -1);
+    e4t__ASSERT_OK(e4__evaluate(task, "buf dup 80 accept", -1));
+
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 15);
+
+    e4t__ASSERT(!memcmp(e4__stack_pop(task), "okay here we go", 15));
+}
+
 /* Covers DUMP */
 static void e4t__test_builtin_io_dump(void)
 {
@@ -2534,6 +2553,7 @@ void e4t__test_builtin(void)
     e4t__test_builtin_immed_cond();
     e4t__test_builtin_immediate();
     e4t__test_builtin_io();
+    e4t__test_builtin_io_accept();
     e4t__test_builtin_io_dump();
     e4t__test_builtin_io_error();
     e4t__test_builtin_io_facility();

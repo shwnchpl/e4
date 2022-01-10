@@ -131,7 +131,7 @@ General Builtins
 - [DONE] Implement STATE and >IN.
 - [DONE] Implement SOURCE.
 - [DONE] Implement UM/MOD.
-- Implement ACCEPT.
+- [DONE] Implement ACCEPT.
 - Implement FIND.
 - Verify that all CORE builtins have been implemented.
 

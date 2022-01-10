@@ -384,6 +384,7 @@ enum e4__builtin_id {
     e4__B_ABORT = 0,
     e4__B_ABORT_QUOTE,
     e4__B_ABS,
+    e4__B_ACCEPT,
     e4__B_ALIGN,
     e4__B_ALIGNED,
     e4__B_ALLOT,
