@@ -132,8 +132,8 @@ General Builtins
 - [DONE] Implement SOURCE.
 - [DONE] Implement UM/MOD.
 - [DONE] Implement ACCEPT.
-- Implement FIND.
-- Verify that all CORE builtins have been implemented.
+- [DONE] Implement FIND.
+- [DONE] Verify that all CORE builtins have been implemented.
 
 General IO
 ----------

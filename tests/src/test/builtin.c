@@ -885,6 +885,29 @@ static void e4t__test_builtin_file_nested(void)
     e4t__ASSERT_EQ(unlink(path1), 0);
 }
 
+/* Covers FIND */
+static void e4t__test_builtin_find(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    e4t__ASSERT_OK(e4__evaluate(task, ": fake-name c\" faake-name\" ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "fake-name dup find", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 3);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_EQ(e4__stack_pop(task), e4__stack_pop(task));
+
+    e4t__ASSERT_OK(e4__evaluate(task, ": dup-name c\" dup\" ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "dup-name find", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), -1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), &e4__BUILTIN_XT[e4__B_DUP]);
+
+    e4t__ASSERT_OK(e4__evaluate(task, ": begin-name c\" begin\" ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "begin-name find", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), &e4__BUILTIN_XT[e4__B_BEGIN]);
+}
 
 /* Covers FORGET, MARKER and look-ahead idiom (which uses builtin
    WORD) */
@@ -2549,6 +2572,7 @@ void e4t__test_builtin(void)
     e4t__test_builtin_file_constants();
     e4t__test_builtin_file_include();
     e4t__test_builtin_file_nested();
+    e4t__test_builtin_find();
     e4t__test_builtin_forget();
     e4t__test_builtin_immed_cond();
     e4t__test_builtin_immediate();

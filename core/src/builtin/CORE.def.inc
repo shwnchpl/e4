@@ -146,6 +146,30 @@ static void e4__builtin_C_FETCH(struct e4__task *task, e4__cell user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_FIND(struct e4__task *task, e4__cell user)
+{
+    register const char *caddr;
+    register const struct e4__dict_header *header;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 1);
+
+    caddr = (const char *)e4__stack_pop(task);
+
+    _e4__BUILTIN_EXPECT_AVAIL(task, 1);
+
+    header = e4__dict_lookup(task, caddr + 1, (e4__u8)*caddr);
+    if (!header) {
+        e4__stack_push(task, (e4__cell)caddr);
+        e4__stack_push(task, 0);
+    } else {
+        e4__stack_push(task, (e4__cell)header->xt);
+        e4__stack_push(task, (e4__cell)(e4__usize)
+                ((header->flags & e4__F_IMMEDIATE) ? 1 : -1));
+    }
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_C_STORE(struct e4__task *task, e4__cell user)
 {
     register e4__u8 *c, v;

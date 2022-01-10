@@ -425,6 +425,7 @@ enum e4__builtin_id {
     e4__B_EXIT,
     e4__B_FETCH,
     e4__B_FILL,
+    e4__B_FIND,
     e4__B_FM_SLASH_MOD,
     e4__B_GREATER_THAN,
     e4__B_HERE,
