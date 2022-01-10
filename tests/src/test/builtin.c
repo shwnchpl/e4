@@ -8,7 +8,7 @@
 #include <time.h>
 #include <unistd.h>
 
-/* Covers *SLASH *SLASH-MOD FM/MOD M* SM/DIV S>D UM* */
+/* Covers *SLASH *SLASH-MOD FM/MOD M* SM/DIV S>D UM* UM/MOD */
 static void e4t__test_builtin_doublemath(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -55,9 +55,9 @@ static void e4t__test_builtin_doublemath(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), -2);
     e4t__ASSERT_EQ(e4__stack_pop(task), 1);
 
-    /* Test FM/MOD and SM/REM. The utility functions behind these
-       builtins are covered more extensively in util.c, so just make
-       sure those utilities are being invoked correctly. */
+    /* Test FM/MOD, UM/MOD, and SM/REM. The utility functions behind
+       these builtins are covered more extensively in util.c, so just
+       make sure those utilities are being invoked correctly. */
     e4t__ASSERT_OK(e4__evaluate(task, "10 s>d 7 fm/mod", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 2);
     e4t__ASSERT_EQ(e4__stack_pop(task), 1);
@@ -77,6 +77,26 @@ static void e4t__test_builtin_doublemath(void)
     e4t__ASSERT_EQ(e4__stack_depth(task), 2);
     e4t__ASSERT_EQ(e4__stack_pop(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), -3);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "0 s>d 1 um/mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "1 s>d 1 um/mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "1 s>d 2 um/mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 1);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "3 s>d 2 um/mod", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 1);
 
     e4t__ASSERT_OK(e4__evaluate(task, "10 s>d 7 sm/rem", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 2);

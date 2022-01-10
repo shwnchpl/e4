@@ -1574,6 +1574,29 @@ static void e4__builtin_U_LESS_THAN(struct e4__task *task, e4__cell user)
     e4__execute_ret(task);
 }
 
+static void e4__builtin_UM_SLASH_MOD(struct e4__task *task, e4__cell user)
+{
+    register e4__usize res, n;
+    register struct e4__double d;
+    e4__usize q, r;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 3);
+
+    n = (e4__usize)e4__stack_pop(task);
+    d.high = (e4__usize)e4__stack_pop(task);
+    d.low = (e4__usize)e4__stack_pop(task);
+
+    if ((res = e4__double_ndiv(d, n, 0, &q, &r))) {
+        e4__exception_throw(task, res);
+        e4__execute_ret(task);
+    }
+
+    e4__stack_push(task, (e4__cell)r);
+    e4__stack_push(task, (e4__cell)q);
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_UM_STAR(struct e4__task *task, e4__cell user)
 {
     register e4__usize l, r;

@@ -130,9 +130,9 @@ General Builtins
 - [DONE] Implement ENVIRONMENT?.
 - [DONE] Implement STATE and >IN.
 - [DONE] Implement SOURCE.
+- [DONE] Implement UM/MOD.
 - Implement ACCEPT.
 - Implement FIND.
-- Implement UM/MOD.
 - Verify that all CORE builtins have been implemented.
 
 General IO

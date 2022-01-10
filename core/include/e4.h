@@ -502,6 +502,7 @@ enum e4__builtin_id {
     e4__B_TYPE,
     e4__B_U_DOT,
     e4__B_U_LESS_THAN,
+    e4__B_UM_SLASH_MOD,
     e4__B_UM_STAR,
     e4__B_UNLOOP,
     e4__B_UNTIL,
