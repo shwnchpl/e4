@@ -37,10 +37,11 @@ Documentation
 - [DONE] Create initial documentation license.
 - [DONE] Create initial background summary.
 - [DONE] Complete standard documentation intro.
+- [DONE] Add initial system label. This can be kept up to date over
+  time.
 - Complete kernel standard documentation.
 - Complete CORE standard documentation.
 - Complete CORE-EXT standard documentation (as much as possible).
-- Add initial system label. This can be kept up to date over time.
 - Document version scheme somewhere, which is essentially that tagged
   releases are tagged and version number is not bumped between releases
   but "-dev" is appended to the version string. Consider switching to
@@ -197,11 +198,6 @@ Testing
 -------
 - [DONE] Split e4t__test_util_doublemath into multiple tests after the
   num to usize/double split.
-- Consider splitting exceedingly long builtin tests into multiple
-  functions. Current candidates for splitting include doublemath,
-  logic, math, and memmanip in particular.
-- Consider splitting builtin tests into multiple files, possibly even
-  in a builtin/ test directory.
 
 
 Version 0.4
@@ -250,6 +246,11 @@ Testing
   in a builtin/ test directory.
 - Consider adding mock file IO tests that do not rely upon the POSIX
   handlers.
+- Consider splitting exceedingly long builtin tests into multiple
+  functions. Current candidates for splitting include doublemath,
+  logic, math, and memmanip in particular.
+- Consider splitting builtin tests into multiple files, possibly even
+  in a builtin/ test directory.
 
 
 Version 0.5
