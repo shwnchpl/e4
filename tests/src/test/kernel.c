@@ -28,12 +28,13 @@ static void e4t__test_kernel_builtin_exec(void)
 static void e4t__test_kernel_dict(void)
 {
     struct e4__task *task = e4t__transient_task();
-    const struct e4__dict_header *sug;
+    const struct e4__dict_header *sug, *h0, *h1, *h2;
 
     #define _d(s, c)    e4__dict_entry(task, s, sizeof(s) - 1, 0, c, NULL)
     #define _l(s)       e4__dict_lookup(task, s, sizeof(s) - 1)
     #define _s(l, p)    e4__dict_suggest(task, l, p, sizeof(p) - 1)
     #define _f(s)       e4__dict_forget(task, s, sizeof(s) - 1)
+    #define _lxt(x)     e4__dict_lookup_xt(task, x)
 
     /* Simply insertion and lookup. */
     _d("first-entry", (e4__code_ptr)0xabcde);
@@ -74,6 +75,28 @@ static void e4t__test_kernel_dict(void)
     e4t__ASSERT((sug = _s(sug, "prefix73")));
     e4t__ASSERT_EQ(sug->xt->code, 0x33333);
 
+    /* Lookup based on execute token works correctly. */
+    _d("xt-entry-1", (e4__code_ptr)0xabcde);
+    e4t__ASSERT((h0 = _l("xt-entry-1")));
+    e4t__ASSERT((h1 = _lxt((e4__cell)h0->xt)));
+    e4t__ASSERT_EQ(h0, h1);
+
+    _d("xt-entry-2", (e4__code_ptr)0x12345);
+    e4t__ASSERT((h1 = _l("xt-entry-2")));
+
+    /* XXX: In user code, no one should ever use a dictionary header
+       returned from one of the lookup APIs in this way, but for the
+       purposes of this test it is known to be safe. */
+    ((struct e4__dict_header *)h1)->xt = h0->xt;
+
+    e4t__ASSERT((h2 = _lxt((e4__cell)h1->xt)));
+    e4t__ASSERT_EQ(h1, h2);
+    e4t__ASSERT(h0 != h2);
+    e4t__ASSERT_EQ(h0->xt, h2->xt);
+
+    e4t__ASSERT(!_lxt(NULL));
+
+    #undef _lxt
     #undef _f
     #undef _s
     #undef _l

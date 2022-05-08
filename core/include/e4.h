@@ -726,6 +726,8 @@ e4__usize e4__dict_forget(struct e4__task *task, const char *name,
         e4__u8 nbytes);
 const struct e4__dict_header* e4__dict_lookup(struct e4__task *task,
         const char *name, e4__u8 nbytes);
+const struct e4__dict_header* e4__dict_lookup_xt(struct e4__task *task,
+        e4__cell xt);
 const struct e4__dict_header* e4__dict_suggest(struct e4__task *task,
         const struct e4__dict_header *from, const char *prefix,
         e4__u8 pbytes);

@@ -39,6 +39,15 @@ const struct e4__dict_header* e4__dict_lookup(struct e4__task *task,
             task->dict->link : task->dict, name, nbytes);
 }
 
+/* Look up a dictionary entry by execute token rather than name. Will
+   not check the top entry if it has the e4__F_COMPILING flag set. */
+const struct e4__dict_header* e4__dict_lookup_xt(struct e4__task *task,
+        e4__cell xt)
+{
+    return e4__mem_dict_lookup_xt((task->dict->flags & e4__F_COMPILING) ?
+            task->dict->link : task->dict, xt);
+}
+
 /* Suggest a dictionary entry. Will not check the top entry if it
    has the e4__F_COMPILING flag set. */
 const struct e4__dict_header* e4__dict_suggest(struct e4__task *task,
