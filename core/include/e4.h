@@ -736,6 +736,7 @@ enum e4__builtin_id {
         e4__B_INCLUDED,
         e4__B_INCLUDE_FILE,
         e4__B_OPEN_FILE,
+        e4__B_READ_FILE,
         e4__B_R_SLASH_O,
         e4__B_R_SLASH_W,
         e4__B_W_SLASH_O,

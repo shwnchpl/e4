@@ -236,7 +236,46 @@ General Builtins
 - Implement remaining CORE EXT builtins.
 - Add FILE and some FILE EXT word sets impls. Ensure that behavior
   of relevant words (such as SOURCE-ID, REFILL, and () is also updated
-  as appropriate.
+  as appropriate).
+- Fix INCLUDED so that it actually scans a reasonable search path (ie.
+  the current working directory of either the file being evaluated or
+  the program itself). This will likely require new IO handlers. The
+  easiest way to implement this might be to add handlers to get the
+  working directory of an open file and handlers to get and set the
+  current working directory. Unfortunately, this will require storing
+  the directory of a file path when it is opened, which will require
+  even more messing with handlers. It also wouldn't work with
+  e4__evaluate_file, which is a shame. At the end of the day, there
+  just isn't a great way to do this that doesn't involve having to
+  manually track each open file and maintain a mapping. The alternative
+  is to somehow make things work *only* with _evaluate_path, which
+  could *probably* be forced to work by storing path in the IO source
+  (although the lifetime of path is not long enough). The best thing
+  would probably be having some _io_file_dir_from_path handler that
+  could be called on paths in e4__evaluate_path. This could then
+  update the io_src for input with a directory descriptor. If this
+  descriptor is set on subsequent calls to evaluate, some sort of
+  openat and/or chdir can be called. The easiest thing would probably
+  be to make the current open function some kind of openat function
+  and just allow passing it some kind of RELATIVE_OPEN flag. We can
+  then maintain our own DIR_IS_VALID flag in io_src and only set it
+  after a successful call to _io_file_dir_from_path. We will probably
+  also need to add the option of a separate function to call to close
+  the directory handler, but for our posix purposes we can just
+  reuse our existing handler. For POSIX purposes, we can use dirname.
+  So, essentially, we have this:
+     * open becomes some form of openat that takes an optional
+       directory handler. This really only requires a flag; we already
+       have fd as an out parameter, so we can just look here if we are
+       instructed to do so and call openat internally.
+     * Add an _io_file_openparentdir function that returns a directory
+       handler. We'll call this in evaluate_path and store it in the
+       io_src. In evaluate path, if flags in io_src indicate, then
+       we'll use it in openat. This needs to *also* take an openat
+       style directory descriptor to account for the fact that we may
+       already be in openat territory.
+     * Add an handler for closing directory handles.
+  A little bit of a mess, but it should be doable.
 - Consider adding _NF variants to USERVAR declaration macros, defining
   e4__UV_BEGIN, and simply defining BEGIN as its own uservar rather
   than in terms of HERE using PUN macros. Consider also removing pun

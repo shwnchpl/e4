@@ -43,6 +43,11 @@ static void e4__builtin_INCLUDED(struct e4__task *task, e4__cell user)
        necessarily available if this wordlist is being included but
        the exception wordlist is not. */
 
+    /* FIXME: This should be included from the working directory of
+       the file that is currently being evaluated if a file is
+       currently being evaluated. This will likely require new io
+       handlers. */
+
     _e4__BUILTIN_EXPECT_DEPTH(task, 2);
 
     u = (e4__usize)e4__stack_pop(task);
@@ -92,6 +97,33 @@ static void e4__builtin_OPEN_FILE(struct e4__task *task, e4__cell user)
         }
     } else {
         e4__stack_push(task, (e4__cell)fd);
+        e4__stack_push(task, (e4__cell)0);
+    }
+
+    e4__execute_ret(task);
+}
+
+static void e4__builtin_READ_FILE(struct e4__task *task, e4__cell user)
+{
+    register e4__usize io_res, fd;
+    register char *addr;
+    e4__usize u;
+
+    _e4__BUILTIN_EXPECT_DEPTH(task, 3);
+
+    fd = (e4__usize)e4__stack_pop(task);
+    u = (e4__usize)e4__stack_pop(task);
+    addr = (char *)e4__stack_pop(task);
+
+    if ((io_res = e4__io_file_read(task, fd, addr, &u))) {
+        if (e4__E_HAS_PLATFORM_IOR(io_res)) {
+            e4__stack_push(task, (e4__cell)0);
+            e4__stack_push(task, (e4__cell)e4__task_ior(task, 0));
+        } else {
+            e4__exception_throw(task, io_res);
+        }
+    } else {
+        e4__stack_push(task, (e4__cell)u);
         e4__stack_push(task, (e4__cell)0);
     }
 

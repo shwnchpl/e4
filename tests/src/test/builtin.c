@@ -666,13 +666,15 @@ static void e4t__test_builtin_file_constants(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), e4__F_WRITE | e4__F_BIN);
 }
 
-/* Covers CLOSE-FILE, INCLUDED, INCLUDE-FILE, OPEN-FILE */
+/* Covers CLOSE-FILE INCLUDED INCLUDE-FILE OPEN-FILE READ-FILE */
 static void e4t__test_builtin_file_include(void)
 {
     struct e4__task *task = e4t__transient_task();
     char buf[64] = {0};
+    char file_contents[128] = {0};
     char path[] = "/tmp/e4-XXXXXX";
     int fd;
+    e4__usize ufd;
 
     /* Test that attempting to open, close, or include a file doesn't
        exist fails as expected. */
@@ -703,8 +705,39 @@ static void e4t__test_builtin_file_include(void)
     e4t__ASSERT_OK(e4__evaluate(task, "r/o open-file", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 2);
     e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    ufd = (e4__usize)e4__stack_peek(task);
+
+    /* Attempt to read the contents of the file into a buffer. */
+    e4__stack_push(task, (e4__cell)file_contents);
+    e4__stack_push(task, (e4__cell)(sizeof(file_contents)));
+    e4__stack_rot(task);
+    e4t__ASSERT_OK(e4__evaluate(task, " read-file", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 20);
+    e4t__ASSERT(!e4__mem_strncasecmp(file_contents, ": foo 3 7 + ;\n"
+            "foo 15", 20));
+
+    /* Attempt to read from a file with the file read position
+       at EOF. */
+    e4__stack_push(task, (e4__cell)file_contents);
+    e4__stack_push(task, (e4__cell)(sizeof(file_contents)));
+    e4__stack_push(task, (e4__cell)ufd);
+    e4t__ASSERT_EQ(e4__evaluate(task, " read-file", -1), e4__E_EOF);
+    e4t__ASSERT_EQ(e4__stack_depth(task), 3);
+    e4__stack_clear(task);
+
+    /* Attempt to read from an invalid file handler. */
+    e4__stack_push(task, (e4__cell)file_contents);
+    e4__stack_push(task, (e4__cell)(sizeof(file_contents)));
+    e4__stack_push(task, (e4__cell)(e4__usize)-1);
+    e4t__ASSERT_OK(e4__evaluate(task, " read-file", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 2);
+    e4t__ASSERT_EQ(e4__stack_pop(task), EBADF);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 0);
 
     /* Attempt to close a file that has been opened. */
+    e4__stack_push(task, (e4__cell)ufd);
     e4t__ASSERT_OK(e4__evaluate(task, "close-file", -1));
     e4t__ASSERT_EQ(e4__stack_depth(task), 1);
     e4t__ASSERT_EQ(e4__stack_pop(task), 0);

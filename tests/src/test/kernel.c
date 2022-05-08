@@ -595,6 +595,9 @@ static void e4t__test_kernel_io_file(void)
     /* FIXME: Add tests for opening a file with write permissions and
        writing to the file once associated handlers have been
        implemented. */
+    /* FIXME: Add tests for writing to a file with only read
+       permissions and reading from a file with only write
+       permissions. */
     /* FIXME: Add tests for all remaining io_file kernel APIs once the
        associated handlers have been implemented. */
 }
