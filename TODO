@@ -185,6 +185,12 @@ REPL
 - [DONE] Create REPL task buffer size to something much larger (32K?
   8M?) and/or allow for setting buffer size via a command line argument
   or environment variable.
+- Look into SIGINT return to shell after CTRL-C followed by graceful
+  exit. This may be happening as a result of the longjump out of the
+  signal handler, although it *doesn't* seem to happen for signals
+  other than SIGINT. Simple work-arounds (like setting SIGINT's action
+  to SIG_IGN and then raising SIGINT before exiting the program) do
+  not seem to resolve the issue.
 - Source ~/.e4-editrc to allow for e4 specific input overrides. For
   example, tab completion on tab could be disabled by macro binding
   the tab key to two or four spaces.
@@ -198,6 +204,8 @@ Testing
 -------
 - [DONE] Split e4t__test_util_doublemath into multiple tests after the
   num to usize/double split.
+- Consider adding case sensitive e4t__ASSERT_MATCH variant and updating
+  tests to use it where appropriate.
 
 
 Version 0.4
@@ -230,8 +238,8 @@ Documentation
 
 Kernel
 ------
-- Consider providing optional POSIX handlers for file IO. These could
-  be enabled/disabled at compile time.
+- [DONE] Consider providing optional POSIX handlers for file IO. These
+  could be enabled/disabled at compile time.
 
 REPL
 ----
