@@ -204,6 +204,9 @@ REPL
 - Source ~/.e4-editrc to allow for e4 specific input overrides. For
   example, tab completion on tab could be disabled by macro binding
   the tab key to two or four spaces.
+- [DONE] Add ARGV and ARGC words. ARGV should return a string and its
+  length, similar to s", if the argument is valid. ARGC should just be
+  argument count.
 
 Repo Maintenance
 ----------------

@@ -34,6 +34,8 @@ struct repl_data {
     e4__bool winch;
     e4__bool interrupted;
     e4__bool no_jump;
+    e4__usize argc;
+    char **argv;
 };
 
 static struct repl_data *GLOBAL_rd = NULL;
@@ -292,6 +294,31 @@ static e4__usize repl_type(void *user, const char *buf, e4__usize n)
     return e4__E_OK;
 }
 
+static void repl_argv(struct e4__task *task, e4__cell user)
+{
+    struct repl_data *rd = *(struct repl_data **)user;
+    const char *arg = NULL;
+    e4__usize len = 0;
+    e4__usize offset;
+
+    if (e4__stack_depth(task) < 1) {
+        e4__exception_throw(task, e4__E_STKUNDERFLOW);
+        e4__execute_ret(task);
+        return;
+    }
+
+    offset = (e4__usize)e4__stack_pop(task);
+    if (offset < rd->argc) {
+        arg = rd->argv[offset];
+        len = strlen(arg);
+    }
+
+    e4__stack_push(task, (e4__cell)arg);
+    e4__stack_push(task, (e4__cell)len);
+
+    e4__execute_ret(task);
+}
+
 int main(int argc, char **argv)
 {
     static char task_buffer[128 * 1024];
@@ -318,6 +345,16 @@ int main(int argc, char **argv)
     EditLine *el = NULL;
     History *hist;
     int exit_status = EXIT_SUCCESS;
+
+    if (argc > 1) {
+        /* XXX: Hack. If we're going to execute a file rather than drop
+           directly into repl mode, make that file argv[0]. */
+        rd.argc = argc - 1;
+        rd.argv = &argv[1];
+    } else {
+        rd.argc = argc;
+        rd.argv = argv;
+    }
 
     hist = history_init();
     history(hist, &rd.ev, H_SETSIZE, 100);
@@ -372,6 +409,11 @@ int main(int argc, char **argv)
     /* XXX: Hack to allow shebang lines. */
     e4__dict_entry(task, "#!", 2, 0, e4__BUILTIN_XT[e4__B_BACKSLASH].code,
             e4__BUILTIN_XT[e4__B_BACKSLASH].user);
+
+    /* XXX: Hack to provide ARGC and ARGV words. */
+    e4__dict_entry(task, "ARGC", 4, e4__F_CONSTANT, e4__execute_userval,
+            (e4__cell)rd.argc);
+    e4__dict_entry(task, "ARGV", 4, 0, repl_argv, &rd);
 
     /* XXX: Temporary "hack" to add file execution and some diagnostic
        information. Evaluates a file. So long as the evaluation doesn't
