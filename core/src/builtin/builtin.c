@@ -78,6 +78,9 @@ static const void *_e4__BUILTIN_RETURN_THUNK[] =
 #if defined(e4__INCLUDE_CORE_EXT)
     #include "CORE-EXT.def.inc"
 #endif
+#if defined(e4__INCLUDE_DLFCN)
+    #include "DLFCN.def.inc"
+#endif
 #if defined(e4__INCLUDE_EXCEPTION)
     #include "EXCEPTION.def.inc"
 #endif
@@ -104,6 +107,9 @@ static const void *_e4__BUILTIN_RETURN_THUNK[] =
 
 #if defined(e4__INCLUDE_CORE_EXT)
     #include "CORE-EXT.decl.inc"
+#endif
+#if defined(e4__INCLUDE_DLFCN)
+    #include "DLFCN.decl.inc"
 #endif
 #if defined(e4__INCLUDE_EXCEPTION)
     #include "EXCEPTION.decl.inc"
@@ -200,6 +206,9 @@ const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT] =
     #if defined(e4__INCLUDE_CORE_EXT)
         _e4__BUILTIN_CORE_EXT_DECL()
     #endif
+    #if defined(e4__INCLUDE_DLFCN)
+        _e4__BUILTIN_DLFCN_DECL()
+    #endif
     #if defined(e4__INCLUDE_EXCEPTION)
         _e4__BUILTIN_EXCEPTION_DECL()
     #endif
@@ -251,6 +260,9 @@ const struct e4__execute_tuple e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
 
     #if defined(e4__INCLUDE_CORE_EXT)
         _e4__BUILTIN_CORE_EXT_DECL()
+    #endif
+    #if defined(e4__INCLUDE_DLFCN)
+        _e4__BUILTIN_DLFCN_DECL()
     #endif
     #if defined(e4__INCLUDE_EXCEPTION)
         _e4__BUILTIN_EXCEPTION_DECL()

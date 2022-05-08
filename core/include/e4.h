@@ -590,6 +590,14 @@ enum e4__builtin_id {
 
     #endif /* defined(e4__INCLUDE_CORE_EXT) */
 
+    #if defined(e4__INCLUDE_DLFCN)
+
+        e4__B_DLCLOSE,
+        e4__B_DLOPEN,
+        e4__B_DLSYM,
+
+    #endif /* defined(e4__INCLUDE_DLFCN) */
+
     #if defined(e4__INCLUDE_EXCEPTION)
 
         /* EXCEPTION words */

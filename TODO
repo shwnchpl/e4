@@ -135,6 +135,7 @@ General Builtins
 - [DONE] Implement ACCEPT.
 - [DONE] Implement FIND.
 - [DONE] Verify that all CORE builtins have been implemented.
+- [DONE] Add DLSYM builtins and associated kernel/IO APIs.
 
 General IO
 ----------

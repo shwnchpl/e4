@@ -1164,6 +1164,39 @@ static void e4t__test_builtin_io_accept(void)
     e4t__ASSERT(!memcmp(e4__stack_pop(task), "okay here we go", 15));
 }
 
+/* Covers DLCLOSE DLOPEN DLSYM */
+static void e4t__test_builtin_io_dlfcn(void)
+{
+    struct e4__task *task = e4t__transient_task();
+    e4__cell handle;
+
+    /* XXX: This test is *VERY* likely to only pass on Linux or in an
+       extremely Linux-like environment. */
+
+    /* Test that opening a dynamic library and loading a symbol works
+       as expected. */
+    e4t__ASSERT_OK(e4__evaluate(task, "s\\\" libc.so.6\\z\" drop dlopen", -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    handle = e4__stack_peek(task);
+
+    e4t__ASSERT_OK(e4__evaluate(task, "s\\\" strlen\\z\" drop swap dlsym",
+            -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), strlen);
+
+    /* Test that attempting to open a non-existent library or load
+       a nonexistent symbol fails as expected. */
+    e4t__ASSERT_EQ(e4__evaluate(task, "s\\\" probably-not-real.so.what\\z\" "
+                "drop dlopen", -1), e4__E_DLFAILURE);
+    e4__stack_push(task, handle);
+    e4t__ASSERT_EQ(e4__evaluate(task, "s\\\" probably-not-real.so.what\\z\" "
+            "drop swap dlsym", -1), e4__E_DLFAILURE);
+
+    /* Test that closing the dynamic library works as expected. */
+    e4__stack_push(task, handle);
+    e4t__ASSERT_OK(e4__evaluate(task, "dlclose", -1));
+}
+
 /* Covers DUMP */
 static void e4t__test_builtin_io_dump(void)
 {
@@ -2628,6 +2661,7 @@ void e4t__test_builtin(void)
     e4t__test_builtin_immediate();
     e4t__test_builtin_io();
     e4t__test_builtin_io_accept();
+    e4t__test_builtin_io_dlfcn();
     e4t__test_builtin_io_dump();
     e4t__test_builtin_io_error();
     e4t__test_builtin_io_facility();
