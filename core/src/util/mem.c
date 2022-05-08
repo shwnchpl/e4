@@ -91,6 +91,30 @@ e4__usize e4__mem_cells(e4__usize n)
     return n * sizeof(e4__cell);
 }
 
+const char* e4__mem_codeptr_tostr(e4__code_ptr code)
+{
+    if (code == e4__execute_deferthunk)
+        return "defer thunk";
+    else if (code == e4__execute_doesthunk)
+        return "does thunk";
+    else if (code == e4__execute_marker)
+        return "marker";
+    else if (code == e4__execute_threaded)
+        return "threaded";
+    else if (code == e4__execute_threadedthunk)
+        return "threaded thunk";
+    else if (code == e4__execute_userval)
+        return "user value";
+    else if (code == e4__execute_uservar)
+        return "user variable";
+    else if (code == e4__execute_value)
+        return "value";
+    else if (code == e4__execute_variable)
+        return "variable";
+
+    return "native";
+}
+
 e4__usize e4__mem_dict_entry(void *here, struct e4__dict_header *prev,
         const char *name, e4__u8 nbytes, e4__u8 flags, e4__code_ptr code,
         void *user)
@@ -321,6 +345,178 @@ parse_normal:
     *str += *chunk_len;
 
     return begin;
+}
+
+/* XXX: Buffer must be able to store at least 80 characters. Specifying
+   size is not an option. On first call, *p MUST equal *header. Between
+   calls, *p must not be altered as it stores state.
+
+   It is also critical to note that header must be mutable and that it
+   may be modified by calls to this function. Like *p, it MUST not be
+   modified between calls.
+
+   Returns -1 if for some reason what has been requested would be
+   *longer* than 80 characters. This is an error condition and should
+   be handled accordingly. */
+static void e4__mem_see__flagsline_(void) {}
+static void e4__mem_see__nativeline_(void) {}
+e4__usize e4__mem_see(const void **p, struct e4__dict_header *header,
+        const struct e4__dict_header *dict, char *buffer, char **out_buffer)
+{
+    char *b_end = buffer + 79;
+    char *b_offset = b_end;
+
+line_begin:
+
+    if (*((const struct e4__dict_header **)p) == header) {
+        const char *desc = e4__mem_codeptr_tostr(header->xt->code);
+        const e4__u8 desc_len = strlen(desc);
+        struct e4__double d;
+        const e4__usize avail_digits = 80 - header->nbytes - desc_len - 19;
+
+        /* FIXME: Is this overly restrictive? Should something just be
+           truncated? */
+        if (header->nbytes + desc_len + 19 > 80)
+            goto out_error;
+
+        d = e4__usize_todouble((e4__usize)header->xt->user);
+
+        e4__mem_pno_holds(&b_offset, " )\n", 3);
+        if (e4__mem_pno_digits(&b_offset, avail_digits, 16, 0, &d))
+            goto out_error;
+        e4__mem_pno_holds(&b_offset, " - user: 0x", 11);
+        e4__mem_pno_holds(&b_offset, desc, desc_len);
+        e4__mem_pno_holds(&b_offset, " ( ", 3);
+        e4__mem_pno_holds(&b_offset, header->name, header->nbytes);
+
+        if (header->flags & e4__F_TEMPHEADER)
+            e4__mem_pno_holds(&b_offset, "> ", 2);
+        else
+            e4__mem_pno_holds(&b_offset, ": ", 2);
+
+        *p = (e4__cell)(e4__usize)e4__mem_see__flagsline_;
+    } else if (*p == (e4__cell)(e4__usize)e4__mem_see__flagsline_) {
+        if (header->flags & (e4__F_BUILTIN | e4__F_CONSTANT | e4__F_COMPONLY |
+                e4__F_IMMEDIATE)) {
+
+            e4__mem_pno_hold(&b_offset, '\n');
+
+            if (header->flags & e4__F_IMMEDIATE)
+                e4__mem_pno_holds(&b_offset, " [IMMEDIATE]", 12);
+            if (header->flags & e4__F_COMPONLY)
+                e4__mem_pno_holds(&b_offset, " [COMPONLY]", 11);
+            if (header->flags & e4__F_CONSTANT)
+                e4__mem_pno_holds(&b_offset, " [CONSTANT]", 11);
+            if (header->flags & e4__F_BUILTIN)
+                e4__mem_pno_holds(&b_offset, " [BUILTIN]", 10);
+
+            e4__mem_pno_holds(&b_offset, "       ", 7);
+        }
+
+        if (header->xt->code == e4__execute_deferthunk) {
+            /* Look up the header of the code being thunked into. If it
+               is not available, build a fake header. Start again from
+               the beginning. */
+            const struct e4__dict_header *e = e4__mem_dict_lookup_xt(dict,
+                    header->xt->user);
+
+            if (e)
+                *header = *e;
+            else {
+                header->name = "_";
+                header->nbytes = 1;
+                header->xt = (struct e4__execute_token *)header->xt->user;
+                header->link = NULL;
+                header->flags = 0;
+            }
+
+            header->flags |= e4__F_TEMPHEADER;
+
+            *p = header;
+        } else if (header->xt->code == e4__execute_threaded)
+            *p = &header->xt->data[0];
+        else if (header->xt->code == e4__execute_threadedthunk)
+            *p = header->xt->user;
+        else if ((header->xt->code == e4__execute_doesthunk) ||
+                (header->xt->code == e4__execute_value) ||
+                (header->xt->code == e4__execute_variable))
+            *p = (e4__cell)(e4__usize)header->xt->code;
+        else if ((header->xt->code == e4__execute_marker) ||
+                (header->xt->code == e4__execute_userval) ||
+                (header->xt->code == e4__execute_uservar))
+            *p = NULL;
+        else
+            *p = (e4__cell)(e4__usize)e4__mem_see__nativeline_;
+
+        /* If there is no flags line, begin again. */
+        if (!(b_end - b_offset) && *p)
+            goto line_begin;
+    } else if (*p == (e4__cell)(e4__usize)e4__execute_value) {
+        struct e4__double d =
+                e4__usize_todouble((e4__usize)header->xt->data[0]);
+
+        e4__mem_pno_hold(&b_offset, '\n');
+        if (e4__mem_pno_digits(&b_offset, 73, 16, 0, &d))
+            goto out_error;
+        e4__mem_pno_holds(&b_offset, "    0x", 6);
+
+        *p = NULL;
+    } else if ((*p == (e4__cell)(e4__usize)e4__execute_doesthunk) ||
+            (*p == (e4__cell)(e4__usize)e4__execute_variable)) {
+        struct e4__double d = e4__usize_todouble((e4__usize)header->xt->data);
+
+        e4__mem_pno_holds(&b_offset, ")\n", 2);
+        if (e4__mem_pno_digits(&b_offset, 64, 16, 0, &d))
+            goto out_error;
+        e4__mem_pno_holds(&b_offset, "    (data @ 0x", 14);
+
+        if (*p == (e4__cell)(e4__usize)e4__execute_doesthunk)
+            *p = header->xt->user;
+        else
+            *p = NULL;
+    } else if (*p == (e4__cell)(e4__usize)e4__mem_see__nativeline_) {
+        struct e4__double d = e4__usize_todouble((e4__usize)header->xt->code);
+
+        e4__mem_pno_holds(&b_offset, ")\n", 2);
+        if (e4__mem_pno_digits(&b_offset, 57, 16, 0, &d))
+            goto out_error;
+        e4__mem_pno_holds(&b_offset, "    (native code @ 0x", 21);
+
+        *p = NULL;
+    } else if (*p) {
+        const e4__cell xt = **(e4__cell **)p;
+        const struct e4__dict_header *e =
+		e4__mem_dict_lookup_xt(dict, (e4__cell)xt);
+
+        e4__mem_pno_hold(&b_offset, '\n');
+
+        if (e) {
+            if (e->nbytes + 5 > 80)
+                goto out_error;
+
+            e4__mem_pno_holds(&b_offset, e->name, e->nbytes);
+        } else {
+            struct e4__double d = e4__usize_todouble((e4__usize)xt);
+
+            if (e4__mem_pno_digits(&b_offset, 73, 16, 0, &d))
+                goto out_error;
+            e4__mem_pno_holds(&b_offset, "0x", 2);
+        }
+
+        e4__mem_pno_holds(&b_offset, "    ", 4);
+
+        if (xt == (e4__cell)&e4__BUILTIN_XT[e4__B_SENTINEL])
+            *p = NULL;
+        else
+            ++(*(e4__cell **)p);
+    }
+
+    *out_buffer = b_offset + 1;
+    return b_end - b_offset;
+
+out_error:
+    *p = NULL;
+    return (e4__usize)-1;
 }
 
 int e4__mem_strncasecmp(const char *left, const char *right, e4__usize n)

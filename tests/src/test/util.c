@@ -697,6 +697,301 @@ static void e4t__test_util_mem_pno(void)
     e4t__ASSERT_MATCH(&b[1], "Price: $19.95");
 }
 
+static void e4t__test_util_mem_see(void)
+{
+    char buf[4096] = {0,};
+    char line_buf[81] = {0,};
+    char fmt_buf[81] = {0,};
+    char *here = buf, *line;
+    int fmt_buf_len;
+    e4__usize wrote, line_len;
+    struct e4__dict_header *dict = NULL, header_mut;
+    struct e4__execute_token dt_xt, *dtdt_xt, *threaded_xt;
+    void *does_thunk_addr, *does_thunk_data_addr;
+    void *marker_here_addr;
+    void *variable_data_addr;
+    const void *state;
+
+    /* FIXME: This test would benefit from a case sensitive
+       e4t__ASSERT_MATCH variant, should one ever be added. */
+
+    /* XXX: Parts of this test assume a 64-bit system and may not pass
+       on other architectures. If this test does fail in such a case, it
+       likely is only the result of assumptions that are made about the
+       length of the hexadecimal representation of addresses and does
+       not indicate a serious issue. */
+
+    /* XXX: This test does not exercise every possible overflow case
+       because some of them simply are not possible on a 64-bit
+       architecture (namely, lines containing only numbers can never
+       overflow). */
+
+    /* XXX: Several parts of this test can be expected to fail if the
+       following condition is not true. */
+    e4t__ASSERT_EQ(sizeof(unsigned long), sizeof(void *));
+
+    /********************************************
+     * Define utility macros to simplify testing.
+     ********************************************/
+
+    #define _df(s, c, u, f)  \
+        do {    \
+            wrote = e4__mem_dict_entry(here, dict, s, sizeof(s) - 1, f, c,  \
+                    u);  \
+            dict = (struct e4__dict_header *)here;  \
+            here += wrote;  \
+        } while (0)
+    #define _d(s, c, u) _df(s, c, u, 0)
+    #define _l(s)   e4__mem_dict_lookup(dict, s, sizeof(s) - 1)
+    /* XXX: This works because here will always be aligned based on how
+       we are adding to it. */
+    #define _c(b)   \
+        do {    \
+            *((e4__cell *)here) = (e4__cell)b;  \
+            here += sizeof(e4__cell);   \
+        } while (0)
+    #define _s_setup(s) \
+        do {    \
+            header_mut = *_l(s);    \
+            state = &header_mut;    \
+        } while (0)
+    #define _s_line()   \
+        e4__mem_see(&state, &header_mut, dict, line_buf, &line)
+    #define _expect_line(s) \
+        do {    \
+            line_len = _s_line();   \
+            e4t__ASSERT_EQ(line_len, sizeof(s) - 1);    \
+            e4t__ASSERT_MATCH(line, s); \
+        } while (0)
+    #define _expect_formatted_line(s, p)    \
+        do {    \
+            fmt_buf_len = sprintf(fmt_buf, s, (unsigned long)p);    \
+            line_len = _s_line();   \
+            e4t__ASSERT_EQ(line_len, fmt_buf_len);  \
+            e4t__ASSERT_MATCH(line, fmt_buf);   \
+        } while (0)
+    #define _long_name  \
+        "very-long-entry-that-will-definitely-" \
+        "cause-an-overflow-because-it-is-itself-over-80-characters"
+
+    /************************************************
+     * Create each possible type of dictionary entry.
+     ************************************************/
+
+    /* Start by creating some basic "native code" definitions to which
+       other threaded code definitions can refer. */
+    _df("native-0x123", (e4__code_ptr)0x123, (void *)0x456,
+            e4__F_BUILTIN | e4__F_CONSTANT | e4__F_COMPONLY | e4__F_IMMEDIATE);
+    _d("native-0xabc", (e4__code_ptr)0xabc, NULL);
+    _d("native-0xfed", (e4__code_ptr)0xfed, NULL);
+
+    /* Add the sentinel as a definition, for convenience. This is a
+       hack. */
+    _d("SENTINEL", NULL, NULL);
+    ((struct e4__dict_header *)_l("SENTINEL"))->xt =
+            (struct e4__execute_token *)&e4__BUILTIN_XT[e4__B_SENTINEL];
+
+    /* Create a threaded definition. */
+    _df("threaded-0x123", e4__execute_threaded, NULL, e4__F_IMMEDIATE);
+    _c(_l("native-0x123")->xt);
+    _c(_l("native-0xfed")->xt);
+    _c(0x8999);
+    _c(_l("native-0xabc")->xt);
+    _c(&e4__BUILTIN_XT[e4__B_SENTINEL]);
+    threaded_xt = _l("threaded-0x123")->xt;
+
+    /* Create a threaded thunk definition. */
+    _d("threaded-thunk-0x123", e4__execute_threadedthunk, threaded_xt->data);
+
+    /* Create a defer thunk that refers to threaded code in the
+       dictionary. */
+    _d("defer-thunk-0x123", e4__execute_deferthunk, threaded_xt);
+
+    /* Create a defer thunk that refers to anonymous native code. */
+    dt_xt.code = (e4__code_ptr)0x789;
+    dt_xt.user = (void *)0x777;
+    _d("defer-thunk-0x765", e4__execute_deferthunk, &dt_xt);
+
+    /* Create a defer thunk that refers to a defer thunk. */
+    dtdt_xt = _l("defer-thunk-0x765")->xt;
+    _df("defer-thunk-0xf00", e4__execute_deferthunk, dtdt_xt, e4__F_IMMEDIATE);
+
+    /* Create a does> thunk. */
+    does_thunk_addr = here;
+    _c(_l("native-0xfed")->xt);
+    _c(_l("native-0xfed")->xt);
+    _c(&e4__BUILTIN_XT[e4__B_SENTINEL]);
+    _d("does-thunk-0x123", e4__execute_doesthunk, does_thunk_addr);
+    does_thunk_data_addr = here;
+
+    /* Create a value. */
+    _d("value-0x123", e4__execute_value, NULL);
+    _c(0x9001);
+
+    /* Create a variable. */
+    _d("variable-0x123", e4__execute_variable, NULL);
+    variable_data_addr = here;
+    _c(0x9002);
+
+    /* Create a user value. */
+    _d("userval-0x123", e4__execute_userval, (void *)0x123);
+
+    /* Create a user variable. */
+    _d("uservar-0x555", e4__execute_uservar, (void *)0x555);
+
+    /* Create a marker. */
+    marker_here_addr = here;
+    _d("marker-HERE", e4__execute_marker, (void *)here);
+
+    /* Create a dictionary entry that will overflow. */
+    _d(_long_name, (e4__code_ptr)0xdac, NULL);
+
+    /* Create a dictionary entry that refers to the entry that will
+       overflow. */
+    _df("threaded-0xdac", e4__execute_threaded, NULL,
+            e4__F_BUILTIN | e4__F_COMPONLY);
+    _c(_l("native-0x123")->xt);
+    _c(_l(_long_name)->xt);
+    _c(0x9003);
+    _c(&e4__BUILTIN_XT[e4__B_SENTINEL]);
+
+    /***********************************************************
+     * Look-up each entry and ensure that output is as expected.
+     ***********************************************************/
+
+    /* Check the initial native code entry. */
+    _s_setup("native-0x123");
+    _expect_line(": native-0x123 ( native - user: 0x456 )\n");
+    _expect_line("        [BUILTIN] [CONSTANT] [COMPONLY] [IMMEDIATE]\n");
+    _expect_line("    (native code @ 0x123)\n");
+    e4t__ASSERT_EQ(state, NULL);
+
+    /* Check threaded definition. */
+    _s_setup("threaded-0x123");
+    _expect_line(": threaded-0x123 ( threaded - user: 0x0 )\n");
+    _expect_line("        [IMMEDIATE]\n");
+    _expect_line("    native-0x123\n");
+    _expect_line("    native-0xfed\n");
+    _expect_line("    0x8999\n");
+    _expect_line("    native-0xabc\n");
+    _expect_line("    SENTINEL\n");
+    e4t__ASSERT_EQ(state, NULL);
+
+    /* Check threaded thunk definition. */
+    _s_setup("threaded-thunk-0x123");
+    _expect_formatted_line(
+            ": threaded-thunk-0x123 ( threaded thunk - user: 0x%lX )\n",
+            threaded_xt->data);
+    _expect_line("    native-0x123\n");
+    _expect_line("    native-0xfed\n");
+    _expect_line("    0x8999\n");
+    _expect_line("    native-0xabc\n");
+    _expect_line("    SENTINEL\n");
+    e4t__ASSERT_EQ(state, NULL);
+
+    /* Check defer thunk that refers to threaded code in the
+       dictionary. */
+    _s_setup("defer-thunk-0x123");
+    _expect_formatted_line(
+            ": defer-thunk-0x123 ( defer thunk - user: 0x%lX )\n",
+            threaded_xt);
+    _expect_line("> threaded-0x123 ( threaded - user: 0x0 )\n");
+    _expect_line("        [IMMEDIATE]\n");
+    _expect_line("    native-0x123\n");
+    _expect_line("    native-0xfed\n");
+    _expect_line("    0x8999\n");
+    _expect_line("    native-0xabc\n");
+    _expect_line("    SENTINEL\n");
+    e4t__ASSERT_EQ(state, NULL);
+
+    /* Check defer thunk that refers to anonymous native code. */
+    _s_setup("defer-thunk-0x765");
+    _expect_formatted_line(
+            ": defer-thunk-0x765 ( defer thunk - user: 0x%lX )\n", &dt_xt);
+    _expect_line("> _ ( native - user: 0x777 )\n");
+    _expect_line("    (native code @ 0x789)\n");
+    e4t__ASSERT_EQ(state, NULL);
+
+    /* Check defer thunk that refers to a defer thunk. */
+    _s_setup("defer-thunk-0xf00");
+    _expect_formatted_line(
+            ": defer-thunk-0xf00 ( defer thunk - user: 0x%lX )\n", dtdt_xt);
+    _expect_line("        [IMMEDIATE]\n");
+    _expect_formatted_line(
+            "> defer-thunk-0x765 ( defer thunk - user: 0x%lX )\n", &dt_xt);
+    _expect_line("> _ ( native - user: 0x777 )\n");
+    _expect_line("    (native code @ 0x789)\n");
+    e4t__ASSERT_EQ(state, NULL);
+
+    /* Check does> thunk. */
+    _s_setup("does-thunk-0x123");
+    _expect_formatted_line(
+            ": does-thunk-0x123 ( does thunk - user: 0x%lX )\n",
+            does_thunk_addr);
+    _expect_formatted_line("    (data @ 0x%lX)\n", does_thunk_data_addr);
+    _expect_line("    native-0xfed\n");
+    _expect_line("    native-0xfed\n");
+    _expect_line("    SENTINEL\n");
+    e4t__ASSERT_EQ(state, NULL);
+
+    /* Check value. */
+    _s_setup("value-0x123");
+    _expect_line(": value-0x123 ( value - user: 0x0 )\n");
+    _expect_line("    0x9001\n");
+    e4t__ASSERT_EQ(state, NULL);
+
+    /* Check variable. */
+    _s_setup("variable-0x123");
+    _expect_line(": variable-0x123 ( variable - user: 0x0 )\n");
+    _expect_formatted_line("    (data @ 0x%lX)\n", variable_data_addr);
+    e4t__ASSERT_EQ(state, NULL);
+
+    /* Check user value. */
+    _s_setup("userval-0x123");
+    _expect_line(": userval-0x123 ( user value - user: 0x123 )\n");
+    _expect_line("");
+    e4t__ASSERT_EQ(state, NULL);
+
+    /* Check user variable. */
+    _s_setup("uservar-0x555");
+    _expect_line(": uservar-0x555 ( user variable - user: 0x555 )\n");
+    _expect_line("");
+    e4t__ASSERT_EQ(state, NULL);
+
+    /* Check marker. */
+    _s_setup("marker-HERE");
+    _expect_formatted_line(
+            ": marker-HERE ( marker - user: 0x%lX )\n", marker_here_addr);
+    _expect_line("");
+    e4t__ASSERT_EQ(state, NULL);
+
+    /* Check dictionary entry that will overflow. */
+    _s_setup(_long_name);
+    line_len = _s_line();
+    e4t__ASSERT_EQ(line_len, -1);
+    e4t__ASSERT_EQ(state, NULL);
+
+    /* Check dictionary entry that refers to the entry that will
+       overflow. */
+    _s_setup("threaded-0xdac");
+    _expect_line(": threaded-0xdac ( threaded - user: 0x0 )\n");
+    _expect_line("        [BUILTIN] [COMPONLY]\n");
+    _expect_line("    native-0x123\n");
+    line_len = _s_line();
+    e4t__ASSERT_EQ(line_len, -1);
+    e4t__ASSERT_EQ(state, NULL);
+
+    #undef _long_name
+    #undef _expect_formatted_line
+    #undef _expect_line
+    #undef _s_line
+    #undef _s_setup
+    #undef _c
+    #undef _l
+    #undef _d
+    #undef _df
+}
+
 static void e4t__test_util_numformat(void)
 {
     static char buf[31] = {0,};
@@ -965,6 +1260,7 @@ void e4t__test_util(void)
     e4t__test_util_mem_dict();
     e4t__test_util_mem_dump();
     e4t__test_util_mem_pno();
+    e4t__test_util_mem_see();
     e4t__test_util_numformat();
     e4t__test_util_numparse();
     e4t__test_util_strnescape();

@@ -345,6 +345,7 @@ struct e4__gmt {
 #define e4__F_CONSTANT      (0x04)
 #define e4__F_BUILTIN       (0x08)
 #define e4__F_COMPILING     (0x10)
+#define e4__F_TEMPHEADER    (0x20)
 
 /* flag constants - file permissions */
 #define e4__F_READ          (0x01)
@@ -845,6 +846,8 @@ const struct e4__dict_header* e4__mem_dict_lookup_xt(
 const struct e4__dict_header* e4__mem_dict_suggest(
         const struct e4__dict_header *dict, const char *prefix, e4__u8 pbytes);
 e4__usize e4__mem_dump(const char **p, e4__usize *len, char *buffer);
+e4__usize e4__mem_see(const void **p, struct e4__dict_header *header,
+        const struct e4__dict_header *dict, char *buffer, char **out_buffer);
 const char* e4__mem_strnescape(const char **str, e4__usize *len,
         e4__usize *chunk_len, char *scratch);
 int e4__mem_strncasecmp(const char *left, const char *right, e4__usize n);
