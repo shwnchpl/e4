@@ -619,6 +619,7 @@ enum e4__builtin_id {
         e4__B_DOT_S,
         e4__B_DUMP,
         e4__B_QUESTION,
+        e4__B_SEE,
         e4__B_WORDS,
 
     #endif /* defined(e4__INCLUDE_TOOLS) */

@@ -267,12 +267,12 @@ Version 0.5
 
 Compilation
 -----------
-- Implement decompilation (ie. SEE). To start, simply naively display
-  the internal representation. The fully naive approach, for words with
-  the threaded_execute handler, is to simply search the dictionary
-  linearly for each word to see if any entry has each address as an
-  execution token. If it does, display the name corresponding to that
-  entry. If not, simply display the address. This isn't terribly
+- [DONE] Implement decompilation (ie. SEE). To start, simply naively
+  display the internal representation. The fully naive approach, for
+  words with the threaded_execute handler, is to simply search the
+  dictionary linearly for each word to see if any entry has each address
+  as an execution token. If it does, display the name corresponding to
+  that entry. If not, simply display the address. This isn't terribly
   efficient, but it doesn't require storing any references from XT to
   dictionary entry or any other metadata, so it is probably sufficient.
   Output can look something like this for threaded code.

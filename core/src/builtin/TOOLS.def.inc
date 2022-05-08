@@ -68,6 +68,19 @@ static const void * const e4__builtin_QUESTION[] = {
     &e4__BUILTIN_XT[e4__B_SENTINEL],
 };
 
+static void e4__builtin_SEE(struct e4__task *task, e4__cell user)
+{
+    register const char *word;
+    register e4__usize len, io_res;
+
+    _e4__BUILTIN_LOOKAHEAD(task, word, len);
+
+    if ((io_res = e4__io_see(task, word, len)))
+        e4__exception_throw(task, io_res);
+
+    e4__execute_ret(task);
+}
+
 static void e4__builtin_WORDS(struct e4__task *task, e4__cell user)
 {
     struct e4__dict_header *e = task->dict;

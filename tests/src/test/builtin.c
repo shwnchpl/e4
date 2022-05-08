@@ -1380,6 +1380,56 @@ static void e4t__test_builtin_io_pno(void)
     e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "Price: $0.02");
 }
 
+/* Covers SEE */
+static void e4t__test_builtin_io_see(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* FIXME: This test would benefit from a case sensitive
+       e4t__ASSERT_MATCH variant, should one ever be added. */
+
+    /* XXX: This test is sparse compared to e4t__test_util_mem_see,
+       which covers the e4__mem_see's detailed functionality.
+       e4__io_see is a thin wrapper around this function and the SEE
+       builtin is a thin wrapper around e4__io_see, so this test
+       exists primarily to ensure that SEE invokes e4__io_see correctly
+       and that, in turn, the correct output is provided. */
+
+    /* Check that calling SEE with an invalid dictionary entry fails. */
+    e4t__ASSERT_EQ(e4__evaluate(task, "see", -1), e4__E_ZLNAME);
+    e4t__ASSERT_EQ(e4__evaluate(task, "see notathing", -1), e4__E_UNDEFWORD);
+
+    /* Check that calling SEE with a dictionary entry that is too long
+       fails. */
+    #define _long_name  \
+        "very-long-entry-that-will-definitely-" \
+        "cause-an-overflow-because-it-is-itself-over-80-characters"
+
+    e4t__ASSERT_OK(e4__evaluate(task, ": " _long_name " 2 2 + ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, _long_name, -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+    e4t__ASSERT_EQ(e4__evaluate(task, "see " _long_name, -1),
+            e4__E_SEEOVERFLOW);
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "");
+
+    #undef _long_name
+
+    /* Check that calling SEE with a valid dictionary entry yields the
+       expected output. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo 2 2 + ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, "see foo", -1));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(),
+            ": foo ( threaded - user: 0x0 )\n"
+            "    LIT_CELL\n"
+            "    0x2\n"
+            "    LIT_CELL\n"
+            "    0x2\n"
+            "    +\n"
+            "    EXIT\n"
+            "    SENTINEL\n");
+}
+
 /* Covers = < > <> 0< 0> 0<> 0= AND INVERT NEGATE OR U< U> XOR */
 static void e4t__test_builtin_logic(void)
 {
@@ -2582,6 +2632,7 @@ void e4t__test_builtin(void)
     e4t__test_builtin_io_error();
     e4t__test_builtin_io_facility();
     e4t__test_builtin_io_pno();
+    e4t__test_builtin_io_see();
     e4t__test_builtin_logic();
     e4t__test_builtin_loop_inc();
     e4t__test_builtin_math();
