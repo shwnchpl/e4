@@ -474,20 +474,19 @@ static void e4t__test_kernel_io_dlfcn(void)
 
     /* Test that opening a dynamic library and loading a symbol works
        as expected. */
-    e4t__ASSERT_EQ(e4__io_dlopen(task, "libc.so.6", &handle0),
-            e4__E_UNSUPPORTED);
-    e4t__ASSERT_EQ(e4__io_dlsym(task, handle0, "strlen", &func0),
-            e4__E_UNSUPPORTED);
+    e4t__ASSERT_OK(e4__io_dlopen(task, "libc.so.6", &handle0));
+    e4t__ASSERT_OK(e4__io_dlsym(task, handle0, "strlen", &func0));
+    e4t__ASSERT_EQ(strlen, func0);
 
     /* Test that attempting to open a non-existent library or load
        a nonexistent symbol fails as expected. */
     e4t__ASSERT_EQ(e4__io_dlopen(task, "probably-not-real.so.what", &handle1),
-            e4__E_UNSUPPORTED);
+            e4__E_DLFAILURE);
     e4t__ASSERT_EQ(e4__io_dlsym(task, handle0, "probably-not-real.so.what",
-                &func1), e4__E_UNSUPPORTED);
+                &func1), e4__E_DLFAILURE);
 
     /* Test that closing the dynamic library works as expected. */
-    e4t__ASSERT_EQ(e4__io_dlclose(task, handle0), e4__E_UNSUPPORTED);
+    e4t__ASSERT_OK(e4__io_dlclose(task, handle0));
 }
 
 static void e4t__test_kernel_io_dump(void)

@@ -2,6 +2,41 @@
 
 #if defined(e4__INCLUDE_POSIX_HOOKS)
 
+    #if defined(e4__INCLUDE_DLFCN)
+
+        #include <dlfcn.h>
+
+        e4__usize e4__posix_dlclose(void *user, void *handle)
+        {
+            return !dlclose(handle) ? e4__E_OK : e4__E_DLFAILURE;
+        }
+
+        e4__usize e4__posix_dlopen(void *user, const char *path, void **handle)
+        {
+            register void *addr = dlopen(path, RTLD_LAZY);
+
+            if (!addr)
+                return e4__E_DLFAILURE;
+
+            *handle = addr;
+
+            return e4__E_OK;
+        }
+
+        e4__usize e4__posix_dlsym(void *user, void *handle,
+                const char *symbol, void **addr)
+        {
+            dlerror();
+            *addr = dlsym(handle, symbol);
+
+            if (dlerror())
+                return e4__E_DLFAILURE;
+
+            return e4__E_OK;
+        }
+
+    #endif  /* defined(e4__INCLUDE_DLFCN) */
+
     #if defined(e4__INCLUDE_FACILITY_EXT)
 
         #include <time.h>

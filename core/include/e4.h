@@ -354,6 +354,7 @@ struct e4__gmt {
 #define e4__E_INCFOVERFLOW  (-261)
 #define e4__E_LONGFILEPATH  (-262)
 #define e4__E_SEEOVERFLOW   (-263)
+#define e4__E_DLFAILURE     (-264)
 
 /* flag constants - dictionary entry */
 #define e4__F_IMMEDIATE     (0x01)
@@ -942,6 +943,14 @@ void e4__usize_togmt(e4__usize t, struct e4__gmt *gmt);
 /* posix.c functions */
 
 #if defined(e4__INCLUDE_POSIX_HOOKS)
+
+    #if defined(e4__INCLUDE_DLFCN)
+        e4__usize e4__posix_dlclose(void *user, void *handle);
+        e4__usize e4__posix_dlopen(void *user, const char *path,
+                void **handle);
+        e4__usize e4__posix_dlsym(void *user, void *handle, const char *symbol,
+                void **addr);
+    #endif  /* defined(e4__INCLUDE_DLFCN) */
 
     #if defined(e4__INCLUDE_FACILITY_EXT)
         e4__usize e4__posix_ms(void *user, e4__usize ms);

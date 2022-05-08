@@ -149,6 +149,8 @@ const char* e4__usize_format_exception(e4__usize e, e4__usize *len)
             _return_with_len("file path too long");
         case e4__E_SEEOVERFLOW:
             _return_with_len("SEE buffer overflow");
+        case e4__E_DLFAILURE:
+            _return_with_len("dynamic library failure");
 
         /* unknown */
         default:
