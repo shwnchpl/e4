@@ -536,6 +536,13 @@ e4__usize e4__mem_number(const char *buf, e4__usize length, e4__u8 base,
     register e4__usize result = 0;
     register const char *start = buf;
 
+    /* FIXME: This function returns garbage when asked to parse a
+       number that does not fit in an e4__usize. Instead it should
+       do something reasonable, like return some sort of failure
+       code when a number that is too large is detected. Code that
+       makes use of this function can handle the error as
+       appropriate. */
+
     /* XXX: Ambiguous behavior. This implementation clamps to the
        acceptable range. */
     if (base < 2) base = 2;

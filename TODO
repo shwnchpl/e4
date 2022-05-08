@@ -173,6 +173,8 @@ Kernel
 - [DONE] Improve stack size calculations.
 - [DONE] Handle stack overflow.
 - [DONE] Handle return stack overflow.
+- Make e4__mem_number behave reasonably when it is passed a string
+  with a number that is excessively large.
 - Use checked allocation everywhere that HERE is manipulated. WORD is
   specifically allowed to dip into the PNO buffer but not PAD.
   Compilation also does not currently fail correctly/gracefully when
