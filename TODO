@@ -287,6 +287,32 @@ General Builtins
   e4__UV_BEGIN, and simply defining BEGIN as its own uservar rather
   than in terms of HERE using PUN macros. Consider also removing pun
   macros.
+- Consider adding a LOCALS wordlist implementation. This can be done by
+  taking the following measures:
+    * When compiling, maintain a mapping of locals to offsets. We can
+      limit the names of locals to 31 characters each per 3.3.1.2.
+      These locals should run as some immediate which compiles into
+      LOCAL_LIT,i (or something along those lines) that will access
+      local rbp[i] at runtime.
+    * On local definition, >r is compiled.
+    * At the end of compilation, r> (or some return stack popping
+      variant) are compiled in for each locals dictionary entry.
+    * TO looks ahead when compiling already. If the word it looks
+      ahead to is a local, it should compile as LOCAL_STORE,i (or
+      something along those lines).
+    * This should make it possible to make definitions like as follows:
+        : foo [ s" my-local" ] (local) ;
+    * 0 0 (local) can probably be a no-op with this implementation.
+    * Storage for local mappings during compilation can be stored in
+      some specially reserved block in the task structure. 2K should
+      be sufficient for 16 entries. It may be possible to get away
+      with using less space. State tracking such as number of locals
+      defined and true dictionary top (without compile-time locals
+      definitions)can live here as well. mem_dict APIs can probably be
+      used.
+    * A #LOCALS environmental query should be added.
+  Once these measures have been taking and (LOCAL) is functional, words
+  like LOCALS| and {: can be added as well.
 
 Documentation
 -------------
