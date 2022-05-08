@@ -730,6 +730,54 @@ static void e4t__test_kernel_io_pno(void)
     e4t__ASSERT_EQ(e4__io_pno_finish(task, &pno, &len), e4__E_PNOOVERFLOW);
 }
 
+static void e4t__test_kernel_io_see(void)
+{
+    struct e4__task *task = e4t__transient_task();
+
+    /* FIXME: This test would benefit from a case sensitive
+       e4t__ASSERT_MATCH variant, should one ever be added. */
+
+    /* XXX: This test is sparse compared to e4t__test_util_mem_see,
+       which covers the e4__mem_see's detailed functionality.
+       e4__io_see is a thin wrapper around this function, so this test
+       exists primarily to ensure that e4__io_see invokes e4__mem_see
+       and provides its output correctly. */
+
+    /* Check that calling e4__io_see with an invalid dictionary entry
+       fails. */
+    e4t__ASSERT_EQ(e4__io_see(task, "notathing", 9), e4__E_UNDEFWORD);
+
+    /* Check that calling e4__io_see with a dictionary entry that is
+       too long fails. */
+    #define _long_name  \
+        "very-long-entry-that-will-definitely-" \
+        "cause-an-overflow-because-it-is-itself-over-80-characters"
+
+    e4t__ASSERT_OK(e4__evaluate(task, ": " _long_name " 2 2 + ;", -1));
+    e4t__ASSERT_OK(e4__evaluate(task, _long_name, -1));
+    e4t__ASSERT_EQ(e4__stack_depth(task), 1);
+    e4t__ASSERT_EQ(e4__stack_pop(task), 4);
+    e4t__ASSERT_EQ(e4__io_see(task, _long_name, sizeof(_long_name) - 1),
+            e4__E_SEEOVERFLOW);
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(), "");
+
+    #undef _long_name
+
+    /* Check that calling e4__io_see with a valid dictionary entry
+       yields the expected output. */
+    e4t__ASSERT_OK(e4__evaluate(task, ": foo 2 2 + ;", -1));
+    e4t__ASSERT_OK(e4__io_see(task, "foo", 3));
+    e4t__ASSERT_MATCH(e4t__term_obuf_consume(),
+            ": foo ( threaded - user: 0x0 )\n"
+            "    LIT_CELL\n"
+            "    0x2\n"
+            "    LIT_CELL\n"
+            "    0x2\n"
+            "    +\n"
+            "    EXIT\n"
+            "    SENTINEL\n");
+}
+
 static void e4t__test_kernel_mem(void)
 {
     struct e4__task *task = e4t__transient_task();
@@ -1008,6 +1056,7 @@ void e4t__test_kernel(void)
     e4t__test_kernel_io_dump();
     e4t__test_kernel_io_file();
     e4t__test_kernel_io_pno();
+    e4t__test_kernel_io_see();
     e4t__test_kernel_mem();
     e4t__test_kernel_quit();
     e4t__test_kernel_rstack_overflow();

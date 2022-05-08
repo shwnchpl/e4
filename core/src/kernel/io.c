@@ -17,6 +17,7 @@ e4__usize e4__io_dump(struct e4__task *task, e4__cell p, e4__usize len)
     e4__usize io_res;
 
     while (len) {
+        /* FIXME: Is using HERE in this way actually even safe? */
         const e4__usize line_len = e4__mem_dump(&buf, &len,
                 (char *)task->here);
         if ((io_res = e4__io_type(task, (const char *)task->here, line_len)))
@@ -204,6 +205,34 @@ e4__usize e4__io_refill(struct e4__task *task, e4__usize *bf)
         *bf = e4__BF_TRUE;
 
     return io_res;
+}
+
+e4__usize e4__io_see(struct e4__task *task, const char *name, e4__u8 nbytes)
+{
+    register const struct e4__dict_header *header;
+    struct e4__dict_header header_mut;
+    register e4__usize io_res;
+    const void *state;
+    char *buf;
+
+    if (!(header = e4__dict_lookup(task, name, nbytes)))
+        return e4__E_UNDEFWORD;
+
+    header_mut = *header;
+    state = &header_mut;
+    while (state) {
+        /* FIXME: Is using HERE in this way actually even safe? */
+        register const e4__usize line_len = e4__mem_see(&state, &header_mut,
+                task->dict, (char *)task->here, &buf);
+
+        if (line_len == (e4__usize)-1)
+            return e4__E_SEEOVERFLOW;
+
+        if ((io_res = e4__io_type(task, buf, line_len)))
+            return io_res;
+    }
+
+    return e4__E_OK;
 }
 
 e4__usize e4__io_type(struct e4__task *task, const char *buf, e4__usize n)

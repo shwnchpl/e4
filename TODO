@@ -240,6 +240,7 @@ Kernel
 ------
 - [DONE] Consider providing optional POSIX handlers for file IO. These
   could be enabled/disabled at compile time.
+- Consider gating e4__io_dump and e4__io_see behind e4__INCLUDE_TOOLS.
 
 REPL
 ----

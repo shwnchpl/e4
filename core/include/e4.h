@@ -338,6 +338,7 @@ struct e4__gmt {
 #define e4__E_DICTUNDERFLOW (-260)
 #define e4__E_INCFOVERFLOW  (-261)
 #define e4__E_LONGFILEPATH  (-262)
+#define e4__E_SEEOVERFLOW   (-263)
 
 /* flag constants - dictionary entry */
 #define e4__F_IMMEDIATE     (0x01)
@@ -786,6 +787,7 @@ e4__usize e4__io_pno_holds(struct e4__task *task, const char *s,
         e4__usize len);
 void e4__io_pno_start(struct e4__task *task);
 e4__usize e4__io_refill(struct e4__task *task, e4__usize *bf);
+e4__usize e4__io_see(struct e4__task *task, const char *name, e4__u8 nbytes);
 e4__usize e4__io_type(struct e4__task *task, const char *buf, e4__usize n);
 char* e4__io_word(struct e4__task *task, char delim);
 
