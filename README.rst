@@ -1,18 +1,47 @@
 e4
 ==
 
-An embedded Forth. Once version 1.0 is reached, e4 will be a Forth-2012
-System providing the Core Extensions word set.
+e4 is a standards-compliant embeddable Forth 2012 system. For more
+information, see the system label
+(:code:`doc/rst/core/stddoc/system-label.rst`). For example usage,
+see the :code:`repl` and :code:`examples` directories.
 
 About
 -----
 
-TODO: Update this README.
+Forth is an extremely powerful and yet extremely simple stack based
+programming language. The goal of e4 is to make Forth embeddable in the
+same way that SQLite has made SQL embeddable. e4 is reentrant safe,
+makes no dynamic allocations, and can run when initialized with as
+little as 2K of dynamic memory. e4 is written in ANSI C89 and will run
+on almost any target for which C code compiles, bare-metal or otherwise.
+The e4 kernel compiles and runs efficient threaded code that performs
+well enough for both embedded and general-purpose applications.
 
-Why e4?
--------
+On top of all this, e4 is distributed as single header/single
+source-file amalgamation, so it is easy to incorporate into existing
+projects, and this source file is structured in such a way that C
+preprocessor definitions can be used to include or exclude builtin
+wordlists, making e4 even more flexible and compact.
 
-TODO: Update this README.
+The e4 documentation is currently a work in progress, as is e4 itself,
+and as such e4 should not be considered "production ready" (unless
+you're feeling extremely adventurous), but despite this you may still
+find it useful. e4 can be used to spin up an interactive debug
+environment on a resource constrained embedded environment in a matter
+of minutes (see :code:`examples/arduino`) and it is trivial to write
+Forth words to allow for C functions to be called in an interactive
+environment. On a POSIX system, the e4 REPL is even more powerful and
+supports loading dynamic libraries and calling arbitrary functions via
+libffi (see :code:`examples/chip8`).
+
+The ultimate goal of e4 is to provide a truly minimal, modular, and
+portable standards compliant Forth implementation. If you have any
+suggestions that may help to make this goal a reality, or any questions
+or comments about where the project is at currently, please do not
+hesitate to `reach out`_.
+
+.. _reach out: mailto:shawn@chapla.email
 
 Why "e4"?
 ---------
@@ -78,7 +107,7 @@ License
 -------
 
 Unless otherwise noted, all source in this directory tree is copyright
-2021 Shawn M. Chapla and is released under the MIT license. For more
+2022 Shawn M. Chapla and is released under the MIT license. For more
 details, please see the LICENSE file.
 
 Acknowledgments
