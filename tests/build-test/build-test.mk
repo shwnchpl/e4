@@ -22,26 +22,28 @@ $($(1)_BUILD_DIR)/%.c.o: %.c
 endef
 
 # Test the three main build modes.
-$(eval $(call build-test,BUILD_EVERYTHING,0x20607a1,-De4__BUILD_EVERYTHING))
+$(eval $(call build-test,BUILD_EVERYTHING,0x60607a1,-De4__BUILD_EVERYTHING))
 $(eval $(call build-test,BUILD_DEFAULT,0x607a1,-De4__BUILD_DEFAULT))
 $(eval $(call build-test,BUILD_MINIMAL,0,-De4__BUILD_MINIMAL))
 
 # Test excluding any single wordlist from an everything build.
-$(eval $(call build-test,BUILD_EVERYTHING_NO_CORE_EXT,0x20607a0,\
+$(eval $(call build-test,BUILD_EVERYTHING_NO_CORE_EXT,0x60607a0,\
 	-De4__BUILD_EVERYTHING -De4__EXCLUDE_CORE_EXT))
-$(eval $(call build-test,BUILD_EVERYTHING_NO_EXCEPTION,0x2060781,\
+$(eval $(call build-test,BUILD_EVERYTHING_NO_DLFCN,0x20607a1,\
+	-De4__BUILD_EVERYTHING -De4__EXCLUDE_DLFCN))
+$(eval $(call build-test,BUILD_EVERYTHING_NO_EXCEPTION,0x6060781,\
 	-De4__BUILD_EVERYTHING -De4__EXCLUDE_EXCEPTION))
-$(eval $(call build-test,BUILD_EVERYTHING_NO_FACILITY,0x2060721,\
+$(eval $(call build-test,BUILD_EVERYTHING_NO_FACILITY,0x6060721,\
 	-De4__BUILD_EVERYTHING -De4__EXCLUDE_FACILITY))
-$(eval $(call build-test,BUILD_EVERYTHING_NO_FACILITY_EXT,0x20606a1,\
+$(eval $(call build-test,BUILD_EVERYTHING_NO_FACILITY_EXT,0x60606a1,\
 	-De4__BUILD_EVERYTHING -De4__EXCLUDE_FACILITY_EXT))
-$(eval $(call build-test,BUILD_EVERYTHING_NO_FILE,0x20605a1,\
+$(eval $(call build-test,BUILD_EVERYTHING_NO_FILE,0x60605a1,\
 	-De4__BUILD_EVERYTHING -De4__EXCLUDE_FILE))
-$(eval $(call build-test,BUILD_EVERYTHING_NO_FILE_EXT,0x20603a1,\
+$(eval $(call build-test,BUILD_EVERYTHING_NO_FILE_EXT,0x60603a1,\
 	-De4__BUILD_EVERYTHING -De4__EXCLUDE_FILE_EXT))
-$(eval $(call build-test,BUILD_EVERYTHING_NO_TOOLS,0x20407a1,\
+$(eval $(call build-test,BUILD_EVERYTHING_NO_TOOLS,0x60407a1,\
 	-De4__BUILD_EVERYTHING -De4__EXCLUDE_TOOLS))
-$(eval $(call build-test,BUILD_EVERYTHING_NO_TOOLS_EXT,0x20207a1,\
+$(eval $(call build-test,BUILD_EVERYTHING_NO_TOOLS_EXT,0x60207a1,\
 	-De4__BUILD_EVERYTHING -De4__EXCLUDE_TOOLS_EXT))
 
 # Test excluding any single wordlist from a default build.

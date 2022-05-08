@@ -269,6 +269,36 @@ char* e4__io_word(struct e4__task *task, char delim)
     return (char *)task->here;
 }
 
+#if defined(e4__INCLUDE_DLFCN)
+
+    e4__usize e4__io_dlclose(struct e4__task *task, void *handle)
+    {
+        if (!task->io_func.dlclose)
+            return e4__E_UNSUPPORTED;
+
+        return task->io_func.dlclose(task->io_func.user, handle);
+    }
+
+    e4__usize e4__io_dlopen(struct e4__task *task, const char *path,
+            void **handle)
+    {
+        if (!task->io_func.dlopen)
+            return e4__E_UNSUPPORTED;
+
+        return task->io_func.dlopen(task->io_func.user, path, handle);
+    }
+
+    e4__usize e4__io_dlsym(struct e4__task *task, void *handle,
+            const char *symbol, void **addr)
+    {
+        if (!task->io_func.dlsym)
+            return e4__E_UNSUPPORTED;
+
+        return task->io_func.dlsym(task->io_func.user, handle, symbol, addr);
+    }
+
+#endif /* defined(e4__INCLUDE_DLFCN) */
+
 #if defined(e4__INCLUDE_FACILITY)
 
     e4__usize e4__io_keyq(struct e4__task *task, e4__usize *bflag)

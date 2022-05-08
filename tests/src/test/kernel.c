@@ -464,6 +464,32 @@ static void e4t__test_kernel_io(void)
     e4t__ASSERT(!e4__mem_strncasecmp(word, "quux", 4));
 }
 
+static void e4t__test_kernel_io_dlfcn(void)
+{
+    struct e4__task *task = e4t__transient_task();
+    void *func0 = NULL, *handle0 = NULL, *func1, *handle1;
+
+    /* XXX: This test is *VERY* likely to only pass on Linux or in an
+       extremely Linux-like environment. */
+
+    /* Test that opening a dynamic library and loading a symbol works
+       as expected. */
+    e4t__ASSERT_EQ(e4__io_dlopen(task, "libc.so.6", &handle0),
+            e4__E_UNSUPPORTED);
+    e4t__ASSERT_EQ(e4__io_dlsym(task, handle0, "strlen", &func0),
+            e4__E_UNSUPPORTED);
+
+    /* Test that attempting to open a non-existent library or load
+       a nonexistent symbol fails as expected. */
+    e4t__ASSERT_EQ(e4__io_dlopen(task, "probably-not-real.so.what", &handle1),
+            e4__E_UNSUPPORTED);
+    e4t__ASSERT_EQ(e4__io_dlsym(task, handle0, "probably-not-real.so.what",
+                &func1), e4__E_UNSUPPORTED);
+
+    /* Test that closing the dynamic library works as expected. */
+    e4t__ASSERT_EQ(e4__io_dlclose(task, handle0), e4__E_UNSUPPORTED);
+}
+
 static void e4t__test_kernel_io_dump(void)
 {
     /* XXX: Parts of this test only work correctly on a 64 bit system
@@ -1053,6 +1079,7 @@ void e4t__test_kernel(void)
     e4t__test_kernel_evaluate_file();
     e4t__test_kernel_exceptions();
     e4t__test_kernel_io();
+    e4t__test_kernel_io_dlfcn();
     e4t__test_kernel_io_dump();
     e4t__test_kernel_io_file();
     e4t__test_kernel_io_pno();

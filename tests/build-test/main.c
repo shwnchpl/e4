@@ -33,6 +33,7 @@
 #define XCHAR_BIT           23
 #define XCHAR_EXT_BIT       24
 #define POSIX_HOOKS_BIT     25
+#define DLFCN_BIT           26
 
 /* ASCII escape sequences for simple colored output. */
 #define COLOR_RESET         "\033[0m"
@@ -66,6 +67,9 @@ int main(int argc, char **argv)
 
         #if defined(e4__INCLUDE_CORE_EXT)
             wordset |= (1 << CORE_EXT_BIT);
+        #endif
+        #if defined(e4__INCLUDE_DLFCN)
+            wordset |= (1 << DLFCN_BIT);
         #endif
         #if defined(e4__INCLUDE_EXCEPTION)
             wordset |= (1 << EXCEPTION_BIT);

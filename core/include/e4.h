@@ -27,6 +27,7 @@
 
 #if defined(e4__BUILD_EVERYTHING)
     #define e4__INCLUDE_CORE_EXT
+    #define e4__INCLUDE_DLFCN
     #define e4__INCLUDE_EXCEPTION
     #define e4__INCLUDE_FACILITY
     #define e4__INCLUDE_FACILITY_EXT
@@ -48,6 +49,10 @@
 
 #if defined(e4__EXCLUDE_CORE_EXT) && defined(e4__INCLUDE_CORE_EXT)
     #undef e4__INCLUDE_CORE_EXT
+#endif
+
+#if defined(e4__EXCLUDE_DLFCN) && defined(e4__INCLUDE_DLFCN)
+    #undef e4__INCLUDE_DLFCN
 #endif
 
 #if defined(e4__EXCLUDE_EXCEPTION) && defined(e4__INCLUDE_EXCEPTION)
@@ -231,6 +236,16 @@ struct e4__io_func {
     e4__usize (*accept)(void *user, char *buf, e4__usize *n);
     e4__usize (*key)(void *user, char *buf);
     e4__usize (*type)(void *user, const char *buf, e4__usize n);
+
+    #if defined(e4__INCLUDE_DLFCN)
+
+        /* DLFCN IO handlers */
+        e4__usize (*dlclose)(void *user, void *handle);
+        e4__usize (*dlopen)(void *user, const char *path, void **handle);
+        e4__usize (*dlsym)(void *user, void *handle, const char *symbol,
+                void **addr);
+
+    #endif /* defined(e4__INCLUDE_DLFCN) */
 
     #if defined(e4__INCLUDE_FACILITY)
 
@@ -791,6 +806,14 @@ e4__usize e4__io_refill(struct e4__task *task, e4__usize *bf);
 e4__usize e4__io_see(struct e4__task *task, const char *name, e4__u8 nbytes);
 e4__usize e4__io_type(struct e4__task *task, const char *buf, e4__usize n);
 char* e4__io_word(struct e4__task *task, char delim);
+
+#if defined(e4__INCLUDE_DLFCN)
+    e4__usize e4__io_dlclose(struct e4__task *task, void *handle);
+    e4__usize e4__io_dlopen(struct e4__task *task, const char *path,
+            void **handle);
+    e4__usize e4__io_dlsym(struct e4__task *task, void *handle,
+            const char *symbol, void **addr);
+#endif /* defined(e4__INCLUDE_DLFCN) */
 
 #if defined(e4__INCLUDE_FACILITY)
     e4__usize e4__io_keyq(struct e4__task *task, e4__usize *bflag);
