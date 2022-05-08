@@ -410,7 +410,7 @@ static void e4t__test_util_mem_dict(void)
     char *here = buf;
     e4__usize wrote;
     struct e4__dict_header *dict = NULL;
-    const struct e4__dict_header *last;
+    const struct e4__dict_header *last, *h0, *h1, *h2;
 
     #define _d(s, c)    \
         do {    \
@@ -421,6 +421,7 @@ static void e4t__test_util_mem_dict(void)
         } while (0)
     #define _l(s)   e4__mem_dict_lookup(dict, s, sizeof(s) - 1)
     #define _s(d, p)    e4__mem_dict_suggest(d, p, sizeof(p) - 1)
+    #define _lxt(x) e4__mem_dict_lookup_xt(dict, x)
 
     /* Test basic lookup. */
     _d("first-entry", (e4__code_ptr)0xabcde);
@@ -451,6 +452,28 @@ static void e4t__test_util_mem_dict(void)
     e4t__ASSERT_EQ(last->xt->code, 0x11111);
     e4t__ASSERT(!(last = _s(last->link, "prefix")));
 
+    /* Lookup based on execute token works correctly. */
+    _d("xt-entry-1", (e4__code_ptr)0xabcde);
+    e4t__ASSERT((h0 = _l("xt-entry-1")));
+    e4t__ASSERT((h1 = _lxt((e4__cell)h0->xt)));
+    e4t__ASSERT_EQ(h0, h1);
+
+    _d("xt-entry-2", (e4__code_ptr)0x12345);
+    e4t__ASSERT((h1 = _l("xt-entry-2")));
+
+    /* XXX: In user code, no one should ever use a dictionary header
+       returned from one of the lookup APIs in this way, but for the
+       purposes of this test it is known to be safe. */
+    ((struct e4__dict_header *)h1)->xt = h0->xt;
+
+    e4t__ASSERT((h2 = _lxt((e4__cell)h1->xt)));
+    e4t__ASSERT_EQ(h1, h2);
+    e4t__ASSERT(h0 != h2);
+    e4t__ASSERT_EQ(h0->xt, h2->xt);
+
+    e4t__ASSERT(!_lxt(NULL));
+
+    #undef _lxt
     #undef _s
     #undef _l
     #undef _d
@@ -508,7 +531,7 @@ static void e4t__test_util_mem_dump(void)
     e4t__ASSERT_MATCH(line, expected_line[2]);
 }
 
-static void e4t__test_util_mem_pno()
+static void e4t__test_util_mem_pno(void)
 {
     char buffer[131] = {0};
     char *b = &buffer[129];

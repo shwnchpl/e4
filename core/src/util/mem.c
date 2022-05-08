@@ -139,6 +139,18 @@ const struct e4__dict_header* e4__mem_dict_lookup(
     return NULL;
 }
 
+const struct e4__dict_header* e4__mem_dict_lookup_xt(
+        const struct e4__dict_header *dict, e4__cell xt)
+{
+    while (dict) {
+        if ((e4__cell)dict->xt == xt)
+            return dict;
+        dict = dict->link;
+    }
+
+    return NULL;
+}
+
 const struct e4__dict_header* e4__mem_dict_suggest(
         const struct e4__dict_header *dict, const char *prefix, e4__u8 pbytes)
 {
