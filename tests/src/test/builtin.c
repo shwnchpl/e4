@@ -4,9 +4,14 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <stdio.h>
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+
+#if defined(e4__INCLUDE_FFI)
+    #include <ffi.h>
+#endif
 
 /* Covers *SLASH *SLASH-MOD FM/MOD M* SM/DIV S>D UM* UM/MOD */
 static void e4t__test_builtin_doublemath(void)
@@ -2641,6 +2646,318 @@ static void e4t__test_builtin_uservars(void)
     e4t__ASSERT_EQ(e4__stack_pop(task), 1);
 }
 
+#if defined(e4__INCLUDE_FFI)
+
+    /* Covers FFI-DOUBLE FFI-FLOAT FFI-POINTER FFI-SCHAR FFI-SINT
+       FFI-SINT8 FFI-SINT16 FFI-SINT32 FFI-SINT64 FFI-SLONG FFI-SSHORT
+       FFI-UCHAR FFI-UINT FFI-UINT8 FFI-UINT16 FFI-UINT32 FFI-UINT64
+       FFI-ULONG FFI-USHORT FFI-VOID */
+    static void e4t__test_builtin_ffi_constants(void)
+    {
+        struct e4__task *task = e4t__transient_task();
+
+        /* XXX: This test expects a 64 bit system where all FFI
+           type words are available. */
+
+        #define _expect_type(s, t) \
+            do { \
+                e4t__ASSERT_OK(e4__evaluate(task, s, -1));  \
+                e4t__ASSERT_EQ(e4__stack_depth(task), 1);   \
+                e4t__ASSERT_EQ(e4__stack_pop(task), t); \
+            } while (0)
+
+        _expect_type("FFI-DOUBLE", &ffi_type_double);
+        _expect_type("FFI-FLOAT", &ffi_type_float);
+        _expect_type("FFI-POINTER", &ffi_type_pointer);
+        _expect_type("FFI-SCHAR", &ffi_type_schar);
+        _expect_type("FFI-SINT", &ffi_type_sint);
+        _expect_type("FFI-SINT8", &ffi_type_sint8);
+        _expect_type("FFI-SINT16", &ffi_type_sint16);
+        _expect_type("FFI-SINT32", &ffi_type_sint32);
+        _expect_type("FFI-SINT64", &ffi_type_sint64);
+        _expect_type("FFI-SLONG", &ffi_type_slong);
+        _expect_type("FFI-SSHORT", &ffi_type_sshort);
+        _expect_type("FFI-UCHAR", &ffi_type_uchar);
+        _expect_type("FFI-UINT", &ffi_type_uint);
+        _expect_type("FFI-UINT8", &ffi_type_uint8);
+        _expect_type("FFI-UINT16", &ffi_type_uint16);
+        _expect_type("FFI-UINT32", &ffi_type_uint32);
+        _expect_type("FFI-UINT64", &ffi_type_uint64);
+        _expect_type("FFI-ULONG", &ffi_type_ulong);
+        _expect_type("FFI-USHORT", &ffi_type_ushort);
+        _expect_type("FFI-VOID", &ffi_type_void);
+
+        #undef _expect_type
+    }
+
+    /* XXX: Tests making use of this macro expect a 64 bit system where
+       a char is 8 bits, a short is 16 bits, an int is 32 bits, and a
+       long is 64 bits. On systems where this is not the case, these
+       tests may not pass. Any such failure is likely a result of the
+       expected result values hardcoded here rather than an issue with
+       the code being tested itself. */
+    #define _test_ffi_def_add_helpers() \
+        _test_ffi_def_addfunc("ffi-sint8", e4__s8, s8, 127, 1, -128) \
+        _test_ffi_def_addfunc("ffi-sint16", e4__s16, s16, 32767, 1, -32768)   \
+        _test_ffi_def_addfunc("ffi-sint32", e4__s32, s32, 2147483647, 1,    \
+                -2147483648)    \
+        _test_ffi_def_addfunc("ffi-sint64", e4__s64, s64,   \
+                9223372036854775807l, 2, -9223372036854775807l) \
+        _test_ffi_def_addfunc("ffi-uint8", e4__u8, u8, 255, 2, 1)    \
+        _test_ffi_def_addfunc("ffi-uint16", e4__u16, u16, 65535, 3, 2)    \
+        _test_ffi_def_addfunc("ffi-uint32", e4__u32, u32, 4294967295u, 4, 3) \
+        _test_ffi_def_addfunc("ffi-uint64", e4__u64, u64,   \
+                18446744073709551615ul, 5, 4)   \
+        _test_ffi_def_addfunc("ffi-schar", signed char, schar, 127, 1, -128) \
+        _test_ffi_def_addfunc("ffi-sshort", signed short, sshort, 32767, 1, \
+                -32768) \
+        _test_ffi_def_addfunc("ffi-sint", signed int, sint, 2147483647, 1, \
+                -2147483648)    \
+        _test_ffi_def_addfunc("ffi-slong", signed long, slong,  \
+                9223372036854775807l, 2, -9223372036854775807l) \
+        _test_ffi_def_addfunc("ffi-uchar", unsigned char, uchar, 255, 2, 1)  \
+        _test_ffi_def_addfunc("ffi-ushort", unsigned short, ushort, 65535, 3, \
+                2)  \
+        _test_ffi_def_addfunc("ffi-uint", unsigned int, uint, 4294967295u, 4, \
+                3) \
+        _test_ffi_def_addfunc("ffi-ulong", unsigned long, ulong,    \
+                18446744073709551615ul, 5, 4)   \
+        _test_ffi_def_addfunc("ffi-float", float, float, 500, -30, 470) \
+        _test_ffi_def_addfunc("ffi-double", double, double, -70, 1000, 930)
+
+    #define _test_ffi_def_addfunc(ft, ct, name, arg_a, arg_b, exp_res)  \
+        static ct e4t__test_builtin_ffi_def__##name(ct a, ct b, ct *c);
+
+    _test_ffi_def_add_helpers()
+    static void e4t__test_builtin_ffi_def__voidreturn(e4__s8 a, e4__s8 b,
+            e4__s8 *c);
+
+    #undef _test_ffi_def_addfunc
+
+    /* Covers FFI-DEF FFI_CALL */
+    static void e4t__test_builtin_ffi_def(void)
+    {
+        struct e4__task *task = e4t__transient_task();
+
+        /* XXX: This test expects a 64 bit system where all FFI
+           type words are available. */
+
+        /* Test that a definition with bad FFI types does not work. */
+        e4t__ASSERT_EQ(e4__evaluate(task, "ffi-void 1 ffi-void 0 ffi-def foo",
+                -1), e4__E_BADFFITYPE);
+        e4t__ASSERT_EQ(e4__evaluate(task, "0 1 ffi-void 0 ffi-def foo", -1),
+                e4__E_BADFFITYPE);
+        e4t__ASSERT_EQ(e4__evaluate(task, "ffi-sint 1 0 0 ffi-def foo", -1),
+                e4__E_BADFFITYPE);
+
+        /* Test that a definition with good FFI types works even with
+           a bad pointer. */
+        e4t__ASSERT_OK(e4__evaluate(task, "0 ffi-void 0 ffi-def foo", -1));
+        e4t__ASSERT_OK(e4__evaluate(task, "forget foo", -1));
+
+        #define _test_ffi_def_addfunc(ft, ct, name, arg_a, arg_b, exp_res)  \
+            do {    \
+                ct arg_c; \
+                e4t__ASSERT_OK(e4__evaluate(task, ft " " ft " ffi-pointer 3 " \
+                        ft, -1)); \
+                e4__stack_push(task, (e4__cell)(e4__usize)  \
+                        e4t__test_builtin_ffi_def__##name); \
+                e4t__ASSERT_OK(e4__evaluate(task, "ffi-def test-fcall", -1)); \
+                e4__stack_push(task, (e4__cell)arg_a);  \
+                e4__stack_push(task, (e4__cell)arg_b);  \
+                e4__stack_push(task, (e4__cell)&arg_c); \
+                e4t__ASSERT_OK(e4__evaluate(task, "test-fcall", -1));    \
+                e4t__ASSERT_EQ(e4__stack_depth(task), 1);    \
+                e4t__ASSERT_EQ(e4__stack_pop(task), exp_res);    \
+                e4t__ASSERT_EQ(arg_c, exp_res);    \
+                e4t__ASSERT_OK(e4__evaluate(task, "forget test-fcall", -1)); \
+            } while (0);
+
+        _test_ffi_def_add_helpers()
+
+        do {
+            e4__s8 arg_c;
+
+            e4t__ASSERT_OK(e4__evaluate(task,
+                    "ffi-sint8 ffi-sint8 ffi-pointer 3 ffi-void", -1));
+            e4__stack_push(task, (e4__cell)(e4__usize)
+                    e4t__test_builtin_ffi_def__voidreturn);
+            e4t__ASSERT_OK(e4__evaluate(task, "ffi-def test-fcall", -1));
+            e4__stack_push(task, (e4__cell)-5);
+            e4__stack_push(task, (e4__cell)-10);
+            e4__stack_push(task, (e4__cell)&arg_c);
+            e4t__ASSERT_OK(e4__evaluate(task, "test-fcall", -1));
+            e4t__ASSERT_EQ(e4__stack_depth(task), 0);
+            e4t__ASSERT_EQ(arg_c, -15);
+            e4t__ASSERT_OK(e4__evaluate(task, "forget test-fcall", -1));
+        } while (0);
+
+        #undef _test_ffi_def_addfunc
+    }
+
+    #define _test_ffi_def_addfunc(ft, ct, name, arg_a, arg_b, exp_res)  \
+        static ct e4t__test_builtin_ffi_def__##name(ct a, ct b, ct *c)  \
+        {   \
+            return (*c = a + b);    \
+        }
+
+    _test_ffi_def_add_helpers()
+    static void e4t__test_builtin_ffi_def__voidreturn(e4__s8 a, e4__s8 b,
+            e4__s8 *c)
+    {
+        *c = a + b;
+    }
+
+    #undef _test_ffi_def_addfunc
+    #undef _test_ffi_def_add_helpers
+
+    /* Covers FFI-ALIGN FFI-ALIGNED FFI, FFI@ FFI! FFI-UNITS */
+    static void e4t__test_builtin_ffi_utils()
+    {
+        struct e4__task *task = e4t__transient_task();
+
+        /* XXX: This test expects a 64 bit system where all FFI
+           type words are available. */
+
+        #define _expect_cases_nonvoid() \
+            do {    \
+                _expect_case("FFI-DOUBLE", double); \
+                _expect_case("FFI-FLOAT", float);   \
+                _expect_case("FFI-POINTER", void *);    \
+                _expect_case("FFI-SCHAR", signed char); \
+                _expect_case("FFI-SINT", signed int);   \
+                _expect_case("FFI-SINT8", e4__s8);  \
+                _expect_case("FFI-SINT16", e4__s16);    \
+                _expect_case("FFI-SINT32", e4__s32);    \
+                _expect_case("FFI-SINT64", e4__s64);    \
+                _expect_case("FFI-SLONG", signed long); \
+                _expect_case("FFI-SSHORT", signed short);   \
+                _expect_case("FFI-UCHAR", unsigned char);   \
+                _expect_case("FFI-UINT", unsigned int); \
+                _expect_case("FFI-UINT8", e4__u8);  \
+                _expect_case("FFI-UINT16", e4__u16);    \
+                _expect_case("FFI-UINT32", e4__u32);    \
+                _expect_case("FFI-UINT64", e4__u64);    \
+                _expect_case("FFI-ULONG", unsigned long);   \
+                _expect_case("FFI-USHORT", unsigned short); \
+            } while (0)
+
+        /* Test that FFI-ALIGN works as expected. */
+        e4t__ASSERT_EQ(e4__evaluate(task, "ffi-void ffi-align", -1),
+                e4__E_BADFFITYPE);
+        e4t__ASSERT_EQ(e4__evaluate(task, "0 ffi-align", -1),
+                e4__E_BADFFITYPE);
+
+        #define _expect_case(s, t)  \
+            do {    \
+                e4t__ASSERT_OK(e4__evaluate(task, "here 1 allot " s \
+                        " ffi-align here swap - dup negate allot", -1));    \
+                e4t__ASSERT_EQ(e4__stack_depth(task), 1);   \
+                e4t__ASSERT_EQ(e4__stack_pop(task), sizeof(t)); \
+            } while (0)
+
+        _expect_cases_nonvoid();
+
+        #undef _expect_case
+
+        /* Test that FFI-ALIGNED works as expected. */
+        e4t__ASSERT_EQ(e4__evaluate(task, "1 ffi-void ffi-aligned", -1),
+                e4__E_BADFFITYPE);
+        e4t__ASSERT_EQ(e4__evaluate(task, "1 0 ffi-aligned", -1),
+                e4__E_BADFFITYPE);
+
+        #define _expect_case(s, t)  \
+            do {    \
+                e4t__ASSERT_OK(e4__evaluate(task, "1 " s " ffi-aligned", -1));\
+                e4t__ASSERT_EQ(e4__stack_depth(task), 1);   \
+                e4t__ASSERT_EQ(e4__stack_pop(task), sizeof(t)); \
+            } while (0)
+
+        _expect_cases_nonvoid();
+
+        #undef _expect_case
+
+        /* Test that FFI, works as expected. */
+        e4t__ASSERT_EQ(e4__evaluate(task, "-1 ffi-void ffi,", -1),
+                e4__E_BADFFITYPE);
+        e4t__ASSERT_EQ(e4__evaluate(task, "-1 0 ffi,", -1), e4__E_BADFFITYPE);
+
+        #define _expect_case(s, t)  \
+            do {    \
+                const e4__cell here = e4__task_uservar(task, e4__UV_HERE);  \
+                e4t__ASSERT_OK(e4__evaluate(task, "here 0xabcdef012345678 " s \
+                        " ffi, here swap -", -1));\
+                e4t__ASSERT_EQ(e4__stack_depth(task), 1);   \
+                e4t__ASSERT_EQ(e4__stack_peek(task), sizeof(t));    \
+                e4t__ASSERT_EQ(*(t *)here, (t)0xabcdef012345678);   \
+                e4t__ASSERT_OK(e4__evaluate(task, "negate allot", -1)); \
+            } while (0)
+
+        _expect_cases_nonvoid();
+
+        #undef _expect_case
+
+        /* Test that FFI@ works as expected. */
+        e4t__ASSERT_EQ(e4__evaluate(task, "here ffi-void ffi@", -1),
+                e4__E_BADFFITYPE);
+        e4t__ASSERT_EQ(e4__evaluate(task, "here 0 ffi@", -1),
+                e4__E_BADFFITYPE);
+
+        #define _expect_case(s, t)  \
+            do {    \
+                t scratch = (t)0xabcdef012345678ul; \
+                e4__stack_push(task, (e4__cell)&scratch);   \
+                e4t__ASSERT_OK(e4__evaluate(task, s " ffi@", -1));  \
+                e4t__ASSERT_EQ(e4__stack_depth(task), 1);   \
+                e4t__ASSERT_EQ((t)(e4__usize)e4__stack_pop(task), (t)scratch);\
+            } while (0)
+
+        _expect_cases_nonvoid();
+
+        #undef _expect_case
+
+        /* Test that FFI! works as expected. */
+        e4t__ASSERT_EQ(e4__evaluate(task, "0 pad ffi-void ffi!", -1),
+                e4__E_BADFFITYPE);
+        e4t__ASSERT_EQ(e4__evaluate(task, "0 pad 0 ffi!", -1),
+                e4__E_BADFFITYPE);
+
+        #define _expect_case(s, t)  \
+            do {    \
+                t scratch = 0;  \
+                e4__stack_push(task, (e4__cell)&scratch);   \
+                e4t__ASSERT_OK(e4__evaluate(task, " 0xabcdef012345678 swap " \
+                        s " ffi!", -1));   \
+                e4t__ASSERT_EQ(e4__stack_depth(task), 0);   \
+                e4t__ASSERT_EQ(scratch, (t)0xabcdef012345678ul);    \
+            } while (0)
+
+        _expect_cases_nonvoid();
+
+        #undef _expect_case
+
+        /* Test that FFI-UNITS works as expected. */
+        e4t__ASSERT_EQ(e4__evaluate(task, "10 ffi-void ffi-units", -1),
+                e4__E_BADFFITYPE);
+        e4t__ASSERT_EQ(e4__evaluate(task, "10 0 ffi-units", -1),
+                e4__E_BADFFITYPE);
+
+        #define _expect_case(s, t)  \
+            do {    \
+                e4t__ASSERT_OK(e4__evaluate(task, "10 " s " FFI-UNITS", -1)); \
+                e4t__ASSERT_EQ(e4__stack_depth(task), 1);   \
+                e4t__ASSERT_EQ(e4__stack_pop(task), 10 * sizeof(t));    \
+            } while (0)
+
+        _expect_cases_nonvoid();
+
+        #undef _expect_case
+
+        #undef _expect_cases_nonvoid
+    }
+
+#endif /* defined(e4__INCLUDE_FFI) */
+
 void e4t__test_builtin(void)
 {
     e4t__test_builtin_doublemath();
@@ -2678,4 +2995,13 @@ void e4t__test_builtin(void)
     e4t__test_builtin_timedate();
     e4t__test_builtin_transientstr();
     e4t__test_builtin_uservars();
+
+    #if defined(e4__INCLUDE_FFI)
+        e4t__test_builtin_ffi_constants();
+        e4t__test_builtin_ffi_def();
+        e4t__test_builtin_ffi_utils();
+    #else
+        fprintf(stderr, e4t__COLOR_YELLOW "WARNING: Compiled without FFI "
+                "support. Excluding FFI tests.\n" e4t__COLOR_RESET);
+    #endif /* defined(e4__INCLUDE_FFI) */
 }

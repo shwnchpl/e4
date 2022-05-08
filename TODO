@@ -26,6 +26,11 @@ Build
 -----
 - [DONE] Split the e4__num namespace into e4__double and e4__usize.
 - [DONE] Set up example REPL build for the Arduino MKR Zero.
+- [DONE] Make it possible to build REPL, tests, and build tests without
+  libffi. This can be done with some kind of Makefile flags and by
+  splitting the libffi ldflags into a separate variable that depends on
+  libffi. It may be acceptable to require libffi for the build tests,
+  but the unit tests and repl absolutely should not require it.
 
 Compilation
 -----------
@@ -136,6 +141,10 @@ General Builtins
 - [DONE] Implement FIND.
 - [DONE] Verify that all CORE builtins have been implemented.
 - [DONE] Add DLSYM builtins and associated kernel/IO APIs.
+- [DONE] Add libffi FFI builtins and associated kernel APIs.
+- Consider making it possible to pass callbacks to C libraries using the
+  libffi closure API. This would definitely lead to threading concerns,
+  however, if e4 code were going to execute on multiple threads.
 
 General IO
 ----------

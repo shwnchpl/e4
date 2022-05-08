@@ -29,7 +29,15 @@ Build Dependencies
 
 Generating the amalgamated source file, and by extension building the
 REPL, requires `amal.rb`_ (which itself requires Ruby). Additionally,
-the REPL requires `libedit`_.
+the REPL requires `libedit`_ and the REPL and unit tests both require
+`libffi`_ for FFI support. If FFI support is not desired/needed for the
+REPL, the unit tests, or both, then these applications may be built
+without libffi by invoking make with the environment variable(s)
+E4__REPL_OMIT_FFI, E4__TESTS_OMIT_FFI, and/or E4__OMIT_FFI set to any
+non-empty value as appropriate. The build tests unconditionally require
+the presence of libffi in order to pass for build configurations that
+require libffi, however they should pass for all other configurations
+whether libffi is present or not.
 
 To generate the amalgamated source file or to build the REPL and/or
 tests using the provided Makefile, a C compiler that recognizes flags
@@ -62,6 +70,7 @@ in the ``doc`` directory with any text editor or RST viewer.
 
 .. _amal.rb: https://github.com/shwnchpl/amal.rb
 .. _libedit: https://thrysoee.dk/editline/
+.. _libffi: https://sourceware.org/libffi/
 .. _Sphinx: https://www.sphinx-doc.org/
 .. _pdfTeX: https://www.tug.org/applications/pdftex/
 

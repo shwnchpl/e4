@@ -3,6 +3,10 @@
 
 #include <string.h>
 
+#if defined(e4__INCLUDE_FFI)
+    #include <ffi.h>
+#endif
+
 /* utility macros */
 
 #define _e4__BUILTIN_EXPECT_AVAIL(t, c) \
@@ -90,6 +94,9 @@ static const void *_e4__BUILTIN_RETURN_THUNK[] =
 #if defined(e4__INCLUDE_FACILITY_EXT)
     #include "FACILITY-EXT.def.inc"
 #endif
+#if defined(e4__INCLUDE_FFI)
+    #include "FFI.def.inc"
+#endif
 #if defined(e4__INCLUDE_FILE)
     #include "FILE.def.inc"
 #endif
@@ -119,6 +126,9 @@ static const void *_e4__BUILTIN_RETURN_THUNK[] =
 #endif
 #if defined(e4__INCLUDE_FACILITY_EXT)
     #include "FACILITY-EXT.decl.inc"
+#endif
+#if defined(e4__INCLUDE_FFI)
+    #include "FFI.decl.inc"
 #endif
 #if defined(e4__INCLUDE_FILE)
     #include "FILE.decl.inc"
@@ -172,6 +182,12 @@ static const void *_e4__BUILTIN_RETURN_THUNK[] =
 #define _e4__BUILTIN_CONSTANT(w, c) \
     _e4__BUILTIN_CONSTANT_N(w, #w, c)
 
+#if defined(e4__INCLUDE_FFI)
+    #define _e4__BUILTIN_FFICONST(w, n, ft, ct) \
+        _e4__BUILTIN_CONSTANT_N(w, n, \
+                (sizeof(e4__cell) >= sizeof(ct) ? ft : NULL))
+#endif
+
 /* Define builtin header table. */
 #define _e4__BUILTIN_PROC_HEADER(w, link, n, f) \
     {   \
@@ -217,6 +233,9 @@ const struct e4__dict_header e4__BUILTIN_HEADER[e4__BUILTIN_COUNT] =
     #endif
     #if defined(e4__INCLUDE_FACILITY_EXT)
         _e4__BUILTIN_FACILITY_EXT_DECL()
+    #endif
+    #if defined(e4__INCLUDE_FFI)
+        _e4__BUILTIN_FFI_DECL()
     #endif
     #if defined(e4__INCLUDE_FILE)
         _e4__BUILTIN_FILE_DECL()
@@ -273,6 +292,9 @@ const struct e4__execute_tuple e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
     #if defined(e4__INCLUDE_FACILITY_EXT)
         _e4__BUILTIN_FACILITY_EXT_DECL()
     #endif
+    #if defined(e4__INCLUDE_FFI)
+        _e4__BUILTIN_FFI_DECL()
+    #endif
     #if defined(e4__INCLUDE_FILE)
         _e4__BUILTIN_FILE_DECL()
     #endif
@@ -291,6 +313,9 @@ const struct e4__execute_tuple e4__BUILTIN_XT[e4__BUILTIN_COUNT] =
 #undef _e4__BUILTIN_THUNK_NF
 #undef _e4__BUILTIN_PROC_NF
 #undef _e4__BUILTIN_PROC_FIRST
+#if defined(e4__INCLUDE_FFI)
+    #undef _e4__BUILTIN_FFICONST
+#endif
 #undef _e4__BUILTIN_CONSTANT
 #undef _e4__BUILTIN_USERVAR
 #undef _e4__BUILTIN_ALIAS_F

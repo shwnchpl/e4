@@ -296,6 +296,7 @@ static void e4__builtin_CREATE(struct e4__task *task, e4__cell user)
 
     _e4__BUILTIN_LOOKAHEAD(task, word, len);
 
+    /* FIXME: Should this be checking compilation status? */
     e4__dict_entry(task, word, len, 0, e4__execute_variable, NULL);
     e4__execute_ret(task);
 }

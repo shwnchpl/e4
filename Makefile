@@ -27,8 +27,23 @@ TESTS_DEPS := $(TESTS_OBJS:.o=.d)
 
 CFLAGS := -Wall -Wpedantic -Werror -std=c89 -Os -MMD -MP
 POSIX_FLAGS := $(CFLAGS) -De4__BUILD_EVERYTHING
+
+REPL_FLAGS := $(POSIX_FLAGS)
+TESTS_FLAGS := $(POSIX_FLAGS)
 REPL_LDFLAGS := -ledit
 TESTS_LDFLAGS := -L$(BUILD_DIR) -le4
+
+ifneq ($(E4__OMIT_FFI)$(E4__REPL_OMIT_FFI),)
+	REPL_FLAGS += -De4__EXCLUDE_FFI
+else
+	REPL_LDFLAGS += -lffi
+endif
+
+ifneq ($(E4__OMIT_FFI)$(E4__TESTS_OMIT_FFI),)
+	TESTS_FLAGS += -De4__EXCLUDE_FFI
+else
+	TESTS_LDFLAGS += -lffi
+endif
 
 # If a target fails, delete it.
 .DELETE_ON_ERROR:
@@ -87,7 +102,7 @@ $(TARGET_LIB): $(CORE_OBJS)
 	$(AR) rcs $@ $(CORE_OBJS)
 
 $(TARGET_REPL): $(REPL_OBJS) $(TARGET_AMALGAM)
-	$(CC) $(POSIX_FLAGS) $(TARGET_AMALGAM) $(REPL_OBJS) $(REPL_LDFLAGS) \
+	$(CC) $(REPL_FLAGS) $(TARGET_AMALGAM) $(REPL_OBJS) $(REPL_LDFLAGS) \
 		-o $@
 
 $(TARGET_TESTS): $(TESTS_OBJS) $(TARGET_LIB)
@@ -96,7 +111,7 @@ $(TARGET_TESTS): $(TESTS_OBJS) $(TARGET_LIB)
 # Build step for C source
 $(BUILD_DIR)/%.c.o: %.c
 	mkdir -p $(dir $@)
-	$(CC) $(POSIX_FLAGS) -I$(INC_DIRS) -c $< -o $@
+	$(CC) $(TESTS_FLAGS) -I$(INC_DIRS) -c $< -o $@
 
 -include $(CORE_DEPS)
 -include $(REPL_DEPS)

@@ -31,6 +31,7 @@
     #define e4__INCLUDE_EXCEPTION
     #define e4__INCLUDE_FACILITY
     #define e4__INCLUDE_FACILITY_EXT
+    #define e4__INCLUDE_FFI
     #define e4__INCLUDE_FILE
     #define e4__INCLUDE_FILE_EXT
     #define e4__INCLUDE_POSIX_HOOKS
@@ -65,6 +66,10 @@
 
 #if defined(e4__EXCLUDE_FACILITY_EXT) && defined(e4__INCLUDE_FACILITY_EXT)
     #undef e4__INCLUDE_FACILITY_EXT
+#endif
+
+#if defined(e4__EXCLUDE_FFI) && defined(e4__INCLUDE_FFI)
+    #undef e4__INCLUDE_FFI
 #endif
 
 #if defined(e4__EXCLUDE_FILE) && defined(e4__INCLUDE_FILE)
@@ -154,6 +159,65 @@ typedef void** e4__cell;
     #endif
 #endif
 
+#if defined(e4__INCLUDE_FFI) && !defined(e4__SIZED_TYPES_DEFINED)
+    /* XXX: If using FFI extensions with a compiler where _MSC_VER is
+       not set (ie, something other than MSVC) and GCC/Clang style
+       size mode attributes are not available, it is necessary to
+       define e4__s16, e4__s32, e4__s64, e4__u16, e4__u32, and e4__u64
+       manually in e4-config.h. In many cases, this can be done using
+       stdint.h if C99 features are available. In some rare cases, it
+       may be necessary to define the types manually based upon known
+       constraints of the target system. In any case where these sized
+       types are defined in e4-config.h, e4__SIZED_TYPES_DEFINED should
+       also be defined to prevent attempts to redefined them here.
+
+       It is also critical to note that while these values must be
+       defined, FFI as it is currently implemented cannot be used to
+       call functions that require input or output parameters larger
+       than the size of an e4__cell. On such platforms, the associated
+       FFI words for parameter types (for instance, FFI-UINT64, etc.)
+       will still be defined, however rather than pointing to actual
+       libffi types, they will point to NULL and will thereby almost
+       certainly lead to exceptions at runtime (e4__E_BADFFITYPE) in the
+       event that they are used. This is the case for *ALL* FFI types,
+       not just those that are explicitly sized!
+
+       The most prudent thing for a system requiring FFI to do if there
+       is any doubt about whether or not the size of some type is
+       greater than the size of a cell is to check whether the
+       associated FFI word returns something other than NULL and handle
+       such cases accordingly. */
+
+    #if defined(_MSC_VER)
+        /* MSVC. Simply use Windows style type definitions. */
+        typedef signed char e4__s8;
+        typedef signed short e4__s16;
+        typedef signed int e4__s32;
+        typedef signed __int64 e4__s64;
+
+        typedef unsigned char e4__u8;
+        typedef unsigned short e4__u16;
+        typedef unsigned int e4__u32;
+        typedef unsigned __int64 e4__u64;
+    #else
+        /* Hope that we're on a compiler that supports GCC/Clang style
+           mode attributes. If we are not, this will not compile and it
+           will be necessary to provide definitions manually in
+           e4-config.h (see above comment for more details). */
+        typedef signed int e4__s8 __attribute__((__mode__(__QI__)));
+        typedef signed int e4__s16 __attribute__((__mode__(__HI__)));
+        typedef signed int e4__s32 __attribute__((__mode__(__SI__)));
+        typedef signed int e4__s64 __attribute__((__mode__(__DI__)));
+
+        typedef unsigned int e4__u8 __attribute__((__mode__(__QI__)));
+        typedef unsigned int e4__u16 __attribute__((__mode__(__HI__)));
+        typedef unsigned int e4__u32 __attribute__((__mode__(__SI__)));
+        typedef unsigned int e4__u64 __attribute__((__mode__(__DI__)));
+    #endif
+
+    #define e4__SIZED_TYPES_DEFINED
+#endif
+
 #define e4__USIZE_BIT   (sizeof(e4__usize) * CHAR_BIT)
 
 #if defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT)
@@ -176,7 +240,11 @@ typedef void** e4__cell;
 #endif /* defined(e4__INCLUDE_FILE) || defined(e4__INCLUDE_FILE_EXT) */
 
 typedef unsigned char e4__bool;
-typedef unsigned char e4__u8;
+
+#if !defined(e4__SIZED_TYPES_DEFINED)
+    typedef unsigned char e4__u8;
+    typedef signed char e4__s8;
+#endif
 
 struct e4__task;
 
@@ -355,6 +423,9 @@ struct e4__gmt {
 #define e4__E_LONGFILEPATH  (-262)
 #define e4__E_SEEOVERFLOW   (-263)
 #define e4__E_DLFAILURE     (-264)
+#define e4__E_BADFFITYPE    (-265)
+#define e4__E_BADFFIABI     (-266)
+#define e4__E_UNKNOWNFFIERR (-267)
 
 /* flag constants - dictionary entry */
 #define e4__F_IMMEDIATE     (0x01)
@@ -622,6 +693,40 @@ enum e4__builtin_id {
         e4__B_TIME_AND_DATE,
 
     #endif /* defined(e4__INCLUDE_FACILITY_EXT) */
+
+    #if defined(e4__INCLUDE_FFI)
+
+        /* FFI words */
+        e4__B_FFI_ALIGN,
+        e4__B_FFI_ALIGNED,
+        e4__B_FFI_CALL,
+        e4__B_FFI_COMMA,
+        e4__B_FFI_DEF,
+        e4__B_FFI_DOUBLE,
+        e4__B_FFI_FETCH,
+        e4__B_FFI_FLOAT,
+        e4__B_FFI_POINTER,
+        e4__B_FFI_SCHAR,
+        e4__B_FFI_SINT,
+        e4__B_FFI_SINT8,
+        e4__B_FFI_SINT16,
+        e4__B_FFI_SINT32,
+        e4__B_FFI_SINT64,
+        e4__B_FFI_SLONG,
+        e4__B_FFI_SSHORT,
+        e4__B_FFI_STORE,
+        e4__B_FFI_UCHAR,
+        e4__B_FFI_UINT,
+        e4__B_FFI_UINT8,
+        e4__B_FFI_UINT16,
+        e4__B_FFI_UINT32,
+        e4__B_FFI_UINT64,
+        e4__B_FFI_ULONG,
+        e4__B_FFI_UNITS,
+        e4__B_FFI_USHORT,
+        e4__B_FFI_VOID,
+
+    #endif /* defined(e4__INCLUDE_FFI) */
 
     #if defined(e4__INCLUDE_FILE)
 
