@@ -67,6 +67,7 @@ include doc/sphinx.mk
 # Examples targets.
 EXAMPLES_TARGETS :=
 include examples/arduino/arduino.mk
+include examples/chip8/chip8.mk
 examples: $(EXAMPLES_TARGETS)
 
 # Utility targets to run the repl and tests.
@@ -79,7 +80,7 @@ run-tests: tests
 # file.
 longest-lines:
 	find . -name '*.[ch]' -o -name '*.in[co]' -o -name '*.mk' \
-		-o -name 'Makefile' | xargs wc -L
+		-o -name 'Makefile' -o -name '*.fth' | xargs wc -L
 
 # Utility target to generate tags. Requires the clean target, to ensure
 # that tags do not erroneously point into the amalgamation.

@@ -13,7 +13,12 @@ Repo Maintenance
 - Add license text to all source files.
 - Consider updating project to use GPL or Apache license.
 - Ensure that license is copied into all deliverables (for instance,
-  the amalgam and Arduino sketch build directories/archives).
+  the amalgam and Arduino sketch build directories/archives as well
+  as chip8.fth emulator example, if it is copied).
+- Consider whether the Arduino and chip8.fth examples should have the
+  same license as other code. It may make sense for these examples to
+  be permissively licensed (ie. under the MIT license) even if the
+  rest of the repo is not.
 - Add C++ include guards to all headers?
 - Add logo (possibly color and monochrome) where appropriate.
 - Consider adding a HACKING.rst document and/or a style guide?
