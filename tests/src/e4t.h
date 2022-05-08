@@ -70,6 +70,12 @@
         }   \
     } while (0)
 
+/* ASCII escape sequences for simple colored output. */
+#define e4t__COLOR_RESET         "\033[0m"
+#define e4t__COLOR_RED           "\033[0;31m"
+#define e4t__COLOR_GREEN         "\033[0;32m"
+#define e4t__COLOR_YELLOW        "\033[0;33m"
+
 /* main.c declarations */
 extern unsigned long e4t__assert_attemptcount;
 extern unsigned long e4t__assert_failcount;

@@ -4,11 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/* ASCII escape sequences for simple colored output. */
-#define COLOR_RESET         "\033[0m"
-#define COLOR_RED           "\033[0;31m"
-#define COLOR_GREEN         "\033[0;32m"
-
 unsigned long e4t__assert_attemptcount = 0;
 unsigned long e4t__assert_failcount = 0;
 
@@ -45,7 +40,8 @@ int main(void)
     e4t__test_util();
 
     fprintf(stderr, "%sTests complete! (%lu of %lu passed; %lu failed)"
-            COLOR_RESET "\n", e4t__assert_failcount ? COLOR_RED : COLOR_GREEN,
+            e4t__COLOR_RESET "\n",
+            e4t__assert_failcount ? e4t__COLOR_RED : e4t__COLOR_GREEN,
             e4t__assert_attemptcount - e4t__assert_failcount,
             e4t__assert_attemptcount, e4t__assert_failcount);
 
