@@ -32,27 +32,27 @@
 #define e4t__ASSERT_OK(e)  \
     e4t__ASSERT_EQ((e), 0)
 
-#define e4t__ASSERT_EQ(e, v)    \
+#define e4t__ASSERT_EQ(v, e)    \
     do {    \
-        e4__usize e_ = ((e4__usize)(e));    \
         e4__usize v_ = ((e4__usize)(v));    \
+        e4__usize e_ = ((e4__usize)(e));    \
         ++e4t__assert_attemptcount; \
         if (e_ != v_) {   \
             fprintf(stderr, "Assert failed! (" __FILE__ ":%u) - " \
-                    "EXCEPTED: %ld; ACTUAL: %ld\n", __LINE__, v_, e_);  \
+                    "EXCEPTED: %ld; ACTUAL: %ld\n", __LINE__, e_, v_);  \
             ++e4t__assert_failcount;    \
         }   \
     } while (0)
 
 /* XXX: This expects null terminated strings. */
-#define e4t__ASSERT_MATCH(e, v) \
+#define e4t__ASSERT_MATCH(v, e) \
     do {    \
-        const char *e_ = (e); \
         const char *v_ = (v); \
+        const char *e_ = (e); \
         ++e4t__assert_attemptcount; \
         if (e4__mem_strncasecmp(e_, v_, -1)) {   \
             fprintf(stderr, "Assert failed! (" __FILE__ ":%u) - " \
-                    "EXCEPTED: \"%s\"; ACTUAL: \"%s\"\n", __LINE__, v_, e_);\
+                    "EXCEPTED: \"%s\"; ACTUAL: \"%s\"\n", __LINE__, e_, v_);\
             ++e4t__assert_failcount;    \
         }   \
     } while (0)
